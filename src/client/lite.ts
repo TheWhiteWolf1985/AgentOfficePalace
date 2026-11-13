@@ -1,4 +1,5 @@
 import './i18n';
+import { openLanguageSettings } from './ui/language';
 import { t as uiText } from '../shared/i18n';
 // The 2D view (/lite): the office without the 3D, for a phone or a computer the 3D office is too
 // much for. Every worker on the floor and how it's doing, the ones waiting on someone first; its
@@ -323,6 +324,7 @@ $('btn-issues').addEventListener('click', () => openBoard('issues', net, boardAc
 $('btn-pulls').addEventListener('click', () => openBoard('pulls', net, boardActions()));
 $('btn-queue').addEventListener('click', () => openQueue(net, { openTerminal: openWorker }));
 $('btn-new').addEventListener('click', () => sendToWorker(uiText('✨ New task')));
+$('btn-settings').addEventListener('click', openLanguageSettings);
 
 function renderNav() {
   const count = (id: string, n: number) => ($(id).querySelector('.n')!.textContent = n ? String(n) : '');

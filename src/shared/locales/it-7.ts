@@ -198,5 +198,21 @@ export default {
   "Every reviewer's notes": "Note di tutti i revisori",
   "A reviewer's lens, for the example tag": "Prospettiva di un revisore, per l'etichetta di esempio",
   "Sign writer": "Autore delle insegne",
-  "The instructions for the small model (Claude Haiku) that writes the name and one-line summary on the card above each worker's head. It always answers with a name and a summary.": "Istruzioni per il modello piccolo (Claude Haiku) che scrive nome e sintesi sulla scheda sopra ciascun agente. Risponde sempre con un nome e una sintesi."
+  "The instructions for the small model (Claude Haiku) that writes the name and one-line summary on the card above each worker's head. It always answers with a name and a summary.": "Istruzioni per il modello piccolo (Claude Haiku) che scrive nome e sintesi sulla scheda sopra ciascun agente. Risponde sempre con un nome e una sintesi.",
+  "Check and merge": "Verifica e unisci",
+  "Forgejo merge": "Merge Forgejo",
+  "Controlled merge": "Merge controllato",
+  "Check unavailable": "Controllo non disponibile",
+  "The service rechecks the revision and deletes the branch after the merge.": "Il servizio ricontrolla la revisione e cancella il branch dopo il merge.",
+  "Read-only comments; merging uses the controlled service.": "Commenti in sola lettura; il merge usa il servizio controllato.",
+  "Open on Forgejo ↗": "Apri su Forgejo ↗",
+  "🔀 Controlled merge": "🔀 Merge controllato",
+  "Review gates: ": "Controllo revisioni: ",
+  "GREEN — ": "VERDE — ",
+  "RED — ": "ROSSO — ",
+  "Review gate check unavailable": "Controllo revisioni non disponibile",
+  "The service rechecks reviews and document checks before merging and verifies vault synchronization.": "Il servizio ricontrolla revisioni e checker prima del merge e verifica la sincronizzazione del vault.",
+  "🙋 Workers needing you: {0}": "🙋 Agenti che richiedono il tuo intervento: {0}",
+  "🏎️ Driving {0}": "🏎️ Alla guida di {0}",
+  "🏎️ Riding in {0}": "🏎️ Passeggero di {0}"
 };

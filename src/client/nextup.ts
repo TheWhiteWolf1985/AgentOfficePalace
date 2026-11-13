@@ -51,7 +51,7 @@ export function byUrgency(workers: Iterable<WorkerInfo>): WorkerInfo[] {
 export function waitingLabel(waiting: readonly WorkerInfo[]): string {
   const needs = waiting.filter((w) => w.status === 'needs_input').length;
   const done = waiting.length - needs;
-  return [needs && uiText`🙋 ${needs} ${needs === 1 ? 'needs' : 'need'} you`, done && uiText`✅ ${done} done`].filter(Boolean).join(' · ');
+  return [needs && uiText`🙋 Workers needing you: ${needs}`, done && uiText`✅ ${done} done`].filter(Boolean).join(' · ');
 }
 
 /**

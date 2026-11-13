@@ -1,4 +1,5 @@
 import { getLanguage, isLanguage, setLanguage, t, type Language } from '../shared/i18n';
+import './ui/language.css';
 export { t, getLanguage, languageTag } from '../shared/i18n';
 
 export const LANGUAGE_KEY = 'agent-office.language';
@@ -51,6 +52,7 @@ if (typeof document !== 'undefined' && typeof location !== 'undefined') {
     label.className = 'language-choice';
     label.append(t('Language'), ' ');
     const select = document.createElement('select');
+    select.className = 'language-select';
     select.setAttribute('aria-label', t('Language'));
     for (const [value, name] of [['it', 'Italiano'], ['en', 'English']]) {
       const option = document.createElement('option');

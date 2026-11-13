@@ -13,7 +13,7 @@ import { agentFields, choiceLabel, officeChoice } from './provider';
 import { openPromptEditor, rewrittenPrompts } from './prompts';
 import { outsideSetting } from './settings-sky';
 import { choiceRow } from './settings-rows';
-import { chooseLanguage, getLanguage } from '../i18n';
+import { languageSelect } from './language';
 
 const VIEWS: [ViewMode, string, string][] = [
   ['first', uiText('👀 First person'), uiText('See through your own eyes. Click the office to look around with the mouse and click things to use them. Esc frees the mouse.')],
@@ -447,9 +447,7 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
   const character = h('button.btn', { type: 'button' }, account ? uiText('🧍 Change your look') : uiText('🧍 Change your look & name'));
   const panes: Record<SettingsPane, Node[]> = {
     language: [setting(uiText('Language'), 'you',
-      h('select', { 'aria-label': uiText('Language'), onchange: (event: Event) => chooseLanguage((event.target as HTMLSelectElement).value) },
-        h('option', { value: 'it', selected: getLanguage() === 'it' }, 'Italiano'),
-        h('option', { value: 'en', selected: getLanguage() === 'en' }, 'English')),
+      languageSelect(),
       h('p.setting-note', {}, uiText('Changing language reloads this page. Your agents keep working.')))],
     you: [
       setting(uiText('Your character'), null, character),

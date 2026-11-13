@@ -54,7 +54,7 @@ export function openPull(first: GhPull, net: Net, actions: BoardActions) {
     renderConv();
     renderFrame();
   });
-  conv.append(h('div.gh-col', {}, thread, it.readOnly ? h('p.gh-quiet', {}, 'Commenti in sola lettura; il merge usa il servizio controllato.') : comment.el));
+  conv.append(h('div.gh-col', {}, thread, it.readOnly ? h('p.gh-quiet', {}, uiText("Read-only comments; merging uses the controlled service.")) : comment.el));
   const filesPane = h('div.pd');
   const footBtns = h('span.gh-foot');
   const el = h(
@@ -64,7 +64,7 @@ export function openPull(first: GhPull, net: Net, actions: BoardActions) {
     meta,
     h('nav.gh-tabs', { role: 'tablist' }, tabConv, tabFiles),
     h('div.gh-body', {}, conv, filesPane),
-    h('footer', {}, h('a.grow', { href: it.url, target: '_blank', rel: 'noopener noreferrer' }, it.readOnly ? 'Apri su Forgejo ↗' : uiText('Open on GitHub ↗')), footBtns),
+    h('footer', {}, h('a.grow', { href: it.url, target: '_blank', rel: 'noopener noreferrer' }, it.readOnly ? uiText("Open on Forgejo ↗") : uiText('Open on GitHub ↗')), footBtns),
   );
 
   const handToWorker = () => {
@@ -106,7 +106,7 @@ export function openPull(first: GhPull, net: Net, actions: BoardActions) {
 
     if (it.readOnly) {
       const merge = h('button.btn.primary', {type: 'button', disabled: !detail || !detail.gateRevisioni?.verde || it.state !== 'OPEN'},
-        '🔀 Merge controllato');
+        uiText("🔀 Controlled merge"));
       merge.addEventListener('click', () => detail && openForgejoMerge(it, detail, net, loadAll));
       footBtns.replaceChildren(merge);
       return;
@@ -175,8 +175,8 @@ export function openPull(first: GhPull, net: Net, actions: BoardActions) {
 
     if (it.readOnly) {
       const gate = d.gateRevisioni;
-      thread.append(h('p.gh-quiet', {}, gate ? ('Controllo revisioni: ' + (gate.verde ? 'VERDE — ' : 'ROSSO — ') + gate.motivo) : 'Controllo revisioni non disponibile'));
-      thread.append(h('p.gh-quiet', {}, 'Il servizio ricontrolla revisioni e checker prima del merge e verifica la sincronizzazione del vault.'));
+      thread.append(h('p.gh-quiet', {}, gate ? (uiText("Review gates: ") + (gate.verde ? uiText("GREEN — ") : uiText("RED — ")) + gate.motivo) : uiText("Review gate check unavailable")));
+      thread.append(h('p.gh-quiet', {}, uiText("The service rechecks reviews and document checks before merging and verifies vault synchronization.")));
       return;
     }
     const st = mergeStatus(d);

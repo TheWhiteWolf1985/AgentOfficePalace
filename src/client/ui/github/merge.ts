@@ -142,19 +142,19 @@ export function openMerge(it: GhPull, d: GhPullDetail, net: Net, handToWorker: (
 /** Human-requested Forgejo merge; the separate service independently rechecks the displayed commit. */
 export function openForgejoMerge(it: GhPull, d: GhPullDetail, net: Net, onMerged: () => void) {
   const result = h('div.gh-merge-result');
-  const cancel = h('button.btn', {type: 'button'}, 'Annulla');
-  const go = h('button.btn.primary', {type: 'button'}, 'Verifica e unisci');
+  const cancel = h('button.btn', {type: 'button'}, uiText("Cancel"));
+  const go = h('button.btn.primary', {type: 'button'}, uiText("Check and merge"));
   const ready = !!d.gateRevisioni?.verde && !!d.headCommit && it.state === 'OPEN';
   go.disabled = !ready;
-  const el = h('div.modal.gh-merge', {role: 'dialog', 'aria-label': 'Merge Forgejo'},
-    h('header', {}, h('h2', {}, 'Merge controllato')),
-    h('div.body', {}, h('p', {}, it.title), h('p', {}, d.gateRevisioni?.motivo ?? 'Controllo non disponibile'),
-      h('p', {}, 'Il servizio ricontrolla la revisione e cancella il branch dopo il merge.'), result),
+  const el = h('div.modal.gh-merge', {role: 'dialog', 'aria-label': uiText("Forgejo merge")},
+    h('header', {}, h('h2', {}, uiText("Controlled merge"))),
+    h('div.body', {}, h('p', {}, it.title), h('p', {}, d.gateRevisioni?.motivo ?? uiText("Check unavailable")),
+      h('p', {}, uiText("The service rechecks the revision and deletes the branch after the merge.")), result),
     h('footer', {}, cancel, go));
   const modal = openModal(el, {onClose: () => mergeWaiters.delete(it.number)});
   cancel.addEventListener('click', () => modal.close());
   go.addEventListener('click', () => {
-    go.disabled = true; result.replaceChildren('Verifica in corso…');
+    go.disabled = true; result.replaceChildren(uiText("Checking…"));
     mergeWaiters.set(it.number, (msg) => {
       mergeWaiters.delete(it.number);
       if (msg.error) {result.replaceChildren(msg.error); go.disabled = false; return;}

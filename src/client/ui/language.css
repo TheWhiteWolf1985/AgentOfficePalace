@@ -1,0 +1,5 @@
+.language-settings { width: min(460px, calc(100vw - 32px)); }
+.language-settings label { display: grid; gap: 8px; font-weight: 800; }
+.language-select { font: inherit; padding: 8px 12px; border: 2px solid var(--ink); border-radius: 10px; background: var(--paper); color: var(--ink); }
+.language-settings .setting-note { margin-top: 14px; }
+.language-choice { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 20px; }

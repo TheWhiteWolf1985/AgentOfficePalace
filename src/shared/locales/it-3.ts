@@ -151,7 +151,7 @@ export default {
   "✳️ Claude": "✳️ Claude",
   "🐙 GitHub": "🐙 GitHub",
   "Starting {0}’s sign-in…": "Avvio dell'accesso a {0}…",
-  "Checking…": "Verifica…",
+  "Checking…": "Verifica in corso…",
   "Open Claude’s sign-in page ↗": "Apri la pagina di accesso Claude ↗",
   " and sign in with your own account.": " e accedi con il tuo account.",
   "It shows you a code. Paste it here:": "La pagina mostra un codice. Incollalo qui:",
