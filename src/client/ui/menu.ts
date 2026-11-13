@@ -202,8 +202,8 @@ export function mountHud(actions: HudAction[], settings: Settings, save: () => v
     const el = h(
       'div.hud-menu',
       { role: 'menu', 'aria-label': uiText('Menu') },
-      h('div.menu-col', {}, ...section(uiText('Open'), rows(uiText('Open'))), ...section(uiText('Together'), rows(uiText('Together')))),
-      h('div.menu-col', {}, ...section(uiText('Show on screen'), PANELS.map(toggle)), ...section(uiText('Office'), rows(uiText('Office')))),
+      h('div.menu-col', {}, ...section(uiText('Open'), rows('Open')), ...section(uiText('Together'), rows('Together'))),
+      h('div.menu-col', {}, ...section(uiText('Show on screen'), PANELS.map(toggle)), ...section(uiText('Office'), rows('Office'))),
       h('p.menu-foot', {}, uiText('Pin what you use most to keep it on the top bar. '), h('kbd', {}, 'Tab'), uiText(' opens and closes this menu.')),
     );
     // On the window, so the keys work wherever focus is while the menu is up.
