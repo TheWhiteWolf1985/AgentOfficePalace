@@ -500,6 +500,7 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
   }
   const show = (id: SettingsPane) => {
     lastPane = id;
+    el.classList.toggle('settings-wide', id === 'connections' || id === 'management');
     for (const [t, tab] of tabs) {
       tab.classList.toggle('on', t === id);
       tab.setAttribute('aria-selected', String(t === id));

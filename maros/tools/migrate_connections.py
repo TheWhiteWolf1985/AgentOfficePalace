@@ -3,9 +3,11 @@
 import argparse
 import json
 import os
+import subprocess
 from pathlib import Path
 import time
 import urllib.request
+import urllib.error
 
 def main():
     parser = argparse.ArgumentParser()
@@ -25,8 +27,21 @@ def main():
     for role in ("lettura", "caporedattore", "capoanalista", "capoeditore"):
         token = (root / "identita" / role / "forgejo-token").read_text().strip()
         req = urllib.request.Request("http://192.168.1.76:3000/api/v1/user", headers={"Authorization": "token " + token})
-        with urllib.request.urlopen(req, timeout=15) as response:
-            username = json.load(response)["login"]
+        try:
+            with urllib.request.urlopen(req, timeout=15) as response:
+                username = json.load(response)["login"]
+        except urllib.error.HTTPError as error:
+            if role != "lettura" or error.code != 403:
+                raise
+            if not args.apply:
+                print(json.dumps({"verified": False, "needs_reader_identity_scope": True, "applied": False}))
+                return
+            token = subprocess.check_output(["docker", "exec", "--user", "1000:1000", "forgejo", "forgejo", "admin", "user", "generate-access-token", "--username", "ufficiolettura", "--token-name", "agent-office-gui-reader-" + str(int(time.time())), "--scopes", "read:user,read:repository,read:issue", "--raw"], text=True).strip()
+            if not token or any(c.isspace() for c in token):
+                raise ValueError("Token del lettore non generato")
+            req = urllib.request.Request("http://192.168.1.76:3000/api/v1/user", headers={"Authorization": "token " + token})
+            with urllib.request.urlopen(req, timeout=15) as response:
+                username = json.load(response)["login"]
         expected = "ufficiolettura" if role == "lettura" else role
         if username != expected:
             raise ValueError("Identita del ruolo non corrispondente: " + role)

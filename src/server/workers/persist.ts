@@ -24,6 +24,8 @@ export function saveWorkers(file: string, workers: Iterable<Worker>, stopping: b
     provider: info.provider,
     model: info.model,
     effort: info.effort,
+    connectionAccountId: info.connectionAccountId,
+    connectionRole: info.connectionRole,
     deskId: info.deskId,
     name: info.name,
     color: info.color,
