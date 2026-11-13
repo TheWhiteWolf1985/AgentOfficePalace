@@ -56,3 +56,9 @@ di ricezione dal responsabile destinatario; in caso di mancata risposta,
 segnalare il blocco al coordinatore senza dichiarare l incarico concluso.
 I responsabili usano soltanto i nove agenti nominati dell ufficio, senza creare
 sostituti temporanei. Identificare sempre PR e commit nei passaggi.
+
+Il codice e la configurazione dello stack sono versionati separatamente in
+J.Zanella/AgentOfficePalace sul Forgejo aziendale. Ogni modifica software o di
+configurazione dell ufficio deve essere riportata dal coordinatore in quel
+repository con commit e push verificati; questi incarichi documentali non
+autorizzano gli specialisti a modificare il software dell ufficio.

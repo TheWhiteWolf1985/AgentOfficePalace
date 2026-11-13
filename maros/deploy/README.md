@@ -24,3 +24,17 @@ I tre checker e i contratti documentali provengono dalla wiki separata: la versi
 va predisposta in data/risorse/wiki/strumenti e confrontata con il checkout della wiki.
 Template, baseline e documenti della wiki sono dipendenze esterne, non inclusi in questo repository.
 Non copiare auth.json, sessioni, password, token o directory identita dentro Git.
+
+## Allineamento Git della VM111
+
+Il checkout /srv/data/agent-office/source deve essere pulito e avere origin
+sul Forgejo aziendale AgentOfficePalace. upstream identifica il progetto GitHub.
+Una chiave SSH dedicata della VM consente fetch/push nel solo repository del
+software; la privata resta nella home codex della VM e non e montata negli agenti.
+Dopo un intervento confrontare HEAD con main remoto ed eseguire:
+python3 -B source/maros/tools/check_runtime.py --root /srv/data/agent-office --check-image
+Il controllo confronta anche gli script e i manifest operativi esterni al checkout.
+Nessun controllo periodico viene installato. Le credenziali non vanno copiate qui.
+
+Il lockfile e stato allineato a quello del container operativo: le versioni dei
+413 record del lock sono invariate, cambiano solo i metadati libc di dieci pacchetti.

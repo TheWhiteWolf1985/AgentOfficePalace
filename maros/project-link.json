@@ -1,0 +1,15 @@
+{
+  "project_name": "LLM Wiki",
+  "codex_project_id": "6e22b6f0-19ef-451c-8579-a84f1e4d6d1f",
+  "project_root": "\\\\192.168.1.238\\dati$\\IT\\RAG",
+  "code_checkout": "\\\\192.168.1.238\\dati$\\IT\\RAG\\AgentOfficePalace",
+  "repository": "ssh://git@192.168.1.59/J.Zanella/AgentOfficePalace.git",
+  "default_branch": "main",
+  "vm": 111,
+  "vm_address": "192.168.1.76",
+  "vm_checkout": "/srv/data/agent-office/source",
+  "vm_stack_root": "/srv/data/agent-office",
+  "document_repository": "ssh://git@192.168.1.76:2222/officeagents/documentazione.git",
+  "commit_and_push_required": true,
+  "runtime_data_in_git": false
+}
