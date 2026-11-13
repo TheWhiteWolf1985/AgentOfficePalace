@@ -48,7 +48,7 @@ export function errorBox(text: string, retry?: () => void) {
 }
 
 export function stateOf(it: { state: string; isDraft?: boolean }): [string, string] {
-  if (it.state === 'MERGED') return ['merged', 'merged'];
-  if (it.state === 'CLOSED') return ['closed', 'offline'];
-  return it.isDraft ? ['draft', 'idle'] : ['open', 'working'];
+  if (it.state === 'MERGED') return [uiText('merged'), 'merged'];
+  if (it.state === 'CLOSED') return [uiText('closed'), 'offline'];
+  return it.isDraft ? [uiText('draft'), 'idle'] : [uiText('open'), 'working'];
 }

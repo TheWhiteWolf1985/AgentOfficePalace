@@ -215,5 +215,19 @@ export default {
   "🙋 {0} needs you": "🙋 {0} richiede il tuo intervento",
   "🙋 {0} need you": "🙋 {0} richiedono il tuo intervento",
   "🏎️ Driving {0}": "🏎️ Alla guida di {0}",
-  "🏎️ Riding in {0}": "🏎️ Passeggero di {0}"
+  "🏎️ Riding in {0}": "🏎️ Passeggero di {0}",
+  "merged": "unita",
+  "closed": "chiusa",
+  "draft": "bozza",
+  "open": "aperta",
+  "binary": "binario",
+  "from": "da",
+  "outdated": "superato",
+  "reviewed": "verificato",
+  "close": "chiudi",
+  "(you)": "(tu)",
+  "allow anywhere": "consenti ovunque",
+  "other workers": "altri agenti",
+  "uncommitted changes": "modifiche non committate",
+  "commits": "commit"
 };

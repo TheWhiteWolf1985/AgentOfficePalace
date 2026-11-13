@@ -42,7 +42,7 @@ export function togglePalette(entries: () => PaletteEntry[]) {
   const hint = h(
     'footer',
     {},
-    h('span.grow', {}, h('span.key', {}, '↵'), uiText('open '), h('span.key', {}, '⇧↵'), uiText('walk there first '), h('span.key', {}, '↑↓'), uiText('choose '), h('span.key', {}, 'Esc'), 'close'),
+    h('span.grow', {}, h('span.key', {}, '↵'), uiText('open '), h('span.key', {}, '⇧↵'), uiText('walk there first '), h('span.key', {}, '↑↓'), uiText('choose '), h('span.key', {}, 'Esc'), uiText('close')),
   );
   const el = h('div.modal.palette', { role: 'dialog', 'aria-label': uiText('Command palette') }, h('div.palette-find', {}, input), list, empty, hint);
 

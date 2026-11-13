@@ -3,6 +3,10 @@ import assert from 'node:assert/strict';
 import { t, setLanguage, getLanguage, isLanguage, languageTag, remoteText } from '../src/shared/i18n.js';
 import { italian } from '../src/shared/locales/it.js';
 import { savedLanguage } from '../src/client/i18n.js';
+import { workerPr } from '../src/shared/status.js';
+import { waitingLabel } from '../src/client/nextup.js';
+import { notifyPermission } from '../src/client/notify.js';
+import type { WorkerInfo } from '../src/shared/protocol.js';
 
 test('Italian and English preserve user-supplied values and use English for unknown UI text', () => {
   try {
@@ -47,4 +51,24 @@ test('server error translation preserves variable names and unknown diagnostics'
     setLanguage('en');
     assert.equal(remoteText('Wrong password'), 'Wrong password');
   } finally { setLanguage('en'); }
+});
+
+test('Italian labels leave PR state and browser capability identifiers operational', () => {
+  const previous = ['window', 'Notification'].map((name) => [name, Object.getOwnPropertyDescriptor(globalThis, name)] as const);
+  try {
+    setLanguage('it');
+    const worker = { id: 'worker-1', status: 'needs_input', pr: { number: 42 } } as WorkerInfo;
+    assert.deepEqual(workerPr(worker, [], []), { state: 'open', number: 42 });
+    assert.equal(waitingLabel([worker]), '🙋 1 richiede il tuo intervento');
+    assert.equal(waitingLabel([worker, { ...worker, id: 'worker-2' }]), '🙋 2 richiedono il tuo intervento');
+    Object.defineProperty(globalThis, 'window', { configurable: true, value: { isSecureContext: true, Notification: {} } });
+    Object.defineProperty(globalThis, 'Notification', { configurable: true, value: { permission: 'granted' } });
+    assert.equal(notifyPermission(), 'granted');
+  } finally {
+    for (const [name, descriptor] of previous) {
+      if (descriptor) Object.defineProperty(globalThis, name, descriptor);
+      else Reflect.deleteProperty(globalThis, name);
+    }
+    setLanguage('en');
+  }
 });

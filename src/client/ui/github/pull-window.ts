@@ -86,7 +86,7 @@ export function openPull(first: GhPull, net: Net, actions: BoardActions) {
       h('b', {}, it.author),
       h('span', {}, it.state === 'MERGED' ? uiText`merged ${commits} into` : uiText`wants to merge ${commits} into`),
       h('code', {}, it.baseRefName),
-      h('span', {}, 'from'),
+      h('span', {}, uiText('from')),
       h('code', {}, it.headRefName),
       h('span.gh-pm', {}, h('span.add', {}, `+${it.additions}`), ' ', h('span.del', {}, `−${it.deletions}`)),
       ...it.labels.map(labelChip),
@@ -162,7 +162,7 @@ export function openPull(first: GhPull, net: Net, actions: BoardActions) {
               {},
               h('span', {}, '💬'),
               h('code', { title: c.path }, `${c.path}${c.line ? `:${c.line}` : ''}`),
-              c.line == null ? h('span.gh-badge.muted', {}, 'outdated') : null,
+              c.line == null ? h('span.gh-badge.muted', {}, uiText('outdated')) : null,
               h('span.grow'),
               c.line != null ? h('button.btn', { type: 'button', onclick: () => showInDiff(c) }, uiText('Show in diff')) : null,
             ),
@@ -404,7 +404,7 @@ export function openPull(first: GhPull, net: Net, actions: BoardActions) {
       h('div.pd-side-head', {}, h('div.seg.pd-mode', {}, modeBtn('tree', uiText('🌲 Tree')), modeBtn('list', uiText('☰ List'))), h('div.pd-bar', {}, h('i')), h('div.pd-done-txt')),
       filterInput,
       fileList,
-      h('div.pd-keys', {}, h('span.key', {}, 'J'), h('span.key', {}, 'K'), uiText('next / previous file · '), h('span.key', {}, 'V'), 'reviewed'),
+      h('div.pd-keys', {}, h('span.key', {}, 'J'), h('span.key', {}, 'K'), uiText('next / previous file · '), h('span.key', {}, 'V'), uiText('reviewed')),
     );
     const main = h('div.pd-main', { tabindex: -1 });
     budget = 0;
@@ -424,7 +424,7 @@ export function openPull(first: GhPull, net: Net, actions: BoardActions) {
           h('button.pd-fold', { type: 'button', 'aria-label': uiText('Show or hide this file'), onclick: () => (open.set(f.path, !isOpenFile(f)), syncSection(f)) }),
           h('span.pd-st', { class: f.status, title: STATUS_WORD[f.status] }, f.status),
           h('span.pd-fpath', { title: f.path }, f.status === 'R' && f.oldPath ? `${f.oldPath} → ${f.path}` : f.path),
-          h('span.gh-pm', {}, f.binary ? h('span.bin', {}, 'binary') : h('span', {}, h('span.add', {}, `+${f.additions}`), ' ', h('span.del', {}, `−${f.deletions}`))),
+          h('span.gh-pm', {}, f.binary ? h('span.bin', {}, uiText('binary')) : h('span', {}, h('span.add', {}, `+${f.additions}`), ' ', h('span.del', {}, `−${f.deletions}`))),
           n ? h('span.pd-c', {}, `💬 ${n}`) : null,
           h('span.pd-stale.hidden', { title: uiText('The file changed after you marked it reviewed') }, uiText('changed since review')),
           h('label.pd-viewed', { title: uiText('Mark as reviewed (V)') }, box, uiText('Reviewed')),

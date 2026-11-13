@@ -429,7 +429,7 @@ export function openTerminal(net: Net, workerId: string, onChanges?: () => void,
       el.classList.toggle('uploading', --uploading > 0);
     }
   };
-  const hasFiles = (e: DragEvent) => !!e.dataTransfer?.types.includes(uiText('Files'));
+  const hasFiles = (e: DragEvent) => !!e.dataTransfer?.types.includes('Files');
   // The whole screen is the drop zone while the terminal is open, so a near miss doesn't open the file in the browser.
   let dragDepth = 0;
   const dragEnd = () => {

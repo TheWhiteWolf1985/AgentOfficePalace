@@ -25,7 +25,7 @@ export function openChangesFor(): { workerId: string; repo?: string } | null {
 const STATUS_WORD: Record<ChangedFile['status'], string> = { M: 'modified', A: 'added', D: 'deleted', R: 'renamed', T: uiText('type changed'), '?': uiText('new file') };
 
 function plusMinus(a: number, d: number, binary = false): HTMLElement {
-  if (binary) return h('span.pm', {}, h('span.bin', {}, 'binary'));
+  if (binary) return h('span.pm', {}, h('span.bin', {}, uiText('binary')));
   return h('span.pm', {}, h('span.add', {}, `+${a}`), ' ', h('span.del', {}, `−${d}`));
 }
 

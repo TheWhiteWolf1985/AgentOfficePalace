@@ -293,7 +293,7 @@ export function lostWorktreeDialog(opts: LostWorktreeOptions) {
       {},
       h('p', { style: 'margin:0 0 10px;font-weight:700' }, uiText`${folder} was deleted outside agent-office, so ${name} ${opts.openTerminal ? uiText('is running in a folder that no longer exists') : uiText("can't start there")}.`),
       h('p.wt-status', { style: 'margin:0' }, what),
-      others.length ? h('p.wt-status.warn', {}, uiText`${plural(others.length, uiText('other worker'))} on this floor lost ${others.length === 1 ? uiText('its worktree') : uiText('their worktrees')} too: ${others.join(', ')}.`) : null,
+      others.length ? h('p.wt-status.warn', {}, uiText`${plural(others.length, 'other worker')} on this floor lost ${others.length === 1 ? uiText('its worktree') : uiText('their worktrees')} too: ${others.join(', ')}.`) : null,
     ),
     h('footer', {}, home, h('span.grow'), look, all, one),
   );
@@ -316,7 +316,7 @@ function describeState(s: WorktreeState, branch: string, prefix = ''): { lines: 
   let risky = false;
   if (!s.exists) lines.push(uiText`${prefix}The worktree folder is already gone.`);
   if (s.dirty) {
-    lines.push(uiText`⚠️ ${prefix}${plural(s.dirty, uiText('uncommitted change'))} in the worktree — deleting it loses them.`);
+    lines.push(uiText`⚠️ ${prefix}${plural(s.dirty, 'uncommitted change')} in the worktree — deleting it loses them.`);
     risky = true;
   }
   if (s.unpushed) {
@@ -328,5 +328,5 @@ function describeState(s: WorktreeState, branch: string, prefix = ''): { lines: 
 }
 
 function plural(count: number, noun: string) {
-  return `${count} ${noun}${count === 1 ? '' : 's'}`;
+  return `${count} ${uiText(noun + (count === 1 ? '' : 's'))}`;
 }

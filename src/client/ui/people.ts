@@ -28,7 +28,7 @@ export function renderPeople(voice: Voice, onEditProfile: () => void, onWalkTo: 
       h('span.dot', { style: `background:${p.color}` }),
       h('span.name', {}, p.name, sub ? h('span.sub', {}, sub) : null),
       p.account ? h('span.acct', { title: uiText`Signed in with ${you ? 'your' : 'their'} own account` }, '✓') : null,
-      you ? h('span.you', {}, '(you)') : null,
+      you ? h('span.you', {}, uiText('(you)')) : null,
       // Somewhere else in the building: which floor.
       !you && !store.onMyFloor(p)
         ? p.floor === ROOF

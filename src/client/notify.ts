@@ -9,7 +9,7 @@ export type NotifyPermission = NotificationPermission | 'unsupported';
 
 /** What the browser says about notifications from the office. They need https or localhost. */
 export function notifyPermission(): NotifyPermission {
-  if (!(uiText('Notification') in window) || !window.isSecureContext) return 'unsupported';
+  if (!('Notification' in window) || !window.isSecureContext) return 'unsupported';
   return Notification.permission;
 }
 
