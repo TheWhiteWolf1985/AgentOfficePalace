@@ -1,3 +1,4 @@
+import { t as uiText } from '../../../shared/i18n';
 import * as THREE from 'three';
 import { BARK_EVERY_S, BARK_FOR_S, DOG_COATS, dogAt, dogBreed, legSeconds, type DogAct, type DogBreed, type DogState } from '../../../shared/dog';
 import type { Theme } from '../../../shared/protocol';
@@ -256,19 +257,19 @@ export class Dog {
     const s = this.state;
     if (!s) return '';
     const moving = performance.now() < this.arriveAt;
-    const w = s.workerId ? (workerName(s.workerId) ?? 'a worker') : 'a worker';
-    if (s.following) return `following ${personName(s.following) ?? 'someone'}`;
+    const w = s.workerId ? (workerName(s.workerId) ?? uiText('a worker')) : uiText('a worker');
+    if (s.following) return uiText`following ${personName(s.following) ?? 'someone'}`;
     switch (s.act) {
       case 'bark':
-        return moving ? `running to ${w}, who needs input` : `barking at ${w}: needs input`;
+        return moving ? uiText`running to ${w}, who needs input` : uiText`barking at ${w}: needs input`;
       case 'nap':
-        return moving ? 'off for a nap' : `napping under ${w}'s desk`;
+        return moving ? uiText('off for a nap') : uiText`napping under ${w}'s desk`;
       case 'wag':
-        return s.petBy ? `wagging at ${s.petBy}` : 'wagging';
+        return s.petBy ? uiText`wagging at ${s.petBy}` : 'wagging';
       case 'lie':
-        return moving ? 'trotting to the lounge' : 'lounging';
+        return moving ? uiText('trotting to the lounge') : 'lounging';
       case 'sniff':
-        return moving ? 'trotting about' : 'sniffing around';
+        return moving ? uiText('trotting about') : uiText('sniffing around');
       case 'sit':
         return 'sitting';
       default:
@@ -305,7 +306,7 @@ export class Dog {
       if (!this.hushed(s.workerId)) {
         this.sounds.bark(at.x, at.z, this.barks === 0 ? 3 : 2);
         this.woofT = 0;
-        this.say('woof', this.barks === 0 ? 'Woof! Woof! Woof!' : 'Woof! Woof!', 1.4);
+        this.say('woof', this.barks === 0 ? uiText('Woof! Woof! Woof!') : uiText('Woof! Woof!'), 1.4);
       }
       this.barks++;
       this.nextBark = this.arriveAt + this.barks * BARK_EVERY_S * 1000;
@@ -331,7 +332,7 @@ export class Dog {
       })
       // A file that didn't load, or isn't the model the code knows (a part missing): no dog but its name tag.
       .catch((err: unknown) => {
-        console.error(`The office dog's model (${breed}) didn't load`, err);
+        console.error(uiText`The office dog's model (${breed}) didn't load`, err);
         return false;
       });
     // On or not coming, unless another breed was asked for meanwhile: then it's that one's turn.

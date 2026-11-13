@@ -1,3 +1,4 @@
+import { t as uiText } from '../../../shared/i18n';
 import { GAME, scoreText } from '../../../shared/cabinet';
 import type { Ctx } from '../../core/context';
 import { aside, hintTitle, key, onE } from '../../core/hint';
@@ -29,12 +30,12 @@ export function installCabinet(ctx: Ctx, deps: CabinetDeps): Cabinet {
       const f = store.cabinetFrame;
       if (c.player && c.player.id !== store.you) {
         const who = c.player.name;
-        return { k: `${who}|${f?.score}`, parts: [hintTitle('🕹️ Arcade'), aside(`▶ ${clip(who, 24)} is playing${f ? ` · ${scoreText(f.score)}` : ''}`), key('E', 'Watch')] };
+        return { k: `${who}|${f?.score}`, parts: [hintTitle(uiText('🕹️ Arcade')), aside(uiText`▶ ${clip(who, 24)} is playing${f ? ` · ${scoreText(f.score)}` : ''}`), key('E', uiText('Watch'))] };
       }
       const left = cabinet.leftAt;
       const best = c.scores[0];
-      const about = left !== null ? `your game's paused at ${scoreText(left)}` : best ? `🏆 ${clip(best.name, 24)} · ${scoreText(best.score)}` : 'no high score yet';
-      return { k: `${left}|${best?.name}|${best?.score}`, parts: [hintTitle(`🕹️ ${GAME}`), aside(about), key('E', left !== null ? 'Carry on' : 'Play')] };
+      const about = left !== null ? uiText`your game's paused at ${scoreText(left)}` : best ? `🏆 ${clip(best.name, 24)} · ${scoreText(best.score)}` : uiText('no high score yet');
+      return { k: `${left}|${best?.name}|${best?.score}`, parts: [hintTitle(`🕹️ ${GAME}`), aside(about), key('E', left !== null ? uiText('Carry on') : uiText('Play'))] };
     },
     use: onE(() => cabinet.play()),
   });

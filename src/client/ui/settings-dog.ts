@@ -1,3 +1,4 @@
+import { t as uiText } from '../../shared/i18n';
 // ⚙️ Settings' Office dog, under Building: its name, and its breed and coat as buttons, for everyone
 // on the floor (see server/dog.ts).
 import type { Net } from '../net';
@@ -7,18 +8,18 @@ import { h } from './dom';
 
 /** The setting, made by `frame` from what goes in it, and how to paint it afresh when the dog changes. */
 export function dogSetting(net: Net, frame: (body: Node[]) => HTMLElement): { section: HTMLElement; paint: () => void } {
-  const dogInput = h('input', { type: 'text', maxlength: DOG_NAME_MAX, 'aria-label': 'The dog’s name', spellcheck: 'false', autocomplete: 'off' }) as HTMLInputElement;
-  const dogSave = h('button.btn.primary', { type: 'button' }, 'Rename');
+  const dogInput = h('input', { type: 'text', maxlength: DOG_NAME_MAX, 'aria-label': uiText('The dog’s name'), spellcheck: 'false', autocomplete: 'off' }) as HTMLInputElement;
+  const dogSave = h('button.btn.primary', { type: 'button' }, uiText('Rename'));
   const dogNote = h('p.setting-note');
-  const breedRow = h('div.seg', { role: 'radiogroup', 'aria-label': 'Breed' });
-  const coatRow = h('div.swatches', { role: 'radiogroup', 'aria-label': 'Coat' });
+  const breedRow = h('div.seg', { role: 'radiogroup', 'aria-label': uiText('Breed') });
+  const coatRow = h('div.swatches', { role: 'radiogroup', 'aria-label': uiText('Coat') });
   const dogSection = frame([h('div.webhook', {}, dogInput, dogSave), breedRow, coatRow, dogNote]);
   const paintDog = () => {
     const dog = store.dog;
     dogSection.classList.toggle('hidden', !dog);
     if (!dog) return;
     dogInput.placeholder = dog.name;
-    dogNote.textContent = `${dog.name} lives on this floor. When a worker needs input, ${dog.name} runs to its desk and barks. Walk up and press E to pet it. Its name, breed and coat are for everyone on this floor.`;
+    dogNote.textContent = uiText`${dog.name} lives on this floor. When a worker needs input, ${dog.name} runs to its desk and barks. Walk up and press E to pet it. Its name, breed and coat are for everyone on this floor.`;
     const breed = dogBreed(dog.breed);
     breedRow.replaceChildren(
       ...DOG_BREEDS.map((b) =>

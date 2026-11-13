@@ -1,3 +1,4 @@
+import { t as uiText } from './i18n.js';
 // The meeting room's patterns: how 2–5 workers at the table work on one question or task together.
 // The server runs them (server/meetings.ts); the client offers them when a meeting is called.
 
@@ -27,53 +28,53 @@ export interface PatternDef {
 export const MEETING_PATTERNS: Record<MeetingPattern, PatternDef> = {
   debate: {
     icon: '🗣️',
-    label: 'Debate',
-    blurb: 'Each worker proposes, then critiques the others; in the last round the head of the table writes the decision.',
-    roles: ['Chair', 'Pragmatist', 'Skeptic', 'Simplifier', 'User advocate'],
+    label: uiText('Debate'),
+    blurb: uiText('Each worker proposes, then critiques the others; in the last round the head of the table writes the decision.'),
+    roles: [uiText('Chair'), uiText('Pragmatist'), uiText('Skeptic'), uiText('Simplifier'), uiText('User advocate')],
     seats: { min: 2, max: 5, default: 3 },
     rounds: { min: 2, max: 4, default: 3 },
-    roundsNote: 'Proposals, then a round of critique per extra round, then the decision.',
+    roundsNote: uiText('Proposals, then a round of critique per extra round, then the decision.'),
     output: (slug) => `docs/decisions/${slug}.md`,
   },
   lead: {
     icon: '🧭',
-    label: 'Lead & team',
-    blurb: 'The lead splits the task into parts, the team each do one, and the lead merges their work and writes it up.',
-    roles: ['Lead', 'Engineer', 'Engineer', 'Engineer', 'Engineer'],
+    label: uiText('Lead & team'),
+    blurb: uiText('The lead splits the task into parts, the team each do one, and the lead merges their work and writes it up.'),
+    roles: [uiText('Lead'), uiText('Engineer'), uiText('Engineer'), uiText('Engineer'), uiText('Engineer')],
     seats: { min: 2, max: 5, default: 3 },
     rounds: { min: 3, max: 3, default: 3 },
-    stages: ['Planning', 'Execution', 'Merge'],
+    stages: [uiText('Planning'), uiText('Execution'), uiText('Merge')],
     output: (slug) => `docs/meetings/${slug}.md`,
   },
   mapreduce: {
     icon: '🗂️',
-    label: 'Map-reduce',
-    blurb: 'The same task over each part (files, modules, issues) in parallel; the head of the table combines the results.',
-    roles: ['Reducer', 'Mapper', 'Mapper', 'Mapper', 'Mapper'],
+    label: uiText('Map-reduce'),
+    blurb: uiText('The same task over each part (files, modules, issues) in parallel; the head of the table combines the results.'),
+    roles: [uiText('Reducer'), uiText('Mapper'), uiText('Mapper'), uiText('Mapper'), uiText('Mapper')],
     seats: { min: 2, max: 5, default: 3 },
     rounds: { min: 2, max: 2, default: 2 },
-    stages: ['Map', 'Reduce'],
+    stages: [uiText('Map'), uiText('Reduce')],
     output: (slug) => `docs/meetings/${slug}.md`,
     needs: 'parts',
   },
   redblue: {
     icon: '🛡️',
-    label: 'Red / blue',
-    blurb: 'Red attacks the change (bugs, security), blue fixes what holds up, round after round; blue writes it up.',
-    roles: ['Blue team', 'Red team'],
+    label: uiText('Red / blue'),
+    blurb: uiText('Red attacks the change (bugs, security), blue fixes what holds up, round after round; blue writes it up.'),
+    roles: [uiText('Blue team'), uiText('Red team')],
     seats: { min: 2, max: 2, default: 2 },
     rounds: { min: 1, max: 5, default: 3 },
-    roundsNote: 'An attack and a fix per round; it ends early when red finds nothing more.',
+    roundsNote: uiText('An attack and a fix per round; it ends early when red finds nothing more.'),
     output: (slug) => `docs/reviews/${slug}.md`,
   },
   review: {
     icon: '🔍',
-    label: 'Review panel',
-    blurb: 'Reviewers read a pull request through their own lens; the head of the table merges them into one review, posted on the PR.',
-    roles: ['Correctness', 'Security', 'Performance & simplicity', 'Tests', 'API design'],
+    label: uiText('Review panel'),
+    blurb: uiText('Reviewers read a pull request through their own lens; the head of the table merges them into one review, posted on the PR.'),
+    roles: [uiText('Correctness'), uiText('Security'), uiText('Performance & simplicity'), uiText('Tests'), uiText('API design')],
     seats: { min: 2, max: 5, default: 3 },
     rounds: { min: 2, max: 2, default: 2 },
-    stages: ['Reviews', 'Combined review'],
+    stages: [uiText('Reviews'), uiText('Combined review')],
     output: (_slug, pr) => `reviews/pr-${pr ?? 'n'}.md`,
     needs: 'pr',
   },
@@ -111,18 +112,18 @@ export function slugify(s: string, max = 40): string {
  * the office's own folder or git's.
  */
 export function outputProblem(p: string): string | undefined {
-  if (!p.trim()) return 'Say which file the meeting writes';
-  if (p.length > 200) return 'That output path is too long';
-  if (/^[/\\]|^[a-zA-Z]:/.test(p)) return 'The output file goes inside the project: give a path relative to it';
+  if (!p.trim()) return uiText('Say which file the meeting writes');
+  if (p.length > 200) return uiText('That output path is too long');
+  if (/^[/\\]|^[a-zA-Z]:/.test(p)) return uiText('The output file goes inside the project: give a path relative to it');
   const parts = p.split(/[/\\]/);
-  if (parts.some((x) => x === '..' || x === '.' || x === '')) return 'The output path can’t have empty, . or .. parts';
-  if (parts[0] === '.git' || parts[0] === '.agent-office' || parts[0] === MEETING_NOTES_DIR) return `The output can’t go in ${parts[0]}/`;
-  if (/[\0-\x1f]/.test(p)) return 'The output path has control characters in it';
+  if (parts.some((x) => x === '..' || x === '.' || x === '')) return uiText('The output path can’t have empty, . or .. parts');
+  if (parts[0] === '.git' || parts[0] === '.agent-office' || parts[0] === MEETING_NOTES_DIR) return uiText`The output can’t go in ${parts[0]}/`;
+  if (/[\0-\x1f]/.test(p)) return uiText('The output path has control characters in it');
   return undefined;
 }
 
 /** "3 rounds" / "round 2 of 3". */
-const rounds = (n: number) => `${n} round${n === 1 ? '' : 's'}`;
+const rounds = (n: number) => uiText`${n} round${n === 1 ? '' : 's'}`;
 
 /**
  * For a pattern that always runs the same rounds, what the dialog shows in place of a limit to set:
@@ -133,18 +134,18 @@ export function fixedRounds(p: PatternDef): { line: string; stages: string; why:
   if (p.rounds.min !== p.rounds.max) return undefined;
   const n = rounds(p.rounds.max);
   const stages = (p.stages ?? []).join(' → ');
-  return { line: `${n} · fixed by the ${p.label} workflow`, stages, why: `${p.label} always runs ${n}${stages ? `: ${stages}` : ''}. Each one is a step of the pattern, so there’s none to add or take away.` };
+  return { line: uiText`${n} · fixed by the ${p.label} workflow`, stages, why: uiText`${p.label} always runs ${n}${stages ? `: ${stages}` : ''}. Each one is a step of the pattern, so there’s none to add or take away.` };
 }
 
 /** The spend, e.g. "1.2M tokens · $2.40" (or without the cost when a provider doesn't report it). */
 export function meetingSpend(m: Pick<Meeting, 'tokens' | 'cost' | 'costKnown'>): string {
-  return `${fmtTokens(m.tokens)} tokens${m.costKnown ? ` · ${fmtCost(m.cost)}` : m.cost > 0 ? ` · ${fmtCost(m.cost)}+` : ''}`;
+  return uiText`${fmtTokens(m.tokens)} tokens${m.costKnown ? ` · ${fmtCost(m.cost)}` : m.cost > 0 ? ` · ${fmtCost(m.cost)}+` : ''}`;
 }
 
 /** What's on the table in a line: "Round 2 of 3 · critiquing". */
 export function meetingStage(m: Meeting): string {
   const doing = [...new Set(m.turns.filter((t) => t.state !== 'done').map((t) => t.doing))].join(', ');
-  return `Round ${m.round} of ${m.rounds}${doing ? ` · ${doing}` : ''}`;
+  return uiText`Round ${m.round} of ${m.rounds}${doing ? ` · ${doing}` : ''}`;
 }
 
 /**
@@ -153,11 +154,11 @@ export function meetingStage(m: Meeting): string {
  */
 export function meetingSummary(m: Meeting): string {
   const p = MEETING_PATTERNS[m.pattern];
-  const ran = m.status === 'done' ? rounds(m.round) : `${m.status === 'stopped' ? 'in ' : ''}round ${m.round} of ${m.rounds}`;
+  const ran = m.status === 'done' ? rounds(m.round) : uiText`${m.status === 'stopped' ? uiText('in ') : ''}round ${m.round} of ${m.rounds}`;
   const head = `${p.icon} ${p.label} · ${ran} · ${meetingSpend(m)}`;
   if (m.status === 'stopped') return `${head} · ⛔ ${m.reason ?? 'stopped'}`;
   if (m.status === 'running') return head;
-  const where = m.review?.url ? ' · posted on the PR' : m.review?.error ? ` · couldn't post it: ${m.review.error}` : m.commit ? ` on ${m.worktree?.branch}` : m.worktree ? ` in ${m.worktree.branch}'s worktree` : '';
+  const where = m.review?.url ? uiText(' · posted on the PR') : m.review?.error ? uiText` · couldn't post it: ${m.review.error}` : m.commit ? uiText` on ${m.worktree?.branch}` : m.worktree ? uiText` in ${m.worktree.branch}'s worktree` : '';
   return `${head} · ✅ ${m.output}${where}`;
 }
 

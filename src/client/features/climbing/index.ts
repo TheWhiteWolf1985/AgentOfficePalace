@@ -1,3 +1,4 @@
+import { t as uiText } from '../../../shared/i18n';
 /**
  * The ladder and the fire poles between floors: up or down the ladder through the hatches, down a pole
  * (a twirl round it on the bottom floor), and what that does to your view on the way.
@@ -53,7 +54,7 @@ export function installClimbing(ctx: Ctx, deps: ClimbingDeps) {
       else if (kind === 'twirl') sound.twirl();
       else if (kind === 'bonk') {
         sound.bonk();
-        toast(`🔝 ${store.currentFloor()?.name ?? 'This'} is the top floor — the hatch won't budge`);
+        toast(uiText`🔝 ${store.currentFloor()?.name ?? uiText('This')} is the top floor — the hatch won't budge`);
       } else if (kind === 'land') {
         sound.poleLanding(speed);
         landed(speed);
@@ -88,7 +89,7 @@ export function installClimbing(ctx: Ctx, deps: ClimbingDeps) {
       ctx.smoke.exhale(at, dir.set(Math.sin(a), 0.15, Math.cos(a)).normalize());
     }
     const f = store.currentFloor();
-    toast(`🚒 Wheee! Down to ${f?.name ?? 'the floor below'}`);
+    toast(uiText`🚒 Wheee! Down to ${f?.name ?? uiText('the floor below')}`);
   }
   office.stack.onHatch = (where, open) => ctx.sound.hatch({ x: LADDER.x + 0.3, y: where === 'floor' ? 0 : WALL_HEIGHT, z: LADDER.z }, open);
   // Speed lines round the edge of the screen, sliding down a pole.
@@ -98,7 +99,7 @@ export function installClimbing(ctx: Ctx, deps: ClimbingDeps) {
   /** E at the ladder: onto it, facing the wall. */
   function grabLadder() {
     if (ctx.trip() || climber.active) return;
-    if (!floorThere(1) && !floorThere(-1)) return toast('No other floors yet — add a project in the elevator', 'warn');
+    if (!floorThere(1) && !floorThere(-1)) return toast(uiText('No other floors yet — add a project in the elevator'), 'warn');
     if (ctx.player.seat) deps.standUp();
     ctx.activities.stopAll('start');
     deps.stopWalking();
@@ -129,7 +130,7 @@ export function installClimbing(ctx: Ctx, deps: ClimbingDeps) {
       const up = floorThere(1)?.name;
       const down = floorThere(-1)?.name;
       const where = [up && `⬆ ${up}`, down && `⬇ ${down}`].filter(Boolean).join(' · ');
-      return { k: where, parts: [hintTitle('🪜 Ladder'), aside(where || 'no other floors yet'), key('E', 'Climb on')] };
+      return { k: where, parts: [hintTitle(uiText('🪜 Ladder')), aside(where || uiText('no other floors yet')), key('E', uiText('Climb on'))] };
     },
     use: onE(() => grabLadder()),
   });
@@ -137,11 +138,11 @@ export function installClimbing(ctx: Ctx, deps: ClimbingDeps) {
     reach: 4,
     hint: () => {
       if (office.stack.polesGoDown()) {
-        const down = floorThere(-1)?.name ?? 'the floor below';
-        return { k: `down|${down}`, parts: [hintTitle('🚒 Fire pole'), aside(`down to ${down}`), key('E', 'Slide down!')] };
+        const down = floorThere(-1)?.name ?? uiText('the floor below');
+        return { k: `down|${down}`, parts: [hintTitle(uiText('🚒 Fire pole')), aside(uiText`down to ${down}`), key('E', uiText('Slide down!'))] };
       }
       const up = floorThere(1)?.name ?? 'upstairs';
-      return { k: `landing|${up}`, parts: [hintTitle('🚒 Fire pole'), aside(`comes down from ${up}`), key('E', 'Twirl')] };
+      return { k: `landing|${up}`, parts: [hintTitle(uiText('🚒 Fire pole')), aside(uiText`comes down from ${up}`), key('E', uiText('Twirl'))] };
     },
     use: onE((it) => {
       if (it.pole !== undefined) usePole(it.pole);
@@ -161,12 +162,12 @@ export function installClimbing(ctx: Ctx, deps: ClimbingDeps) {
       const busy = l.waiting || l.auto;
       k = `ladder|${up}|${down}|${atFloor}|${busy}`;
       parts = busy
-        ? [title('🪜 Climbing…')]
-        : [title('🪜 On the ladder'), up ? key('W', `Up to ${up}`) : aside('top floor'), key('S', down ? `Down to ${down}` : atFloor ? 'Step off' : 'Down'), key('E', atFloor ? 'Step off' : 'Let go')];
+        ? [title(uiText('🪜 Climbing…'))]
+        : [title(uiText('🪜 On the ladder')), up ? key('W', uiText`Up to ${up}`) : aside(uiText('top floor')), key('S', down ? uiText`Down to ${down}` : atFloor ? uiText('Step off') : uiText('Down')), key('E', atFloor ? uiText('Step off') : uiText('Let go'))];
     } else {
       const how = climber.sliding;
       k = `pole|${how}`;
-      parts = [title(how === 'twirl' ? '🚒 Wheee!' : '🚒 Wheeeeeee!')];
+      parts = [title(how === 'twirl' ? uiText('🚒 Wheee!') : uiText('🚒 Wheeeeeee!'))];
     }
     ctx.hint.draw(el, k, () => parts);
   }

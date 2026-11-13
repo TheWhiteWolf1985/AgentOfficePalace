@@ -1,3 +1,4 @@
+import { t as uiText, languageTag } from '../../../shared/i18n';
 // Inside the whiteboard window: Excalidraw, kept in step with everyone else on the floor. Loaded
 // (React and Excalidraw, a few MB) only when someone opens the whiteboard, or when there's a drawing
 // to show on the board in the office (see ui.ts).
@@ -78,7 +79,7 @@ function upload(f: BinaryFileData): Promise<boolean> {
         return true;
       }
       const { error } = (await res.json().catch(() => ({}))) as { error?: string };
-      toast(error ?? "Couldn't put that picture on the whiteboard", 'warn');
+      toast(error ?? uiText("Couldn't put that picture on the whiteboard"), 'warn');
       return false;
     })
     .catch(() => {
@@ -210,7 +211,7 @@ export function mountWhiteboard(host: HTMLElement, send: (msg: ClientMsg) => voi
       const n = JSON.stringify(el).length;
       // The office would refuse it (or drop the connection over it), so it stays on your screen only.
       if (n > WB_MAX_ELEMENT_BYTES) {
-        if (!tooBig.has(el.id)) toast("That's too big for the whiteboard, so only you can see it. Try it in smaller pieces.", 'warn');
+        if (!tooBig.has(el.id)) toast(uiText("That's too big for the whiteboard, so only you can see it. Try it in smaller pieces."), 'warn');
         tooBig.add(el.id);
         continue;
       }
@@ -282,7 +283,7 @@ export function mountWhiteboard(host: HTMLElement, send: (msg: ClientMsg) => voi
         isCollaborating: true,
         name,
         theme: 'light',
-        langCode: 'en',
+        langCode: languageTag(),
         autoFocus: true,
         aiEnabled: false,
         // Opening a file would replace the drawing for you alone; everything else in the menu works for everyone.
@@ -305,7 +306,7 @@ export function mountWhiteboard(host: HTMLElement, send: (msg: ClientMsg) => voi
         e(WelcomeScreen.Hints.MenuHint),
         e(WelcomeScreen.Hints.ToolbarHint),
         e(WelcomeScreen.Hints.HelpHint),
-        e(WelcomeScreen.Center, null, e(WelcomeScreen.Center.Heading, null, 'Draw together: everyone on this floor sees it live, and it stays up on the board')),
+        e(WelcomeScreen.Center, null, e(WelcomeScreen.Center.Heading, null, uiText('Draw together: everyone on this floor sees it live, and it stays up on the board'))),
       ),
     ),
   );

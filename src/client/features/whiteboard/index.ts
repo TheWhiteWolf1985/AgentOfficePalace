@@ -1,3 +1,4 @@
+import { t as uiText } from '../../../shared/i18n';
 /** The whiteboard: it shows what everyone's drawn on it, and E draws on it with them. */
 import type { Ctx } from '../../core/context';
 import { aside, hintTitle, key, onE } from '../../core/hint';
@@ -20,7 +21,7 @@ export function installWhiteboard(ctx: Ctx) {
     reach: 7,
     hint: () => {
       const names = store.drawing.flatMap((id) => (id === store.you ? [] : (store.peers.get(id)?.name ?? []))).join(', ');
-      return { k: names, parts: [hintTitle('📝 Whiteboard'), aside(names ? `✏️ ${clip(names, 40)} drawing` : 'draw together, live'), key('E', names ? 'Join in' : 'Draw')] };
+      return { k: names, parts: [hintTitle(uiText('📝 Whiteboard')), aside(names ? uiText`✏️ ${clip(names, 40)} drawing` : uiText('draw together, live')), key('E', names ? uiText('Join in') : uiText('Draw'))] };
     },
     use: onE(() => openWhiteboard(ctx.net)),
   });

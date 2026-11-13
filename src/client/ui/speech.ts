@@ -1,3 +1,4 @@
+import { t as uiText } from '../../shared/i18n';
 // Speech to text with the recognizer the browser comes with (the Web Speech API), for dictating a
 // prompt (see dictate.ts). Chrome, Edge and Safari have one; Firefox doesn't. Nothing is installed
 // and the office never gets the audio: the browser listens and hands back words. Chrome and Edge
@@ -112,16 +113,16 @@ export function speechProblem(code: string, lang: string): string | undefined {
     case 'aborted':
       return undefined;
     case 'not-allowed':
-      return 'Dictation needs the microphone: allow it for this page in the address bar, then try again.';
+      return uiText('Dictation needs the microphone: allow it for this page in the address bar, then try again.');
     case 'audio-capture':
-      return 'Dictation found no microphone to listen to.';
+      return uiText('Dictation found no microphone to listen to.');
     case 'network':
     case 'service-not-allowed':
-      return "This browser's speech service didn't answer, so there's nothing to take dictation. Chrome, Edge and Safari have one; Brave and some others come without it.";
+      return uiText("This browser's speech service didn't answer, so there's nothing to take dictation. Chrome, Edge and Safari have one; Brave and some others come without it.");
     case 'language-not-supported':
-      return `This browser can't take dictation in ${lang}.`;
+      return uiText`This browser can't take dictation in ${lang}.`;
     default:
-      return `Dictation stopped: ${code}.`;
+      return uiText`Dictation stopped: ${code}.`;
   }
 }
 
@@ -155,7 +156,7 @@ export function listen(on: ListenHandlers, opts: { Ctor?: RecognizerCtor; lang?:
   const lang = opts.lang ?? speechLang();
   const now = opts.now ?? Date.now;
   if (!Ctor) {
-    on.end('This browser has no speech recognition built in. Chrome, Edge and Safari do.');
+    on.end(uiText('This browser has no speech recognition built in. Chrome, Edge and Safari do.'));
     return { stop() {}, abort() {} };
   }
   const rec = new Ctor();
@@ -187,7 +188,7 @@ export function listen(on: ListenHandlers, opts: { Ctor?: RecognizerCtor; lang?:
       rec.start();
       return true;
     } catch (err) {
-      problem ??= `Dictation couldn't start: ${(err as Error).message}`;
+      problem ??= uiText`Dictation couldn't start: ${(err as Error).message}`;
       return false;
     }
   };

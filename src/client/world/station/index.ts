@@ -1,3 +1,4 @@
+import { t as uiText } from '../../../shared/i18n';
 import * as THREE from 'three';
 import type { FloorPalette } from '../../../shared/floors';
 import type { MapPlan } from '../../../shared/maps';
@@ -91,7 +92,7 @@ export function buildStation(plan: MapPlan): World {
       nameplate = null;
     }
     if (!name) return;
-    nameplate = textPlane(`🛰️ ${name.toUpperCase()} STATION`, { bg: '#0f1a26', color: '#e6f6ff', border: `#${kit.mats.accent.color.getHexString()}`, size: 64 });
+    nameplate = textPlane(uiText`🛰️ ${name.toUpperCase()} STATION`, { bg: '#0f1a26', color: '#e6f6ff', border: `#${kit.mats.accent.color.getHexString()}`, size: 64 });
     nameplate.scale.multiplyScalar(1.5);
     // On the wall behind the chair, facing down the deck.
     const [bx, bz] = [-Math.sin(nameAt.rotY), -Math.cos(nameAt.rotY)];

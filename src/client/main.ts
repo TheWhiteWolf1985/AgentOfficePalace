@@ -1,3 +1,5 @@
+import './i18n';
+import { t as uiText } from '../shared/i18n';
 import './style.css';
 import { Net } from './net';
 import { DesktopNotifier } from './notify';
@@ -219,8 +221,8 @@ void whoami().then(() => {
       });
     });
     loading.until([
-      { say: 'Knocking on the door', done: welcomed },
-      { say: 'Fetching the dog', done: parts.dog.firstReady },
+      { say: uiText('Knocking on the door'), done: welcomed },
+      { say: uiText('Fetching the dog'), done: parts.dog.firstReady },
     ]);
   } else {
     // Pick a character first (people from before there was a choice keep their name and color).

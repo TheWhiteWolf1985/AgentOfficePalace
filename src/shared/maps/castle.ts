@@ -1,3 +1,4 @@
+import { t as uiText } from '../i18n.js';
 import type { MapConfig, PropConfig } from './types.js';
 
 /*
@@ -81,21 +82,21 @@ const round = (v: number) => Math.round(v * 100) / 100;
 
 export const CASTLE: MapConfig = {
   id: 'castle',
-  name: 'Castle',
+  name: uiText('Castle'),
   icon: '🏰',
-  description: 'A great hall with a throne of iron blades. Workers sit at the long tables, line up before your throne when they’re done or need you, and grow long grey beards the longer they work. Speak to the Hand of the King to send out a new one; send one home, and the Kingsguard drags it down to the dungeon to rot.',
+  description: uiText('A great hall with a throne of iron blades. Workers sit at the long tables, line up before your throne when they’re done or need you, and grow long grey beards the longer they work. Speak to the Hand of the King to send out a new one; send one home, and the Kingsguard drags it down to the dungeon to rot.'),
   style: 'castle',
   hall: { width: W, length: L, height: 13 },
   spawn: { x: -2.6, z: -21, rotY: Math.PI },
   door: { x: 0, z: L / 2 - 1.4 },
   throne: { x: 0, z: -27.4, rotY: 0, dais: { width: 12, depth: 5, height: 0.9, steps: 3 } },
-  herald: { x: 3.3, z: -26.3, rotY: -0.35, name: 'Hand of the King', says: 'Speak to me to send out a new worker', ask: 'What shall they toil on, my liege?', button: 'Send them out ⚔️' },
+  herald: { x: 3.3, z: -26.3, rotY: -0.35, name: uiText('Hand of the King'), says: uiText('Speak to me to send out a new worker'), ask: uiText('What shall they toil on, my liege?'), button: uiText('Send them out ⚔️') },
   lineup: { x: 0, z: -25.6, rotY: Math.PI, step: [0, 1.3], count: 8 },
   tables: [
-    { name: 'North-west table', x: -6.8, z: -8, length: 10, seats: 4 },
-    { name: 'North-east table', x: 6.8, z: -8, length: 10, seats: 4 },
-    { name: 'South-west table', x: -6.8, z: 6, length: 10, seats: 4 },
-    { name: 'South-east table', x: 6.8, z: 6, length: 10, seats: 4 },
+    { name: uiText('North-west table'), x: -6.8, z: -8, length: 10, seats: 4 },
+    { name: uiText('North-east table'), x: 6.8, z: -8, length: 10, seats: 4 },
+    { name: uiText('South-west table'), x: -6.8, z: 6, length: 10, seats: 4 },
+    { name: uiText('South-east table'), x: 6.8, z: 6, length: 10, seats: 4 },
   ],
   stations: {
     issues: { x: -11.3, z: -15, rotY: -Math.PI / 2 },
@@ -104,10 +105,10 @@ export const CASTLE: MapConfig = {
   },
   council: { x: 6.6, z: -18.8, rotY: 0 },
   boards: {
-    issues: { x: -WALL_X, y: 3.5, z: -15, rotY: Math.PI / 2, width: 4.4, height: 2.6, label: '📜 Petitions' },
-    queue: { x: -WALL_X, y: 3.5, z: -3, rotY: Math.PI / 2, width: 4.4, height: 2.6, label: '📋 Orders of the day' },
-    pulls: { x: WALL_X, y: 3.5, z: -15, rotY: -Math.PI / 2, width: 4.4, height: 2.6, label: '🔀 Decrees for the seal' },
-    services: { x: WALL_X, y: 3.5, z: -3, rotY: -Math.PI / 2, width: 4.4, height: 2.6, label: '🌐 Services' },
+    issues: { x: -WALL_X, y: 3.5, z: -15, rotY: Math.PI / 2, width: 4.4, height: 2.6, label: uiText('📜 Petitions') },
+    queue: { x: -WALL_X, y: 3.5, z: -3, rotY: Math.PI / 2, width: 4.4, height: 2.6, label: uiText('📋 Orders of the day') },
+    pulls: { x: WALL_X, y: 3.5, z: -15, rotY: -Math.PI / 2, width: 4.4, height: 2.6, label: uiText('🔀 Decrees for the seal') },
+    services: { x: WALL_X, y: 3.5, z: -3, rotY: -Math.PI / 2, width: 4.4, height: 2.6, label: uiText('🌐 Services') },
   },
   props,
   agents: { outfit: 'peasant', ageMinutes: 30 },
@@ -133,15 +134,15 @@ export const CASTLE: MapConfig = {
   },
   // Sent home, a worker's dragged off to the dungeon by the Kingsguard and left there to rot.
   sendHome: {
-    escort: { name: 'Kingsguard', post: { x: 6.3, z: AISLE_Z + 0.3, rotY: -Math.PI / 2, below: true }, color: '#8e1b1b' },
+    escort: { name: uiText('Kingsguard'), post: { x: 6.3, z: AISLE_Z + 0.3, rotY: -Math.PI / 2, below: true }, color: '#8e1b1b' },
     steps: [
       { do: 'fetch' },
-      { do: 'say', who: 'escort', text: ['By order of the crown, you’re coming with me.', 'On your feet. The king’s done with you.', 'You’re dismissed. Come quietly.', 'Up. The dungeon’s waiting.'] },
+      { do: 'say', who: 'escort', text: [uiText('By order of the crown, you’re coming with me.'), uiText('On your feet. The king’s done with you.'), uiText('You’re dismissed. Come quietly.'), uiText('Up. The dungeon’s waiting.')] },
       { do: 'pack' },
-      { do: 'say', text: ['🙏 Mercy, my liege!', '😰 But my pull request…', '😭 I was nearly done!', '🥺 Just one more commit!', '😱 Not the dungeon!', '😶 …'] },
+      { do: 'say', text: [uiText('🙏 Mercy, my liege!'), uiText('😰 But my pull request…'), uiText('😭 I was nearly done!'), uiText('🥺 Just one more commit!'), uiText('😱 Not the dungeon!'), '😶 …'] },
       { do: 'walk', to: 'cell' },
       { do: 'jail' },
-      { do: 'say', who: 'escort', text: ['🔒 Rot in there.', '🔒 Enjoy your stay.', '🔒 Nobody leaves.', '🔒 Should have shipped it.'] },
+      { do: 'say', who: 'escort', text: [uiText('🔒 Rot in there.'), uiText('🔒 Enjoy your stay.'), uiText('🔒 Nobody leaves.'), uiText('🔒 Should have shipped it.')] },
       { do: 'return' },
     ],
     starveHours: 24,

@@ -1,3 +1,4 @@
+import { t as uiText } from '../../../shared/i18n';
 import './ui.css';
 import { EMOTES, type EmoteId } from '../../../shared/emotes';
 import { h } from '../../ui/dom';
@@ -42,7 +43,7 @@ export class EmoteWheel {
       );
     });
     this.caption = h('div.middle');
-    this.el = h('div.emote-wheel.hidden', { role: 'menu', 'aria-label': 'Emotes' }, h('div.ring', {}, ...this.items, this.caption));
+    this.el = h('div.emote-wheel.hidden', { role: 'menu', 'aria-label': uiText('Emotes') }, h('div.ring', {}, ...this.items, this.caption));
     this.el.addEventListener('pointerdown', (e) => {
       e.preventDefault();
       const i = this.items.findIndex((b) => b.contains(e.target as Node));
@@ -125,7 +126,7 @@ export class EmoteWheel {
   private render() {
     this.items.forEach((b, i) => b.classList.toggle('on', i === this.at));
     const e = EMOTES[this.at];
-    const how = !e ? 'Point at one, or 1–6' : this.heldAt ? 'Let go of G' : 'Click';
-    this.caption.replaceChildren(h('b', {}, e?.label ?? 'Emote'), h('small', {}, how));
+    const how = !e ? uiText('Point at one, or 1–6') : this.heldAt ? uiText('Let go of G') : uiText('Click');
+    this.caption.replaceChildren(h('b', {}, e?.label ?? uiText('Emote')), h('small', {}, how));
   }
 }

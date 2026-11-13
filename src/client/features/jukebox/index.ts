@@ -1,3 +1,4 @@
+import { t as uiText } from '../../../shared/i18n';
 import { trackTitle } from '../../../shared/jukebox';
 import type { Ctx } from '../../core/context';
 import { aside, hintTitle, key, onE } from '../../core/hint';
@@ -33,7 +34,7 @@ export function installJukebox(ctx: Ctx, deps: JukeboxDeps) {
     hint: () => {
       const j = store.jukebox;
       const what = j.on ? trackTitle(j) : '';
-      return { k: `${j.on}|${what}`, parts: [hintTitle('🎵 Jukebox'), aside(j.on ? `♪ ${clip(what, 40)}` : 'off'), key('E', j.on ? 'Change the song' : 'Put on a song')] };
+      return { k: `${j.on}|${what}`, parts: [hintTitle(uiText('🎵 Jukebox')), aside(j.on ? `♪ ${clip(what, 40)}` : 'off'), key('E', j.on ? uiText('Change the song') : uiText('Put on a song'))] };
     },
     use: onE(() => showJukebox()),
   });

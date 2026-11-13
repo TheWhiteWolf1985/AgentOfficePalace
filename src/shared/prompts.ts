@@ -1,3 +1,4 @@
+import { t as uiText } from './i18n.js';
 // Every prompt the office writes for a worker by itself: what 🤖 Hand to a worker, 🔍 Review and the
 // boards' other buttons send, what the queue adds to a task, the board agents' briefs, the meeting
 // room's parts and the sign-writer's instructions. Each can be rewritten in ⚙️ Settings (kept by
@@ -10,13 +11,13 @@ export type PromptGroup = 'issues' | 'pulls' | 'queue' | 'repos' | 'stations' | 
 
 /** The editor's sections, in order. */
 export const PROMPT_GROUPS: Record<PromptGroup, string> = {
-  issues: '📌 Issues board',
-  pulls: '🔀 Pull requests board',
-  queue: '📋 Task queue',
-  repos: '🗂️ Across repositories',
-  stations: '🧑‍💼 Board agents',
-  meetings: '🤝 Meeting room',
-  office: '🏷️ Worker signs',
+  issues: uiText('📌 Issues board'),
+  pulls: uiText('🔀 Pull requests board'),
+  queue: uiText('📋 Task queue'),
+  repos: uiText('🗂️ Across repositories'),
+  stations: uiText('🧑‍💼 Board agents'),
+  meetings: uiText('🤝 Meeting room'),
+  office: uiText('🏷️ Worker signs'),
 };
 
 export interface PromptDef {
@@ -72,16 +73,16 @@ function stationDefault(kind: StationKind): string {
 
 const station = (kind: StationKind): PromptDef => ({
   group: 'stations',
-  label: `${STATION_AGENT[kind].name}'s brief`,
-  used: `Told to the ${STATION_AGENT[kind].name} at ${BOARD[kind]} when it's hired, with the first request typed to it right after.`,
+  label: uiText`${STATION_AGENT[kind].name}'s brief`,
+  used: uiText`Told to the ${STATION_AGENT[kind].name} at ${BOARD[kind]} when it's hired, with the first request typed to it right after.`,
   vars: {},
   text: stationDefault(kind),
 });
 
 // --- Placeholders several prompts share -----------------------------------------------------------
 
-const ISSUE_VARS = { number: 'The issue number', title: 'The issue title', url: 'Its page on GitHub' };
-const PULL_VARS = { number: 'The pull request number', title: 'Its title', url: 'Its page on GitHub', branch: 'Its branch', base: 'The branch it merges into' };
+const ISSUE_VARS = { number: uiText('The issue number'), title: uiText('The issue title'), url: uiText('Its page on GitHub') };
+const PULL_VARS = { number: uiText('The pull request number'), title: uiText('Its title'), url: uiText('Its page on GitHub'), branch: uiText('Its branch'), base: uiText('The branch it merges into') };
 const MERGE_VARS = { ...PULL_VARS, repo: 'owner/name of the repository', merge: 'The gh pr merge command for the method (and branch deletion) picked in the merge dialog' };
 const CHECKOUT = 'Get onto its branch: `gh pr checkout {{number}}`. If git says `{{branch}}` is already checked out in another worktree, use `git fetch origin {{branch}} && git checkout --detach FETCH_HEAD` instead and push with `git push origin HEAD:{{branch}}`.';
 const OUTPUT = "That file is the meeting's output.";
@@ -92,23 +93,23 @@ const DEFS = {
   // --- 📌 Issues board ---
   'issue.work': {
     group: 'issues',
-    label: '🤖 Hand to a worker',
-    used: 'The task a worker gets for an issue: 🤖 Hand to a worker, 📋 Add to queue, and a card carried to a desk or the queue.',
+    label: uiText('🤖 Hand to a worker'),
+    used: uiText('The task a worker gets for an issue: 🤖 Hand to a worker, 📋 Add to queue, and a card carried to a desk or the queue.'),
     vars: ISSUE_VARS,
     text: 'Work on GitHub issue #{{number}}: "{{title}}".\n\nRead it first with `gh issue view {{number}} --comments`. Create a new branch, implement the change, verify it, then open a pull request that closes #{{number}}.',
   },
   'issue.ask': {
     group: 'issues',
-    label: '✍️ Ask a worker (context)',
-    used: 'Told to the worker ahead of your own words when you ✍️ Ask a worker about an issue.',
+    label: uiText('✍️ Ask a worker (context)'),
+    used: uiText('Told to the worker ahead of your own words when you ✍️ Ask a worker about an issue.'),
     vars: ISSUE_VARS,
     optional: true,
     text: 'This is about GitHub issue #{{number}} "{{title}}" ({{url}}). Read it with `gh issue view {{number}} --comments`.',
   },
   'issue.meeting': {
     group: 'issues',
-    label: '🤝 Meeting about it',
-    used: 'What a 🤝 Meeting about an issue is about, to start with: the meeting form opens with it filled in.',
+    label: uiText('🤝 Meeting about it'),
+    used: uiText('What a 🤝 Meeting about an issue is about, to start with: the meeting form opens with it filled in.'),
     vars: ISSUE_VARS,
     text: 'GitHub issue #{{number}}: “{{title}}”. Read it first with gh issue view {{number}} --comments.',
   },
@@ -116,15 +117,15 @@ const DEFS = {
   // --- 🔀 Pull requests board ---
   'pull.review': {
     group: 'pulls',
-    label: '🔍 Review',
-    used: 'What 🔍 Review on an open pull request sends a worker.',
+    label: uiText('🔍 Review'),
+    used: uiText('What 🔍 Review on an open pull request sends a worker.'),
     vars: PULL_VARS,
     text: "Review pull request #{{number}}: \"{{title}}\".\n\nUse `gh pr view {{number}} --comments` and `gh pr diff {{number}}`. Look for bugs, risky changes and missing tests, then give me a short summary with concrete suggestions. Don't push any commits.",
   },
   'pull.fixMerge': {
     group: 'pulls',
-    label: '🤖 Fix up & merge',
-    used: 'What the merge dialog\'s "hand it to a worker" sends when the pull request has no conflicts: address the feedback, get the checks green, merge.',
+    label: uiText('🤖 Fix up & merge'),
+    used: uiText('What the merge dialog\'s "hand it to a worker" sends when the pull request has no conflicts: address the feedback, get the checks green, merge.'),
     vars: MERGE_VARS,
     text: [
       'Get pull request #{{number}} "{{title}}" ({{url}}) ready and merge it.',
@@ -139,8 +140,8 @@ const DEFS = {
   },
   'pull.fixConflicts': {
     group: 'pulls',
-    label: '🤖 Fix conflicts & merge',
-    used: 'What the merge dialog\'s "hand it to a worker" sends when the pull request conflicts with its base.',
+    label: uiText('🤖 Fix conflicts & merge'),
+    used: uiText('What the merge dialog\'s "hand it to a worker" sends when the pull request conflicts with its base.'),
     vars: MERGE_VARS,
     text: [
       'Pull request #{{number}} "{{title}}" ({{url}}) has merge conflicts with `{{base}}`. Resolve them and merge it.',
@@ -155,16 +156,16 @@ const DEFS = {
   },
   'pull.ask': {
     group: 'pulls',
-    label: '✍️ Ask a worker (context)',
-    used: 'Told to the worker ahead of your own words when you ✍️ Ask a worker about a pull request.',
+    label: uiText('✍️ Ask a worker (context)'),
+    used: uiText('Told to the worker ahead of your own words when you ✍️ Ask a worker about a pull request.'),
     vars: PULL_VARS,
     optional: true,
     text: 'This is about pull request #{{number}} "{{title}}" ({{url}}), branch `{{branch}}` into `{{base}}`. Read it with `gh pr view {{number}} --comments` and see its changes with `gh pr diff {{number}}`.',
   },
   'pull.panel': {
     group: 'pulls',
-    label: '🤝 Review panel',
-    used: 'What a 🤝 Review panel is about, to start with: the meeting form opens with it filled in.',
+    label: uiText('🤝 Review panel'),
+    used: uiText('What a 🤝 Review panel is about, to start with: the meeting form opens with it filled in.'),
     vars: PULL_VARS,
     text: 'Review pull request #{{number}}: “{{title}}”.',
   },
@@ -172,8 +173,8 @@ const DEFS = {
   // --- 📋 Task queue ---
   'queue.worktree': {
     group: 'queue',
-    label: '🌿 Worktree note',
-    used: 'Added after every task the queue starts in its own git worktree.',
+    label: uiText('🌿 Worktree note'),
+    used: uiText('Added after every task the queue starts in its own git worktree.'),
     vars: {},
     optional: true,
     text: "You're in your own git worktree, on a fresh branch made for this task. Commit there, push it, and open the pull request from it.",
@@ -182,12 +183,12 @@ const DEFS = {
   // --- 🗂️ Across repositories ---
   'worker.repos': {
     group: 'repos',
-    label: '🗂️ Workspace brief',
-    used: "Written into the workspace of a worker hired across several floors' repositories, as its CLAUDE.md and AGENTS.md, which the agent reads when it starts.",
+    label: uiText('🗂️ Workspace brief'),
+    used: uiText("Written into the workspace of a worker hired across several floors' repositories, as its CLAUDE.md and AGENTS.md, which the agent reads when it starts."),
     vars: {
-      branch: 'The branch every worktree in the workspace is on',
-      repos: "One line per repository: its folder in the workspace, its project and the branch it's cut from",
-      home: 'The project of the floor the worker was hired on (owner/name when it is on GitHub)',
+      branch: uiText('The branch every worktree in the workspace is on'),
+      repos: uiText("One line per repository: its folder in the workspace, its project and the branch it's cut from"),
+      home: uiText('The project of the floor the worker was hired on (owner/name when it is on GitHub)'),
     },
     needs: ['repos'],
     text: [
@@ -210,23 +211,23 @@ const DEFS = {
   // --- 🤝 Meeting room ---
   'meeting.brief': {
     group: 'meetings',
-    label: 'Sitting down',
-    used: 'What every worker at the table is told when it sits down, ahead of its first part.',
+    label: uiText('Sitting down'),
+    used: uiText('What every worker at the table is told when it sits down, ahead of its first part.'),
     vars: {
-      title: "The meeting's title",
-      role: 'Their role at the table',
-      pattern: 'The kind of meeting: Debate, Lead & team…',
-      others: 'The other roles at the table',
-      how: 'How the rounds of this kind of meeting go',
-      about: 'What the meeting is about, as it was called',
-      pullRequest: 'For a pull request: a line saying which and how to read it (empty otherwise)',
-      issue: 'For an issue: a line saying which and how to read it (empty otherwise)',
-      cwd: 'Their working directory',
-      notes: "The notes folder, where they read each other's parts",
-      output: "The output file, as it's named in the project",
-      outputPath: 'The output file, by its full path',
-      rounds: 'The round limit: "3 rounds"',
-      where: 'What they may and may not do in the checkout (commit, push, switch branches)',
+      title: uiText("The meeting's title"),
+      role: uiText('Their role at the table'),
+      pattern: uiText('The kind of meeting: Debate, Lead & team…'),
+      others: uiText('The other roles at the table'),
+      how: uiText('How the rounds of this kind of meeting go'),
+      about: uiText('What the meeting is about, as it was called'),
+      pullRequest: uiText('For a pull request: a line saying which and how to read it (empty otherwise)'),
+      issue: uiText('For an issue: a line saying which and how to read it (empty otherwise)'),
+      cwd: uiText('Their working directory'),
+      notes: uiText("The notes folder, where they read each other's parts"),
+      output: uiText("The output file, as it's named in the project"),
+      outputPath: uiText('The output file, by its full path'),
+      rounds: uiText('The round limit: "3 rounds"'),
+      where: uiText('What they may and may not do in the checkout (commit, push, switch branches)'),
     },
     text: [
       '{{title}}',
@@ -240,120 +241,120 @@ const DEFS = {
   },
   'meeting.wait': {
     group: 'meetings',
-    label: 'No part in round 1',
-    used: 'Told (after sitting down) to a worker with nothing to do in the first round, like the team in Lead & team.',
+    label: uiText('No part in round 1'),
+    used: uiText('Told (after sitting down) to a worker with nothing to do in the first round, like the team in Lead & team.'),
     vars: {},
     text: "Round 1 has no part for you. Reply in one line that you're ready and end your turn; your part comes in a later message.",
   },
   'meeting.nudge': {
     group: 'meetings',
-    label: 'Nudge',
-    used: 'Sent once to a worker that ended its turn without writing its part.',
-    vars: { file: 'The file the meeting is waiting on' },
+    label: uiText('Nudge'),
+    used: uiText('Sent once to a worker that ended its turn without writing its part.'),
+    vars: { file: uiText('The file the meeting is waiting on') },
     needs: ['file'],
     text: 'You ended your turn without writing {{file}}, which the meeting is waiting on. Write it now, then end your turn.',
   },
   'meeting.debate.propose': {
     group: 'meetings',
-    label: 'Debate · propose',
-    used: 'Round 1 of a Debate, for everyone at the table.',
-    vars: { role: 'Their role', file: FILE_NOTE },
+    label: uiText('Debate · propose'),
+    used: uiText('Round 1 of a Debate, for everyone at the table.'),
+    vars: { role: uiText('Their role'), file: FILE_NOTE },
     needs: ['file'],
     text: "Propose your answer, from where you stand as the {{role}}: what you'd do, why, and what it costs. Write it to {{file}}, then end your turn.",
   },
   'meeting.debate.critique': {
     group: 'meetings',
-    label: 'Debate · critique',
-    used: 'The rounds of a Debate between the first and the last, for everyone at the table.',
-    vars: { previousRound: 'The round before this one', theirNotes: "The others' notes from it", file: FILE_NOTE },
+    label: uiText('Debate · critique'),
+    used: uiText('The rounds of a Debate between the first and the last, for everyone at the table.'),
+    vars: { previousRound: uiText('The round before this one'), theirNotes: uiText("The others' notes from it"), file: FILE_NOTE },
     needs: ['file'],
     text: "Read the others' notes from round {{previousRound}}: {{theirNotes}}. Say where they're wrong or miss something, then give your revised proposal. Write it to {{file}}, then end your turn.",
   },
   'meeting.debate.decide': {
     group: 'meetings',
-    label: 'Debate · decide',
-    used: 'The last round of a Debate, for the head of the table.',
-    vars: { notes: 'The notes folder', lastNotes: "The last round's notes", output: OUTPUT_NOTE },
+    label: uiText('Debate · decide'),
+    used: uiText('The last round of a Debate, for the head of the table.'),
+    vars: { notes: uiText('The notes folder'), lastNotes: uiText("The last round's notes"), output: OUTPUT_NOTE },
     needs: ['output'],
     text: `Read every note in {{notes}}/ (the last round's are {{lastNotes}}). Weigh the proposals and critiques, and write the decision to {{output}}: what was decided and why, the options that lost and why, and what's still open. ${OUTPUT}`,
   },
   'meeting.lead.plan': {
     group: 'meetings',
-    label: 'Lead & team · plan',
-    used: 'Round 1 of Lead & team, for the lead.',
-    vars: { parts: 'How many parts: "2 parts"', team: 'The rest of the table, by role', exampleRole: "The first teammate's role", file: 'The plan, which the meeting waits for' },
+    label: uiText('Lead & team · plan'),
+    used: uiText('Round 1 of Lead & team, for the lead.'),
+    vars: { parts: uiText('How many parts: "2 parts"'), team: uiText('The rest of the table, by role'), exampleRole: uiText("The first teammate's role"), file: uiText('The plan, which the meeting waits for') },
     needs: ['file'],
     text: 'Read the task and the code it touches, and split the work into {{parts}}, one each for {{team}}. Write the plan to {{file}}: a section for each of them headed with their role (like "## {{exampleRole}}"), saying what to do and which files they own, so that no two of them touch the same file. Don\'t make the changes yourself. Then end your turn.',
   },
   'meeting.lead.part': {
     group: 'meetings',
-    label: 'Lead & team · do a part',
-    used: 'Round 2 of Lead & team, for each teammate.',
-    vars: { plan: "The lead's plan", role: 'Their role, which heads their section of it', lead: "The lead's role", file: FILE_NOTE },
+    label: uiText('Lead & team · do a part'),
+    used: uiText('Round 2 of Lead & team, for each teammate.'),
+    vars: { plan: uiText("The lead's plan"), role: uiText('Their role, which heads their section of it'), lead: uiText("The lead's role"), file: FILE_NOTE },
     needs: ['file'],
     text: 'Read {{plan}} and do your part, the section headed "## {{role}}". Change only the files it gives you, and don\'t commit. When you\'re done, write what you did and what the {{lead}} should know (what you couldn\'t do, how you checked it) to {{file}}, then end your turn.',
   },
   'meeting.lead.merge': {
     group: 'meetings',
-    label: 'Lead & team · merge',
-    used: 'Round 3 of Lead & team, for the lead.',
-    vars: { reports: "The team's reports", output: OUTPUT_NOTE },
+    label: uiText('Lead & team · merge'),
+    used: uiText('Round 3 of Lead & team, for the lead.'),
+    vars: { reports: uiText("The team's reports"), output: OUTPUT_NOTE },
     needs: ['output'],
     text: `Read the team's reports ({{reports}}) and look at their changes (git status, git diff). Fix whatever doesn't fit together and check that it works (build it, run the tests). Then write {{output}}: what was done, by whom, and how it was checked. ${OUTPUT} Don't commit.`,
   },
   'meeting.mapreduce.map': {
     group: 'meetings',
-    label: 'Map-reduce · map',
-    used: 'Round 1 of Map-reduce, for each mapper.',
-    vars: { parts: 'Their parts, one "- " line each', file: FILE_NOTE },
+    label: uiText('Map-reduce · map'),
+    used: uiText('Round 1 of Map-reduce, for each mapper.'),
+    vars: { parts: uiText('Their parts, one "- " line each'), file: FILE_NOTE },
     needs: ['parts', 'file'],
     text: 'Do the task for your parts, and only those:\n{{parts}}\nWrite what you found or did to {{file}}, a section per part, then end your turn.',
   },
   'meeting.mapreduce.reduce': {
     group: 'meetings',
-    label: 'Map-reduce · reduce',
-    used: 'Round 2 of Map-reduce, for the head of the table.',
-    vars: { results: "The mappers' notes", output: OUTPUT_NOTE },
+    label: uiText('Map-reduce · reduce'),
+    used: uiText('Round 2 of Map-reduce, for the head of the table.'),
+    vars: { results: uiText("The mappers' notes"), output: OUTPUT_NOTE },
     needs: ['output'],
     text: `Read the mappers' results ({{results}}) and combine them into {{output}}: one result that reads as a whole, not a pile of sections. ${OUTPUT}`,
   },
   'meeting.redblue.attack': {
     group: 'meetings',
-    label: 'Red / blue · attack',
-    used: 'Every round of Red / blue, for the Red team. A note that says just NO FINDINGS ends the meeting early.',
-    vars: { previousFixes: "After round 1: a sentence (starting with a space) pointing at the Blue team's last fixes. Empty in round 1", file: FILE_NOTE },
+    label: uiText('Red / blue · attack'),
+    used: uiText('Every round of Red / blue, for the Red team. A note that says just NO FINDINGS ends the meeting early.'),
+    vars: { previousFixes: uiText("After round 1: a sentence (starting with a space) pointing at the Blue team's last fixes. Empty in round 1"), file: FILE_NOTE },
     needs: ['file'],
     text: "Attack the change the meeting is about like an adversary would: bugs, security holes, unhandled edge cases, broken error handling. Read the code; don't change it.{{previousFixes}} List each finding in {{file}} with its file:line, what goes wrong and how to make it happen, the most serious first. If you find nothing worth fixing, write just NO FINDINGS. Then end your turn.",
   },
   'meeting.redblue.fix': {
     group: 'meetings',
-    label: 'Red / blue · fix',
-    used: 'Every round of Red / blue, for the Blue team.',
-    vars: { findings: "The Red team's findings", file: "The Blue team's note on what it did", lastRound: 'In the last round: a sentence (starting with a space) asking it to write the output too. Empty otherwise', output: OUTPUT_NOTE },
+    label: uiText('Red / blue · fix'),
+    used: uiText('Every round of Red / blue, for the Blue team.'),
+    vars: { findings: uiText("The Red team's findings"), file: uiText("The Blue team's note on what it did"), lastRound: uiText('In the last round: a sentence (starting with a space) asking it to write the output too. Empty otherwise'), output: OUTPUT_NOTE },
     needs: ['file', 'lastRound'],
     text: "Read the Red team's findings in {{findings}} and fix each one that's real, in the checkout (don't commit). For each, say in {{file}} what you did, or why it isn't a problem.{{lastRound}} Then end your turn.",
   },
   'meeting.redblue.writeup': {
     group: 'meetings',
-    label: 'Red / blue · write it up',
-    used: 'Red / blue, once the Red team finds nothing more: for the Blue team.',
-    vars: { findings: "The Red team's last note", notes: 'The notes folder', output: OUTPUT_NOTE },
+    label: uiText('Red / blue · write it up'),
+    used: uiText('Red / blue, once the Red team finds nothing more: for the Blue team.'),
+    vars: { findings: uiText("The Red team's last note"), notes: uiText('The notes folder'), output: OUTPUT_NOTE },
     needs: ['output'],
     text: `The Red team found nothing more in {{findings}}. Write {{output}}: every finding from every round ({{notes}}/), what was fixed and how, and what's still open. ${OUTPUT} Don't commit.`,
   },
   'meeting.review.review': {
     group: 'meetings',
-    label: 'Review panel · review',
-    used: 'Round 1 of a Review panel, for each reviewer. A note that says just NO FINDINGS counts as nothing found.',
-    vars: { pr: 'The pull request number', role: 'Their lens: Security, Performance…', file: FILE_NOTE },
+    label: uiText('Review panel · review'),
+    used: uiText('Round 1 of a Review panel, for each reviewer. A note that says just NO FINDINGS counts as nothing found.'),
+    vars: { pr: uiText('The pull request number'), role: uiText('Their lens: Security, Performance…'), file: FILE_NOTE },
     needs: ['file'],
     text: "Review pull request #{{pr}} through your lens, {{role}}, and nothing else. Read it with gh pr view {{pr}} and gh pr diff {{pr}}; don't check it out or change any files. Write your findings to {{file}}, one per bullet: the file:line, what's wrong and what to do about it, the most serious first. If you find nothing, write just NO FINDINGS. Then end your turn.",
   },
   'meeting.review.combine': {
     group: 'meetings',
-    label: 'Review panel · combine',
-    used: 'Round 2 of a Review panel, for the head of the table. The office posts the file on the pull request.',
-    vars: { findings: "Every reviewer's notes", exampleRole: "A reviewer's lens, for the example tag", output: OUTPUT_NOTE },
+    label: uiText('Review panel · combine'),
+    used: uiText('Round 2 of a Review panel, for the head of the table. The office posts the file on the pull request.'),
+    vars: { findings: uiText("Every reviewer's notes"), exampleRole: uiText("A reviewer's lens, for the example tag"), output: OUTPUT_NOTE },
     needs: ['output'],
     text: `Read every reviewer's findings ({{findings}}). Drop the duplicates, keeping the clearest wording, and write one combined review to {{output}} in Markdown: a short summary with your verdict first, then the findings, the most serious first, each tagged with the lens it came from in bold brackets like **[{{exampleRole}}]**, with its file:line. Don't post it: the office posts it on the pull request once the file is written. ${OUTPUT}`,
   },
@@ -361,8 +362,8 @@ const DEFS = {
   // --- 🏷️ Worker signs ---
   'office.namer': {
     group: 'office',
-    label: 'Sign writer',
-    used: "The instructions for the small model (Claude Haiku) that writes the name and one-line summary on the card above each worker's head. It always answers with a name and a summary.",
+    label: uiText('Sign writer'),
+    used: uiText("The instructions for the small model (Claude Haiku) that writes the name and one-line summary on the card above each worker's head. It always answers with a name and a summary."),
     vars: {},
     text: `You write the label for a sign above an AI coding agent's head in a virtual office, so people walking past can tell what it is working on.
 Reply with JSON only:

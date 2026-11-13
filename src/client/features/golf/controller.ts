@@ -1,3 +1,4 @@
+import { t as uiText } from '../../../shared/i18n';
 import * as THREE from 'three';
 import { BALCONY, GOLF_HOLE } from '../../../shared/layout';
 import { isTyping, type PlayerController } from '../../player';
@@ -94,7 +95,7 @@ export class Golfer {
     this.rest = h('span.golf-rest');
     this.mark = h('span.golf-last');
     this.info = h('div.golf-info');
-    this.panel = h('div.golf.panel.hidden', { id: 'golf', 'aria-label': 'Golf' }, h('div.golf-title', {}, `⛳ Hole 1 · ${Math.round(PIN_DISTANCE)} m · Par 1`), h('div.golf-meter', {}, this.rest, this.mark), this.info);
+    this.panel = h('div.golf.panel.hidden', { id: 'golf', 'aria-label': uiText('Golf') }, h('div.golf-title', {}, uiText`⛳ Hole 1 · ${Math.round(PIN_DISTANCE)} m · Par 1`), h('div.golf-meter', {}, this.rest, this.mark), this.info);
     $('hud').append(this.panel);
     window.addEventListener('keydown', (e) => this.key(e, true));
     window.addEventListener('keyup', (e) => this.key(e, false));
@@ -271,8 +272,8 @@ export class Golfer {
     this.mark.style.left = `${this.lastPower * 100}%`;
     this.mark.classList.toggle('hidden', this.lastPower < 0);
     const off = THREE.MathUtils.radToDeg(this.aim - PIN_YAW);
-    const aim = Math.abs(off) < 0.5 ? 'at the pin' : `${Math.abs(off).toFixed(0)}° ${off > 0 ? 'left' : 'right'}`;
-    const text = `Loft ${THREE.MathUtils.radToDeg(this.loft).toFixed(0)}° · Aim ${aim}`;
+    const aim = Math.abs(off) < 0.5 ? uiText('at the pin') : `${Math.abs(off).toFixed(0)}° ${off > 0 ? 'left' : 'right'}`;
+    const text = uiText`Loft ${THREE.MathUtils.radToDeg(this.loft).toFixed(0)}° · Aim ${aim}`;
     if (text === this.shown) return;
     this.shown = text;
     this.info.textContent = text;

@@ -1,3 +1,4 @@
+import { t as uiText, remoteText } from '../../../shared/i18n';
 import type { ServerMsg } from '../../../shared/protocol';
 import { store } from '../../state';
 
@@ -11,13 +12,13 @@ function onFloor(url: string): string {
 
 export async function getJson<T>(url: string): Promise<T> {
   const r = await fetch(onFloor(url), { credentials: 'same-origin' });
-  if (!r.ok) throw new Error((await r.json().catch(() => null))?.error ?? `HTTP ${r.status}`);
+  if (!r.ok) throw new Error(remoteText((await r.json().catch(() => null))?.error ?? uiText`HTTP ${r.status}`));
   return r.json() as Promise<T>;
 }
 
 export async function getText(url: string): Promise<string> {
   const r = await fetch(onFloor(url), { credentials: 'same-origin' });
-  if (!r.ok) throw new Error((await r.json().catch(() => null))?.error ?? `HTTP ${r.status}`);
+  if (!r.ok) throw new Error(remoteText((await r.json().catch(() => null))?.error ?? uiText`HTTP ${r.status}`));
   return r.text();
 }
 

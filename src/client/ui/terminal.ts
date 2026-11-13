@@ -1,3 +1,4 @@
+import { t as uiText } from '../../shared/i18n';
 import './terminal.css';
 import { Terminal } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
@@ -29,9 +30,9 @@ const TYPING_SHOWS_MS = 2500;
 
 /** "Sam is typing…", "Sam and Ada are typing…", "Sam and 2 others are typing…". */
 function typingLine(names: string[]): string {
-  if (names.length === 1) return `${names[0]} is typing…`;
-  if (names.length === 2) return `${names[0]} and ${names[1]} are typing…`;
-  return `${names[0]} and ${names.length - 1} others are typing…`;
+  if (names.length === 1) return uiText`${names[0]} is typing…`;
+  if (names.length === 2) return uiText`${names[0]} and ${names[1]} are typing…`;
+  return uiText`${names[0]} and ${names.length - 1} others are typing…`;
 }
 
 /**
@@ -55,12 +56,12 @@ function initials(name: string): string {
 
 /** Sends a file dropped or pasted into a worker's terminal to the office; where the office keeps it. */
 async function uploadDrop(workerId: string, f: File): Promise<string> {
-  const name = f.name || 'That file';
-  if (f.size > DROP_MAX_BYTES) throw new Error(`${name} is too big to drop into a terminal (${DROP_MAX_BYTES / 1024 / 1024} MB at most)`);
+  const name = f.name || uiText('That file');
+  if (f.size > DROP_MAX_BYTES) throw new Error(uiText`${name} is too big to drop into a terminal (${DROP_MAX_BYTES / 1024 / 1024} MB at most)`);
   const q = new URLSearchParams({ floor: store.floor ?? '', worker: workerId, name: f.name });
   const res = await fetch(`/api/term/drop?${q}`, { method: 'POST', headers: { 'content-type': f.type || 'application/octet-stream' }, body: f });
   const r = (await res.json().catch(() => ({}))) as { path?: string; error?: string };
-  if (!res.ok || !r.path) throw new Error(r.error ?? `${name} could not be dropped into the terminal`);
+  if (!res.ok || !r.path) throw new Error(r.error ?? uiText`${name} could not be dropped into the terminal`);
   return r.path;
 }
 
@@ -75,14 +76,14 @@ export interface TerminalOptions {
 
 /** The keypad's keys: what each types, or a function of the terminal for the ones that depend on its mode. */
 const KEYPAD: { label: string; title: string; keys: string | ((term: Terminal) => string) }[] = [
-  { label: '1', title: 'Pick 1 (yes, in a permission prompt)', keys: '1' },
-  { label: '2', title: 'Pick 2', keys: '2' },
-  { label: '3', title: 'Pick 3', keys: '3' },
-  { label: '↑', title: 'Up', keys: (t) => (t.modes.applicationCursorKeysMode ? '\x1bOA' : '\x1b[A') },
-  { label: '↓', title: 'Down', keys: (t) => (t.modes.applicationCursorKeysMode ? '\x1bOB' : '\x1b[B') },
+  { label: '1', title: uiText('Pick 1 (yes, in a permission prompt)'), keys: '1' },
+  { label: '2', title: uiText('Pick 2'), keys: '2' },
+  { label: '3', title: uiText('Pick 3'), keys: '3' },
+  { label: '↑', title: uiText('Up'), keys: (t) => (t.modes.applicationCursorKeysMode ? '\x1bOA' : '\x1b[A') },
+  { label: '↓', title: uiText('Down'), keys: (t) => (t.modes.applicationCursorKeysMode ? '\x1bOB' : '\x1b[B') },
   { label: '⏎', title: 'Enter', keys: '\r' },
   { label: '⇥', title: 'Tab', keys: '\t' },
-  { label: 'Esc', title: 'Esc: close a menu, or interrupt the agent', keys: '\x1b' },
+  { label: 'Esc', title: uiText('Esc: close a menu, or interrupt the agent'), keys: '\x1b' },
   { label: '^C', title: 'Ctrl+C', keys: '\x03' },
 ];
 
@@ -114,24 +115,24 @@ export function openTerminal(net: Net, workerId: string, onChanges?: () => void,
   const viewers = h('div.viewers', {});
   const modelsBtn = h('button.btn', {
     type: 'button',
-    title: 'OpenCode models: Ctrl+X then M (use /models if custom bindings override it)',
-    'aria-label': 'OpenCode models',
-  }, '🧠 Models');
+    title: uiText('OpenCode models: Ctrl+X then M (use /models if custom bindings override it)'),
+    'aria-label': uiText('OpenCode models'),
+  }, uiText('🧠 Models'));
   const typed = h('span.typed', {});
   // The Esc key leaves the terminal, so this is how Esc reaches the program: to close a menu like
   // Claude's /skills, or to interrupt it. Ctrl+[ does the same from the keyboard.
   const escBtn = h('button.btn', {
     type: 'button',
-    title: 'Send Esc to the terminal (Ctrl+[): closes a menu like /skills, or interrupts the agent. The Esc key on its own leaves the terminal',
-    'aria-label': 'Send Esc to the terminal',
-  }, '⎋ Esc');
-  const changesBtn = h('button.btn', { type: 'button', title: 'What this worker changed: files, diff, commit, open a PR (C at the desk)' }, '🌿 Changes');
-  const hideBtn = h('button.btn.term-hide', { type: 'button', title: 'Hide this terminal; the worker keeps running at its desk', 'aria-label': 'Hide terminal' }, 'Hide');
-  const closeBtn = h('button.btn.close', { title: 'Hide terminal (Esc or Ctrl+]) · the worker keeps running; ⎋ Esc or Ctrl+[ sends Esc to the terminal', 'aria-label': 'Hide terminal' }, '✕');
-  const host = h('div.term-host', { 'data-drop': '📎 Drop screenshots or files here to put them in the terminal' });
-  const keys = h('div.term-keys', { role: 'group', 'aria-label': 'Keys' });
-  const say = h('input', { type: 'text', placeholder: 'Reply, or tell it what to do next…', 'aria-label': 'Prompt', enterkeyhint: 'send', autocomplete: 'off' }) as HTMLInputElement;
-  const sayBtn = h('button.btn.primary', { type: 'submit' }, 'Send');
+    title: uiText('Send Esc to the terminal (Ctrl+[): closes a menu like /skills, or interrupts the agent. The Esc key on its own leaves the terminal'),
+    'aria-label': uiText('Send Esc to the terminal'),
+  }, uiText('⎋ Esc'));
+  const changesBtn = h('button.btn', { type: 'button', title: uiText('What this worker changed: files, diff, commit, open a PR (C at the desk)') }, uiText('🌿 Changes'));
+  const hideBtn = h('button.btn.term-hide', { type: 'button', title: uiText('Hide this terminal; the worker keeps running at its desk'), 'aria-label': uiText('Hide terminal') }, uiText('Hide'));
+  const closeBtn = h('button.btn.close', { title: uiText('Hide terminal (Esc or Ctrl+]) · the worker keeps running; ⎋ Esc or Ctrl+[ sends Esc to the terminal'), 'aria-label': uiText('Hide terminal') }, '✕');
+  const host = h('div.term-host', { 'data-drop': uiText('📎 Drop screenshots or files here to put them in the terminal') });
+  const keys = h('div.term-keys', { role: 'group', 'aria-label': uiText('Keys') });
+  const say = h('input', { type: 'text', placeholder: uiText('Reply, or tell it what to do next…'), 'aria-label': uiText('Prompt'), enterkeyhint: 'send', autocomplete: 'off' }) as HTMLInputElement;
+  const sayBtn = h('button.btn.primary', { type: 'submit' }, uiText('Send'));
   const sayForm = h('form.term-say', {}, dictateField(say), sayBtn);
   const keypad = opts.keypad ? h('div.term-keypad', {}, keys, sayForm) : null;
   const tabs = termTabs(workerId, { host, keypad, focusTerm: () => term.focus() });
@@ -145,11 +146,11 @@ export function openTerminal(net: Net, workerId: string, onChanges?: () => void,
         term.paste(`${text} `);
       },
     },
-    { label: 'Dictate' },
+    { label: uiText('Dictate') },
   );
   host.append(mic.live);
   // The keypad has an Esc of its own, and a 🎤 on its prompt box.
-  const el = h('div.modal.term', { role: 'dialog', 'aria-label': `${info.name} terminal` }, h('header', {}, dot, title, pill, cost, viewers, typed, modelsBtn, keypad ? null : mic.button, keypad ? null : escBtn, onChanges ? changesBtn : null, hideBtn, closeBtn), tabs.bar, host, tabs.pages, keypad);
+  const el = h('div.modal.term', { role: 'dialog', 'aria-label': uiText`${info.name} terminal` }, h('header', {}, dot, title, pill, cost, viewers, typed, modelsBtn, keypad ? null : mic.button, keypad ? null : escBtn, onChanges ? changesBtn : null, hideBtn, closeBtn), tabs.bar, host, tabs.pages, keypad);
 
   const term = new Terminal({
     fontFamily: 'ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
@@ -204,12 +205,12 @@ export function openTerminal(net: Net, workerId: string, onChanges?: () => void,
       ...people.map((v) =>
         h(
           'span.avatar',
-          { class: v.typing ? 'typing' : '', style: `background:${v.color}`, title: `${v.name}${v.you ? ' (you)' : ''}${v.typing ? ' · typing' : ''}` },
+          { class: v.typing ? 'typing' : '', style: `background:${v.color}`, title: `${v.name}${v.you ? uiText(' (you)') : ''}${v.typing ? uiText(' · typing') : ''}` },
           initials(v.name),
         ),
       ),
     );
-    viewers.title = people.length ? `In this terminal: ${people.map((v) => (v.you ? `${v.name} (you)` : v.name)).join(', ')}` : '';
+    viewers.title = people.length ? uiText`In this terminal: ${people.map((v) => (v.you ? uiText`${v.name} (you)` : v.name)).join(', ')}` : '';
     const typists = people.filter((v) => v.typing && !v.you).map((v) => v.name);
     typed.classList.toggle('now', typists.length > 0);
     if (typists.length) {
@@ -217,7 +218,7 @@ export function openTerminal(net: Net, workerId: string, onChanges?: () => void,
       typed.title = '';
     } else {
       typed.textContent = w.lastInput ? `⌨️ ${w.lastInput.by}` : '';
-      typed.title = w.lastInput ? `${w.lastInput.by} typed here last, ${timeAgo(w.lastInput.at)}` : '';
+      typed.title = w.lastInput ? uiText`${w.lastInput.by} typed here last, ${timeAgo(w.lastInput.at)}` : '';
     }
   };
   /** Everyone in the terminal, one face per person however many windows they have it open in, you first. */
@@ -259,7 +260,7 @@ export function openTerminal(net: Net, workerId: string, onChanges?: () => void,
     const workerProvider = w.kind === 'agent' ? resolvedProvider(w.provider, store.project) : undefined;
     const usageState = w.kind === 'agent' ? providerUsageState(w.provider, store.project, w.usage) : undefined;
     const waiting = usageState === 'waiting' ? providerWaitingLabel(workerProvider, store.project) : '';
-    cost.textContent = w.kind !== 'agent' ? '' : usageState === 'tracked' && w.usage ? usageLabel(w.usage, workerProvider) : waiting ? waiting : usageState === 'untracked' ? 'usage untracked' : '';
+    cost.textContent = w.kind !== 'agent' ? '' : usageState === 'tracked' && w.usage ? usageLabel(w.usage, workerProvider) : waiting ? waiting : usageState === 'untracked' ? uiText('usage untracked') : '';
     cost.title = w.kind === 'agent' && w.usage ? usageTitle(w.usage, workerProvider) : w.kind === 'agent' ? providerUsageNote(workerProvider!) : '';
     renderPresence(w);
     const openCode = w.kind === 'agent' && resolvedProvider(w.provider, store.project) === 'opencode';
@@ -282,7 +283,7 @@ export function openTerminal(net: Net, workerId: string, onChanges?: () => void,
   const jumpTo = (f: TerminalFind) => {
     const buf = term.buffer.active;
     const row = findLine(buf, f.needle, f.fromEnd);
-    if (row === undefined) return toast('That line has scrolled out of the terminal since', 'warn');
+    if (row === undefined) return toast(uiText('That line has scrolled out of the terminal since'), 'warn');
     let end = row;
     while (buf.getLine(end + 1)?.isWrapped) end++;
     // A marker follows the line when the terminal reflows, which it does as the window settles.
@@ -336,10 +337,10 @@ export function openTerminal(net: Net, workerId: string, onChanges?: () => void,
 
   const modal = openModal(el, {
     backdropCloses: true,
-    doing: `💻 in ${info.name}'s terminal`,
+    doing: uiText`💻 in ${info.name}'s terminal`,
     onClose: (byEsc) => {
       // Leaving with Esc while the program wanted one (you were in /skills, say): say how to send it one.
-      if (byEsc && ready && screenMentionsEsc(term)) toast(`Esc left the terminal. To send ${store.workers.get(workerId)?.name ?? info.name} an Esc (to close a menu), use ⎋ Esc at the top or Ctrl+[`);
+      if (byEsc && ready && screenMentionsEsc(term)) toast(uiText`Esc left the terminal. To send ${store.workers.get(workerId)?.name ?? info.name} an Esc (to close a menu), use ⎋ Esc at the top or Ctrl+[`);
       listeners.delete(onMsg);
       unsub();
       unsubPeers();

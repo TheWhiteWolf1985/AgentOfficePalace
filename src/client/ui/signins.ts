@@ -1,3 +1,4 @@
+import { t as uiText } from '../../shared/i18n';
 import './signins.css';
 import type { SignInKind, SignInState } from '../../shared/protocol';
 import type { Net } from '../net';
@@ -18,28 +19,28 @@ let open: { modal: Modal; say(why?: string): void } | null = null;
  */
 export function openSignIns(net: Net, why?: string) {
   if (open) return open.say(why);
-  const close = h('button.btn.close', { 'aria-label': 'Close' }, '✕');
+  const close = h('button.btn.close', { 'aria-label': uiText('Close') }, '✕');
   const banner = h('p.team-status', { hidden: true });
   const cards = h('div.signins');
   const el = h(
     'div.modal',
-    { role: 'dialog', 'aria-label': 'Your sign-ins', style: 'width:min(640px,100%)' },
-    h('header', {}, h('h2', {}, '🔐 Your sign-ins'), close),
+    { role: 'dialog', 'aria-label': uiText('Your sign-ins'), style: 'width:min(640px,100%)' },
+    h('header', {}, h('h2', {}, uiText('🔐 Your sign-ins')), close),
     h(
       'div.body.team',
       {},
-      h('p.note.lead', {}, 'Your workers run on your own Claude plan, and the office acts on GitHub as you: comments, merges and pull requests show up under your name. Only your workers use them.'),
+      h('p.note.lead', {}, uiText('Your workers run on your own Claude plan, and the office acts on GitHub as you: comments, merges and pull requests show up under your name. Only your workers use them.')),
       banner,
       cards,
-      h('p.note', {}, 'Or open a 🐚 shell at any desk: it runs as you, so ', h('code', {}, 'claude auth login'), ' and ', h('code', {}, 'gh auth login'), ' typed there sign you in too.'),
+      h('p.note', {}, uiText('Or open a 🐚 shell at any desk: it runs as you, so '), h('code', {}, 'claude auth login'), uiText(' and '), h('code', {}, 'gh auth login'), uiText(' typed there sign you in too.')),
     ),
   );
 
   // Kept across renders, so a half-typed code or token survives the next update.
   const inputs = {
-    code: h('input', { type: 'text', placeholder: 'Paste the code here', 'aria-label': 'Code from the sign-in page', autocomplete: 'off', spellcheck: 'false' }) as HTMLInputElement,
-    claude: h('input', { type: 'password', placeholder: 'sk-ant-oat01-…', 'aria-label': 'Claude token', autocomplete: 'off', spellcheck: 'false' }) as HTMLInputElement,
-    github: h('input', { type: 'password', placeholder: 'ghp_… or github_pat_…', 'aria-label': 'GitHub token', autocomplete: 'off', spellcheck: 'false' }) as HTMLInputElement,
+    code: h('input', { type: 'text', placeholder: uiText('Paste the code here'), 'aria-label': uiText('Code from the sign-in page'), autocomplete: 'off', spellcheck: 'false' }) as HTMLInputElement,
+    claude: h('input', { type: 'password', placeholder: 'sk-ant-oat01-…', 'aria-label': uiText('Claude token'), autocomplete: 'off', spellcheck: 'false' }) as HTMLInputElement,
+    github: h('input', { type: 'password', placeholder: 'ghp_… or github_pat_…', 'aria-label': uiText('GitHub token'), autocomplete: 'off', spellcheck: 'false' }) as HTMLInputElement,
   };
 
   const say = (text?: string) => {
@@ -55,7 +56,7 @@ export function openSignIns(net: Net, why?: string) {
 
   const tokenRow = (which: SignInKind) => {
     const input = inputs[which];
-    const save = h('button.btn', { type: 'submit' }, 'Save');
+    const save = h('button.btn', { type: 'submit' }, uiText('Save'));
     const form = h('form.invite-row', {}, input, save) as HTMLFormElement;
     form.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -70,11 +71,11 @@ export function openSignIns(net: Net, why?: string) {
   const card = (which: SignInKind, s: SignInState, office: boolean) => {
     const status =
       s.status === 'ok'
-        ? h('span.signin-who.ok', {}, '✅ ', s.how === 'office' ? `The office’s own${s.who ? ` (${s.who})` : ''}` : (s.who ?? 'Signed in'))
+        ? h('span.signin-who.ok', {}, '✅ ', s.how === 'office' ? uiText`The office’s own${s.who ? ` (${s.who})` : ''}` : (s.who ?? uiText('Signed in')))
         : s.status === 'busy'
-          ? h('span.signin-who', {}, '⏳ Signing in…')
-          : h('span.signin-who.none', {}, 'Not signed in');
-    const head = h('div.team-head', {}, h('h4', {}, which === 'claude' ? '✳️ Claude' : '🐙 GitHub'), status);
+          ? h('span.signin-who', {}, uiText('⏳ Signing in…'))
+          : h('span.signin-who.none', {}, uiText('Not signed in'));
+    const head = h('div.team-head', {}, h('h4', {}, which === 'claude' ? uiText('✳️ Claude') : uiText('🐙 GitHub')), status);
     const body = h('div.signin-body');
     const box = h('section.signin', { class: s.status }, head, body);
     if (s.error) body.append(h('p.team-status.error', {}, s.error));
@@ -82,9 +83,9 @@ export function openSignIns(net: Net, why?: string) {
     if (s.pending) {
       const url = s.pending.url && /^https:\/\//.test(s.pending.url) ? s.pending.url : undefined;
       if (!url) {
-        body.append(h('p.note', {}, `Starting ${NAMES[which]}’s sign-in…`));
+        body.append(h('p.note', {}, uiText`Starting ${NAMES[which]}’s sign-in…`));
       } else if (which === 'claude') {
-        const send = h('button.btn.primary', { type: 'submit' }, s.pending.sent ? 'Checking…' : 'Send');
+        const send = h('button.btn.primary', { type: 'submit' }, s.pending.sent ? uiText('Checking…') : uiText('Send'));
         if (s.pending.sent) send.setAttribute('disabled', '');
         const form = h('form.invite-row', {}, inputs.code, send) as HTMLFormElement;
         form.addEventListener('submit', (e) => {
@@ -95,7 +96,7 @@ export function openSignIns(net: Net, why?: string) {
           inputs.code.value = '';
         });
         body.append(
-          h('ol.signin-steps', {}, h('li', {}, h('a.btn.primary', { href: url, target: '_blank', rel: 'noopener noreferrer' }, 'Open Claude’s sign-in page ↗'), ' and sign in with your own account.'), h('li', {}, 'It shows you a code. Paste it here:', form)),
+          h('ol.signin-steps', {}, h('li', {}, h('a.btn.primary', { href: url, target: '_blank', rel: 'noopener noreferrer' }, uiText('Open Claude’s sign-in page ↗')), uiText(' and sign in with your own account.')), h('li', {}, uiText('It shows you a code. Paste it here:'), form)),
         );
       } else {
         const code = s.pending.code ?? '';
@@ -103,34 +104,34 @@ export function openSignIns(net: Net, why?: string) {
           h(
             'ol.signin-steps',
             {},
-            h('li', {}, 'Copy your one-time code:', h('div.cmd', {}, h('pre.signin-code', {}, code), copyButton('Copy', () => code))),
-            h('li', {}, h('a.btn.primary', { href: url, target: '_blank', rel: 'noopener noreferrer' }, 'Open github.com/login/device ↗'), ' and enter it there.'),
-            h('li', {}, 'This updates by itself once GitHub says yes.'),
+            h('li', {}, uiText('Copy your one-time code:'), h('div.cmd', {}, h('pre.signin-code', {}, code), copyButton(uiText('Copy'), () => code))),
+            h('li', {}, h('a.btn.primary', { href: url, target: '_blank', rel: 'noopener noreferrer' }, uiText('Open github.com/login/device ↗')), uiText(' and enter it there.')),
+            h('li', {}, uiText('This updates by itself once GitHub says yes.')),
           ),
         );
       }
-      body.append(h('div.signin-actions', {}, button('Cancel', () => net.send({ t: 'signins.cancel', which }))));
+      body.append(h('div.signin-actions', {}, button(uiText('Cancel'), () => net.send({ t: 'signins.cancel', which }))));
       return box;
     }
 
     if (s.status === 'ok') {
-      const change = button(s.how === 'office' ? 'Use my own instead' : 'Sign out', () => {
+      const change = button(s.how === 'office' ? uiText('Use my own instead') : uiText('Sign out'), () => {
         if (s.how === 'office') return net.send({ t: 'signins.signout', which });
-        confirmDialog(`Sign out of ${NAMES[which]}?`, which === 'claude' ? 'Workers you hire from now on need a new sign-in. The ones already running keep going.' : 'The office stops acting on GitHub as you until you sign in again.', 'Sign out', () => net.send({ t: 'signins.signout', which }));
+        confirmDialog(uiText`Sign out of ${NAMES[which]}?`, which === 'claude' ? uiText('Workers you hire from now on need a new sign-in. The ones already running keep going.') : uiText('The office stops acting on GitHub as you until you sign in again.'), uiText('Sign out'), () => net.send({ t: 'signins.signout', which }));
       });
       body.append(h('div.signin-actions', {}, change));
       return box;
     }
 
     // Not signed in (or busy looking): the ways in.
-    const start = button(`Sign in with ${NAMES[which]}`, () => net.send({ t: 'signins.start', which }), 'primary');
+    const start = button(uiText`Sign in with ${NAMES[which]}`, () => net.send({ t: 'signins.start', which }), 'primary');
     const actions = h('div.signin-actions', {}, start);
-    if (office) actions.append(button('Use the office’s own', () => net.send({ t: 'signins.office', which })));
+    if (office) actions.append(button(uiText('Use the office’s own'), () => net.send({ t: 'signins.office', which })));
     body.append(
       actions,
       which === 'claude'
-        ? h('p.note', {}, 'Or paste a token: run ', h('code', {}, 'claude setup-token'), ' on your own computer (or use an Anthropic API key).')
-        : h('p.note', {}, 'Or paste a GitHub token (', h('a', { href: 'https://github.com/settings/tokens/new?scopes=repo,read:org,workflow&description=Agent%20Office', target: '_blank', rel: 'noopener noreferrer' }, 'make one'), ' with repo, read:org and workflow).'),
+        ? h('p.note', {}, uiText('Or paste a token: run '), h('code', {}, 'claude setup-token'), uiText(' on your own computer (or use an Anthropic API key).'))
+        : h('p.note', {}, uiText('Or paste a GitHub token ('), h('a', { href: 'https://github.com/settings/tokens/new?scopes=repo,read:org,workflow&description=Agent%20Office', target: '_blank', rel: 'noopener noreferrer' }, uiText('make one')), uiText(' with repo, read:org and workflow).')),
       tokenRow(which),
     );
     return box;
@@ -141,7 +142,7 @@ export function openSignIns(net: Net, why?: string) {
     const typing = document.activeElement;
     cards.replaceChildren();
     if (!s) {
-      cards.append(h('p.empty', {}, store.me.account ? 'Loading…' : 'On the shared office password, workers run on the office’s own sign-ins.'));
+      cards.append(h('p.empty', {}, store.me.account ? uiText('Loading…') : uiText('On the shared office password, workers run on the office’s own sign-ins.')));
       return;
     }
     cards.append(card('claude', s.claude, s.office), card('github', s.github, s.office));

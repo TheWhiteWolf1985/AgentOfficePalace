@@ -1,3 +1,4 @@
+import { t as uiText } from '../../../shared/i18n';
 /**
  * Sitting down: on a chair, a stool, the couch, the throne. Sitting there already, E gets you up, or
  * does what the seat's for (the TV from the couch, Minesweeper from the boss's chair, the bar's menu).
@@ -68,7 +69,7 @@ export function installSeating(ctx: Ctx, deps: SeatingDeps) {
     }
     const place = freePlace(seat);
     if (!place) {
-      toast(`No room on that ${seat.label.replace(/^\S+ /, '').toLowerCase()} right now`, 'warn');
+      toast(uiText`No room on that ${seat.label.replace(/^\S+ /, '').toLowerCase()} right now`, 'warn');
       return;
     }
     player.sit(place);
@@ -88,7 +89,7 @@ export function installSeating(ctx: Ctx, deps: SeatingDeps) {
       ctx.player.stand();
       // On your feet as far as everyone's concerned (the office still has you where you sat before).
       gotUp();
-      toast(`${msg.by} got there first`, 'warn');
+      toast(uiText`${msg.by} got there first`, 'warn');
     }
   });
 
@@ -112,11 +113,11 @@ export function installSeating(ctx: Ctx, deps: SeatingDeps) {
       if (!seat) return { k: '', parts: [] };
       if (ctx.player.seat?.seatId === seat.id) {
         const tv = !!seat.tv && tvShowing();
-        const use = tv ? 'Watch the TV' : seat.game ? 'Play Minesweeper' : seat.bar ? 'Order a drink' : '';
-        return { k: `${seat.id}|sitting|${tv}`, parts: [hintTitle(seat.label), aside('sitting'), ...(use ? [key('E', use), key('W A S D', 'Get up')] : [key('E', 'Get up')])] };
+        const use = tv ? uiText('Watch the TV') : seat.game ? uiText('Play Minesweeper') : seat.bar ? uiText('Order a drink') : '';
+        return { k: `${seat.id}|sitting|${tv}`, parts: [hintTitle(seat.label), aside('sitting'), ...(use ? [key('E', use), key('W A S D', uiText('Get up'))] : [key('E', uiText('Get up'))])] };
       }
       const full = !freePlace(seat);
-      return { k: `${seat.id}|${full}`, parts: [hintTitle(seat.label), seat.game ? aside('💣 Minesweeper on the monitor') : '', full ? aside('no room') : key('E', 'Sit down')] };
+      return { k: `${seat.id}|${full}`, parts: [hintTitle(seat.label), seat.game ? aside(uiText('💣 Minesweeper on the monitor')) : '', full ? aside(uiText('no room')) : key('E', uiText('Sit down'))] };
     },
     use: onE((it) => {
       if (it.seatId) useSeat(it.seatId);

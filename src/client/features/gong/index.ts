@@ -1,3 +1,4 @@
+import { t as uiText } from '../../../shared/i18n';
 /**
  * The merge gong: E bangs it, and the office rings it for everyone on the floor when a pull request
  * merges (a dance party under a confetti rain) or the task queue empties (three strokes and a party).
@@ -43,7 +44,7 @@ export function installGong(ctx: Ctx, deps: GongDeps) {
 
   ctx.interactions.define('gong', {
     reach: 3.5,
-    hint: () => ({ k: '', parts: [hintTitle('🎉 Merge gong'), aside('rings when a PR merges'), key('E', 'Bang it')] }),
+    hint: () => ({ k: '', parts: [hintTitle(uiText('🎉 Merge gong')), aside(uiText('rings when a PR merges')), key('E', uiText('Bang it'))] }),
     use: onE(() => hitGong()),
   });
 

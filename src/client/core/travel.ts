@@ -1,3 +1,4 @@
+import { t as uiText } from '../../shared/i18n';
 /**
  * Floors and the elevator: the building as tall as its floors, riding the elevator (up to the roof,
  * down to the garage), straight to another floor from the floor list, through the ceiling up the
@@ -88,8 +89,8 @@ export function installTravel(ctx: Ctx, core: CoreState, parts: TravelParts) {
     hint: (it) => {
       const f = store.currentFloor();
       const n = store.floors.length;
-      if (it === office.garageLift.interactable) return { k: `garage|${f?.name}|${n}`, parts: [hintTitle('🛗 Elevator'), aside(f ? `Garage · up to ${clip(f.name, 24)}` : 'Garage'), key('E', 'Choose a floor')] };
-      return { k: `${f?.name}|${n}`, parts: [hintTitle('🛗 Elevator'), f ? aside(`${f.name} · ${n} floor${n === 1 ? '' : 's'}`) : '', key('E', n > 1 ? 'Choose a floor' : 'Floors & projects')] };
+      if (it === office.garageLift.interactable) return { k: `garage|${f?.name}|${n}`, parts: [hintTitle(uiText('🛗 Elevator')), aside(f ? uiText`Garage · up to ${clip(f.name, 24)}` : uiText('Garage')), key('E', uiText('Choose a floor'))] };
+      return { k: `${f?.name}|${n}`, parts: [hintTitle(uiText('🛗 Elevator')), f ? aside(uiText`${f.name} · ${n} floor${n === 1 ? '' : 's'}`) : '', key('E', n > 1 ? uiText('Choose a floor') : uiText('Floors & projects'))] };
     },
     use: onE(() => showElevator()),
   });
@@ -120,7 +121,7 @@ export function installTravel(ctx: Ctx, core: CoreState, parts: TravelParts) {
     if (!inOffice()) {
       if (to === ROOF || to === GARAGE) {
         parts.walking.stopWalkingTo();
-        toast(`There's no ${to === ROOF ? 'rooftop bar' : 'garage'} on this map (${plan().icon} ${plan().name})`, 'warn');
+        toast(`There's no ${to === ROOF ? uiText('rooftop bar') : 'garage'} on this map (${plan().icon} ${plan().name})`, 'warn');
         return;
       }
       // Still up on a roof this map doesn't have: straight down to that floor.

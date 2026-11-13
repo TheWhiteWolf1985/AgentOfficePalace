@@ -1,10 +1,11 @@
+import { t as uiText } from './i18n.js';
 // What a person looks like in the office, picked on the character select screen.
 // Server and client share these lists so a look is just three small indexes on the wire.
 
 export const SKIN_TONES = ['#ffe3cc', '#ffd7b5', '#f1c27d', '#e0ac69', '#c68642', '#a0663a', '#8d5524', '#5c3a21'];
 export const HAIR_COLORS = ['#2b2d42', '#4a3222', '#6f4e37', '#e9c46a', '#c1440e', '#d9d9d9', '#d62828', '#ff8fab', '#9d4edd', '#264653'];
-export const HAIR_COLOR_NAMES = ['Black', 'Dark brown', 'Brown', 'Blonde', 'Ginger', 'Silver', 'Red', 'Pink', 'Purple', 'Teal'];
-export const HAIR_STYLES = ['Short', 'Long', 'Bun', 'Spiky', 'Curly', 'Ponytail', 'Bald'];
+export const HAIR_COLOR_NAMES = [uiText('Black'), uiText('Dark brown'), uiText('Brown'), uiText('Blonde'), uiText('Ginger'), uiText('Silver'), uiText('Red'), uiText('Pink'), uiText('Purple'), uiText('Teal')];
+export const HAIR_STYLES = [uiText('Short'), uiText('Long'), uiText('Bun'), uiText('Spiky'), uiText('Curly'), uiText('Ponytail'), uiText('Bald')];
 
 export interface Look {
   skin: number;

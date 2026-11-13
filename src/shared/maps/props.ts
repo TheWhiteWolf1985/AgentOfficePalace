@@ -1,3 +1,4 @@
+import { t as uiText } from '../i18n.js';
 import type { Circle, Rect } from '../nav.js';
 import type { PropConfig } from './types.js';
 
@@ -9,37 +10,37 @@ import type { PropConfig } from './types.js';
 
 export const PROP_KINDS = {
   /** A stone pillar, floor to ceiling. `scale` widens it. */
-  pillar: 'A stone pillar, floor to ceiling',
+  pillar: uiText('A stone pillar, floor to ceiling'),
   /** A torch in an iron sconce on a wall or a pillar, `y` up, burning toward `rotY`. */
-  torch: 'A torch in a sconce on a wall or pillar',
+  torch: uiText('A torch in a sconce on a wall or pillar'),
   /** An iron fire bowl on legs. */
-  brazier: 'A fire in an iron bowl on legs',
+  brazier: uiText('A fire in an iron bowl on legs'),
   /** An iron ring of candles hanging from the roof, at `y`. */
-  chandelier: 'A ring of candles hanging from the roof',
+  chandelier: uiText('A ring of candles hanging from the roof'),
   /** A long banner hanging on a wall, its top at `y`, `width` by `height`, facing `rotY`. */
-  banner: 'A banner hanging on a wall',
+  banner: uiText('A banner hanging on a wall'),
   /** A tall pointed stained-glass window in a wall, its sill at `y`. */
-  window: 'A tall stained-glass window',
+  window: uiText('A tall stained-glass window'),
   /** A round stained-glass window, its middle at `y`, `width` across. */
-  rose: 'A round stained-glass window',
+  rose: uiText('A round stained-glass window'),
   /** A carpet runner on the floor, `width` by `length` along `rotY`. */
-  carpet: 'A carpet runner',
+  carpet: uiText('A carpet runner'),
   /** A knight in stone on a plinth. */
-  statue: 'A stone knight on a plinth',
+  statue: uiText('A stone knight on a plinth'),
   /** A suit of armour on a stand. */
-  armor: 'A suit of armour',
+  armor: uiText('A suit of armour'),
   /** A shield with crossed swords, hung on a wall at `y`. */
-  shield: 'A shield and crossed swords on a wall',
+  shield: uiText('A shield and crossed swords on a wall'),
   /** A great fireplace against a wall, `width` wide. */
-  hearth: 'A fireplace',
+  hearth: uiText('A fireplace'),
   /** The gong a merged pull request rings (one per map). */
-  gong: 'The merge gong',
+  gong: uiText('The merge gong'),
   /** Casks of ale on a rack: a drink perks you up, like the office's coffee. */
-  cask: 'Casks of ale (the coffee)',
+  cask: uiText('Casks of ale (the coffee)'),
   /** A table with nothing to sit at, `width` by `length`. */
-  table: 'A table without seats',
+  table: uiText('A table without seats'),
   /** A tall iron candle stand. */
-  candles: 'A candle stand',
+  candles: uiText('A candle stand'),
 } as const;
 export type PropKind = keyof typeof PROP_KINDS;
 

@@ -1,3 +1,4 @@
+import { t as uiText } from '../../../shared/i18n';
 import * as THREE from 'three';
 import { prisonSeat, wasting, type DungeonPlan, type SendHomePlan, type Spot } from '../../../shared/maps';
 import type { JailState, Prisoner } from '../../../shared/protocol';
@@ -16,7 +17,7 @@ import { mesh, toon } from '../../world/toon';
 /** How often (s) how far gone they are is worked out again: it changes over hours. */
 const REFRESH = 2;
 /** What they mutter, now and then, while you're down there with them. */
-const MUTTERS = ['🍞 …bread?', '💧 water…', '🙏 let me out', '😩 I can fix it, I swear', '🐀 hello, rat', '🥶 so cold…', '📜 I’ll write the tests!', '😵 …', '🎵 99 bugs in the code…', '🕯️ is it day?', '😢 I miss my desk', '🔑 psst… the key?'];
+const MUTTERS = [uiText('🍞 …bread?'), uiText('💧 water…'), uiText('🙏 let me out'), uiText('😩 I can fix it, I swear'), uiText('🐀 hello, rat'), uiText('🥶 so cold…'), uiText('📜 I’ll write the tests!'), '😵 …', uiText('🎵 99 bugs in the code…'), uiText('🕯️ is it day?'), uiText('😢 I miss my desk'), uiText('🔑 psst… the key?')];
 /** How close (m) you have to be to hear one. */
 const EARSHOT = 9;
 

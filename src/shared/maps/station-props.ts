@@ -1,3 +1,4 @@
+import { t as uiText } from '../i18n.js';
 import type { Circle, Rect } from '../nav.js';
 import { VIEWPORT } from './airlock.js';
 import { PROP_SIZE, boxFootprint } from './props.js';
@@ -10,27 +11,27 @@ import type { PropConfig } from './types.js';
 
 export const STATION_PROP_KINDS = {
   /** A hull rib across the hall at `z`: a column up each side wall, and a beam across the ceiling between them. */
-  rib: 'A hull rib: a column up each side wall and a beam across the ceiling',
+  rib: uiText('A hull rib: a column up each side wall and a beam across the ceiling'),
   /** A window cut through the wall it's on, its sill at `y`, `width` by `height`: space shows through it. */
-  viewport: 'A window out into space',
+  viewport: uiText('A window out into space'),
   /** A light pod hanging from the ceiling, down to `y`. */
-  lamp: 'A light pod hanging from the ceiling',
+  lamp: uiText('A light pod hanging from the ceiling'),
   /** A strip of light let into the deck, `width` by `length` along `rotY`. */
-  strip: 'A strip of light in the deck',
+  strip: uiText('A strip of light in the deck'),
   /** A display on a wall, its middle at `y`, `width` by `height`, facing `rotY`. */
-  screen: 'A display on a wall',
+  screen: uiText('A display on a wall'),
   /** A round holo-table, a globe turning over it. */
-  hologram: 'A holo-table with a globe turning over it',
+  hologram: uiText('A holo-table with a globe turning over it'),
   /** A hydroponics planter against a wall, `width` wide. */
-  planter: 'A hydroponics planter',
+  planter: uiText('A hydroponics planter'),
   /** A stack of cargo crates. */
-  crate: 'Cargo crates',
+  crate: uiText('Cargo crates'),
   /** The gong a merged pull request rings (one per map). */
-  gong: 'The merge gong',
+  gong: uiText('The merge gong'),
   /** A drinks dispenser: a cup perks you up, like the office's coffee. */
-  dispenser: 'A drinks dispenser (the coffee)',
+  dispenser: uiText('A drinks dispenser (the coffee)'),
   /** A console table with nothing to sit at, `width` by `length`. */
-  table: 'A console table without seats',
+  table: uiText('A console table without seats'),
 } as const;
 export type StationPropKind = keyof typeof STATION_PROP_KINDS;
 

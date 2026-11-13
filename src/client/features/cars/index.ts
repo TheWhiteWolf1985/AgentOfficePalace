@@ -1,3 +1,4 @@
+import { t as uiText } from '../../../shared/i18n';
 /**
  * The cars in the garage: getting in (behind the wheel, or beside whoever's driving), driving, the
  * horn, laps of the scenic loop, and a car shoving you out of its way. Placing you anywhere gets you
@@ -52,10 +53,10 @@ export function installCars(ctx: Ctx, deps: CarsDeps) {
     const c = store.cars[i];
     const def = CARS[i];
     if (ctx.trip() || ctx.activities.running('climber') || driver.active || !c || !def) return;
-    if (ctx.carrying()) return toast('🗂️ Your hands are full: put the card back first (Q)', 'warn');
-    if (ctx.holdingBall()) return toast('🏀 Put the ball down first (Q)', 'warn');
+    if (ctx.carrying()) return toast(uiText('🗂️ Your hands are full: put the card back first (Q)'), 'warn');
+    if (ctx.holdingBall()) return toast(uiText('🏀 Put the ball down first (Q)'), 'warn');
     const seat: CarSeat | null = !c.driver ? 'driver' : !c.passenger ? 'passenger' : null;
-    if (!seat) return toast(`🏎️ The ${def.name} is full`, 'warn');
+    if (!seat) return toast(uiText`🏎️ The ${def.name} is full`, 'warn');
     if (ctx.player.seat) deps.standUp();
     ctx.activities.stopAll('start');
     deps.stopWalking();
@@ -73,12 +74,12 @@ export function installCars(ctx: Ctx, deps: CarsDeps) {
       const c = store.cars[it.car ?? -1];
       const def = CARS[it.car ?? -1];
       if (!c || !def) return { k: '', parts: [] };
-      const name = (id?: string) => (id ? clip(store.peers.get(id)?.name ?? 'Someone', 20) : '');
+      const name = (id?: string) => (id ? clip(store.peers.get(id)?.name ?? uiText('Someone'), 20) : '');
       const [at, beside] = [name(c.driver), name(c.passenger)];
       const k = `${it.car}|${at}|${beside}`;
-      if (!at) return { k, parts: [hintTitle(`🏎️ ${def.name}`), aside(beside ? `${beside} is waiting in it` : 'keys in the ignition'), key('E', 'Drive it')] };
-      if (!beside) return { k, parts: [hintTitle(`🏎️ ${def.name}`), aside(`${at} is driving`), key('E', 'Hop in')] };
-      return { k, parts: [hintTitle(`🏎️ ${def.name}`), aside(`${at} and ${beside} · full`)] };
+      if (!at) return { k, parts: [hintTitle(`🏎️ ${def.name}`), aside(beside ? uiText`${beside} is waiting in it` : uiText('keys in the ignition')), key('E', uiText('Drive it'))] };
+      if (!beside) return { k, parts: [hintTitle(`🏎️ ${def.name}`), aside(uiText`${at} is driving`), key('E', uiText('Hop in'))] };
+      return { k, parts: [hintTitle(`🏎️ ${def.name}`), aside(uiText`${at} and ${beside} · full`)] };
     },
     use: onE((it) => {
       if (it.car !== undefined) getIn(it.car);
@@ -90,7 +91,7 @@ export function installCars(ctx: Ctx, deps: CarsDeps) {
     const i = driver.car;
     if (i === null) return true;
     if (!driver.leave(anyway)) {
-      toast('🚪 No room to open the door here', 'warn');
+      toast(uiText('🚪 No room to open the door here'), 'warn');
       return false;
     }
     leftCar(i);
@@ -168,7 +169,7 @@ export function installCars(ctx: Ctx, deps: CarsDeps) {
     }
     if (done?.best) ctx.sound.golf('cheer');
     else ctx.sound.arcade('clear');
-    toast(done?.best ? `🏁 Lap of the scenic loop: ${lapTime(time)}, your best yet!` : `🏁 Lap of the scenic loop: ${lapTime(time)} (best ${lapTime(laps.best ?? time)})`, 'info');
+    toast(done?.best ? uiText`🏁 Lap of the scenic loop: ${lapTime(time)}, your best yet!` : uiText`🏁 Lap of the scenic loop: ${lapTime(time)} (best ${lapTime(laps.best ?? time)})`, 'info');
   }
 
   ctx.ticks.add('vehicles', ({ dt, now }) => {
@@ -220,7 +221,7 @@ export function installCars(ctx: Ctx, deps: CarsDeps) {
       if (mine?.car === driver.car && mine.seat === driver.seat) return;
       const who = store.cars[driver.car!]?.[driver.seat!];
       getOut(true);
-      toast(`🏎️ ${(who && store.peers.get(who)?.name) || 'Someone'} got in there first`, 'warn');
+      toast(uiText`🏎️ ${(who && store.peers.get(who)?.name) || uiText('Someone')} got in there first`, 'warn');
     } else if (mine) {
       // You got out while it was answering something else of yours.
       carPending++;
@@ -277,14 +278,14 @@ export function installCars(ctx: Ctx, deps: CarsDeps) {
       const now = performance.now() / 1000;
       const done = laps.done && now - laps.done.at < 6 ? laps.done : null;
       const running = laps.running(now);
-      const lap = done ? ` · 🏁 ${lapTime(done.time)}${done.best ? ' best!' : ''}` : running !== null ? ` · ⏱ ${lapTime(running)}` : '';
+      const lap = done ? ` · 🏁 ${lapTime(done.time)}${done.best ? uiText(' best!') : ''}` : running !== null ? ` · ⏱ ${lapTime(running)}` : '';
       hint = {
         k: `drive|${kmh}|${other}|${where}|${lap}`,
-        parts: [h('span.title', {}, `🏎️ ${CARS[i].name}`), aside(`${kmh} km/h${where}${lap}${other ? ` · with ${clip(other, 20)}` : ''}`), key('W A S D', 'Drive'), key('Space', 'Brake'), key('H', 'Honk'), key('E', 'Get out')],
+        parts: [h('span.title', {}, `🏎️ ${CARS[i].name}`), aside(uiText`${kmh} km/h${where}${lap}${other ? uiText` · with ${clip(other, 20)}` : ''}`), key('W A S D', uiText('Drive')), key('Space', uiText('Brake')), key('H', uiText('Honk')), key('E', uiText('Get out'))],
       };
     } else {
       const at = name(c?.driver);
-      hint = { k: `ride|${at}|${where}`, parts: [h('span.title', {}, `🏎️ ${CARS[i].name}`), aside(`${at ? `${clip(at, 24)} is driving` : 'nobody at the wheel'}${where}`), key('H', 'Honk'), key('E', 'Get out')] };
+      hint = { k: `ride|${at}|${where}`, parts: [h('span.title', {}, `🏎️ ${CARS[i].name}`), aside(`${at ? uiText`${clip(at, 24)} is driving` : uiText('nobody at the wheel')}${where}`), key('H', uiText('Honk')), key('E', uiText('Get out'))] };
     }
     ctx.hint.draw(el, `car|${hint.k}`, () => hint.parts);
   }

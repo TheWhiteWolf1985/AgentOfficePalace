@@ -1,3 +1,4 @@
+import { t as uiText } from './i18n.js';
 // The whiteboard: an Excalidraw drawing everyone on a floor draws on together. The server keeps
 // each floor's elements and passes every change on; browsers merge them the way Excalidraw's own
 // live collaboration does, by each element's version (see `newer`).
@@ -85,12 +86,12 @@ export function checkElement(raw: unknown): WbElement | undefined {
 
 /** A picture as someone sent it, or why it can't go on the board. */
 export function checkFile(raw: unknown): WbFile | string {
-  if (!raw || typeof raw !== 'object') return 'Bad picture';
+  if (!raw || typeof raw !== 'object') return uiText('Bad picture');
   const f = raw as Record<string, unknown>;
-  if (typeof f.id !== 'string' || !ID_RE.test(f.id)) return 'Bad picture id';
-  if (typeof f.mimeType !== 'string' || !WB_IMAGE_TYPES.includes(f.mimeType)) return 'The whiteboard only takes pictures (PNG, JPEG, GIF, WebP, SVG…)';
-  if (typeof f.dataURL !== 'string' || !f.dataURL.startsWith(`data:${f.mimeType}`)) return 'Bad picture data';
-  if (f.dataURL.length > WB_MAX_FILE_BYTES) return `That picture is too big for the whiteboard (over ${WB_MAX_FILE_BYTES / 1024 / 1024} MB)`;
+  if (typeof f.id !== 'string' || !ID_RE.test(f.id)) return uiText('Bad picture id');
+  if (typeof f.mimeType !== 'string' || !WB_IMAGE_TYPES.includes(f.mimeType)) return uiText('The whiteboard only takes pictures (PNG, JPEG, GIF, WebP, SVG…)');
+  if (typeof f.dataURL !== 'string' || !f.dataURL.startsWith(`data:${f.mimeType}`)) return uiText('Bad picture data');
+  if (f.dataURL.length > WB_MAX_FILE_BYTES) return uiText`That picture is too big for the whiteboard (over ${WB_MAX_FILE_BYTES / 1024 / 1024} MB)`;
   const created = typeof f.created === 'number' && Number.isFinite(f.created) ? f.created : Date.now();
   return { id: f.id, mimeType: f.mimeType, dataURL: f.dataURL, created };
 }

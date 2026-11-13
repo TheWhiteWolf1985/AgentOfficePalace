@@ -1,3 +1,4 @@
+import { t as uiText } from '../i18n.js';
 import type { Bounds, Pt } from '../nav.js';
 import { MapError, isObj, num } from './check.js';
 import type { AirlockConfig, AirlockPlan, MapConfig, WallOpening, WallSide } from './types.js';
@@ -76,12 +77,12 @@ export function wallOpenings(c: MapConfig, hall: Bounds, height: number, airlock
     if (o.u - o.width / 2 < lo + MARGIN || o.u + o.width / 2 > hi - MARGIN) throw new MapError(`${what} runs off the end of the ${o.wall} wall: move it along, or make it narrower`);
     if (o.y + o.height > height - MARGIN) throw new MapError(`${what} reaches ${(o.y + o.height).toFixed(1)} m up, and the hall's walls are ${height} m: it needs ${MARGIN} m of wall over it`);
     const hit = out.find((p) => p.wall === o.wall && Math.abs(p.u - o.u) < (p.width + o.width) / 2 + MARGIN);
-    if (hit) throw new MapError(`${what} runs into ${hit.kind === 'door' ? 'the way in' : hit.kind === 'airlock' ? 'the airlock' : 'another viewport'} in the ${o.wall} wall`);
+    if (hit) throw new MapError(`${what} runs into ${hit.kind === 'door' ? uiText('the way in') : hit.kind === 'airlock' ? uiText('the airlock') : uiText('another viewport')} in the ${o.wall} wall`);
     out.push(o);
   };
   const d = nearestWall(hall, c.door.x, c.door.z);
-  add({ wall: d.wall, kind: 'door', u: along(d.wall, c.door.x, c.door.z), y: 0, width: HATCH.width, height: HATCH.height }, 'the way in (door)');
-  if (airlock) add({ wall: airlock.wall, kind: 'airlock', u: along(airlock.wall, airlock.door[0], airlock.door[1]), y: 0, width: AIRLOCK.door, height: AIRLOCK.height }, 'the airlock');
+  add({ wall: d.wall, kind: 'door', u: along(d.wall, c.door.x, c.door.z), y: 0, width: HATCH.width, height: HATCH.height }, uiText('the way in (door)'));
+  if (airlock) add({ wall: airlock.wall, kind: 'airlock', u: along(airlock.wall, airlock.door[0], airlock.door[1]), y: 0, width: AIRLOCK.door, height: AIRLOCK.height }, uiText('the airlock'));
   (c.props ?? []).forEach((p, i) => {
     if (p.kind !== 'viewport') return;
     const { wall, gap } = nearestWall(hall, p.x, p.z);

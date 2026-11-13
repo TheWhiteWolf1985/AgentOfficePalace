@@ -1,3 +1,4 @@
+import { t as uiText } from '../../shared/i18n';
 import './search.css';
 import type { ChatLine, SearchResults, TerminalHit } from '../../shared/protocol';
 import { SEARCH_MAX, SEARCH_MIN, searchKey } from '../../shared/search';
@@ -15,7 +16,7 @@ async function search(q: string): Promise<SearchResults> {
   // Terminals are the workers on your floor; the chat is the whole building's.
   const floor = store.floor ? `&floor=${encodeURIComponent(store.floor)}` : '';
   const r = await fetch(`/api/search?q=${encodeURIComponent(q)}${floor}`, { credentials: 'same-origin' });
-  if (!r.ok) throw new Error((await r.json().catch(() => null))?.error ?? `HTTP ${r.status}`);
+  if (!r.ok) throw new Error((await r.json().catch(() => null))?.error ?? uiText`HTTP ${r.status}`);
   return r.json() as Promise<SearchResults>;
 }
 
@@ -38,20 +39,20 @@ function highlight(text: string, needle: string): (string | HTMLElement)[] {
 export function openSearch(openTerminal: (workerId: string, find: TerminalFind) => void) {
   const input = h('input', {
     type: 'text',
-    placeholder: 'Search the chat and every terminal…',
+    placeholder: uiText('Search the chat and every terminal…'),
     maxlength: SEARCH_MAX,
     autocomplete: 'off',
     spellcheck: 'false',
-    'aria-label': 'Search the chat and every terminal',
+    'aria-label': uiText('Search the chat and every terminal'),
   });
   input.value = lastQuery;
   const status = h('p.note.search-status');
   const results = h('div.search-results');
-  const close = h('button.btn.close', { 'aria-label': 'Close' }, '✕');
+  const close = h('button.btn.close', { 'aria-label': uiText('Close') }, '✕');
   const el = h(
     'div.modal.search',
-    { role: 'dialog', 'aria-label': 'Search' },
-    h('header', {}, h('h2', {}, '🔎 Search'), close),
+    { role: 'dialog', 'aria-label': uiText('Search') },
+    h('header', {}, h('h2', {}, uiText('🔎 Search')), close),
     h('div.body', {}, input, status, results),
   );
 
@@ -70,7 +71,7 @@ export function openSearch(openTerminal: (workerId: string, find: TerminalFind) 
       error = '';
       return render();
     }
-    status.textContent = 'Searching…';
+    status.textContent = uiText('Searching…');
     try {
       const r = await search(q);
       if (mine !== seq) return;
@@ -97,7 +98,7 @@ export function openSearch(openTerminal: (workerId: string, find: TerminalFind) 
     );
 
   const termRow = (hit: TerminalHit, needle: string) => {
-    const li = h('li.search-hit.term', { tabindex: 0, role: 'button', title: 'Open the terminal at this line' }, h('code', {}, ...highlight(hit.text, needle)));
+    const li = h('li.search-hit.term', { tabindex: 0, role: 'button', title: uiText('Open the terminal at this line') }, h('code', {}, ...highlight(hit.text, needle)));
     li.addEventListener('click', () => jump(hit, needle));
     li.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
@@ -110,12 +111,12 @@ export function openSearch(openTerminal: (workerId: string, find: TerminalFind) 
 
   const render = () => {
     if (error) {
-      status.textContent = `Couldn't search: ${error}`;
+      status.textContent = uiText`Couldn't search: ${error}`;
       results.replaceChildren();
       return;
     }
     if (!found) {
-      status.textContent = `Finds words in the office chat and in every worker's terminal, including what they showed before the office restarted.`;
+      status.textContent = uiText(`Finds words in the office chat and in every worker's terminal, including what they showed before the office restarted.`);
       results.replaceChildren();
       return;
     }
@@ -130,10 +131,10 @@ export function openSearch(openTerminal: (workerId: string, find: TerminalFind) 
     }
     const count = found.chat.length + [...byWorker.values()].reduce((n, l) => n + l.length, 0);
     status.textContent = !count
-      ? `Nothing in the chat or any terminal matches “${found.q.trim()}”.`
-      : `${count} ${count === 1 ? 'line' : 'lines'}, newest first${found.more ? ' (only the newest are shown; add words to narrow it down)' : ''}.`;
+      ? uiText`Nothing in the chat or any terminal matches “${found.q.trim()}”.`
+      : uiText`${count} ${count === 1 ? 'line' : 'lines'}, newest first${found.more ? uiText(' (only the newest are shown; add words to narrow it down)') : ''}.`;
     const groups: HTMLElement[] = [];
-    if (found.chat.length) groups.push(h('section.search-group', {}, h('h4', {}, '💬 Chat'), h('ul', {}, ...found.chat.map((c) => chatRow(c, needle)))));
+    if (found.chat.length) groups.push(h('section.search-group', {}, h('h4', {}, uiText('💬 Chat')), h('ul', {}, ...found.chat.map((c) => chatRow(c, needle)))));
     for (const [workerId, hits] of byWorker) {
       const w = store.workers.get(workerId)!;
       groups.push(
@@ -174,7 +175,7 @@ export function openSearch(openTerminal: (workerId: string, find: TerminalFind) 
     (next ?? (e.key === 'ArrowUp' ? input : at)).focus();
   });
 
-  const modal = openModal(el, { doing: '🔎 searching the office', onClose: () => clearTimeout(timer) });
+  const modal = openModal(el, { doing: uiText('🔎 searching the office'), onClose: () => clearTimeout(timer) });
   close.addEventListener('click', () => modal.close());
   render();
   void run();

@@ -1,3 +1,4 @@
+import { t as uiText } from '../../../shared/i18n';
 import * as THREE from 'three';
 import type { MachineState } from '../../../shared/protocol';
 import { officeFull } from '../../../shared/machine';
@@ -51,9 +52,9 @@ export class MachineTexture {
     g.textAlign = 'left';
     g.fillStyle = '#ffffff';
     g.font = `900 40px ${FONT}`;
-    g.fillText('🖥️ This machine', 30, 62);
+    g.fillText(uiText('🖥️ This machine'), 30, 62);
     const full = officeFull(s);
-    const status = !s.memTotal ? ['…', MUTED] : s.pressure ? ['⚠️ Under pressure', '#ef476f'] : full ? ['🚫 Office full', '#ffd166'] : ['✅ Room to hire', '#06d6a0'];
+    const status = !s.memTotal ? ['…', MUTED] : s.pressure ? [uiText('⚠️ Under pressure'), '#ef476f'] : full ? [uiText('🚫 Office full'), '#ffd166'] : [uiText('✅ Room to hire'), '#06d6a0'];
     g.font = `800 30px ${FONT}`;
     const tw = g.measureText(status[0]).width;
     g.fillStyle = status[1];
@@ -64,15 +65,15 @@ export class MachineTexture {
     g.fillText(status[0], W - 30 - (tw + 32) / 2, 60);
 
     const memPct = s.memTotal ? Math.round((s.memUsed / s.memTotal) * 100) : 0;
-    this.panel(30, 100, 415, 'CPU', s.cpu, s.cores ? `${s.cores} core${s.cores === 1 ? '' : 's'}` : '', s.history.map(([c]) => c));
-    this.panel(475, 100, 415, 'Memory', memPct, s.memTotal ? `${fmtGb(s.memUsed)} of ${fmtGb(s.memTotal)}` : '', s.history.map(([, m]) => m));
+    this.panel(30, 100, 415, uiText('CPU'), s.cpu, s.cores ? uiText`${s.cores} core${s.cores === 1 ? '' : 's'}` : '', s.history.map(([c]) => c));
+    this.panel(475, 100, 415, uiText('Memory'), memPct, s.memTotal ? uiText`${fmtGb(s.memUsed)} of ${fmtGb(s.memTotal)}` : '', s.history.map(([, m]) => m));
 
     // Footer: the workers, one pip each, against the limit.
     const y = 440;
     g.textAlign = 'left';
     g.font = `800 32px ${FONT}`;
     g.fillStyle = '#ffffff';
-    const label = s.limit === undefined ? `👷 ${s.workers} worker${s.workers === 1 ? '' : 's'} · no limit` : `👷 ${s.workers} of ${s.limit} workers`;
+    const label = s.limit === undefined ? uiText`👷 ${s.workers} worker${s.workers === 1 ? '' : 's'} · no limit` : uiText`👷 ${s.workers} of ${s.limit} workers`;
     g.fillText(label, 30, y + 12);
     if (s.limit !== undefined) {
       const x0 = 30 + g.measureText(label).width + 28;

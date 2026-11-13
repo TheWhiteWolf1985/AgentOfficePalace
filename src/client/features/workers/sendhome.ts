@@ -1,3 +1,4 @@
+import { t as uiText } from '../../../shared/i18n';
 import * as THREE from 'three';
 import { levelRoute, type SendHomePlace, type SendHomeStep } from '../../../shared/maps';
 import type { Pt } from '../../../shared/nav';
@@ -37,7 +38,7 @@ const FEET = 0.07;
 const BEHIND = 0.8;
 /** The most escorts out at once: anyone else sent home meanwhile waits for one. */
 const GUARDS = 4;
-const FAREWELLS = ['😢 bye, everyone', '🥲 it was fun', '📦 welp', '😞 cleaning out my desk', '🥺 but my PR…'];
+const FAREWELLS = [uiText('😢 bye, everyone'), uiText('🥲 it was fun'), uiText('📦 welp'), uiText('😞 cleaning out my desk'), uiText('🥺 but my PR…')];
 
 export class Sendoffs {
   private list: Sendoff[] = [];

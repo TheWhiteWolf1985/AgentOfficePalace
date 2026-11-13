@@ -1,3 +1,4 @@
+import { t as uiText } from '../../../shared/i18n';
 /** Emotes: G opens the wheel (hold it and point, or tap it and click), 1 to 6 play one straight away. */
 import { EMOTES, EMOTE_BY_ID, EmoteBucket, type EmoteId } from '../../../shared/emotes';
 import type { Ctx } from '../../core/context';
@@ -20,7 +21,7 @@ export function installEmotes(ctx: Ctx, deps: EmotesDeps) {
     if (!emoteLimit.take(now)) {
       if (now - emoteWarnedAt > 3000) {
         emoteWarnedAt = now;
-        toast('Easy there, one emote at a time', 'warn');
+        toast(uiText('Easy there, one emote at a time'), 'warn');
       }
       return;
     }

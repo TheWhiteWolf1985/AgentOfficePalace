@@ -1,3 +1,4 @@
+import { t as uiText } from '../../../shared/i18n';
 /**
  * The HUD: a few buttons on the top bar, everything else in the ☰ menu (Tab), with H for the controls
  * and F to hang a picture; the project in the corner (click it for the floors); Settings, and your
@@ -46,72 +47,72 @@ export function installHud(ctx: Ctx, core: CoreState, parts: HudParts) {
 
   // ---- The HUD: a few buttons on the top bar, everything else in the ☰ menu ----------------------------
   const waitingNow = () => waitingInOrder(store.workers.values());
-  const noMedia = () => (window.isSecureContext ? undefined : 'Voice and screen sharing need HTTPS or localhost — use a TLS proxy, --self-signed, or an SSH tunnel');
+  const noMedia = () => (window.isSecureContext ? undefined : uiText('Voice and screen sharing need HTTPS or localhost — use a TLS proxy, --self-signed, or an SSH tunnel'));
   const hud = mountHud(
     [
-      { id: 'issues', icon: '📌', label: 'Issues', section: 'Open', count: () => store.issues.items.filter((i) => i.state === 'OPEN').length, run: () => openBoard('issues', net, actions.boardActions()) },
-      { id: 'pulls', icon: '🔀', label: 'Pull requests', section: 'Open', count: () => store.pulls.items.filter((p) => p.state === 'OPEN').length, run: () => openBoard('pulls', net, actions.boardActions()) },
-      { id: 'queue', icon: '📋', label: 'Task queue', section: 'Open', count: () => store.queue.tasks.filter((t) => t.status !== 'done').length, title: () => 'Issues and tasks waiting for a worker', run: waiting.showQueue },
-      { id: 'services', icon: '🌐', label: 'Services', section: 'Open', count: () => store.services.items.length, title: () => 'Web servers the workers are running', run: () => openServices() },
-      { id: 'whiteboard', icon: '📝', label: 'Whiteboard', section: 'Open', title: () => 'Draw together, live', run: () => openWhiteboard(net) },
+      { id: 'issues', icon: '📌', label: uiText('Issues'), section: 'Open', count: () => store.issues.items.filter((i) => i.state === 'OPEN').length, run: () => openBoard('issues', net, actions.boardActions()) },
+      { id: 'pulls', icon: '🔀', label: uiText('Pull requests'), section: 'Open', count: () => store.pulls.items.filter((p) => p.state === 'OPEN').length, run: () => openBoard('pulls', net, actions.boardActions()) },
+      { id: 'queue', icon: '📋', label: uiText('Task queue'), section: 'Open', count: () => store.queue.tasks.filter((t) => t.status !== 'done').length, title: () => uiText('Issues and tasks waiting for a worker'), run: waiting.showQueue },
+      { id: 'services', icon: '🌐', label: uiText('Services'), section: 'Open', count: () => store.services.items.length, title: () => uiText('Web servers the workers are running'), run: () => openServices() },
+      { id: 'whiteboard', icon: '📝', label: uiText('Whiteboard'), section: 'Open', title: () => uiText('Draw together, live'), run: () => openWhiteboard(net) },
       // Up on the top bar while a meeting is on: what's being worked through in the meeting room.
       {
         id: 'meeting',
         icon: '🤝',
-        label: 'Meeting room',
+        label: uiText('Meeting room'),
         section: 'Open',
         status: () => store.meeting.current?.status === 'running',
-        chip: () => 'In a meeting',
-        title: () => 'Call a meeting: workers work through a question or a task together',
+        chip: () => uiText('In a meeting'),
+        title: () => uiText('Call a meeting: workers work through a question or a task together'),
         run: () => parts.meeting.showMeeting(),
       },
-      { id: 'search', icon: '🔎', label: 'Search', section: 'Open', key: '/', title: () => 'Search the chat and every terminal', run: waiting.showSearch },
+      { id: 'search', icon: '🔎', label: uiText('Search'), section: 'Open', key: '/', title: () => uiText('Search the chat and every terminal'), run: waiting.showSearch },
       // The office has its bookshelf for them; a map of its own may not.
-      { id: 'docs', icon: '📚', label: 'Docs', section: 'Open', shown: () => !inOffice(), title: () => 'Read the project’s docs', run: parts.bookshelf.showBookshelf },
-      { id: 'elevator', icon: '🛗', label: () => (inOffice() ? 'Elevator' : 'Floors'), section: 'Open', count: () => store.floors.reduce((n, f) => n + (f.id === store.floor ? 0 : f.waiting), 0), title: () => (inOffice() ? 'Ride to another project' : 'Go to another project, or add one'), run: travel.showElevator },
-      { id: 'roof', icon: '🍸', label: 'Rooftop bar', section: 'Open', shown: () => !core.upTop && inOffice() && builtFloors().length > 0, title: () => 'Ride the elevator up to the roof: a DJ, drinks and the city', run: () => travel.ride(ROOF) },
+      { id: 'docs', icon: '📚', label: uiText('Docs'), section: 'Open', shown: () => !inOffice(), title: () => uiText('Read the project’s docs'), run: parts.bookshelf.showBookshelf },
+      { id: 'elevator', icon: '🛗', label: () => (inOffice() ? uiText('Elevator') : uiText('Floors')), section: 'Open', count: () => store.floors.reduce((n, f) => n + (f.id === store.floor ? 0 : f.waiting), 0), title: () => (inOffice() ? uiText('Ride to another project') : uiText('Go to another project, or add one')), run: travel.showElevator },
+      { id: 'roof', icon: '🍸', label: uiText('Rooftop bar'), section: 'Open', shown: () => !core.upTop && inOffice() && builtFloors().length > 0, title: () => uiText('Ride the elevator up to the roof: a DJ, drinks and the city'), run: () => travel.ride(ROOF) },
       // In voice, V is push to talk, so leaving is only from here.
-      { id: 'voice', icon: '🎙️', label: () => (voice.inVoice ? 'Leave voice' : 'Join voice'), section: 'Together', key: () => (voice.inVoice ? undefined : 'V'), on: () => voice.inVoice, blocked: noMedia, run: () => void talk.toggleVoice() },
+      { id: 'voice', icon: '🎙️', label: () => (voice.inVoice ? uiText('Leave voice') : uiText('Join voice')), section: 'Together', key: () => (voice.inVoice ? undefined : 'V'), on: () => voice.inVoice, blocked: noMedia, run: () => void talk.toggleVoice() },
       // While you're in voice, the top bar keeps the mute button handy. Muted is the usual with push to talk, so it doesn't stand out then.
       {
         id: 'mute',
         icon: () => (voice.muted ? '🔇' : '🎙️'),
-        label: () => (voice.muted ? 'Unmute' : 'Mute'),
+        label: () => (voice.muted ? uiText('Unmute') : uiText('Mute')),
         section: 'Together',
         key: 'M',
         shown: () => voice.inVoice,
         status: () => voice.inVoice,
         on: () => voice.inVoice,
         tone: () => (voice.muted && !settings.pushToTalk ? 'danger' : undefined),
-        title: () => (voice.muted ? 'Muted: hold V to talk, or M to unmute' : 'Mute (M) · hold V to talk'),
+        title: () => (voice.muted ? uiText('Muted: hold V to talk, or M to unmute') : uiText('Mute (M) · hold V to talk')),
         run: () => voice.toggleMute(),
       },
-      { id: 'share', icon: '🖥️', label: () => (voice.sharing ? 'Stop sharing' : 'Share screen'), section: 'Together', on: () => voice.sharing, status: () => voice.sharing, chip: () => 'Sharing', blocked: noMedia, run: () => void talk.toggleShare() },
-      { id: 'decor', icon: '🖼️', label: () => (hanging.hanger.active ? 'Stop hanging the picture' : 'Hang a picture'), section: 'Together', key: 'F', shown: () => inOffice(), on: () => hanging.hanger.active, status: () => hanging.hanger.active, run: () => (hanging.hanger.active ? hanging.hanger.cancel() : hanging.startHanging()) },
-      { id: 'team', icon: '👥', label: 'Invite teammates', section: 'Together', shown: () => store.invites, run: () => openTeam(net) },
-      { id: 'accounts', icon: '🔑', label: 'Accounts', section: 'Together', shown: () => store.me.admin, title: () => 'Invite people, see who has an account, revoke them', run: () => openAccounts(net) },
-      { id: 'signins', icon: '🔐', label: 'Your sign-ins', section: 'Together', shown: () => !!store.me.account, tone: () => (needsSigningIn() ? 'danger' : undefined), status: needsSigningIn, chip: () => 'Sign in to Claude', title: () => 'The Claude plan and GitHub account your workers run on: your own', run: () => openSignIns(net) },
-      { id: 'settings', icon: '⚙️', label: 'Settings', section: 'Office', run: showSettings },
-      { id: 'help', icon: '❓', label: 'Controls', section: 'Office', key: 'H', run: openHelp },
-      { id: 'lite', icon: '📱', label: '2D view', section: 'Office', title: () => 'The workers, their terminals and the boards without the 3D: for a phone or a slow computer', run: () => location.assign('/lite') },
+      { id: 'share', icon: '🖥️', label: () => (voice.sharing ? uiText('Stop sharing') : uiText('Share screen')), section: 'Together', on: () => voice.sharing, status: () => voice.sharing, chip: () => uiText('Sharing'), blocked: noMedia, run: () => void talk.toggleShare() },
+      { id: 'decor', icon: '🖼️', label: () => (hanging.hanger.active ? uiText('Stop hanging the picture') : uiText('Hang a picture')), section: 'Together', key: 'F', shown: () => inOffice(), on: () => hanging.hanger.active, status: () => hanging.hanger.active, run: () => (hanging.hanger.active ? hanging.hanger.cancel() : hanging.startHanging()) },
+      { id: 'team', icon: '👥', label: uiText('Invite teammates'), section: 'Together', shown: () => store.invites, run: () => openTeam(net) },
+      { id: 'accounts', icon: '🔑', label: uiText('Accounts'), section: 'Together', shown: () => store.me.admin, title: () => uiText('Invite people, see who has an account, revoke them'), run: () => openAccounts(net) },
+      { id: 'signins', icon: '🔐', label: uiText('Your sign-ins'), section: 'Together', shown: () => !!store.me.account, tone: () => (needsSigningIn() ? 'danger' : undefined), status: needsSigningIn, chip: () => uiText('Sign in to Claude'), title: () => uiText('The Claude plan and GitHub account your workers run on: your own'), run: () => openSignIns(net) },
+      { id: 'settings', icon: '⚙️', label: uiText('Settings'), section: 'Office', run: showSettings },
+      { id: 'help', icon: '❓', label: uiText('Controls'), section: 'Office', key: 'H', run: openHelp },
+      { id: 'lite', icon: '📱', label: uiText('2D view'), section: 'Office', title: () => uiText('The workers, their terminals and the boards without the 3D: for a phone or a slow computer'), run: () => location.assign('/lite') },
       {
         id: 'upgrade',
         icon: '⬆️',
-        label: () => (store.upgrade.phase === 'building' ? 'Upgrading…' : store.upgrade.latest ? 'Update the office' : 'Upgrade the office'),
+        label: () => (store.upgrade.phase === 'building' ? uiText('Upgrading…') : store.upgrade.latest ? uiText('Update the office') : uiText('Upgrade the office')),
         section: 'Office',
         shown: () => store.upgrade.available,
         // A new version, or one being built, gets a place on the top bar until it's in.
         status: () => !!store.upgrade.latest || store.upgrade.phase === 'building',
-        chip: () => (store.upgrade.phase === 'building' ? 'Upgrading…' : 'Update'),
+        chip: () => (store.upgrade.phase === 'building' ? uiText('Upgrading…') : uiText('Update')),
         tone: () => (store.upgrade.latest && store.upgrade.phase !== 'building' ? 'primary' : undefined),
-        title: () => (store.upgrade.latest ? `New version: ${store.upgrade.latest.subject}` : 'Upgrade the office'),
+        title: () => (store.upgrade.latest ? uiText`New version: ${store.upgrade.latest.subject}` : uiText('Upgrade the office')),
         run: () => openUpgrade(net),
       },
       // Up on the top bar while workers wait on someone (N does the same), next to the Workers button.
       {
         id: 'waiting',
         icon: () => (waitingNow().some((w) => w.status === 'needs_input') ? '🙋' : '✅'),
-        label: 'Next worker that needs you',
+        label: uiText('Next worker that needs you'),
         section: 'Open',
         key: 'N',
         shown: () => waitingNow().length > 0,
@@ -119,7 +120,7 @@ export function installHud(ctx: Ctx, core: CoreState, parts: HudParts) {
         chip: () => waitingLabel(waitingNow()).replace(/^(🙋|✅) /, ''),
         on: () => waitingNow().every((w) => w.status === 'done'),
         tone: () => (waitingNow().some((w) => w.status === 'needs_input') ? 'danger' : undefined),
-        title: () => 'Go to the next worker waiting on someone: the ones that need you first (N)',
+        title: () => uiText('Go to the next worker waiting on someone: the ones that need you first (N)'),
         run: waiting.goToNextWaiting,
       },
     ],

@@ -1,6 +1,6 @@
 services:
   office:
-    image: agent-office:isolato
+    image: agent-office:app
     container_name: agent-office
     restart: unless-stopped
     init: true

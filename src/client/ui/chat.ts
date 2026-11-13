@@ -1,3 +1,4 @@
+import { t as uiText } from '../../shared/i18n';
 // The chat in the corner: the latest lines, each fading away a while after it came in.
 
 import { store } from '../state';
@@ -20,7 +21,7 @@ export function renderChat() {
       return h(
         'li',
         { style: `animation-delay:${Math.round(CHAT_LINGER - (now - seen))}ms` },
-        h('b', { style: `color:${c.color}`, title: c.account ? `${c.name}, signed in with their own account` : undefined }, c.name),
+        h('b', { style: `color:${c.color}`, title: c.account ? uiText`${c.name}, signed in with their own account` : undefined }, c.name),
         c.account ? h('span.acct', {}, ' ✓') : null,
         ': ',
         c.text,

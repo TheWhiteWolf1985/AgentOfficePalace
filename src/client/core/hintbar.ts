@@ -1,3 +1,4 @@
+import { t as uiText } from '../../shared/i18n';
 /**
  * The hint bar (what you're facing and what its keys do, or what you're in the middle of) and the
  * crosshair, drawn each frame by the aim tick (see input/pointer.ts), only when they change.
@@ -33,7 +34,7 @@ export function installHintBar(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'po
     const throne = parts.place.onThrone() && !carrying && !withBall;
     if (throne) {
       if (ctx.world().herald && target?.kind !== 'herald') hint.parts.push(key('K', ctx.plan().herald!.name));
-      if (target?.kind !== 'seat') hint.parts.push(key('W A S D', 'Get up'));
+      if (target?.kind !== 'seat') hint.parts.push(key('W A S D', uiText('Get up')));
     }
     const k = `${withBall ? 'ball!' : `${target?.kind}${target?.deskId ?? ''}`}|${carrying?.issue ?? ''}|${throne}|${hint.k}`;
     if (k === core.hintKey) return;
@@ -56,7 +57,7 @@ export function installHintBar(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'po
     el.classList.toggle('hidden', !show);
     el.classList.toggle('on', !!target);
     el.classList.toggle('free', free);
-    el.querySelector('.look-hint')!.textContent = relookOnKey ? 'Press a key or click to look around' : 'Click to look around';
+    el.querySelector('.look-hint')!.textContent = relookOnKey ? uiText('Press a key or click to look around') : uiText('Click to look around');
   }
 
   return { renderHint, renderCrosshair };

@@ -9,7 +9,7 @@ import { buildElevator, type Elevator } from '../../world/elevator';
 import type { Collider, Interactable } from '../../world/types';
 import { bulb, type NightParts } from '../../world/outside';
 import { canvasTexture } from '../../world/texture';
-import { mergeByMaterial, mesh, roundedBox, toon, toonUnique } from '../../world/toon';
+import { uiText, mergeByMaterial, mesh, roundedBox, toon, toonUnique } from '../../world/toon';
 
 // The rooftop bar, on top of the building (see shared/rooftop.ts): a deck with a glass railing round
 // it and the city all around, the elevator's housing where you arrive, a DJ on a stage under a rig
@@ -293,7 +293,7 @@ export function buildRooftop(night: NightParts, floors: number): Rooftop {
 
   // The elevator, in its housing: a back wall and a roof over the shaft (as tall as a floor), with a light on top.
   const elevator = buildElevator();
-  elevator.setSign('🍸 Rooftop bar');
+  elevator.setSign(uiText('🍸 Rooftop bar'));
   group.add(elevator.group);
   colliders.push(...elevator.colliders);
   interactables.push(elevator.interactable);
@@ -569,7 +569,7 @@ export function buildRooftop(night: NightParts, floors: number): Rooftop {
       g.shadowColor = '#ff4fd8';
       g.shadowBlur = blur;
       g.fillStyle = color;
-      g.fillText('🍸 SKY BAR', 384, 100);
+      g.fillText(uiText('🍸 SKY BAR'), 384, 100);
     }
   });
   const neonMat = new THREE.MeshBasicMaterial({ map: neon, transparent: true, depthWrite: false });
@@ -578,9 +578,9 @@ export function buildRooftop(night: NightParts, floors: number): Rooftop {
   group.add(sign);
 
   // The bartender, behind the bar, facing the counter.
-  const bartender = new Worker('Bartender', '#e76f51');
+  const bartender = new Worker(uiText('Bartender'), '#e76f51');
   bartender.setStatus('idle', false);
-  bartender.setTask({ name: '🍸 Bartender', summary: "What'll it be? E at the bar" });
+  bartender.setTask({ name: uiText('🍸 Bartender'), summary: uiText("What'll it be? E at the bar") });
   const tendX = bx + ROOF_BAR.depth / 2 + 0.7;
   bartender.root.position.set(tendX, 0, bz);
   bartender.root.rotation.y = -Math.PI / 2;
@@ -825,7 +825,7 @@ export function buildRooftop(night: NightParts, floors: number): Rooftop {
       }
       g.globalAlpha = 0.85;
     }
-    const words = f.part === 'drop' ? 'AGENT OFFICE' : f.part === 'build' ? 'GET READY' : 'DJ MERGE CONFLICT';
+    const words = f.part === 'drop' ? 'AGENT OFFICE' : f.part === 'build' ? uiText('GET READY') : 'DJ MERGE CONFLICT';
     fitFont(g, words, 60, W - 40);
     g.textAlign = 'center';
     g.textBaseline = 'middle';

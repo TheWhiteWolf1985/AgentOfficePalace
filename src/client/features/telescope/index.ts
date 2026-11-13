@@ -1,3 +1,4 @@
+import { t as uiText } from '../../../shared/i18n';
 /** The office telescope up on the loft, overlooking the worker floor: E looks through it. */
 import type { Ctx } from '../../core/context';
 import { aside, hintTitle, key, onE } from '../../core/hint';
@@ -54,7 +55,7 @@ export function installTelescope(ctx: Ctx, deps: TelescopeDeps): TelescopeView {
   });
   ctx.interactions.define('telescope', {
     reach: 3.5,
-    hint: () => ({ k: '', parts: [hintTitle('🔭 Office telescope'), aside('overlooks the worker floor'), key('E', 'Look through')] }),
+    hint: () => ({ k: '', parts: [hintTitle(uiText('🔭 Office telescope')), aside(uiText('overlooks the worker floor')), key('E', uiText('Look through'))] }),
     use: onE(() => telescope.enter()),
   });
   // Looking through it, the view is the telescope's (once you've moved and the camera's followed), and

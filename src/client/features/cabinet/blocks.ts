@@ -1,3 +1,4 @@
+import { t as uiText } from '../../../shared/i18n';
 import { CLEAR_POINTS, GAME, WELL_COLS, WELL_ROWS, levelFor, scoreText, type CabinetFrame, type HighScore, type PlayState } from '../../../shared/cabinet';
 
 /**
@@ -369,13 +370,13 @@ function paintGame(g: CanvasRenderingContext2D, f: CabinetFrame, v: ScreenView) 
   // Left: what's on hold and how it's going. Right: what's next and the table.
   const lx = X0 / 2;
   const rx = W - X0 / 2;
-  label(g, 'HOLD', lx, 62);
+  label(g, uiText('HOLD'), lx, 62);
   preview(g, f.hold, lx, 112);
-  label(g, 'SCORE', lx, 196);
+  label(g, uiText('SCORE'), lx, 196);
   value(g, scoreText(f.score), lx, 228, 32);
-  label(g, 'LINES', lx, 282);
+  label(g, uiText('LINES'), lx, 282);
   value(g, String(f.lines), lx, 312, 28);
-  label(g, 'LEVEL', lx, 362);
+  label(g, uiText('LEVEL'), lx, 362);
   value(g, String(f.level), lx, 392, 28);
   if (v.player) {
     g.textAlign = 'center';
@@ -388,18 +389,18 @@ function paintGame(g: CanvasRenderingContext2D, f: CabinetFrame, v: ScreenView) 
     g.textAlign = 'center';
     g.fillStyle = DIM;
     g.font = `800 16px ${FONT}`;
-    g.fillText(`HI ${scoreText(Math.max(best.score, f.score))}`, lx, 502);
+    g.fillText(uiText`HI ${scoreText(Math.max(best.score, f.score))}`, lx, 502);
   }
-  label(g, 'NEXT', rx, 62);
+  label(g, uiText('NEXT'), rx, 62);
   preview(g, f.next, rx, 112);
-  label(g, 'HIGH SCORES', rx, 196);
+  label(g, uiText('HIGH SCORES'), rx, 196);
   if (v.scores.length) table(g, v.scores, rx - 100, 200, 228, 30, 16, v.mine);
-  else value(g, 'Be the first!', rx, 228, 18);
+  else value(g, uiText('Be the first!'), rx, 228, 18);
 
   if (f.state === 'paused') {
-    banner(g, 'PAUSED', v.note ?? 'P to carry on', '#4f86f7');
+    banner(g, uiText('PAUSED'), v.note ?? uiText('P to carry on'), '#4f86f7');
   } else if (f.state === 'over') {
-    banner(g, 'GAME OVER', v.prompt ?? scoreText(f.score), '#e63946');
+    banner(g, uiText('GAME OVER'), v.prompt ?? scoreText(f.score), '#e63946');
   }
 }
 
@@ -419,17 +420,17 @@ function paintAttract(g: CanvasRenderingContext2D, v: ScreenView) {
     x += widths[i];
   });
   g.shadowBlur = 0;
-  label(g, '🏆 HIGH SCORES', W / 2, 142);
+  label(g, uiText('🏆 HIGH SCORES'), W / 2, 142);
   if (v.scores.length) table(g, v.scores, W / 2 - 250, 500, 182, 35, 24, v.mine);
   else {
     g.fillStyle = DIM;
     g.font = `800 22px ${FONT}`;
-    g.fillText('No scores yet. Be the first!', W / 2, 300);
+    g.fillText(uiText('No scores yet. Be the first!'), W / 2, 300);
   }
   if (Math.floor(v.t * 1.6) % 2 === 0) {
     g.fillStyle = '#ffd166';
     g.font = `900 30px ${FONT}`;
-    g.fillText(v.prompt ?? 'PRESS E TO PLAY', W / 2, 562);
+    g.fillText(v.prompt ?? uiText('PRESS E TO PLAY'), W / 2, 562);
   }
 }
 

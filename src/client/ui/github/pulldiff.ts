@@ -1,3 +1,5 @@
+import { languageTag as uiLocale } from '../../../shared/i18n';
+import { t as uiText } from '../../../shared/i18n';
 import './pulldiff.css';
 import type { GhReviewComment } from '../../../shared/protocol';
 import { h, timeAgo } from '../dom';
@@ -165,7 +167,7 @@ export function renderThread(root: GhReviewComment, replies: Map<number, GhRevie
       h(
         'div.pd-comment',
         {},
-        h('div.pd-comment-head', {}, h('b', {}, c.author), h('a', { href: c.url, target: '_blank', rel: 'noopener noreferrer', title: new Date(c.createdAt).toLocaleString() }, timeAgo(c.createdAt))),
+        h('div.pd-comment-head', {}, h('b', {}, c.author), h('a', { href: c.url, target: '_blank', rel: 'noopener noreferrer', title: new Date(c.createdAt).toLocaleString(uiLocale()) }, timeAgo(c.createdAt))),
         markdown(c.body, itemUrl),
       ),
     ),
@@ -193,11 +195,11 @@ export function repliesOf(comments: GhReviewComment[]): Map<number, GhReviewComm
 export function renderFileDiff(f: DiffFile, comments: GhReviewComment[], itemUrl: string): HTMLElement {
   const out = h('div.pd-lines');
   if (f.binary) {
-    out.append(h('div.pd-note', {}, 'Binary file — not shown.'));
+    out.append(h('div.pd-note', {}, uiText('Binary file — not shown.')));
     return out;
   }
   if (!f.lines.length) {
-    out.append(h('div.pd-note', {}, f.status === 'R' ? 'Renamed without changes.' : 'No changes to show (file mode or empty file).'));
+    out.append(h('div.pd-note', {}, f.status === 'R' ? uiText('Renamed without changes.') : uiText('No changes to show (file mode or empty file).')));
     return out;
   }
   const threads = threadsByLine(comments, f.path);
