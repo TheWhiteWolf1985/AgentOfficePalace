@@ -20,6 +20,7 @@ import { launchAcp } from './acp.js';
 import { clockWork } from './clock.js';
 import { childEnv } from './env.js';
 import { midTurn } from './lifecycle.js';
+import { codexAtEmptyPrompt } from '../codex.js';
 import { restoreWorkers, saveWorkers } from './persist.js';
 import { WorkerPrs } from './pr.js';
 import { WIN, binScript, defaultShell, resolveCommand, shellRun, shq, writeOfficeCommands } from './process.js';
@@ -832,6 +833,14 @@ export class WorkerManager {
     // blocked on a human: folder trust dialog, login, first-run onboarding. Flag it so it jumps.
     setTimeout(() => {
       if (info.status !== 'starting' || w.pty !== proc) return;
+      // Codex resume may omit SessionStart despite being ready: trust only its visible empty
+      // prompt, never a generic timeout, so login and permission dialogs remain actionable.
+      if (info.provider === 'codex' && w.term && codexAtEmptyPrompt(screenText(w.term))) {
+        w.bootBlocked = false;
+        info.activity = undefined;
+        this.setStatus(w, 'idle');
+        return;
+      }
       if (adapter?.bootHint) {
         w.bootBlocked = true;
         info.activity = adapter.bootHint;
@@ -999,9 +1008,20 @@ export class WorkerManager {
    * it once the screen moves on.
    */
   private checkBlocked(w: Worker) {
+    const s = w.info.status;
+    // A previously blocked Codex may reach its prompt after onboarding or an update notice.
+    // Only the live, fresh screen counts; never clear real questions or approvals by timeout.
+    if (w.term && w.info.provider === 'codex' && w.bootBlocked && s === 'needs_input') {
+      const text = screenText(w.term, w.term.buffer.active.type === 'normal' ? Math.max(0, w.fresh?.line ?? 0) : 0);
+      if (codexAtEmptyPrompt(text)) {
+        w.bootBlocked = false;
+        w.info.activity = undefined;
+        this.setStatus(w, 'idle');
+        return;
+      }
+    }
     const blockedBy = w.info.kind === 'agent' ? providerAdapter(w.info.provider)?.screen?.blocked : undefined;
     if (!w.term || !blockedBy) return;
-    const s = w.info.status;
     if (s !== 'starting' && s !== 'idle' && !(w.bootBlocked && s === 'needs_input')) return;
     // Only this run's output counts: a "Not logged in" in the scrollback from before is old news.
     const text = screenText(w.term, w.term.buffer.active.type === 'normal' ? Math.max(0, w.fresh?.line ?? 0) : 0);

@@ -2,6 +2,11 @@ import { chmodSync, mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import type { AgentEffort } from '../shared/providers.js';
 
+/** A resumed Codex session can reach its empty prompt without sending SessionStart. */
+export function codexAtEmptyPrompt(screen: string): boolean {
+  return /(?:^|\n)\s*[›>]\s*Ask Codex to do anything\s*(?:\n|$)/.test(screen);
+}
+
 export const CODEX_HOOK_EVENTS = [
   'SessionStart',
   'UserPromptSubmit',

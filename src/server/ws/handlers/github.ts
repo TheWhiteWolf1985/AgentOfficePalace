@@ -22,7 +22,7 @@ export const githubHandlers = {
     ctx.withGitHub(
       c,
       (as) =>
-        void floor.github.merge(n, method, msg.deleteBranch === true, msg.auto === true, as).then((error) => {
+        void floor.github.merge(n, method, msg.deleteBranch === true, msg.auto === true, as, msg.headCommit).then((error) => {
           ctx.sendTo(c, { t: 'gh.merged', number: n, error });
           if (error) return;
           ctx.toastFloor(floor, msg.auto ? `${who} set PR #${n} to merge once its checks pass` : `🎉 ${who} merged PR #${n}`);

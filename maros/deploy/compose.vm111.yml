@@ -1,0 +1,259 @@
+services:
+  office:
+    image: agent-office:isolato
+    container_name: agent-office
+    restart: unless-stopped
+    init: true
+    security_opt:
+      - seccomp:unconfined
+      - apparmor:unconfined
+    user: "1000:1000"
+    group_add:
+      - "104"
+    environment:
+      HOME: /data/home
+      AGENT_OFFICE_HOOK_BIND: 0.0.0.0
+      USER: agentoffice
+    entrypoint: ["node", "/opt/agent-office/bin/agent-office.js"]
+    command: ["/data/workspace/documentazione", "--host", "0.0.0.0", "--port", "4600", "--agent", "/opt/maros-pipeline/bin/codex", "--no-open", "--projects", "/data/workspace"]
+    depends_on:
+      - merge
+      - agent_8808e46d9581
+      - agent_a6ad027d1c31
+      - agent_e8fa8f3593f3
+      - agent_060600b1cd89
+      - agent_0fbfbd67ad38
+      - agent_77067af22c79
+      - agent_8c8553cf4dcf
+      - agent_4fd1877a0463
+      - agent_5efb4d389c27
+    ports:
+      - "192.168.1.76:4600:4600"
+    volumes:
+      - /srv/data/agent-office/data:/data
+      - /srv/data/agent-office/published:/second-brain:ro
+      - /srv/data/agent-office/pipeline:/opt/maros-pipeline:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/bin/docker:/usr/local/bin/docker:ro
+      - /srv/data/agent-office/identita/mergebot/broker-secret:/run/maros-gateway/secret:ro
+  merge:
+    image: agent-office:forgejo-gates
+    container_name: maros-merge
+    restart: unless-stopped
+    init: true
+    user: "1000:1000"
+    cap_drop:
+      - ALL
+    entrypoint: ["python3", "-B", "/opt/maros-pipeline/merge_service.py"]
+    volumes:
+      - /srv/data/agent-office/pipeline:/opt/maros-pipeline:ro
+      - /srv/data/agent-office/identita/mergebot:/run/mergebot:ro
+      - /srv/data/agent-office/sync:/sync:ro
+      - /srv/data/agent-office/pipeline-work:/pipeline-work
+      - /srv/data/agent-office/data/risorse/wiki/strumenti:/wiki-tools:ro
+      - /srv/data/agent-office/published:/published:ro
+  agent_8808e46d9581:
+    image: agent-office:forgejo-gates
+    container_name: maros-agent-8808e46d9581
+    restart: unless-stopped
+    init: true
+    user: "1000:1000"
+    cap_drop:
+      - ALL
+    security_opt:
+      - seccomp:unconfined
+      - apparmor:unconfined
+    entrypoint: ["sleep", "infinity"]
+    environment:
+      HOME: /data/home
+      USER: agentoffice
+    volumes:
+      - /srv/data/agent-office/data:/data
+      - /srv/data/agent-office/published:/second-brain:ro
+      - /srv/data/agent-office/pipeline:/opt/maros-pipeline:ro
+      - /srv/data/agent-office/identita/lettura:/run/maros-role:ro
+      - /srv/data/agent-office/pipeline/bin/office-pr:/usr/local/bin/office-pr:ro
+  agent_a6ad027d1c31:
+    image: agent-office:forgejo-gates
+    container_name: maros-agent-a6ad027d1c31
+    restart: unless-stopped
+    init: true
+    user: "1000:1000"
+    cap_drop:
+      - ALL
+    security_opt:
+      - seccomp:unconfined
+      - apparmor:unconfined
+    entrypoint: ["sleep", "infinity"]
+    environment:
+      HOME: /data/home
+      USER: agentoffice
+    volumes:
+      - /srv/data/agent-office/data:/data
+      - /srv/data/agent-office/published:/second-brain:ro
+      - /srv/data/agent-office/pipeline:/opt/maros-pipeline:ro
+      - /srv/data/agent-office/identita/lettura:/run/maros-role:ro
+      - /srv/data/agent-office/pipeline/bin/office-pr:/usr/local/bin/office-pr:ro
+  agent_e8fa8f3593f3:
+    image: agent-office:forgejo-gates
+    container_name: maros-agent-e8fa8f3593f3
+    restart: unless-stopped
+    init: true
+    user: "1000:1000"
+    cap_drop:
+      - ALL
+    security_opt:
+      - seccomp:unconfined
+      - apparmor:unconfined
+    entrypoint: ["sleep", "infinity"]
+    environment:
+      HOME: /data/home
+      USER: agentoffice
+    volumes:
+      - /srv/data/agent-office/data:/data
+      - /srv/data/agent-office/published:/second-brain:ro
+      - /srv/data/agent-office/pipeline:/opt/maros-pipeline:ro
+      - /srv/data/agent-office/identita/caporedattore:/run/maros-role:ro
+      - /srv/data/agent-office/pipeline/bin/office-pr:/usr/local/bin/office-pr:ro
+  agent_060600b1cd89:
+    image: agent-office:forgejo-gates
+    container_name: maros-agent-060600b1cd89
+    restart: unless-stopped
+    init: true
+    user: "1000:1000"
+    cap_drop:
+      - ALL
+    security_opt:
+      - seccomp:unconfined
+      - apparmor:unconfined
+    entrypoint: ["sleep", "infinity"]
+    environment:
+      HOME: /data/home
+      USER: agentoffice
+    volumes:
+      - /srv/data/agent-office/data:/data
+      - /srv/data/agent-office/published:/second-brain:ro
+      - /srv/data/agent-office/pipeline:/opt/maros-pipeline:ro
+      - /srv/data/agent-office/identita/lettura:/run/maros-role:ro
+      - /srv/data/agent-office/pipeline/bin/office-pr:/usr/local/bin/office-pr:ro
+  agent_0fbfbd67ad38:
+    image: agent-office:forgejo-gates
+    container_name: maros-agent-0fbfbd67ad38
+    restart: unless-stopped
+    init: true
+    user: "1000:1000"
+    cap_drop:
+      - ALL
+    security_opt:
+      - seccomp:unconfined
+      - apparmor:unconfined
+    entrypoint: ["sleep", "infinity"]
+    environment:
+      HOME: /data/home
+      USER: agentoffice
+    volumes:
+      - /srv/data/agent-office/data:/data
+      - /srv/data/agent-office/published:/second-brain:ro
+      - /srv/data/agent-office/pipeline:/opt/maros-pipeline:ro
+      - /srv/data/agent-office/identita/lettura:/run/maros-role:ro
+      - /srv/data/agent-office/pipeline/bin/office-pr:/usr/local/bin/office-pr:ro
+  agent_77067af22c79:
+    image: agent-office:forgejo-gates
+    container_name: maros-agent-77067af22c79
+    restart: unless-stopped
+    init: true
+    user: "1000:1000"
+    cap_drop:
+      - ALL
+    security_opt:
+      - seccomp:unconfined
+      - apparmor:unconfined
+    entrypoint: ["sleep", "infinity"]
+    environment:
+      HOME: /data/home
+      USER: agentoffice
+    volumes:
+      - /srv/data/agent-office/data:/data
+      - /srv/data/agent-office/published:/second-brain:ro
+      - /srv/data/agent-office/pipeline:/opt/maros-pipeline:ro
+      - /srv/data/agent-office/identita/capoanalista:/run/maros-role:ro
+      - /srv/data/agent-office/pipeline/bin/office-pr:/usr/local/bin/office-pr:ro
+  agent_8c8553cf4dcf:
+    image: agent-office:forgejo-gates
+    container_name: maros-agent-8c8553cf4dcf
+    restart: unless-stopped
+    init: true
+    user: "1000:1000"
+    cap_drop:
+      - ALL
+    security_opt:
+      - seccomp:unconfined
+      - apparmor:unconfined
+    entrypoint: ["sleep", "infinity"]
+    environment:
+      HOME: /data/home
+      USER: agentoffice
+    volumes:
+      - /srv/data/agent-office/data:/data
+      - /srv/data/agent-office/published:/second-brain:ro
+      - /srv/data/agent-office/pipeline:/opt/maros-pipeline:ro
+      - /srv/data/agent-office/identita/lettura:/run/maros-role:ro
+      - /srv/data/agent-office/pipeline/bin/office-pr:/usr/local/bin/office-pr:ro
+  agent_4fd1877a0463:
+    image: agent-office:forgejo-gates
+    container_name: maros-agent-4fd1877a0463
+    restart: unless-stopped
+    init: true
+    user: "1000:1000"
+    cap_drop:
+      - ALL
+    security_opt:
+      - seccomp:unconfined
+      - apparmor:unconfined
+    entrypoint: ["sleep", "infinity"]
+    environment:
+      HOME: /data/home
+      USER: agentoffice
+    volumes:
+      - /srv/data/agent-office/data:/data
+      - /srv/data/agent-office/published:/second-brain:ro
+      - /srv/data/agent-office/pipeline:/opt/maros-pipeline:ro
+      - /srv/data/agent-office/identita/lettura:/run/maros-role:ro
+      - /srv/data/agent-office/pipeline/bin/office-pr:/usr/local/bin/office-pr:ro
+  agent_5efb4d389c27:
+    image: agent-office:forgejo-gates
+    container_name: maros-agent-5efb4d389c27
+    restart: unless-stopped
+    init: true
+    user: "1000:1000"
+    cap_drop:
+      - ALL
+    security_opt:
+      - seccomp:unconfined
+      - apparmor:unconfined
+    entrypoint: ["sleep", "infinity"]
+    environment:
+      HOME: /data/home
+      USER: agentoffice
+    volumes:
+      - /srv/data/agent-office/data:/data
+      - /srv/data/agent-office/published:/second-brain:ro
+      - /srv/data/agent-office/pipeline:/opt/maros-pipeline:ro
+      - /srv/data/agent-office/identita/capoeditore:/run/maros-role:ro
+      - /srv/data/agent-office/pipeline/bin/office-pr:/usr/local/bin/office-pr:ro
+
+  wiki_sync:
+    image: agent-office:forgejo-gates
+    container_name: maros-wiki-sync
+    restart: unless-stopped
+    init: true
+    user: "1000:1000"
+    cap_drop:
+      - ALL
+    entrypoint: ["python3", "-B", "/opt/maros-pipeline/wiki_sync_daemon.py"]
+    volumes:
+      - /srv/data/agent-office/pipeline:/opt/maros-pipeline:ro
+      - /srv/data/agent-office/sync:/sync
+      - /srv/data/agent-office/published:/published
+      - /srv/data/agent-office/identita/lettura:/run/readonly:ro
+      - /srv/data/agent-office/data/home/.ssh/known_hosts:/run/known_hosts:ro

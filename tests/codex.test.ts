@@ -7,6 +7,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import {
   CODEX_HOOK_EVENTS,
+  codexAtEmptyPrompt,
   codexHookArgs,
   codexModelArgs,
   normalizeCodexHook,
@@ -139,4 +140,11 @@ test('helper forwards only the bounded root event fields to the authenticated br
     await new Promise<void>((resolve) => server.close(() => resolve()));
     rmSync(dir, { recursive: true, force: true });
   }
+});
+
+test('resumed Codex is ready only at its empty visible prompt', () => {
+  assert.equal(codexAtEmptyPrompt('history\n› Ask Codex to do anything\nmodel footer'), true);
+  assert.equal(codexAtEmptyPrompt('login required\nEnter your code:'), false);
+  assert.equal(codexAtEmptyPrompt('Approve this command?\n1. Yes\n2. No'), false);
+  assert.equal(codexAtEmptyPrompt('Ask Codex to do anything in documentation'), false);
 });

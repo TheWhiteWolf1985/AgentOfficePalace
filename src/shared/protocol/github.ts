@@ -25,6 +25,7 @@ export interface GhIssue {
 }
 
 export interface GhPull {
+  readOnly?: boolean;
   number: number;
   title: string;
   state: string;
@@ -100,6 +101,8 @@ export interface GhCheck {
 
 /** Everything the PR window shows beyond the board card: GET /api/gh/pull?number=N */
 export interface GhPullDetail {
+  gateRevisioni?: { verde: boolean; motivo: string };
+  headCommit?: string;
   number: number;
   body: string;
   state: string;
@@ -140,7 +143,7 @@ export const GH_LABEL_MAX = 100;
 export type GitHubClientMsg =
   | { t: 'gh.refresh' }
   /** Merge a pull request; the answer comes back as gh.merged. */
-  | { t: 'gh.merge'; number: number; method: GhMergeMethod; deleteBranch: boolean; auto?: boolean }
+  | { t: 'gh.merge'; number: number; method: GhMergeMethod; deleteBranch: boolean; auto?: boolean; headCommit?: string }
   /** Comment on an issue or a PR's conversation, as the server's gh account; answered with gh.commented. */
   | { t: 'gh.comment'; kind: 'issue' | 'pull'; number: number; body: string }
   /** Close an issue, or a pull request without merging it; the answer comes back as gh.closed. */
