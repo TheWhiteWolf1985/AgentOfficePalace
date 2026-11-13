@@ -1,3 +1,4 @@
+import { t as uiText } from '../../../shared/i18n';
 import { Caffeine } from './caffeine';
 import type { Ctx } from '../../core/context';
 import { hintTitle, key, onE } from '../../core/hint';
@@ -24,16 +25,16 @@ export function installCoffee(ctx: Ctx) {
     const jittery = caffeine.drink(performance.now() / 1000);
     ctx.sound.coffee();
     if (ctx.player.view === 'first') ctx.hands.sip();
-    if (jittery) toast('☕ One cup too many… you’ve got the jitters!', 'warn');
-    else if (caffeine.cups > 1) toast('☕ Another cup: back to a full minute of buzz');
-    else toast('☕ Fresh coffee! A minute of quicker feet and higher jumps');
+    if (jittery) toast(uiText('☕ One cup too many… you’ve got the jitters!'), 'warn');
+    else if (caffeine.cups > 1) toast(uiText('☕ Another cup: back to a full minute of buzz'));
+    else toast(uiText('☕ Fresh coffee! A minute of quicker feet and higher jumps'));
   }
 
   ctx.interactions.define('coffee', {
     reach: 3,
     hint: (it) => {
       const buzzed = caffeine.buzzed(performance.now() / 1000);
-      return { k: String(buzzed), parts: [hintTitle(it.label ?? '☕ Coffee machine'), key('E', buzzed ? 'Another cup' : 'Grab a cup')] };
+      return { k: String(buzzed), parts: [hintTitle(it.label ?? uiText('☕ Coffee machine')), key('E', buzzed ? uiText('Another cup') : uiText('Grab a cup'))] };
     },
     use: onE(() => drinkCoffee()),
   });

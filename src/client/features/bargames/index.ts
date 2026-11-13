@@ -1,3 +1,4 @@
+import { t as uiText } from '../../../shared/i18n';
 /**
  * Darts and axes at the rooftop bar: stepping up to the line, throws landing (yours and everyone's
  * up there) and chalked up on the board, and your best rounds, kept in this browser.
@@ -98,7 +99,7 @@ export function installBarGames(ctx: Ctx, deps: BarGamesDeps) {
   function stepUp(game: BarGame) {
     if (thrower.active || ctx.trip() || ctx.activities.running('climber')) return;
     const other = lineTaken(game);
-    if (other) return toast(`${game === 'darts' ? '🎯' : '🪓'} ${other} is throwing — wait your turn`, 'warn');
+    if (other) return toast(uiText`${game === 'darts' ? '🎯' : '🪓'} ${other} is throwing — wait your turn`, 'warn');
     if (ctx.player.seat) deps.standUp();
     ctx.activities.stopAll('start');
     deps.stopWalking();
@@ -107,12 +108,12 @@ export function installBarGames(ctx: Ctx, deps: BarGamesDeps) {
 
   /** At the dart board or the axe lane: who's throwing, or your best round, and E to step up. */
   function throwHint(game: BarGame): Hint {
-    const name = game === 'darts' ? '🎯 Darts' : '🪓 Axe throwing';
+    const name = game === 'darts' ? uiText('🎯 Darts') : uiText('🪓 Axe throwing');
     const other = lineTaken(game);
-    if (other) return { k: `taken|${other}`, parts: [hintTitle(name), aside(`${clip(other, 24)} is throwing`)] };
+    if (other) return { k: `taken|${other}`, parts: [hintTitle(name), aside(uiText`${clip(other, 24)} is throwing`)] };
     const best = throwBests[game];
-    const about = best !== undefined ? `your best round: ${best}` : game === 'darts' ? 'three darts a visit' : 'five axes a round';
-    return { k: about, parts: [hintTitle(name), aside(about), key('E', game === 'darts' ? 'Step up to the oche' : 'Step up to the line')] };
+    const about = best !== undefined ? uiText`your best round: ${best}` : game === 'darts' ? uiText('three darts a visit') : uiText('five axes a round');
+    return { k: about, parts: [hintTitle(name), aside(about), key('E', game === 'darts' ? uiText('Step up to the oche') : uiText('Step up to the line'))] };
   }
   ctx.interactions.define('darts', {
     reach: 4,
@@ -127,8 +128,8 @@ export function installBarGames(ctx: Ctx, deps: BarGamesDeps) {
 
   /** What a throw says over the target as it lands. */
   function tossPop(game: BarGame, s: Score): string {
-    if (game === 'darts') return s.points === 0 ? 'Miss' : s.label === 'Bull' ? 'BULL!' : s.label;
-    return s.label === 'Killshot' ? 'KILLSHOT!' : s.label === 'Bull' ? 'BULLSEYE!' : s.points === 0 ? (s.label === 'Drop' ? 'Clank!' : '0') : `+${s.points}`;
+    if (game === 'darts') return s.points === 0 ? uiText('Miss') : s.label === 'Bull' ? uiText('BULL!') : s.label;
+    return s.label === 'Killshot' ? uiText('KILLSHOT!') : s.label === 'Bull' ? uiText('BULLSEYE!') : s.points === 0 ? (s.label === 'Drop' ? uiText('Clank!') : '0') : `+${s.points}`;
   }
 
   /** A throw at a game up here, by you or anyone else: it flies, lands, and goes up on the chalkboard. */
@@ -142,7 +143,7 @@ export function installBarGames(ctx: Ctx, deps: BarGamesDeps) {
     // A new round (or somebody else's): the last one's darts come out of the board first.
     if (toss.n === 1 || !round || round.by !== by) {
       r.games.clear(game);
-      round = rounds[game] = { by, name: mine ? store.profile.name : (peer?.name ?? 'Someone'), color: mine ? store.profile.color : (peer?.color ?? '#8ecae6'), scores: [] };
+      round = rounds[game] = { by, name: mine ? store.profile.name : (peer?.name ?? uiText('Someone')), color: mine ? store.profile.color : (peer?.color ?? '#8ecae6'), scores: [] };
       r.games.chalk(game, round);
       if (mine) thrower.setInfo('');
     }
@@ -177,7 +178,7 @@ export function installBarGames(ctx: Ctx, deps: BarGamesDeps) {
       ctx.sound.toss('cheer', f);
       ctx.confetti.burst(f.x + f.out.x * 0.5, f.y + 0.4, f.z + f.out.z * 0.5, 200, 0.9);
     }
-    const what = game === 'darts' ? (total === 180 ? 'ONE HUNDRED AND EIGHTY!' : `${total} with three darts`) : `${total} of 40 with five axes`;
+    const what = game === 'darts' ? (total === 180 ? uiText('ONE HUNDRED AND EIGHTY!') : uiText`${total} with three darts`) : uiText`${total} of 40 with five axes`;
     const icon = game === 'darts' ? '🎯' : '🪓';
     if (!mine) {
       if (great) toast(`${icon} ${name}: ${what}`);
@@ -189,7 +190,7 @@ export function installBarGames(ctx: Ctx, deps: BarGamesDeps) {
       throwBests[game] = total;
       saveThrowBests();
     }
-    toast(`${icon} ${what}${beat && best !== undefined ? ' — your best yet!' : ''}`);
+    toast(`${icon} ${what}${beat && best !== undefined ? uiText(' — your best yet!') : ''}`);
   }
 
   ctx.messages.on('toss', (msg) => theirToss(msg.id, { game: msg.game, u: msg.u, v: msg.v, stick: msg.stick, n: msg.n }));
@@ -206,7 +207,7 @@ export function installBarGames(ctx: Ctx, deps: BarGamesDeps) {
   /** At the dart board or the axe lane: how to aim and throw, and how to step back. */
   function renderThrowHint(el: HTMLElement) {
     const stage = thrower.doing;
-    ctx.hint.draw(el, `throw|${stage === 'wind'}`, () => (stage === 'wind' ? [h('span.title', {}, 'Let go in the green!')] : [key('Mouse', 'Aim'), key('Space', 'Hold to throw'), key('E', 'Step back')]));
+    ctx.hint.draw(el, `throw|${stage === 'wind'}`, () => (stage === 'wind' ? [h('span.title', {}, uiText('Let go in the green!'))] : [key(uiText('Mouse'), uiText('Aim')), key('Space', uiText('Hold to throw')), key('E', uiText('Step back'))]));
   }
 
   // At the oche or the line, the view narrows onto the target.

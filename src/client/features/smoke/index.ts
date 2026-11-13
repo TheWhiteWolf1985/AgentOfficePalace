@@ -1,3 +1,4 @@
+import { t as uiText } from '../../../shared/i18n';
 import { BALCONY } from '../../../shared/layout';
 import type { Ctx } from '../../core/context';
 import { hintTitle, key, onE } from '../../core/hint';
@@ -35,23 +36,23 @@ export function installSmoke(ctx: Ctx) {
     if (!smokeBreakUntil) return;
     if (!onBalcony()) {
       setSmoking(false);
-      toast('🚭 No smoking inside, so you put it out');
+      toast(uiText('🚭 No smoking inside, so you put it out'));
     } else if (now > smokeBreakUntil) {
       setSmoking(false);
-      toast("That one's done. Back to work!");
+      toast(uiText("That one's done. Back to work!"));
     }
   }
   ctx.ticks.add('world', ({ now }) => checkSmokeBreak(now));
   ctx.interactions.define('smoke', {
     reach: 3,
-    hint: () => ({ k: String(smokeBreakUntil > 0), parts: [hintTitle('🚬 Ashtray'), key('E', smokeBreakUntil ? 'Stub it out' : 'Take a smoke break')] }),
+    hint: () => ({ k: String(smokeBreakUntil > 0), parts: [hintTitle(uiText('🚬 Ashtray')), key('E', smokeBreakUntil ? uiText('Stub it out') : uiText('Take a smoke break'))] }),
     use: onE(() => {
       if (smokeBreakUntil) {
         setSmoking(false);
-        toast('You stub it out in the ashtray');
+        toast(uiText('You stub it out in the ashtray'));
       } else {
         setSmoking(true);
-        toast('🚬 Smoke break');
+        toast(uiText('🚬 Smoke break'));
       }
     }),
   });

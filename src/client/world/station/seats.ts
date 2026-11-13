@@ -1,3 +1,4 @@
+import { t as uiText } from '../../../shared/i18n';
 import * as THREE from 'three';
 import { KIOSK, STATION_AGENT, deskSeat, type DeskDef, type StationKind } from '../../../shared/layout';
 import { BENCH_OUT, COUNCIL, THRONE_SIZE } from '../../../shared/maps';
@@ -71,7 +72,7 @@ export function placeSetting(kit: Kit, def: DeskDef, overflow: boolean): { view:
   return { view: { def, group: g, laptopAnchor, seatAnchor, stage, chair: new THREE.Group(), vacancy, vacancyY: 1.35 }, it };
 }
 
-const CONSOLE_SIGN: Record<StationKind, string> = { issues: '📡 Ask me', pulls: '🔀 Ask me', queue: '📋 Ask me' };
+const CONSOLE_SIGN: Record<StationKind, string> = { issues: uiText('📡 Ask me'), pulls: uiText('🔀 Ask me'), queue: uiText('📋 Ask me') };
 
 /** A board agent's console: a slanted panel on a pedestal, lit in the agent's color; it stands behind it, as at the office's kiosk. */
 export function agentConsole(kit: Kit, def: DeskDef): DeskView {
@@ -163,7 +164,7 @@ export function buildBriefing(kit: Kit): { board?: THREE.Mesh; sign?: THREE.Mesh
   sign.position.set(0, 0.92, 0.07);
   stand.add(mesh(box(1.3, 0.42, 0.06), mats.black, 0, 0.92, 0.02));
   stand.add(sign);
-  const title = textPlane('🤝 Briefing room', { bg: '#0f1a26', color: '#cfeeff', border: '#3a5a78', size: 56 });
+  const title = textPlane(uiText('🤝 Briefing room'), { bg: '#0f1a26', color: '#cfeeff', border: '#3a5a78', size: 56 });
   title.scale.multiplyScalar(0.62);
   title.position.set(0, 2.98, 0.06);
   stand.add(title);

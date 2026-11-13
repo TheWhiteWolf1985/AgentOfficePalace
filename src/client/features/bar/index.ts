@@ -1,3 +1,4 @@
+import { t as uiText } from '../../../shared/i18n';
 /**
  * The rooftop bar: drinks from the bartender, how they go to your head (a glass in hand, hiccups, the
  * world swaying and the frame drawn through the drunk vision), and the DJ's air horn.
@@ -52,13 +53,13 @@ export function installBar(ctx: Ctx, deps: BarDeps) {
 
   /** What the bartender says as they slide it over. */
   const CHEERS: Record<string, string> = {
-    beer: 'Cheers! 🍻',
-    wine: 'Salud!',
-    martini: 'Shaken, not stirred',
-    maitai: 'Aloha!',
-    shot: 'Salt, shot, lime… whoa',
-    mojito: 'Fresh and minty',
-    water: 'Good call. Stay hydrated',
+    beer: uiText('Cheers! 🍻'),
+    wine: uiText('Salud!'),
+    martini: uiText('Shaken, not stirred'),
+    maitai: uiText('Aloha!'),
+    shot: uiText('Salt, shot, lime… whoa'),
+    mojito: uiText('Fresh and minty'),
+    water: uiText('Good call. Stay hydrated'),
   };
 
   /** E at the bar: the menu. */
@@ -76,21 +77,21 @@ export function installBar(ctx: Ctx, deps: BarDeps) {
     r.serve(ctx.player.pos.z);
     ctx.sound.pour(r.pourAt);
     queueDrunkVisionWarmup();
-    if (cut) toast("🙅 The bartender slides you a water instead: you've had enough", 'warn');
+    if (cut) toast(uiText("🙅 The bartender slides you a water instead: you've had enough"), 'warn');
     setTimeout(() => {
       if (!ctx.upTop()) return;
       drunkVision.prepare();
       booze.drink(drink, performance.now() / 1000);
       deps.reach();
       if (ctx.player.view === 'first') ctx.hands.sip();
-      if (!cut) toast(`${drink.emoji} ${drink.name}. ${CHEERS[drink.id] ?? 'Enjoy!'}`);
+      if (!cut) toast(`${drink.emoji} ${drink.name}. ${CHEERS[drink.id] ?? uiText('Enjoy!')}`);
     }, 1500);
   }
 
   ctx.messages.on('horn', (msg) => {
     if (!ctx.upTop()) return;
     ctx.sound.horn();
-    if (msg.by !== store.profile.name) toast(`📯 ${msg.by} blew the air horn!`);
+    if (msg.by !== store.profile.name) toast(uiText`📯 ${msg.by} blew the air horn!`);
   });
   let lastHorn = 0;
   /** E at the DJ booth: the air horn, for everyone on the roof. */
@@ -105,7 +106,7 @@ export function installBar(ctx: Ctx, deps: BarDeps) {
     reach: 3.5,
     hint: () => {
       const cut = booze.cutOff(performance.now() / 1000);
-      return { k: String(cut), parts: [hintTitle('🍸 Sky Bar'), aside(cut ? "you've had enough" : 'drinks on the house'), key('E', cut ? 'Ask for water' : 'Order a drink')] };
+      return { k: String(cut), parts: [hintTitle(uiText('🍸 Sky Bar')), aside(cut ? uiText("you've had enough") : uiText('drinks on the house')), key('E', cut ? uiText('Ask for water') : uiText('Order a drink'))] };
     },
     use: onE(() => showBar()),
   });
@@ -113,8 +114,8 @@ export function installBar(ctx: Ctx, deps: BarDeps) {
     reach: 6,
     hint: () => {
       const f = djFrame(deps.djAt());
-      const what = f.part === 'drop' ? '🔥 the drop' : f.part === 'build' ? 'building up…' : f.part === 'breakdown' ? 'the breakdown' : 'mixing in the next track';
-      return { k: what, parts: [hintTitle('🎧 DJ Merge Conflict'), aside(`drum & bass · ${what}`), key('E', '📯 Air horn!')] };
+      const what = f.part === 'drop' ? uiText('🔥 the drop') : f.part === 'build' ? uiText('building up…') : f.part === 'breakdown' ? uiText('the breakdown') : uiText('mixing in the next track');
+      return { k: what, parts: [hintTitle(uiText('🎧 DJ Merge Conflict')), aside(uiText`drum & bass · ${what}`), key('E', uiText('📯 Air horn!'))] };
     },
     use: onE(() => blowHorn()),
   });
@@ -125,7 +126,7 @@ export function installBar(ctx: Ctx, deps: BarDeps) {
   let nextSip = 0;
   /** The drink in your hand everyone else was last told about. */
   let shownDrink: DrinkId | null = null;
-  const FEELINGS = ['😌 You feel sober again', '🥴 You’re feeling a little tipsy', '🌀 Whoa… is the city spinning?', '🤪 You’re wasted. Maybe have some water'];
+  const FEELINGS = [uiText('😌 You feel sober again'), uiText('🥴 You’re feeling a little tipsy'), uiText('🌀 Whoa… is the city spinning?'), uiText('🤪 You’re wasted. Maybe have some water')];
 
   /** Every frame: how drunk you are, the glass in your hand, hiccups and the odd sip. */
   function drinking(now: number) {

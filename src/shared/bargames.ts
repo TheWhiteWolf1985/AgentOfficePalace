@@ -1,3 +1,4 @@
+import { t as uiText } from './i18n';
 // The games in the rooftop bar's north-west corner: an axe-throwing lane and a dart board. You step
 // up to the line (or the oche) and throw. Your page works out where it lands; the office passes that
 // on to everyone else up there (see the client's features/bargames/controller.ts), and every page scores it the same way
@@ -72,9 +73,9 @@ export const DART_NUMBERS = [20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8
 /** What a dart at (u, v) on the board scores. */
 export function dartScore(u: number, v: number): Score {
   const r = Math.hypot(u, v);
-  if (r <= DART.bull) return { points: 50, label: 'Bull' };
+  if (r <= DART.bull) return { points: 50, label: uiText('Bull') };
   if (r <= DART.outer) return { points: 25, label: '25' };
-  if (r > DART.doubleOut) return { points: 0, label: r <= DART.board ? 'Out' : 'Miss' };
+  if (r > DART.doubleOut) return { points: 0, label: r <= DART.board ? uiText('Out') : uiText('Miss') };
   // Clockwise from straight up, each number's wedge centered on it.
   const a = Math.atan2(u, v);
   const seg = Math.floor(((a + Math.PI / 20 + 2 * Math.PI) % (2 * Math.PI)) / (Math.PI / 10)) % 20;
@@ -113,16 +114,16 @@ export function onBackWall(u: number, v: number): boolean {
 
 /** What an axe at (u, v) scores: nothing unless it `stuck` there. */
 export function axeScore(u: number, v: number, stuck: boolean): Score {
-  if (!stuck) return { points: 0, label: 'Drop' };
+  if (!stuck) return { points: 0, label: uiText('Drop') };
   const half = AXE_TARGET.blade / 2;
   // How far the edge (upright, `half` either side of v) comes to a point.
   const near = (pu: number, pv: number) => Math.hypot(u - pu, Math.max(0, Math.abs(v - pv) - half));
   const k = AXE_TARGET.kill;
   if (near(-k.u, k.v) <= k.r || near(k.u, k.v) <= k.r) return { points: k.points, label: 'Killshot' };
   const r = near(0, 0);
-  for (const ring of AXE_TARGET.rings) if (r <= ring.r) return { points: ring.points, label: ring.points === 6 ? 'Bull' : String(ring.points) };
+  for (const ring of AXE_TARGET.rings) if (r <= ring.r) return { points: ring.points, label: ring.points === 6 ? uiText('Bull') : String(ring.points) };
   const board = Math.abs(u) <= AXE_TARGET.width / 2 && Math.abs(v) <= AXE_TARGET.height / 2;
-  return { points: 0, label: board ? 'Board' : 'Wall' };
+  return { points: 0, label: board ? uiText('Board') : uiText('Wall') };
 }
 
 /** What a throw scores, whichever the game. */

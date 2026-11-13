@@ -1,3 +1,4 @@
+import { t as uiText } from './i18n';
 // What a worker's status means, for the checks the server and the browser both make.
 
 import type { GhPull, QueueTask, WorkerInfo, WorkerStatus } from './protocol.js';
@@ -40,7 +41,7 @@ export function workerPr(w: WorkerInfo, pulls: GhPull[], tasks: QueueTask[]): Wo
   // Its task's PR can drop off the list GitHub sends (the last 30 merged): keep what the queue saw.
   for (const t of tasks) if (t.workerId === w.id && t.pr && !seen.some((p) => p.number === t.pr!.number)) seen.push({ number: t.pr.number, state: t.pr.state });
   // Opened from its desk but not on the list yet (still loading, or no gh to ask): it's open.
-  if (w.pr && !seen.some((p) => p.number === w.pr!.number)) seen.push({ number: w.pr.number, state: 'OPEN' });
+  if (w.pr && !seen.some((p) => p.number === w.pr!.number)) seen.push({ number: w.pr.number, state: uiText('OPEN') });
   const open = seen.find((p) => p.state === 'OPEN' || p.state === 'DRAFT');
   if (open) return { state: 'open', number: open.number };
   const merged = seen.find((p) => p.state === 'MERGED');

@@ -1,3 +1,4 @@
+import { t as uiText } from '../../shared/i18n';
 /**
  * Pointing at things and using them: what's under the crosshair (first person) or what you're
  * standing at (third), within each kind's reach (see ctx.interactions), the note on the issues board
@@ -177,7 +178,7 @@ export function installPointer(ctx: Ctx, core: CoreState, parts: PointerParts) {
     const aim = aimedAt(ndc, 2.5);
     if (!aim) return;
     if (!aim.near) {
-      toast('Walk closer to that first');
+      toast(uiText('Walk closer to that first'));
       return;
     }
     use(aim.it, 'E', noteUnder(aim));

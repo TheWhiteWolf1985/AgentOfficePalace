@@ -1,3 +1,4 @@
+import { t as uiText } from '../../../shared/i18n';
 /**
  * Golf off the balcony: the tee (a club out, a swing, the camera following the ball), everyone's balls
  * in the air or lying where they stopped, and your records, kept in this browser.
@@ -110,15 +111,15 @@ export function installGolf(ctx: Ctx, deps: GolfDeps) {
       ctx.sound.golf('cheer');
     }
     if (!mine) {
-      if (f.holed) toast(`🏆 ${who} got a hole in one!`);
+      if (f.holed) toast(uiText`🏆 ${who} got a hole in one!`);
       return;
     }
     const rec = golfRecord();
     if (f.holed) {
       rec.holes++;
-      toast(rec.holes === 1 ? '🏆 HOLE IN ONE!' : `🏆 HOLE IN ONE! That's ${rec.holes}`);
+      toast(rec.holes === 1 ? uiText('🏆 HOLE IN ONE!') : uiText`🏆 HOLE IN ONE! That's ${rec.holes}`);
     } else if (Number.isFinite(f.fromPin) && (rec.best === null || f.fromPin < rec.best)) {
-      if (rec.best !== null) toast(`⛳ ${pinText(f.fromPin)} from the pin — your best yet!`);
+      if (rec.best !== null) toast(uiText`⛳ ${pinText(f.fromPin)} from the pin — your best yet!`);
       rec.best = f.fromPin;
     } else return;
     saveGolfRecord(rec);
@@ -134,9 +135,9 @@ export function installGolf(ctx: Ctx, deps: GolfDeps) {
   function teeOff() {
     if (golf.active || ctx.trip() || ctx.activities.running('climber')) return;
     const other = teeTaken();
-    if (other) return toast(`🏌️ ${other} is on the tee — wait your turn`, 'warn');
+    if (other) return toast(uiText`🏌️ ${other} is on the tee — wait your turn`, 'warn');
     const carrying = ctx.carrying();
-    if (carrying) return toast(`✋ Your hands are full: put #${carrying.issue} down first (Q)`, 'warn');
+    if (carrying) return toast(uiText`✋ Your hands are full: put #${carrying.issue} down first (Q)`, 'warn');
     if (ctx.player.seat) deps.standUp();
     ctx.activities.stopAll('start');
     deps.stopWalking();
@@ -148,10 +149,10 @@ export function installGolf(ctx: Ctx, deps: GolfDeps) {
     reach: 3.5,
     hint: () => {
       const other = teeTaken();
-      if (other) return { k: `taken|${other}`, parts: [hintTitle('⛳ Golf tee'), aside(`🏌️ ${clip(other, 24)} is teeing off`)] };
+      if (other) return { k: `taken|${other}`, parts: [hintTitle(uiText('⛳ Golf tee')), aside(uiText`🏌️ ${clip(other, 24)} is teeing off`)] };
       const { best, holes } = golfRecord();
-      const about = [holes ? `🏆 ${holes} hole${holes === 1 ? '' : 's'} in one` : '', best !== null ? `your best ${pinText(best)} from the pin` : `the pin's ${Math.round(PIN_DISTANCE)} m out`].filter(Boolean).join(' · ');
-      return { k: about, parts: [hintTitle('⛳ Golf tee'), aside(about), key('E', 'Tee off')] };
+      const about = [holes ? uiText`🏆 ${holes} hole${holes === 1 ? '' : 's'} in one` : '', best !== null ? uiText`your best ${pinText(best)} from the pin` : uiText`the pin's ${Math.round(PIN_DISTANCE)} m out`].filter(Boolean).join(' · ');
+      return { k: about, parts: [hintTitle(uiText('⛳ Golf tee')), aside(about), key('E', uiText('Tee off'))] };
     },
     use: onE(() => teeOff()),
   });
@@ -176,10 +177,10 @@ export function installGolf(ctx: Ctx, deps: GolfDeps) {
     const stage = golf.doing;
     ctx.hint.draw(el, `golf|${stage}`, () =>
       stage === 'watch'
-        ? [title('⛳ Fore!'), key('Space', 'Back to the tee'), key('E', 'Done')]
+        ? [title(uiText('⛳ Fore!')), key('Space', uiText('Back to the tee')), key('E', uiText('Done'))]
         : stage === 'charge' || stage === 'swing'
-          ? [title('⛳ Let go to hit it'), aside('the fuller the meter, the further it goes')]
-          : [key('Space', 'Hold to swing'), key('A D', 'Aim'), key('W S', 'Loft'), key('E', 'Done')],
+          ? [title(uiText('⛳ Let go to hit it')), aside(uiText('the fuller the meter, the further it goes'))]
+          : [key('Space', uiText('Hold to swing')), key('A D', uiText('Aim')), key('W S', uiText('Loft')), key('E', uiText('Done'))],
     );
   }
 

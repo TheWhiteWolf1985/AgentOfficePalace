@@ -1,3 +1,4 @@
+import { t as uiText } from './i18n';
 // Pictures people hang on the office walls. The server keeps the list; every browser draws them
 // in frames, loading each image through the office (GET /api/image), so any image host works.
 
@@ -30,12 +31,12 @@ export interface Decoration extends DecorPlacement {
 }
 
 export const FRAMES = [
-  { name: 'Wood', color: '#c98b5a' },
-  { name: 'Black', color: '#2b2d42' },
-  { name: 'White', color: '#fffaf3' },
-  { name: 'Gold', color: '#e9b949' },
-  { name: 'Coral', color: '#ff8a5b' },
-  { name: 'Teal', color: '#2a9d8f' },
+  { name: uiText('Wood'), color: '#c98b5a' },
+  { name: uiText('Black'), color: '#2b2d42' },
+  { name: uiText('White'), color: '#fffaf3' },
+  { name: uiText('Gold'), color: '#e9b949' },
+  { name: uiText('Coral'), color: '#ff8a5b' },
+  { name: uiText('Teal'), color: '#2a9d8f' },
 ] as const;
 
 /** How wide the frame is around the picture. */
@@ -182,15 +183,15 @@ export function pictureSize(size: number, aspect: number): { w: number; h: numbe
 /** Checks a link someone wants to hang. Returns the tidied URL, or why it won't do. */
 export function checkImageUrl(raw: unknown): { url: string } | { error: string } {
   const s = typeof raw === 'string' ? raw.trim() : '';
-  if (!s) return { error: 'Paste a link to an image' };
-  if (s.length > 2048) return { error: 'That link is too long' };
+  if (!s) return { error: uiText('Paste a link to an image') };
+  if (s.length > 2048) return { error: uiText('That link is too long') };
   let u: URL;
   try {
     u = new URL(s);
   } catch {
-    return { error: "That isn't a web link. Paste an address that starts with https://" };
+    return { error: uiText("That isn't a web link. Paste an address that starts with https://") };
   }
-  if (u.protocol !== 'https:' && u.protocol !== 'http:') return { error: 'Only http and https links can hang on the wall' };
+  if (u.protocol !== 'https:' && u.protocol !== 'http:') return { error: uiText('Only http and https links can hang on the wall') };
   return { url: u.href };
 }
 
@@ -201,17 +202,17 @@ export function sanitizePlacement(x: unknown): DecorPlacement | string {
   const o = (x && typeof x === 'object' ? x : {}) as Record<string, unknown>;
   const url = checkImageUrl(o.url);
   if ('error' in url) return url.error;
-  if (typeof o.wall !== 'string' || !WALL_IDS.has(o.wall)) return 'Pick a wall to hang it on';
+  if (typeof o.wall !== 'string' || !WALL_IDS.has(o.wall)) return uiText('Pick a wall to hang it on');
   const wall = o.wall as WallId;
   const n = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? v : NaN);
   let w = n(o.w);
   let h = n(o.h);
   const u = n(o.u);
   const y = n(o.y);
-  if ([w, h, u, y].some(Number.isNaN) || w <= 0 || h <= 0) return 'That picture has no size';
+  if ([w, h, u, y].some(Number.isNaN) || w <= 0 || h <= 0) return uiText('That picture has no size');
   ({ w, h } = pictureSize(Math.max(w, h), w / h));
   const at = clampToWall(wall, u, y, w, h);
-  if (!at) return "That picture is too big for the wall";
+  if (!at) return uiText("That picture is too big for the wall");
   const title = typeof o.title === 'string' ? o.title.replace(/[\u0000-\u001f\u007f]/g, ' ').trim().slice(0, 80) : '';
   const frame = Number.isInteger(o.frame) && (o.frame as number) >= 0 && (o.frame as number) < FRAMES.length ? (o.frame as number) : 0;
   const round = (v: number) => Math.round(v * 1000) / 1000;

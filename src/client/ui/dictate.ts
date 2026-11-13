@@ -1,3 +1,4 @@
+import { t as uiText } from '../../shared/i18n';
 // Dictation: a 🎤 on a prompt box and in a worker's terminal. Hold it (or Ctrl+Space) and talk, and
 // what you said is typed in where the cursor is once you let go; a quick tap leaves it listening,
 // hands free, until the next one. Nothing is sent for you: you read it over and press Enter yourself.
@@ -25,7 +26,7 @@ export interface Dictation {
   drop(): void;
 }
 
-const TITLE = 'Dictate: hold to talk (or hold Ctrl+Space) and let go, and what you said is typed in. A quick click leaves it listening until you click again';
+const TITLE = uiText('Dictate: hold to talk (or hold Ctrl+Space) and let go, and what you said is typed in. A quick click leaves it listening until you click again');
 
 /** The one that's listening now: there's one microphone, so a second 🎤 cuts off the first. */
 let active: { button: HTMLElement; abort(): void } | null = null;
@@ -51,20 +52,20 @@ export function dictation(target: DictateTarget, opts: { label?: string } = {}):
   if (speechSupport() === 'none') return { button: null, live, key: () => false, drop() {} };
   checkOnDevice();
 
-  const button = h('button.btn.dictate-mic', { type: 'button', title: TITLE, 'aria-label': 'Dictate', 'aria-pressed': 'false' }, opts.label ? `🎤 ${opts.label}` : '🎤');
+  const button = h('button.btn.dictate-mic', { type: 'button', title: TITLE, 'aria-label': uiText('Dictate'), 'aria-pressed': 'false' }, opts.label ? `🎤 ${opts.label}` : '🎤');
   let listening: Listening | null = null;
   const paint = (interim = '') => {
     const on = !!listening;
     button.classList.toggle('live', on);
     button.setAttribute('aria-pressed', String(on));
     live.classList.toggle('hidden', !on);
-    live.textContent = !on ? '' : interim ? `🎙️ ${tail(interim)}` : '🎙️ Listening…';
+    live.textContent = !on ? '' : interim ? `🎙️ ${tail(interim)}` : uiText('🎙️ Listening…');
   };
 
   const start = () => {
     if (listening || target.off?.()) return;
     if (speechSupport() === 'insecure') {
-      toast('Dictation needs HTTPS (or localhost), like voice. Ask whoever runs the office to enable TLS.', 'warn');
+      toast(uiText('Dictation needs HTTPS (or localhost), like voice. Ask whoever runs the office to enable TLS.'), 'warn');
       return;
     }
     active?.abort();

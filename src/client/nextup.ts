@@ -1,3 +1,4 @@
+import { t as uiText } from '../shared/i18n';
 // The workers waiting on you on this floor, the ones that need you before the ones that are done and
 // longest first: N takes you to each in turn (see features/waiting), arrows at the edge of the screen
 // point to them (ui/compass.ts), and the top bar and the Workers panel count them.
@@ -50,7 +51,7 @@ export function byUrgency(workers: Iterable<WorkerInfo>): WorkerInfo[] {
 export function waitingLabel(waiting: readonly WorkerInfo[]): string {
   const needs = waiting.filter((w) => w.status === 'needs_input').length;
   const done = waiting.length - needs;
-  return [needs && `🙋 ${needs} ${needs === 1 ? 'needs' : 'need'} you`, done && `✅ ${done} done`].filter(Boolean).join(' · ');
+  return [needs && uiText`🙋 ${needs} ${needs === 1 ? 'needs' : 'need'} you`, done && uiText`✅ ${done} done`].filter(Boolean).join(' · ');
 }
 
 /**

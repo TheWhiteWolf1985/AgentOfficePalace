@@ -1,3 +1,4 @@
+import { t as uiText } from '../../../shared/i18n';
 import * as THREE from 'three';
 import { BEANBAGS, DESKS, DESK_SIZE, FLOOR, KIOSK, SEATING_BY_ID, STATIONS, STATION_AGENT, deskSeat, type DeskDef, type StationKind } from '../../../shared/layout';
 import { deskPoint } from '../../../shared/nav';
@@ -162,7 +163,7 @@ export function buildBeanbag(def: DeskDef, index: number): DeskView {
   return { def, group, laptopAnchor, seatAnchor, stage, chair: bag, vacancy, vacancyY };
 }
 
-const KIOSK_SIGN: Record<StationKind, string> = { issues: '📌 Ask me', pulls: '🔀 Ask me', queue: '📋 Ask me' };
+const KIOSK_SIGN: Record<StationKind, string> = { issues: uiText('📌 Ask me'), pulls: uiText('🔀 Ask me'), queue: uiText('📋 Ask me') };
 
 /**
  * A board agent's kiosk: a little counter in its color with a sign on the front, and the agent standing

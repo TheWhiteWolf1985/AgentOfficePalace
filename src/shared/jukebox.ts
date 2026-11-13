@@ -1,3 +1,4 @@
+import { t as uiText } from './i18n';
 // The lounge jukebox: the tunes it has and what it's playing, shared by the server (which keeps one
 // per floor) and the browser (which synthesizes the tunes, see client/sound/music.ts).
 
@@ -9,10 +10,10 @@ export interface JukeboxTune {
 }
 
 export const JUKEBOX_TUNES: readonly JukeboxTune[] = [
-  { id: 'rainy-window', title: 'Rainy Window', mood: 'slow and dreamy' },
-  { id: 'coffee-break', title: 'Coffee Break', mood: 'jazzy, easy swing' },
-  { id: 'late-commit', title: 'Late Commit', mood: 'minor key, 2 a.m.' },
-  { id: 'green-build', title: 'Green Build', mood: 'bright and bouncy' },
+  { id: 'rainy-window', title: 'Rainy Window', mood: uiText('slow and dreamy') },
+  { id: 'coffee-break', title: 'Coffee Break', mood: uiText('jazzy, easy swing') },
+  { id: 'late-commit', title: 'Late Commit', mood: uiText('minor key, 2 a.m.') },
+  { id: 'green-build', title: 'Green Build', mood: uiText('bright and bouncy') },
 ];
 
 /** The `track` of a stream someone pasted. */
@@ -36,26 +37,26 @@ export const tuneById = (id: string): JukeboxTune | undefined => JUKEBOX_TUNES.f
 
 /** What's on, for the hint bar and the jukebox's own display: a tune's title, or where the stream comes from. */
 export function trackTitle(s: Pick<JukeboxState, 'track' | 'url'>): string {
-  if (s.track !== STREAM) return tuneById(s.track)?.title ?? 'A tune';
+  if (s.track !== STREAM) return tuneById(s.track)?.title ?? uiText('A tune');
   try {
     const u = new URL(s.url ?? '');
     const file = decodeURIComponent(u.pathname.split('/').filter(Boolean).pop() ?? '');
     return file ? `${u.hostname} · ${file}` : u.hostname;
   } catch {
-    return 'A stream';
+    return uiText('A stream');
   }
 }
 
 export function checkStreamUrl(raw: unknown): { url: string } | { error: string } {
   const s = typeof raw === 'string' ? raw.trim() : '';
-  if (!s) return { error: 'Paste a link to a stream or an audio file' };
-  if (s.length > 2048) return { error: 'That link is too long' };
+  if (!s) return { error: uiText('Paste a link to a stream or an audio file') };
+  if (s.length > 2048) return { error: uiText('That link is too long') };
   let u: URL;
   try {
     u = new URL(s);
   } catch {
-    return { error: "That isn't a web link. Paste an address that starts with https://" };
+    return { error: uiText("That isn't a web link. Paste an address that starts with https://") };
   }
-  if (u.protocol !== 'https:' && u.protocol !== 'http:') return { error: 'Only http and https links can play on the jukebox' };
+  if (u.protocol !== 'https:' && u.protocol !== 'http:') return { error: uiText('Only http and https links can play on the jukebox') };
   return { url: u.href };
 }

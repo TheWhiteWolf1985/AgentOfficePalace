@@ -1,3 +1,5 @@
+import { languageTag as uiLocale } from '../../../shared/i18n';
+import { t as uiText } from '../../../shared/i18n';
 import type { GhComment } from '../../../shared/protocol';
 import { AVATAR_COLORS } from '../../state';
 import { h, timeAgo } from '../dom';
@@ -12,15 +14,15 @@ export function avatar(name: string) {
 }
 
 export function when(iso: string, url?: string) {
-  const title = iso ? new Date(iso).toLocaleString() : '';
+  const title = iso ? new Date(iso).toLocaleString(uiLocale()) : '';
   return url ? h('a.when', { href: url, target: '_blank', rel: 'noopener noreferrer', title }, timeAgo(iso)) : h('span.when', { title }, timeAgo(iso));
 }
 
 export const REVIEW_BADGE: Record<string, [string, string]> = {
-  APPROVED: ['✅ approved', 'ok'],
-  CHANGES_REQUESTED: ['🛠 requested changes', 'bad'],
-  COMMENTED: ['💬 reviewed', ''],
-  DISMISSED: ['review dismissed', 'muted'],
+  APPROVED: [uiText('✅ approved'), 'ok'],
+  CHANGES_REQUESTED: [uiText('🛠 requested changes'), 'bad'],
+  COMMENTED: [uiText('💬 reviewed'), ''],
+  DISMISSED: [uiText('review dismissed'), 'muted'],
 };
 
 export function commentCard(c: GhComment, itemUrl: string, verb: string, badge?: [string, string]) {
@@ -42,7 +44,7 @@ export function spinnerRow(text: string) {
 }
 
 export function errorBox(text: string, retry?: () => void) {
-  return h('div.gh-error', {}, `Couldn't load from GitHub: ${text}`, retry ? h('button.btn', { type: 'button', onclick: retry }, 'Try again') : null);
+  return h('div.gh-error', {}, uiText`Couldn't load from GitHub: ${text}`, retry ? h('button.btn', { type: 'button', onclick: retry }, uiText('Try again')) : null);
 }
 
 export function stateOf(it: { state: string; isDraft?: boolean }): [string, string] {

@@ -1,3 +1,4 @@
+import { t as uiText } from '../../shared/i18n';
 import './litesuggest.css';
 // Offering the 2D view (/lite) where the 3D office is hard going: on a phone, with no keys to walk
 // with, or on a computer where frames come slowly (see framerate.ts).
@@ -28,14 +29,14 @@ export function offerLite(why: 'touch' | 'slow') {
   offered = true;
   const say =
     why === 'touch'
-      ? '📱 On a phone? The 2D view is made for it: every worker and how it’s doing, its terminal, and the boards.'
-      : '🐢 The 3D office is running slowly on this computer. The 2D view has the workers, their terminals and the boards, without the 3D.';
-  const stay = h('button.btn', { type: 'button' }, 'Stay in 3D');
+      ? uiText('📱 On a phone? The 2D view is made for it: every worker and how it’s doing, its terminal, and the boards.')
+      : uiText('🐢 The 3D office is running slowly on this computer. The 2D view has the workers, their terminals and the boards, without the 3D.');
+  const stay = h('button.btn', { type: 'button' }, uiText('Stay in 3D'));
   const el = h(
     'div.lite-offer.panel',
-    { role: 'dialog', 'aria-label': 'Try the 2D view' },
+    { role: 'dialog', 'aria-label': uiText('Try the 2D view') },
     h('p', {}, say),
-    h('div.lite-offer-btns', {}, h('a.btn.primary', { href: '/lite' }, 'Open the 2D view'), stay),
+    h('div.lite-offer-btns', {}, h('a.btn.primary', { href: '/lite' }, uiText('Open the 2D view')), stay),
   );
   stay.addEventListener('click', () => {
     try {

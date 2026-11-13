@@ -1,3 +1,4 @@
+import { t as uiText } from '../../../shared/i18n';
 import * as THREE from 'three';
 import { BALCONY, FLOOR, GOLF_HOLE, GOLF_TEE, ROAD, SLAB, STOREY, STREET_Y, WALL_HEIGHT, WALL_T } from '../../../shared/layout';
 import type { Collider, Interactable } from '../../world/types';
@@ -245,7 +246,7 @@ export function buildGreen(ground: THREE.Group, colliders: Collider[], night: Ni
     colliders.push({ minX: sx + dx - 0.08, maxX: sx + dx + 0.08, minZ: sz - 0.08, maxZ: sz + 0.08, bottom: G, top: G + 1.5 });
   }
   ground.add(mergeByMaterial(parts));
-  const sign = textPlane('⛳ Hole 1 · Par 1', { bg: '#2b2d42', color: '#fffaf3', size: 64, border: '#fffaf3' });
+  const sign = textPlane(uiText('⛳ Hole 1 · Par 1'), { bg: '#2b2d42', color: '#fffaf3', size: 64, border: '#fffaf3' });
   sign.position.set(sx, G + 1.5, sz - 0.07);
   sign.rotation.y = Math.PI;
   ground.add(sign);
@@ -496,28 +497,28 @@ export function fly(shot: Shot, street: number, index: number): Flight {
 
 /** A distance to the pin, as it's read out: "40 cm", "3.4 m", "27 m". */
 export function pinText(m: number): string {
-  if (m < 1) return `${Math.round(m * 100)} cm`;
+  if (m < 1) return uiText`${Math.round(m * 100)} cm`;
   return m < 10 ? `${m.toFixed(1)} m` : `${Math.round(m)} m`;
 }
 
 /** Where a ball stopped, in words. */
 export function lieText(f: Flight): string {
-  if (f.holed) return 'In the hole!';
+  if (f.holed) return uiText('In the hole!');
   switch (f.lie) {
     case 'lost':
-      return 'Lost';
+      return uiText('Lost');
     case 'deck':
-      return "Didn't clear the railing";
+      return uiText("Didn't clear the railing");
     case 'below':
-      return 'Onto the balcony below';
+      return uiText('Onto the balcony below');
     case 'roof':
-      return 'On the roof';
+      return uiText('On the roof');
     case 'sand':
-      return `In the bunker · ${pinText(f.fromPin)}`;
+      return uiText`In the bunker · ${pinText(f.fromPin)}`;
     case 'green':
-      return `On the green · ${pinText(f.fromPin)}`;
+      return uiText`On the green · ${pinText(f.fromPin)}`;
     default:
-      return `${pinText(f.fromPin)} from the pin`;
+      return uiText`${pinText(f.fromPin)} from the pin`;
   }
 }
 

@@ -1,3 +1,4 @@
+import { t as uiText } from '../../shared/i18n';
 import './character.css';
 import * as THREE from 'three';
 import { OutlineEffect } from 'three/examples/jsm/effects/OutlineEffect.js';
@@ -133,13 +134,13 @@ class Preview {
  */
 export function openCharacter(first: boolean, onSave: (p: Profile) => void) {
   const pick: Profile = { ...store.profile, look: { ...store.profile.look } };
-  const canvas = h('canvas', { 'aria-label': 'Your character, drag to spin' }) as HTMLCanvasElement;
+  const canvas = h('canvas', { 'aria-label': uiText('Your character, drag to spin') }) as HTMLCanvasElement;
   const preview = new Preview(canvas, pick);
 
   // Leave the name blank (or skip this) and you go by the made-up one in the box; 🎲 deals another.
   // Guest is what you were before you picked one, so it isn't a name to keep.
-  const input = h('input', { type: 'text', maxlength: 24, value: pick.name === 'Guest' ? '' : pick.name, placeholder: randomName(), 'aria-label': 'Your name' }) as HTMLInputElement;
-  const reroll = h('button.btn', { type: 'button', title: 'Random name', 'aria-label': 'Random name' }, '🎲');
+  const input = h('input', { type: 'text', maxlength: 24, value: pick.name === 'Guest' ? '' : pick.name, placeholder: randomName(), 'aria-label': uiText('Your name') }) as HTMLInputElement;
+  const reroll = h('button.btn', { type: 'button', title: uiText('Random name'), 'aria-label': uiText('Random name') }, '🎲');
   reroll.addEventListener('click', () => {
     let name = randomName();
     while (name === input.value || name === input.placeholder) name = randomName();
@@ -152,13 +153,13 @@ export function openCharacter(first: boolean, onSave: (p: Profile) => void) {
   if (account) {
     input.value = account.name;
     input.readOnly = true;
-    input.title = 'Your account name';
+    input.title = uiText('Your account name');
   }
 
-  const skinRow = h('div.swatches', { role: 'radiogroup', 'aria-label': 'Skin tone' });
-  const styleRow = h('div.seg', { role: 'radiogroup', 'aria-label': 'Hair style' });
-  const hairRow = h('div.swatches', { role: 'radiogroup', 'aria-label': 'Hair color' });
-  const shirtRow = h('div.swatches', { role: 'radiogroup', 'aria-label': 'Shirt color' });
+  const skinRow = h('div.swatches', { role: 'radiogroup', 'aria-label': uiText('Skin tone') });
+  const styleRow = h('div.seg', { role: 'radiogroup', 'aria-label': uiText('Hair style') });
+  const hairRow = h('div.swatches', { role: 'radiogroup', 'aria-label': uiText('Hair color') });
+  const shirtRow = h('div.swatches', { role: 'radiogroup', 'aria-label': uiText('Shirt color') });
 
   const swatch = (color: string, label: string, on: boolean, choose: () => void) =>
     h('button.swatch', { type: 'button', role: 'radio', 'aria-checked': String(on), style: `background:${color}`, class: on ? 'sel' : '', 'aria-label': label, title: label, onclick: choose });
@@ -174,43 +175,43 @@ export function openCharacter(first: boolean, onSave: (p: Profile) => void) {
 
   const paint = () => {
     const { skin, hair, style } = pick.look;
-    skinRow.replaceChildren(...SKIN_TONES.map((c, i) => swatch(c, `Skin tone ${i + 1} of ${SKIN_TONES.length}`, i === skin, () => change({ skin: i }))));
+    skinRow.replaceChildren(...SKIN_TONES.map((c, i) => swatch(c, uiText`Skin tone ${i + 1} of ${SKIN_TONES.length}`, i === skin, () => change({ skin: i }))));
     styleRow.replaceChildren(
       ...HAIR_STYLES.map((name, i) =>
         h('button.btn', { type: 'button', role: 'radio', 'aria-checked': String(i === style), class: i === style ? 'on' : '', onclick: () => change({ style: i }) }, name),
       ),
     );
     hairRow.replaceChildren(...HAIR_COLORS.map((c, i) => swatch(c, HAIR_COLOR_NAMES[i], i === hair, () => change({ hair: i }))));
-    shirtRow.replaceChildren(...AVATAR_COLORS.map((c) => swatch(c, `Shirt ${c}`, c === pick.color, () => change({}, c))));
+    shirtRow.replaceChildren(...AVATAR_COLORS.map((c) => swatch(c, uiText`Shirt ${c}`, c === pick.color, () => change({}, c))));
   };
   paint();
 
-  const surprise = h('button.btn', { type: 'button', title: 'Random look' }, '🎲 Surprise me');
+  const surprise = h('button.btn', { type: 'button', title: uiText('Random look') }, uiText('🎲 Surprise me'));
   surprise.addEventListener('click', () => change(randomLook(), AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)]));
-  const save = h('button.btn.primary', { type: 'submit' }, first ? 'Enter the office 🚪' : 'Save');
-  const close = h('button.btn.close', { type: 'button', 'aria-label': 'Close', title: first ? 'Skip: go in with this look (Esc)' : 'Close (Esc)' }, '✕');
+  const save = h('button.btn.primary', { type: 'submit' }, first ? uiText('Enter the office 🚪') : uiText('Save'));
+  const close = h('button.btn.close', { type: 'button', 'aria-label': uiText('Close'), title: first ? uiText('Skip: go in with this look (Esc)') : uiText('Close (Esc)') }, '✕');
 
   const form = h(
     'form.modal.charsel',
-    { role: 'dialog', 'aria-label': 'Pick your character' },
-    h('header', {}, h('h2', {}, first ? '👋 Pick your character' : '🧍 Your character'), close),
+    { role: 'dialog', 'aria-label': uiText('Pick your character') },
+    h('header', {}, h('h2', {}, first ? uiText('👋 Pick your character') : uiText('🧍 Your character')), close),
     h(
       'div.body',
       {},
-      h('div.charsel-stage', {}, canvas, h('span.tip', {}, 'Drag to spin')),
+      h('div.charsel-stage', {}, canvas, h('span.tip', {}, uiText('Drag to spin'))),
       h(
         'div.charsel-opts',
         {},
-        h('label', {}, 'Your name'),
+        h('label', {}, uiText('Your name')),
         account ? input : h('div.webhook', {}, input, reroll),
-        account ? h('p.setting-note', {}, `🔑 Signed in as ${account.name}, so that's your name here.`) : null,
-        h('label', {}, 'Skin tone'),
+        account ? h('p.setting-note', {}, uiText`🔑 Signed in as ${account.name}, so that's your name here.`) : null,
+        h('label', {}, uiText('Skin tone')),
         skinRow,
-        h('label', {}, 'Hair'),
+        h('label', {}, uiText('Hair')),
         styleRow,
-        h('label', {}, 'Hair color'),
+        h('label', {}, uiText('Hair color')),
         hairRow,
-        h('label', {}, 'Shirt'),
+        h('label', {}, uiText('Shirt')),
         shirtRow,
       ),
     ),
@@ -228,7 +229,7 @@ export function openCharacter(first: boolean, onSave: (p: Profile) => void) {
   const modal = openModal(form, {
     // A stray click shouldn't skip the first one; ✕ and Esc still do.
     backdropCloses: !first,
-    doing: '🪞 picking a new look',
+    doing: uiText('🪞 picking a new look'),
     onClose: () => {
       preview.dispose();
       // The office only lets you in with a character: skipping it goes in with this one, and the name in the box.

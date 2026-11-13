@@ -1,3 +1,5 @@
+import './i18n';
+import { t as uiText } from '../shared/i18n';
 // One-time password reveal: /claim?t=<token>. The server forgets the plaintext as soon as it answers.
 const $ = (id: string) => document.getElementById(id)!;
 const token = new URLSearchParams(location.search).get('t') ?? '';
@@ -11,23 +13,23 @@ function fail(msg: string) {
 }
 
 async function claim() {
-  if (!token) return fail('This link is missing its claim token.');
+  if (!token) return fail(uiText('This link is missing its claim token.'));
   try {
     const res = await fetch('/api/claim', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ token }) });
     const body = await res.json().catch(() => ({}));
-    if (!res.ok) return fail(body.error ?? 'Could not unlock the office.');
-    $('sub').textContent = 'One last thing before you walk in:';
+    if (!res.ok) return fail(body.error ?? uiText('Could not unlock the office.'));
+    $('sub').textContent = uiText('One last thing before you walk in:');
     $('pw').textContent = body.password;
     $('reveal').hidden = false;
   } catch {
-    fail('Server unreachable.');
+    fail(uiText('Server unreachable.'));
   }
 }
 
 $('copy').addEventListener('click', async () => {
   try {
     await navigator.clipboard.writeText($('pw').textContent ?? '');
-    $('copy').textContent = 'Copied ✓';
+    $('copy').textContent = uiText('Copied ✓');
   } catch {
     getSelection()?.selectAllChildren($('pw'));
   }

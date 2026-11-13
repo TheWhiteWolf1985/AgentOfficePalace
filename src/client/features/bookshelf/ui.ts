@@ -1,3 +1,4 @@
+import { t as uiText } from '../../../shared/i18n';
 import './ui.css';
 import { isDocPath, resolveDocLink, type DocFile, type DocList, type DocText } from '../../../shared/docs';
 import { clip, h, openModal, setDoing, timeAgo, toast } from '../../ui/dom';
@@ -122,7 +123,7 @@ function slug(text: string): string {
 }
 
 function size(bytes: number): string {
-  return bytes < 1024 ? `${bytes} B` : `${(bytes / 1024).toFixed(bytes < 10240 ? 1 : 0)} KB`;
+  return bytes < 1024 ? `${bytes} B` : uiText`${(bytes / 1024).toFixed(bytes < 10240 ? 1 : 0)} KB`;
 }
 
 function lastRead(floor: string): string | undefined {
@@ -145,7 +146,7 @@ function rememberRead(floor: string, path: string) {
 
 async function getJson<T>(url: string): Promise<T> {
   const r = await fetch(url, { credentials: 'same-origin' });
-  if (!r.ok) throw new Error((await r.json().catch(() => null))?.error ?? `HTTP ${r.status}`);
+  if (!r.ok) throw new Error((await r.json().catch(() => null))?.error ?? uiText`HTTP ${r.status}`);
   return r.json() as Promise<T>;
 }
 
@@ -153,18 +154,18 @@ export function openBookshelf(deps: ShelfDeps) {
   const { floor, repoUrl } = deps;
   const q = (params: Record<string, string>) => new URLSearchParams({ floor, ...params }).toString();
 
-  const filter = h('input', { type: 'text', placeholder: 'Filter the docs…', 'aria-label': 'Filter the docs', spellcheck: 'false', autocomplete: 'off' }) as HTMLInputElement;
-  const count = h('div.bs-count', {}, 'Looking along the shelves…');
-  const list = h('ul.bs-list', { role: 'listbox', 'aria-label': 'Docs' });
+  const filter = h('input', { type: 'text', placeholder: uiText('Filter the docs…'), 'aria-label': uiText('Filter the docs'), spellcheck: 'false', autocomplete: 'off' }) as HTMLInputElement;
+  const count = h('div.bs-count', {}, uiText('Looking along the shelves…'));
+  const list = h('ul.bs-list', { role: 'listbox', 'aria-label': uiText('Docs') });
   const crumbs = h('div.bs-crumbs');
   const meta = h('div.bs-meta');
-  const toc = h('select.bs-toc', { 'aria-label': 'Jump to a heading', title: 'Jump to a heading' }) as HTMLSelectElement;
+  const toc = h('select.bs-toc', { 'aria-label': uiText('Jump to a heading'), title: uiText('Jump to a heading') }) as HTMLSelectElement;
   const page = h('div.bs-page', { tabindex: -1 });
   let pageSound = deps.pageSound;
-  const soundBtn = h('button.btn.bs-sound', { type: 'button', 'aria-label': 'Page turn sound' });
+  const soundBtn = h('button.btn.bs-sound', { type: 'button', 'aria-label': uiText('Page turn sound') });
   const paintSound = () => {
     soundBtn.textContent = pageSound ? '🔈' : '🔇';
-    soundBtn.title = pageSound ? 'Pages swish as they turn: click to turn that off' : 'Pages turn silently: click to hear them swish';
+    soundBtn.title = pageSound ? uiText('Pages swish as they turn: click to turn that off') : uiText('Pages turn silently: click to hear them swish');
     soundBtn.setAttribute('aria-pressed', String(pageSound));
   };
   paintSound();
@@ -175,8 +176,8 @@ export function openBookshelf(deps: ShelfDeps) {
   });
   const el = h(
     'div.modal.bookshelf',
-    { role: 'dialog', 'aria-label': 'Bookshelf' },
-    h('header', {}, h('h2', {}, '📚 Bookshelf', deps.project ? h('span.bs-project', {}, ` · ${deps.project}`) : ''), soundBtn),
+    { role: 'dialog', 'aria-label': uiText('Bookshelf') },
+    h('header', {}, h('h2', {}, uiText('📚 Bookshelf'), deps.project ? h('span.bs-project', {}, ` · ${deps.project}`) : ''), soundBtn),
     h(
       'div.body',
       {},
@@ -197,10 +198,10 @@ export function openBookshelf(deps: ShelfDeps) {
   /** Where the page was last time it turned (see the scroll listener). */
   let turnedAt = 0;
 
-  const modal = openModal(el, { doing: '📚 at the bookshelf', reading: true });
+  const modal = openModal(el, { doing: uiText('📚 at the bookshelf'), reading: true });
 
   const renderList = () => {
-    count.textContent = !files.length ? '' : filter.value.trim() ? `${shown.length} of ${files.length} docs` : `${files.length} doc${files.length === 1 ? '' : 's'}`;
+    count.textContent = !files.length ? '' : filter.value.trim() ? uiText`${shown.length} of ${files.length} docs` : uiText`${files.length} doc${files.length === 1 ? '' : 's'}`;
     list.replaceChildren(
       ...shown.map((hit, i) => {
         const { doc } = hit;
@@ -219,8 +220,8 @@ export function openBookshelf(deps: ShelfDeps) {
         return li;
       }),
     );
-    if (!files.length) list.append(h('li.bs-none', {}, 'No Markdown files in this project yet.'));
-    else if (!shown.length) list.append(h('li.bs-none', {}, 'No doc matches that.'));
+    if (!files.length) list.append(h('li.bs-none', {}, uiText('No Markdown files in this project yet.')));
+    else if (!shown.length) list.append(h('li.bs-none', {}, uiText('No doc matches that.')));
   };
 
   const refilter = () => {
@@ -299,7 +300,7 @@ export function openBookshelf(deps: ShelfDeps) {
       const to = resolveDocLink(path, img.getAttribute('src') ?? '');
       if (to) img.src = `/api/docs/picture?${q({ path: to.path })}`;
     }
-    toc.replaceChildren(h('option', { value: '' }, '☰ Contents'), ...heads.map((x) => h('option', { value: x.anchor }, `${' '.repeat(x.level - 1)}${clip(x.text, 60)}`)));
+    toc.replaceChildren(h('option', { value: '' }, uiText('☰ Contents')), ...heads.map((x) => h('option', { value: x.anchor }, `${' '.repeat(x.level - 1)}${clip(x.text, 60)}`)));
     toc.hidden = heads.length < 3;
   };
 
@@ -311,15 +312,15 @@ export function openBookshelf(deps: ShelfDeps) {
       doc = await getJson<DocText>(`/api/docs/file?${q({ path })}`);
     } catch (err) {
       if (mine !== opening) return;
-      toast(`📚 Couldn't open ${nameOf(path)}: ${(err as Error).message}`, 'warn');
-      if (!current) page.replaceChildren(h('div.bs-empty', {}, `Couldn't open ${path}.`));
+      toast(uiText`📚 Couldn't open ${nameOf(path)}: ${(err as Error).message}`, 'warn');
+      if (!current) page.replaceChildren(h('div.bs-empty', {}, uiText`Couldn't open ${path}.`));
       return;
     }
     if (mine !== opening || !el.isConnected) return;
     current = path;
     rememberRead(floor, path);
     const info = files.find((f) => f.path === path);
-    const body = doc.text.trim() ? markdownFile(doc.text) : h('div.md', {}, h('p.none', {}, 'This file is empty.'));
+    const body = doc.text.trim() ? markdownFile(doc.text) : h('div.md', {}, h('p.none', {}, uiText('This file is empty.')));
     wire(body, path);
     page.replaceChildren(body);
     const dir = path.slice(0, path.length - nameOf(path).length);
@@ -327,13 +328,13 @@ export function openBookshelf(deps: ShelfDeps) {
     crumbs.title = path;
     const words = doc.text.split(/\s+/).filter(Boolean).length;
     meta.replaceChildren(
-      [`${Math.max(1, Math.round(words / 220))} min read`, info ? size(info.size) : '', info ? `updated ${timeAgo(info.mtime)}` : ''].filter(Boolean).join(' · '),
-      repoUrl ? h('a', { href: `${repoUrl}/blob/HEAD/${path.split('/').map(encodeURIComponent).join('/')}`, target: '_blank', rel: 'noopener noreferrer', title: 'Open it on GitHub' }, 'GitHub ↗') : '',
+      [uiText`${Math.max(1, Math.round(words / 220))} min read`, info ? size(info.size) : '', info ? uiText`updated ${timeAgo(info.mtime)}` : ''].filter(Boolean).join(' · '),
+      repoUrl ? h('a', { href: `${repoUrl}/blob/HEAD/${path.split('/').map(encodeURIComponent).join('/')}`, target: '_blank', rel: 'noopener noreferrer', title: uiText('Open it on GitHub') }, uiText('GitHub ↗')) : '',
     );
     turnedAt = 0;
     jump(hash);
     renderList();
-    setDoing(modal, `📚 reading ${info?.title ?? nameOf(path)}`);
+    setDoing(modal, uiText`📚 reading ${info?.title ?? nameOf(path)}`);
     deps.onTurn();
   };
 
@@ -361,14 +362,14 @@ export function openBookshelf(deps: ShelfDeps) {
       if (!el.isConnected) return;
       files = r.files;
       refilter();
-      if (r.more) count.textContent += ` (the first ${files.length})`;
+      if (r.more) count.textContent += uiText` (the first ${files.length})`;
       const start = [lastRead(floor), ...shelfOrder(files).map((f) => f.path)].find((p) => p && files.some((f) => f.path === p));
       if (start) void openDoc(start);
-      else page.replaceChildren(h('div.bs-empty', {}, '📭 Nothing to read here: this project has no Markdown files yet.'));
+      else page.replaceChildren(h('div.bs-empty', {}, uiText('📭 Nothing to read here: this project has no Markdown files yet.')));
     })
     .catch((err: Error) => {
       if (!el.isConnected) return;
       count.textContent = '';
-      page.replaceChildren(h('div.bs-empty', {}, `Couldn't look along the shelves: ${err.message}`));
+      page.replaceChildren(h('div.bs-empty', {}, uiText`Couldn't look along the shelves: ${err.message}`));
     });
 }

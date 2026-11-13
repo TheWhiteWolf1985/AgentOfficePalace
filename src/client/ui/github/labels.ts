@@ -1,3 +1,4 @@
+import { t as uiText } from '../../../shared/i18n';
 import './windows.css';
 import type { GhIssue, GhLabel, GhPull } from '../../../shared/protocol';
 import type { Net } from '../../net';
@@ -23,7 +24,7 @@ export function openLabels(kind: 'issue' | 'pull', it: GhIssue | GhPull, net: Ne
   const key = `${kind}:${it.number}`;
   const had = new Set(it.labels.map((l) => l.name));
   const on = new Set(had);
-  const noun = kind === 'pull' ? 'PR' : 'issue';
+  const noun = kind === 'pull' ? uiText('PR') : 'issue';
   const manage = `${repoUrlOf(it.url)}/labels`;
   let repo: GhLabel[] | null = null;
   let error = '';
@@ -32,17 +33,17 @@ export function openLabels(kind: 'issue' | 'pull', it: GhIssue | GhPull, net: Ne
   /** Each row and the text the filter looks in. */
   const rows = new Map<HTMLElement, string>();
 
-  const filter = h('input', { type: 'text', placeholder: 'Filter labels…', 'aria-label': 'Filter labels' }) as HTMLInputElement;
+  const filter = h('input', { type: 'text', placeholder: uiText('Filter labels…'), 'aria-label': uiText('Filter labels') }) as HTMLInputElement;
   const list = h('ul.gh-labels');
   const none = h('p.gh-quiet.hidden');
   const result = h('div.gh-merge-result.hidden');
   const summary = h('span.grow');
-  const cancel = h('button.btn', { type: 'button' }, 'Cancel');
-  const save = h('button.btn.primary', { type: 'button' }, '🏷️ Save labels');
+  const cancel = h('button.btn', { type: 'button' }, uiText('Cancel'));
+  const save = h('button.btn.primary', { type: 'button' }, uiText('🏷️ Save labels'));
   const el = h(
     'div.modal.gh-merge.gh-labeler',
-    { role: 'dialog', 'aria-label': `Labels on ${noun} #${it.number}` },
-    h('header', {}, h('h2', {}, `🏷️ Labels on ${noun} #${it.number}`)),
+    { role: 'dialog', 'aria-label': uiText`Labels on ${noun} #${it.number}` },
+    h('header', {}, h('h2', {}, uiText`🏷️ Labels on ${noun} #${it.number}`)),
     h('div.body', {}, h('p.gh-merge-title', {}, it.title), filter, list, none, result),
     h('footer', {}, summary, cancel, save),
   );
@@ -51,8 +52,8 @@ export function openLabels(kind: 'issue' | 'pull', it: GhIssue | GhPull, net: Ne
   const sync = () => {
     const { add, remove } = changes();
     save.disabled = busy || (!add.length && !remove.length);
-    save.textContent = busy ? 'Saving…' : '🏷️ Save labels';
-    summary.textContent = add.length || remove.length ? [...add.map((l) => `+${l}`), ...remove.map((l) => `−${l}`)].join('  ') : `${on.size} label${on.size === 1 ? '' : 's'} on it`;
+    save.textContent = busy ? uiText('Saving…') : uiText('🏷️ Save labels');
+    summary.textContent = add.length || remove.length ? [...add.map((l) => `+${l}`), ...remove.map((l) => `−${l}`)].join('  ') : uiText`${on.size} label${on.size === 1 ? '' : 's'} on it`;
     for (const box of list.querySelectorAll('input')) box.disabled = busy;
   };
   const applyFilter = () => {
@@ -66,7 +67,7 @@ export function openLabels(kind: 'issue' | 'pull', it: GhIssue | GhPull, net: Ne
     const empty = !!repo && !shown;
     none.classList.toggle('hidden', !empty);
     if (empty)
-      none.replaceChildren(q ? `No labels match “${filter.value.trim()}”. ` : 'This repository has no labels yet. ', h('a', { href: manage, target: '_blank', rel: 'noopener noreferrer' }, 'Make one on GitHub ↗'));
+      none.replaceChildren(q ? uiText`No labels match “${filter.value.trim()}”. ` : uiText('This repository has no labels yet. '), h('a', { href: manage, target: '_blank', rel: 'noopener noreferrer' }, uiText('Make one on GitHub ↗')));
   };
   const row = (l: GhLabel) => {
     const box = h('input', { type: 'checkbox' }) as HTMLInputElement;
@@ -89,7 +90,7 @@ export function openLabels(kind: 'issue' | 'pull', it: GhIssue | GhPull, net: Ne
     const rest = (repo ?? []).filter((l) => !had.has(l.name)).sort(byName);
     list.replaceChildren(...[...mine, ...rest].map(row));
     if (error) list.append(h('li', {}, errorBox(error, load)));
-    else if (!repo) list.append(h('li', {}, spinnerRow("Loading the repo's labels…")));
+    else if (!repo) list.append(h('li', {}, spinnerRow(uiText("Loading the repo's labels…"))));
     applyFilter();
     sync();
   };
@@ -117,18 +118,18 @@ export function openLabels(kind: 'issue' | 'pull', it: GhIssue | GhPull, net: Ne
     if (busy || (!add.length && !remove.length)) return;
     busy = true;
     result.className = 'gh-merge-result';
-    result.replaceChildren(h('span.spinner'), 'Saving the labels on GitHub…');
+    result.replaceChildren(h('span.spinner'), uiText('Saving the labels on GitHub…'));
     sync();
     labelWaiters.set(key, (msg) => {
       settle();
-      if (!msg.labels) return fail(msg.error ?? 'GitHub did not take the labels');
+      if (!msg.labels) return fail(msg.error ?? uiText('GitHub did not take the labels'));
       modal.close();
       onSaved?.(msg.labels);
     });
     // The office drops messages while it's disconnected, and then no answer comes.
     timer = window.setTimeout(() => {
       settle();
-      fail('No answer from the office. Look at the board to see whether the labels changed before saving again.');
+      fail(uiText('No answer from the office. Look at the board to see whether the labels changed before saving again.'));
     }, 45_000);
     net.send({ t: 'gh.labels', kind, number: it.number, add, remove });
   };
@@ -152,5 +153,5 @@ export function openLabels(kind: 'issue' | 'pull', it: GhIssue | GhPull, net: Ne
 /** The button that opens the label picker, after an issue's or PR's labels. */
 export function labelButton(kind: 'issue' | 'pull', it: () => GhIssue | GhPull, net: Net, onSaved: (labels: GhLabel[]) => void) {
   const has = it().labels.length > 0;
-  return h('button.btn.gh-label-edit', { type: 'button', title: 'Change the labels', 'aria-label': 'Change the labels', onclick: () => openLabels(kind, it(), net, onSaved) }, has ? '🏷️ Edit' : '🏷️ Add labels');
+  return h('button.btn.gh-label-edit', { type: 'button', title: uiText('Change the labels'), 'aria-label': uiText('Change the labels'), onclick: () => openLabels(kind, it(), net, onSaved) }, has ? uiText('🏷️ Edit') : uiText('🏷️ Add labels'));
 }

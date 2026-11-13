@@ -1,3 +1,4 @@
+import { t as uiText } from './i18n';
 import { ROAD } from './layout.js';
 
 // The scenic loop: a country road out of either end of the street that goes the long way round and
@@ -20,13 +21,13 @@ export const LOOP_PAVED = LOOP_HALF + 0.7;
 export type Place = 'farm' | 'forest' | 'mountains' | 'tunnel' | 'beach' | 'coast' | 'town';
 
 export const PLACES: Record<Place, { name: string; icon: string }> = {
-  farm: { name: 'Meadowbrook Farm', icon: '🌾' },
-  forest: { name: 'Whispering Pines', icon: '🌲' },
-  mountains: { name: 'Summit Pass', icon: '🏔️' },
-  tunnel: { name: 'Granite Tunnel', icon: '🚇' },
-  beach: { name: 'Sunset Beach', icon: '🏖️' },
-  coast: { name: 'Lighthouse Point', icon: '🗼' },
-  town: { name: 'Downtown', icon: '🏙️' },
+  farm: { name: uiText('Meadowbrook Farm'), icon: '🌾' },
+  forest: { name: uiText('Whispering Pines'), icon: '🌲' },
+  mountains: { name: uiText('Summit Pass'), icon: '🏔️' },
+  tunnel: { name: uiText('Granite Tunnel'), icon: '🚇' },
+  beach: { name: uiText('Sunset Beach'), icon: '🏖️' },
+  coast: { name: uiText('Lighthouse Point'), icon: '🗼' },
+  town: { name: uiText('Downtown'), icon: '🏙️' },
 };
 
 /**

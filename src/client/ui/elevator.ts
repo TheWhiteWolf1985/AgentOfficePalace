@@ -1,3 +1,4 @@
+import { t as uiText } from '../../shared/i18n';
 import './elevator.css';
 import type { CloneProgress, FloorInfo, RepoChoice, ServerMsg } from '../../shared/protocol';
 import { cloneLabel, cloneStep, floorPalette, normalizeRepo, sameRepo } from '../../shared/floors';
@@ -76,17 +77,17 @@ export function openElevator(opts: ElevatorOptions): void {
 
   const floorsEl = h('div.floors');
   const addEl = h('div.add');
-  const input = h('input', { type: 'text', placeholder: 'Search your repositories, or type owner/name', 'aria-label': 'Repository', autocomplete: 'off', spellcheck: 'false' }) as HTMLInputElement;
-  const listEl = h('div.repo-list', { role: 'listbox', 'aria-label': 'Repositories' });
+  const input = h('input', { type: 'text', placeholder: uiText('Search your repositories, or type owner/name'), 'aria-label': uiText('Repository'), autocomplete: 'off', spellcheck: 'false' }) as HTMLInputElement;
+  const listEl = h('div.repo-list', { role: 'listbox', 'aria-label': uiText('Repositories') });
   const statusEl = h('div');
-  const addBtn = h('button.btn.primary', { type: 'button' }, '🛗 Add floor');
-  const refreshBtn = h('button.btn', { type: 'button', title: 'Ask GitHub for the list again' }, '↻');
-  const close = h('button.btn.close', { type: 'button', 'aria-label': 'Close', title: 'Close (Esc)' }, '✕');
+  const addBtn = h('button.btn.primary', { type: 'button' }, uiText('🛗 Add floor'));
+  const refreshBtn = h('button.btn', { type: 'button', title: uiText('Ask GitHub for the list again') }, '↻');
+  const close = h('button.btn.close', { type: 'button', 'aria-label': uiText('Close'), title: uiText('Close (Esc)') }, '✕');
 
   // Where clones go. Admins can move it right here: the first project is when it matters.
-  const dirInput = h('input', { type: 'text', placeholder: '~/Workspace', 'aria-label': 'Workspace folder', spellcheck: 'false', autocomplete: 'off' }) as HTMLInputElement;
-  const dirSave = h('button.btn.primary', { type: 'button' }, 'Save');
-  const dirCancel = h('button.btn', { type: 'button' }, 'Cancel');
+  const dirInput = h('input', { type: 'text', placeholder: '~/Workspace', 'aria-label': uiText('Workspace folder'), spellcheck: 'false', autocomplete: 'off' }) as HTMLInputElement;
+  const dirSave = h('button.btn.primary', { type: 'button' }, uiText('Save'));
+  const dirCancel = h('button.btn', { type: 'button' }, uiText('Cancel'));
   const dirEl = h('div.webhook.dir-pick.hidden', {}, dirInput, dirSave, dirCancel);
   const editDir = (on: boolean) => {
     dirEl.classList.toggle('hidden', !on);
@@ -123,21 +124,21 @@ export function openElevator(opts: ElevatorOptions): void {
     const here = mine && !opts.downstairs();
     const p = floorPalette(f.palette);
     const stats: (HTMLElement | string)[] = [];
-    if (f.cloning) stats.push(h('span', { title: f.clone?.detail ?? 'Being cloned' }, cloneLabel(f.clone)));
+    if (f.cloning) stats.push(h('span', { title: f.clone?.detail ?? uiText('Being cloned') }, cloneLabel(f.clone)));
     else {
-      if (f.busy) stats.push(h('span', { title: 'Working' }, `👷 ${f.busy}`));
-      if (f.waiting) stats.push(h('span.waiting', { title: 'Waiting on someone' }, `🙋 ${f.waiting}`));
-      stats.push(h('span', { title: 'Workers at desks' }, `💻 ${f.workers}`));
-      if (f.people) stats.push(h('span', { title: 'People on this floor' }, `🧑 ${f.people}`));
+      if (f.busy) stats.push(h('span', { title: uiText('Working') }, `👷 ${f.busy}`));
+      if (f.waiting) stats.push(h('span.waiting', { title: uiText('Waiting on someone') }, `🙋 ${f.waiting}`));
+      stats.push(h('span', { title: uiText('Workers at desks') }, `💻 ${f.workers}`));
+      if (f.people) stats.push(h('span', { title: uiText('People on this floor') }, `🧑 ${f.people}`));
     }
     const btn = h(
       'button.floor-btn',
-      { type: 'button', class: here ? 'here' : '', disabled: f.cloning || here, title: here ? "You're on this floor" : f.cloning ? 'Still being cloned' : `Ride ${mine ? 'back up ' : ''}to ${f.name}` },
+      { type: 'button', class: here ? 'here' : '', disabled: f.cloning || here, title: here ? uiText("You're on this floor") : f.cloning ? uiText('Still being cloned') : uiText`Ride ${mine ? uiText('back up ') : ''}to ${f.name}` },
       h('span.floor-no', { style: `background:${p.trim}` }, String(i + 1)),
       h(
         'span.floor-text',
         {},
-        h('span.floor-name', {}, f.name, here ? h('span.here-tag', {}, 'you are here') : mine ? h('span.here-tag', {}, 'your floor') : null),
+        h('span.floor-name', {}, f.name, here ? h('span.here-tag', {}, uiText('you are here')) : mine ? h('span.here-tag', {}, uiText('your floor')) : null),
         h('span.floor-sub', {}, [f.repo ?? f.dir, f.cloning ? f.clone?.detail : ''].filter(Boolean).join(' · ')),
         f.cloning ? cloneBar(f.clone) : null,
       ),
@@ -156,23 +157,23 @@ export function openElevator(opts: ElevatorOptions): void {
     const btn = floorButton(f, i);
     if (f.cloning) {
       if (!store.me.admin && !(adding && sameRepo(f.repo, adding))) return btn;
-      const stop = h('button.btn.floor-off', { type: 'button', title: `Stop cloning ${f.repo ?? f.name}`, 'aria-label': `Stop cloning ${f.name}` }, '⏹️');
-      stop.addEventListener('click', () => confirmDialog(`Stop cloning ${f.repo ?? f.name}?`, "What's come down so far is thrown away. You can add it again any time.", '⏹️ Stop cloning', () => net.send({ t: 'floor.cancel', floor: f.id })));
+      const stop = h('button.btn.floor-off', { type: 'button', title: uiText`Stop cloning ${f.repo ?? f.name}`, 'aria-label': uiText`Stop cloning ${f.name}` }, '⏹️');
+      stop.addEventListener('click', () => confirmDialog(uiText`Stop cloning ${f.repo ?? f.name}?`, uiText("What's come down so far is thrown away. You can add it again any time."), uiText('⏹️ Stop cloning'), () => net.send({ t: 'floor.cancel', floor: f.id })));
       return h('div.floor-row', {}, btn, stop);
     }
     if (!store.me.admin) return btn;
-    const off = h('button.btn.floor-off', { type: 'button', title: `Take ${f.name} off the building`, 'aria-label': `Remove ${f.name}` }, '🗑');
+    const off = h('button.btn.floor-off', { type: 'button', title: uiText`Take ${f.name} off the building`, 'aria-label': uiText`Remove ${f.name}` }, '🗑');
     off.addEventListener('click', () => confirmRemove(f));
     return h('div.floor-row', {}, btn, off);
   };
 
   const confirmRemove = (f: FloorInfo) => {
     const next = store.floors.find((o) => o.id !== f.id && !o.cloning);
-    const workers = f.workers ? `Its ${f.workers} worker${f.workers === 1 ? '' : 's'} stop${f.workers === 1 ? 's' : ''}. ` : '';
-    const people = f.people ? `Everyone on it rides the elevator to ${next ? next.name : 'the lobby'}. ` : '';
+    const workers = f.workers ? uiText`Its ${f.workers} worker${f.workers === 1 ? '' : 's'} stop${f.workers === 1 ? 's' : ''}. ` : '';
+    const people = f.people ? uiText`Everyone on it rides the elevator to ${next ? next.name : uiText('the lobby')}. ` : '';
     // The office was started in it: its accounts, password and chat live in that .agent-office too, and stay.
-    const own = f.local ? ' The office keeps its own settings there too, so it carries on as before, just without this floor.' : '';
-    confirmDialog(`Take ${f.name} off the building?`, `${workers}${people}Nothing is deleted: its checkout stays in ${f.dir}, .agent-office folder and all.${own}`, '🗑 Remove floor', () => net.send({ t: 'floor.remove', floor: f.id }));
+    const own = f.local ? uiText(' The office keeps its own settings there too, so it carries on as before, just without this floor.') : '';
+    confirmDialog(uiText`Take ${f.name} off the building?`, uiText`${workers}${people}Nothing is deleted: its checkout stays in ${f.dir}, .agent-office folder and all.${own}`, uiText('🗑 Remove floor'), () => net.send({ t: 'floor.remove', floor: f.id }));
   };
 
   /** The roof, over every floor: the rooftop bar. */
@@ -181,10 +182,10 @@ export function openElevator(opts: ElevatorOptions): void {
     const people = [...store.peers.values()].filter((p) => p.floor === ROOF).length;
     const btn = h(
       'button.floor-btn',
-      { type: 'button', class: here ? 'here' : '', disabled: here, title: here ? "You're up on the roof" : `Ride up to the ${ROOF_NAME.toLowerCase()}` },
+      { type: 'button', class: here ? 'here' : '', disabled: here, title: here ? uiText("You're up on the roof") : uiText`Ride up to the ${ROOF_NAME.toLowerCase()}` },
       h('span.floor-no', { style: 'background:#2b2d42' }, '🍸'),
-      h('span.floor-text', {}, h('span.floor-name', {}, ROOF_NAME, here ? h('span.here-tag', {}, 'you are here') : null), h('span.floor-sub', {}, 'The roof: a DJ playing drum and bass, a bar, and the city all around')),
-      h('span.floor-stats', {}, people ? h('span', { title: 'People up there' }, `🧑 ${people}`) : ''),
+      h('span.floor-text', {}, h('span.floor-name', {}, ROOF_NAME, here ? h('span.here-tag', {}, uiText('you are here')) : null), h('span.floor-sub', {}, uiText('The roof: a DJ playing drum and bass, a bar, and the city all around'))),
+      h('span.floor-stats', {}, people ? h('span', { title: uiText('People up there') }, `🧑 ${people}`) : ''),
     );
     btn.addEventListener('click', () => {
       if (here) return;
@@ -198,12 +199,12 @@ export function openElevator(opts: ElevatorOptions): void {
   const garageButton = () => {
     const here = opts.downstairs();
     const bottom = store.floors.find((f) => !f.cloning);
-    const under = store.floor === ROOF ? `Under ${bottom?.name ?? 'the building'}, level with the street` : 'Under the building, level with the street: the cars, and the way out';
+    const under = store.floor === ROOF ? uiText`Under ${bottom?.name ?? uiText('the building')}, level with the street` : uiText('Under the building, level with the street: the cars, and the way out');
     const btn = h(
       'button.floor-btn',
-      { type: 'button', class: here ? 'here' : '', disabled: here, title: here ? "You're down at the street" : 'Ride down to the garage' },
+      { type: 'button', class: here ? 'here' : '', disabled: here, title: here ? uiText("You're down at the street") : uiText('Ride down to the garage') },
       h('span.floor-no', { style: 'background:#2b2d42' }, '🏎️'),
-      h('span.floor-text', {}, h('span.floor-name', {}, 'Garage', here ? h('span.here-tag', {}, 'you are here') : null), h('span.floor-sub', {}, under)),
+      h('span.floor-text', {}, h('span.floor-name', {}, uiText('Garage'), here ? h('span.here-tag', {}, uiText('you are here')) : null), h('span.floor-sub', {}, under)),
       h('span.floor-stats', {}),
     );
     btn.addEventListener('click', () => {
@@ -220,7 +221,7 @@ export function openElevator(opts: ElevatorOptions): void {
     // Top floor first, the way an elevator's buttons stack, with the roof over them, floor 1 and then the garage at the bottom.
     floorsEl.replaceChildren(
       ...(built ? [roofButton()] : []),
-      ...(floors.length ? floors.map(floorRow).reverse() : [h('p.empty', {}, 'No floors yet.')]),
+      ...(floors.length ? floors.map(floorRow).reverse() : [h('p.empty', {}, uiText('No floors yet.'))]),
       ...(built ? [garageButton()] : []),
     );
   };
@@ -231,9 +232,9 @@ export function openElevator(opts: ElevatorOptions): void {
       'div.repo',
       { role: 'option', class: selected && sameRepo(selected, r.name) ? 'sel' : '', 'aria-selected': String(!!selected && sameRepo(selected, r.name)), title: r.description ?? r.name },
       h('span.nm', {}, r.name),
-      r.private ? h('span', { title: 'Private' }, '🔒') : null,
+      r.private ? h('span', { title: uiText('Private') }, '🔒') : null,
       h('span.desc', {}, r.description ?? ''),
-      floor ? h('span.pill', {}, floor.id === store.floor ? 'you are here' : `floor ${store.floors.indexOf(floor) + 1}`) : r.pushedAt ? h('span.when', {}, timeAgo(r.pushedAt)) : null,
+      floor ? h('span.pill', {}, floor.id === store.floor ? uiText('you are here') : uiText`floor ${store.floors.indexOf(floor) + 1}`) : r.pushedAt ? h('span.when', {}, timeAgo(r.pushedAt)) : null,
     );
     row.addEventListener('click', () => {
       if (adding) return;
@@ -256,7 +257,7 @@ export function openElevator(opts: ElevatorOptions): void {
 
   const renderAdd = () => {
     if (!showAdd) {
-      const open = h('button.btn', { type: 'button' }, '➕ Add a project');
+      const open = h('button.btn', { type: 'button' }, uiText('➕ Add a project'));
       open.addEventListener('click', () => {
         showAdd = true;
         needRepos();
@@ -274,33 +275,33 @@ export function openElevator(opts: ElevatorOptions): void {
     const matches = r.list.filter((x) => !q || x.name.toLowerCase().includes(q) || (x.description ?? '').toLowerCase().includes(q));
     const rows: HTMLElement[] = [];
     // owner/name that isn't in the list (someone else's public repository): offer it anyway.
-    if (typed && !r.list.some((x) => sameRepo(x.name, typed))) rows.push(repoRow({ name: typed, private: false, description: 'Not in your list — the office will try to clone it' }));
+    if (typed && !r.list.some((x) => sameRepo(x.name, typed))) rows.push(repoRow({ name: typed, private: false, description: uiText('Not in your list — the office will try to clone it') }));
     rows.push(...matches.slice(0, SHOWN).map(repoRow));
-    if (!rows.length) rows.push(h('p.empty', { style: 'padding:10px' }, r.loading ? 'Asking GitHub for your repositories…' : r.error ? '' : q ? 'Nothing matches. Type owner/name to clone any repository.' : 'No repositories.'));
-    if (matches.length > SHOWN) rows.push(h('p.empty', { style: 'padding:8px 10px' }, `…and ${matches.length - SHOWN} more — type to narrow it down`));
+    if (!rows.length) rows.push(h('p.empty', { style: 'padding:10px' }, r.loading ? uiText('Asking GitHub for your repositories…') : r.error ? '' : q ? uiText('Nothing matches. Type owner/name to clone any repository.') : uiText('No repositories.')));
+    if (matches.length > SHOWN) rows.push(h('p.empty', { style: 'padding:8px 10px' }, uiText`…and ${matches.length - SHOWN} more — type to narrow it down`));
     listEl.replaceChildren(...rows);
     const pick = choice();
     const dest = pick ? `${store.projectsDir.dir}/${pick}` : `${store.projectsDir.dir}/<owner>/<repo>`;
-    const change = store.me.admin ? h('button.btn.dir-change', { type: 'button', title: 'Clone new projects into another folder on the office’s machine' }, '📁 Change folder') : null;
+    const change = store.me.admin ? h('button.btn.dir-change', { type: 'button', title: uiText('Clone new projects into another folder on the office’s machine') }, uiText('📁 Change folder')) : null;
     change?.addEventListener('click', () => editDir(true));
     // While it clones: how far it's got (the office asks GitHub about it first).
     const on = addingFloor();
     const lines = adding
       ? [
-          h('p.note.busy', {}, on ? `⏳ Cloning ${on.repo ?? adding} into ${store.projectsDir.dir}/${on.repo ?? adding}` : `⏳ Asking GitHub about ${adding}…`),
+          h('p.note.busy', {}, on ? uiText`⏳ Cloning ${on.repo ?? adding} into ${store.projectsDir.dir}/${on.repo ?? adding}` : uiText`⏳ Asking GitHub about ${adding}…`),
           on ? cloneBar(on.clone) : null,
           on ? h('p.note', {}, [cloneStep(on.clone), on.clone?.detail].filter(Boolean).join(' · ')) : null,
-          h('p.note', {}, 'You can close this and carry on: everyone hears when the new floor opens.'),
+          h('p.note', {}, uiText('You can close this and carry on: everyone hears when the new floor opens.')),
         ]
-      : [h('p.note', {}, `Cloned into ${dest} with this machine's gh login. Everything on the new floor works in that checkout.`, change)];
+      : [h('p.note', {}, uiText`Cloned into ${dest} with this machine's gh login. Everything on the new floor works in that checkout.`, change)];
     statusEl.replaceChildren(...lines.filter((l): l is HTMLElement => !!l), ...[r.error, error].filter(Boolean).map((e) => h('p.err', {}, e)));
     addBtn.disabled = !!adding || !pick || store.floors.some((f) => sameRepo(f.repo, pick));
-    addBtn.textContent = adding ? '⏳ Cloning…' : pick ? `🛗 Add ${pick}` : '🛗 Add floor';
+    addBtn.textContent = adding ? uiText('⏳ Cloning…') : pick ? uiText`🛗 Add ${pick}` : uiText('🛗 Add floor');
     input.disabled = !!adding;
     if (!built) {
       built = true;
       addEl.replaceChildren(
-        h('h3', {}, setup && !store.floors.length ? 'Pick your first project' : '➕ Add a project'),
+        h('h3', {}, setup && !store.floors.length ? uiText('Pick your first project') : uiText('➕ Add a project')),
         h('div.repo-search', {}, input, refreshBtn),
         listEl,
         statusEl,
@@ -324,7 +325,7 @@ export function openElevator(opts: ElevatorOptions): void {
     startTimer = window.setTimeout(() => {
       if (adding !== repo || seen) return;
       adding = null;
-      error = `The office didn't start cloning ${repo} — try again`;
+      error = uiText`The office didn't start cloning ${repo} — try again`;
       renderAdd();
     }, START_MS);
   };
@@ -338,7 +339,7 @@ export function openElevator(opts: ElevatorOptions): void {
       opts.ride(floor);
       return;
     }
-    error = why ?? 'The floor could not be added';
+    error = why ?? uiText('The floor could not be added');
     renderAdd();
   };
 
@@ -356,7 +357,7 @@ export function openElevator(opts: ElevatorOptions): void {
     if (!adding) return;
     const f = addingFloor();
     if (f?.cloning) seen = true;
-    else if (seen) settle(f?.id, `Cloning ${adding} stopped before it finished — add it again`);
+    else if (seen) settle(f?.id, uiText`Cloning ${adding} stopped before it finished — add it again`);
   };
   addedWaiters.add(onAdded);
 
@@ -389,20 +390,20 @@ export function openElevator(opts: ElevatorOptions): void {
         'p.intro',
         {},
         store.floors.length
-          ? 'Every project is a floor of this building. Pick a floor to ride to, or add another project.'
-          : "Every project is a floor of this building, and it doesn't have any yet. Pick one of your repositories: the office clones it and it becomes the first floor.",
+          ? uiText('Every project is a floor of this building. Pick a floor to ride to, or add another project.')
+          : uiText("Every project is a floor of this building, and it doesn't have any yet. Pick one of your repositories: the office clones it and it becomes the first floor."),
       )
     : null;
   const el = h(
     'div.modal.elevator',
-    { role: 'dialog', 'aria-label': 'Elevator' },
-    h('header', {}, h('h2', {}, setup ? '🏢 Welcome to Agent Office' : '🛗 Elevator'), close),
+    { role: 'dialog', 'aria-label': uiText('Elevator') },
+    h('header', {}, h('h2', {}, setup ? uiText('🏢 Welcome to Agent Office') : uiText('🛗 Elevator')), close),
     h('div.body', {}, intro, floorsEl, addEl),
-    h('footer', {}, h('span.grow', {}, setup ? 'Your office, one floor per project · Esc to look around first' : 'Pick a floor · Esc to stay here'), addBtn),
+    h('footer', {}, h('span.grow', {}, setup ? uiText('Your office, one floor per project · Esc to look around first') : uiText('Pick a floor · Esc to stay here')), addBtn),
   );
   const unsubs = [store.on('floors', () => (checkAdding(), renderFloors(), renderAdd())), store.on('repos', renderAdd), store.on('projectsDir', () => (editDir(false), renderAdd())), store.on('floor', renderFloors), store.on('peers', renderFloors), store.on('me', () => (renderFloors(), renderAdd()))];
   const modal = openModal(el, {
-    doing: '🛗 at the elevator',
+    doing: uiText('🛗 at the elevator'),
     // A stray click shouldn't lose the first-run panel; ✕ and Esc still close it.
     backdropCloses: !setup,
     onClose: () => {

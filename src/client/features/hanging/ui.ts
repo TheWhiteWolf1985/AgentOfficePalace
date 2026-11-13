@@ -1,3 +1,4 @@
+import { t as uiText } from '../../../shared/i18n';
 import './ui.css';
 import { FRAMES, checkImageUrl, type Decoration } from '../../../shared/decor';
 import { store } from '../../state';
@@ -21,39 +22,39 @@ function lastFrame(): number {
   }
 }
 
-const TIP = 'Paste a link to an image. Online, right-click any picture and choose “Copy image address”.';
+const TIP = uiText('Paste a link to an image. Online, right-click any picture and choose “Copy image address”.');
 
 /** Pick an image, a title and a frame. Editing a picture (`initial`) fills them in. */
 export function openHangDialog(opts: { initial?: Decoration; onDone(choice: HangChoice): void }) {
   const init = opts.initial;
-  const urlIn = h('input', { type: 'text', placeholder: 'https://…/picture.png', 'aria-label': 'Image link', spellcheck: 'false', autocomplete: 'off' }) as HTMLInputElement;
-  const titleIn = h('input', { type: 'text', maxlength: 80, placeholder: 'Optional', 'aria-label': 'Title', autocomplete: 'off' }) as HTMLInputElement;
+  const urlIn = h('input', { type: 'text', placeholder: 'https://…/picture.png', 'aria-label': uiText('Image link'), spellcheck: 'false', autocomplete: 'off' }) as HTMLInputElement;
+  const titleIn = h('input', { type: 'text', maxlength: 80, placeholder: uiText('Optional'), 'aria-label': uiText('Title'), autocomplete: 'off' }) as HTMLInputElement;
   urlIn.value = init?.url ?? '';
   titleIn.value = init?.title ?? '';
   let frame = init?.frame ?? lastFrame();
-  const frames = h('div.seg', { role: 'radiogroup', 'aria-label': 'Frame' });
+  const frames = h('div.seg', { role: 'radiogroup', 'aria-label': uiText('Frame') });
   const preview = h('div.hang-preview');
   const status = h('p.hang-status', {}, TIP);
-  const submit = h('button.btn.primary', { type: 'submit', disabled: true }, init ? 'Save' : 'Pick a spot on the wall →') as HTMLButtonElement;
-  const cancel = h('button.btn', { type: 'button' }, 'Cancel');
-  const close = h('button.btn.close', { type: 'button', 'aria-label': 'Close' }, '✕');
+  const submit = h('button.btn.primary', { type: 'submit', disabled: true }, init ? uiText('Save') : uiText('Pick a spot on the wall →')) as HTMLButtonElement;
+  const cancel = h('button.btn', { type: 'button' }, uiText('Cancel'));
+  const close = h('button.btn.close', { type: 'button', 'aria-label': uiText('Close') }, '✕');
   const form = h(
     'form.modal.hang',
-    { role: 'dialog', 'aria-label': init ? 'Edit picture' : 'Hang a picture' },
-    h('header', {}, h('h2', {}, init ? '🖼️ Edit picture' : '🖼️ Hang a picture'), close),
+    { role: 'dialog', 'aria-label': init ? uiText('Edit picture') : uiText('Hang a picture') },
+    h('header', {}, h('h2', {}, init ? uiText('🖼️ Edit picture') : uiText('🖼️ Hang a picture')), close),
     h(
       'div.body',
       {},
-      h('label', {}, 'Image link'),
+      h('label', {}, uiText('Image link')),
       urlIn,
-      h('label', { style: 'margin-top:12px' }, 'Title'),
+      h('label', { style: 'margin-top:12px' }, uiText('Title')),
       titleIn,
-      h('label', { style: 'margin-top:12px' }, 'Frame'),
+      h('label', { style: 'margin-top:12px' }, uiText('Frame')),
       frames,
       preview,
       status,
     ),
-    h('footer', {}, h('span.grow', {}, init ? '' : 'Then aim at a wall and click.'), cancel, submit),
+    h('footer', {}, h('span.grow', {}, init ? '' : uiText('Then aim at a wall and click.')), cancel, submit),
   ) as HTMLFormElement;
 
   let pic: Picture | null = null;
@@ -96,14 +97,14 @@ export function openHangDialog(opts: { initial?: Decoration; onDone(choice: Hang
     const checked = checkImageUrl(raw);
     if ('error' in checked) return setStatus(checked.error, 'error');
     release = holdPicture(checked.url);
-    setStatus('Loading the image…', 'loading');
+    setStatus(uiText('Loading the image…'), 'loading');
     loading = true;
     try {
       const p = await loadPicture(checked.url);
       if (my !== seq) return;
       loading = false;
       pic = p;
-      preview.replaceChildren(h('img', { src: p.src, alt: 'Preview' }));
+      preview.replaceChildren(h('img', { src: p.src, alt: uiText('Preview') }));
       setStatus('');
       submit.disabled = false;
       if (submitWhenLoaded) finish();
@@ -135,7 +136,7 @@ export function openHangDialog(opts: { initial?: Decoration; onDone(choice: Hang
   }
 
   const modal = openModal(form, {
-    doing: '🖼️ hanging a picture',
+    doing: uiText('🖼️ hanging a picture'),
     onClose: () => {
       seq++;
       clearTimeout(timer);
@@ -168,19 +169,19 @@ export function openPicture(d: Decoration, actions: { move(): void; edit(): void
   const release = holdPicture(d.url);
   const stage = h('div.picture-stage', {}, h('span.spinner'));
   loadPicture(d.url).then(
-    (pic) => stage.replaceChildren(h('img', { src: pic.src, alt: d.title ?? 'Picture' })),
+    (pic) => stage.replaceChildren(h('img', { src: pic.src, alt: d.title ?? uiText('Picture') })),
     (err) => stage.replaceChildren(h('p.hang-status.error', {}, `⚠️ ${(err as Error).message}`)),
   );
-  const link = h('a', { href: d.url, target: '_blank', rel: 'noopener noreferrer' }, 'Open the original ↗');
-  const close = h('button.btn.close', { type: 'button', 'aria-label': 'Close' }, '✕');
-  const takeDown = h('button.btn.danger', { type: 'button' }, 'Take down');
-  const edit = h('button.btn', { type: 'button' }, '✏️ Edit');
-  const move = h('button.btn.primary', { type: 'button' }, '↔️ Move');
+  const link = h('a', { href: d.url, target: '_blank', rel: 'noopener noreferrer' }, uiText('Open the original ↗'));
+  const close = h('button.btn.close', { type: 'button', 'aria-label': uiText('Close') }, '✕');
+  const takeDown = h('button.btn.danger', { type: 'button' }, uiText('Take down'));
+  const edit = h('button.btn', { type: 'button' }, uiText('✏️ Edit'));
+  const move = h('button.btn.primary', { type: 'button' }, uiText('↔️ Move'));
   const el = h(
     'div.modal.picture',
-    { role: 'dialog', 'aria-label': d.title || 'Picture' },
-    h('header', {}, h('h2', {}, `🖼️ ${d.title || 'A picture'}`), close),
-    h('div.body', {}, stage, h('p.picture-meta', {}, `Hung by ${d.by} · ${timeAgo(d.at)} · `, link)),
+    { role: 'dialog', 'aria-label': d.title || uiText('Picture') },
+    h('header', {}, h('h2', {}, `🖼️ ${d.title || uiText('A picture')}`), close),
+    h('div.body', {}, stage, h('p.picture-meta', {}, uiText`Hung by ${d.by} · ${timeAgo(d.at)} · `, link)),
     h('footer', {}, takeDown, h('span.grow'), edit, move),
   );
   // Someone else took it down while you were looking.
@@ -203,7 +204,7 @@ export function openPicture(d: Decoration, actions: { move(): void; edit(): void
     actions.edit();
   });
   takeDown.addEventListener('click', () =>
-    confirmDialog('Take this picture down?', 'It comes off the wall for everyone.', 'Take down', () => {
+    confirmDialog(uiText('Take this picture down?'), uiText('It comes off the wall for everyone.'), uiText('Take down'), () => {
       modal.close();
       actions.remove();
     }),

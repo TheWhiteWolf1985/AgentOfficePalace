@@ -1,3 +1,4 @@
+import { t as uiText } from '../../../shared/i18n';
 /**
  * Hanging a picture on a wall of this floor (F), moving one, and looking closer at one hung already.
  * The pictures themselves are the gallery's (see gallery.ts).
@@ -51,7 +52,7 @@ export function installHanging(ctx: Ctx, deps: HangingDeps) {
     reach: 9,
     hint: (it) => {
       const d = store.decor.find((x) => x.id === it.decorId);
-      return { k: `${d?.title}|${d?.by}`, parts: [hintTitle(`🖼️ ${d?.title || 'A picture'}`), d ? aside(`hung by ${d.by}`) : '', key('E', 'Look closer')] };
+      return { k: `${d?.title}|${d?.by}`, parts: [hintTitle(`🖼️ ${d?.title || uiText('A picture')}`), d ? aside(uiText`hung by ${d.by}`) : '', key('E', uiText('Look closer'))] };
     },
     use: onE((it) => {
       if (it.decorId) hanger.view(it.decorId);
@@ -85,15 +86,15 @@ export function installHanging(ctx: Ctx, deps: HangingDeps) {
   function renderHangHint(el: HTMLElement) {
     const spot = hanger.spot;
     ctx.hint.draw(el, `hang|${hanger.moving}|${spot ? spot.ok : '-'}`, () => {
-      const title = !spot ? '🖼️ Aim at a wall' : !spot.ok ? "🚫 Something's in the way" : hanger.moving ? '🖼️ Moving a picture' : '🖼️ Hanging a picture';
-      return [h('span.title', {}, title), key('Click', 'Hang'), key('Scroll', 'Size'), key('Esc', 'Cancel')];
+      const title = !spot ? uiText('🖼️ Aim at a wall') : !spot.ok ? uiText("🚫 Something's in the way") : hanger.moving ? uiText('🖼️ Moving a picture') : uiText('🖼️ Hanging a picture');
+      return [h('span.title', {}, title), key(uiText('Click'), uiText('Hang')), key(uiText('Scroll'), uiText('Size')), key('Esc', uiText('Cancel'))];
     });
   }
 
   /** F: hang a picture on a wall of this floor. There are no walls for them up on the roof. */
   function startHanging() {
-    if (ctx.upTop()) return toast('No walls to hang pictures on up here — take the elevator down to a floor', 'warn');
-    if (!ctx.inOffice()) return toast(`${ctx.plan().icon} ${ctx.plan().name}'s walls are hung already — pictures go up in the office`, 'warn');
+    if (ctx.upTop()) return toast(uiText('No walls to hang pictures on up here — take the elevator down to a floor'), 'warn');
+    if (!ctx.inOffice()) return toast(uiText`${ctx.plan().icon} ${ctx.plan().name}'s walls are hung already — pictures go up in the office`, 'warn');
     hanger.start();
   }
 

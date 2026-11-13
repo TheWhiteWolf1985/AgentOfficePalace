@@ -1,3 +1,4 @@
+import { t as uiText } from '../../../shared/i18n';
 import * as THREE from 'three';
 import { adrift } from '../../../shared/maps';
 import type { AirlockView } from '../../world/station/airlock';
@@ -19,8 +20,8 @@ const EJECT = { open: 0.5, step: 0.6, seal: 0.5, wait: 1.8, part: 0.22, blow: 5.
 /** A worker's middle is this far above its feet (see adrift.ts). */
 const MIDDLE = 0.45;
 
-const PLEAS = ['😨 Wait, wait, wait!', '🥺 Let’s talk about this!', '😰 I’ll fix the tests!', '🙏 One more chance!', '😳 Is this thing on?', '🚪 Hello? The door?'];
-const CRIES = ['😱 AAAAAAH!', '😵 NOOOoooo…', '🫨 WHOAAAA!', '😭 I regret nothiiing!', '🚀 Wheeeee!', '🫠 Tell my PR I loved it!'];
+const PLEAS = [uiText('😨 Wait, wait, wait!'), uiText('🥺 Let’s talk about this!'), uiText('😰 I’ll fix the tests!'), uiText('🙏 One more chance!'), uiText('😳 Is this thing on?'), uiText('🚪 Hello? The door?')];
+const CRIES = [uiText('😱 AAAAAAH!'), uiText('😵 NOOOoooo…'), uiText('🫨 WHOAAAA!'), uiText('😭 I regret nothiiing!'), uiText('🚀 Wheeeee!'), uiText('🫠 Tell my PR I loved it!')];
 
 /** Whose turn it is in each airlock: one at a time. */
 const using = new WeakMap<AirlockView, string>();

@@ -1,3 +1,4 @@
+import { t as uiText } from '../../../shared/i18n';
 import type { Ctx } from '../../core/context';
 import { aside, hintTitle, key, onE } from '../../core/hint';
 import { noOutline } from '../../core/outline';
@@ -35,7 +36,7 @@ export function installDog(ctx: Ctx): Dog {
         (id) => store.workers.get(id)?.name,
         (id) => (id === store.you ? 'you' : store.peers.get(id)?.name),
       );
-      return { k: `${dog.name}|${doing}`, parts: [hintTitle(`🐶 ${dog.name}`), doing ? aside(doing) : '', key('E', 'Pet')] };
+      return { k: `${dog.name}|${doing}`, parts: [hintTitle(`🐶 ${dog.name}`), doing ? aside(doing) : '', key('E', uiText('Pet'))] };
     },
     use: onE(() => ctx.net.send({ t: 'dog.pet' })),
   });

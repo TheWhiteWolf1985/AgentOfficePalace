@@ -1,3 +1,4 @@
+import { t as uiText } from '../../shared/i18n';
 /**
  * The pieces every hint bar is made of (the key to press, the name of what you're facing, what's
  * going on there), for the office's own hints and every feature's (see core/context.ts's Hint).
@@ -23,7 +24,7 @@ export function hintTitle(text: string) {
 
 /** A board you open with E. */
 export function boardHint(name: string): Hint {
-  return { k: '', parts: [hintTitle(name), key('E', 'Open')] };
+  return { k: '', parts: [hintTitle(name), key('E', uiText('Open'))] };
 }
 
 /** A use that's E only: every other key does nothing there. */

@@ -1,3 +1,4 @@
+import { t as uiText } from '../i18n';
 import type { MapConfig, PropConfig } from './types.js';
 
 /*
@@ -64,23 +65,23 @@ const props: PropConfig[] = [
 
 export const STATION: MapConfig = {
   id: 'station',
-  name: 'Space station',
+  name: uiText('Space station'),
   icon: '🚀',
   description:
-    'A space station in orbit, the Earth rolling by outside its windows. Workers sit at the benches down either side and line up before your captain’s chair on the bridge when they’re done or need you. Speak to the First Officer to bring a new one aboard; send one home, and Security marches it to the airlock and blows it out into space, where everyone ever ejected is still adrift.',
+    uiText('A space station in orbit, the Earth rolling by outside its windows. Workers sit at the benches down either side and line up before your captain’s chair on the bridge when they’re done or need you. Speak to the First Officer to bring a new one aboard; send one home, and Security marches it to the airlock and blows it out into space, where everyone ever ejected is still adrift.'),
   style: 'station',
   hall: { width: W, length: L, height: H },
   spawn: { x: -2.6, z: -17.5, rotY: Math.PI },
   door: { x: 0, z: L / 2 - 1.4 },
   // The bridge: a raised deck right up to the forward windows, the captain's chair on it.
-  throne: { x: 0, z: -24.2, rotY: 0, dais: { width: 14, depth: 7.2, height: 0.6, steps: 2 }, label: '🚀 Captain’s chair' },
-  herald: { x: 3.2, z: -23.2, rotY: -0.35, name: 'First Officer', says: 'Speak to me to bring a new worker aboard', ask: 'What’s their mission, Captain?', button: 'Make it so 🚀' },
+  throne: { x: 0, z: -24.2, rotY: 0, dais: { width: 14, depth: 7.2, height: 0.6, steps: 2 }, label: uiText('🚀 Captain’s chair') },
+  herald: { x: 3.2, z: -23.2, rotY: -0.35, name: uiText('First Officer'), says: uiText('Speak to me to bring a new worker aboard'), ask: uiText('What’s their mission, Captain?'), button: uiText('Make it so 🚀') },
   lineup: { x: 0, z: -22.4, rotY: Math.PI, step: [0, 1.3], count: 8 },
   tables: [
-    { name: 'Port forward bench', x: -BENCH_X, z: -8, length: 10, seats: 4 },
-    { name: 'Starboard forward bench', x: BENCH_X, z: -8, length: 10, seats: 4 },
-    { name: 'Port aft bench', x: -BENCH_X, z: 6, length: 10, seats: 4 },
-    { name: 'Starboard aft bench', x: BENCH_X, z: 6, length: 10, seats: 4 },
+    { name: uiText('Port forward bench'), x: -BENCH_X, z: -8, length: 10, seats: 4 },
+    { name: uiText('Starboard forward bench'), x: BENCH_X, z: -8, length: 10, seats: 4 },
+    { name: uiText('Port aft bench'), x: -BENCH_X, z: 6, length: 10, seats: 4 },
+    { name: uiText('Starboard aft bench'), x: BENCH_X, z: 6, length: 10, seats: 4 },
   ],
   stations: {
     issues: { x: -13.2, z: BOARDS_Z[0], rotY: -Math.PI / 2 },
@@ -90,10 +91,10 @@ export const STATION: MapConfig = {
   // The briefing table, aft on the starboard side.
   council: { x: 10, z: 24.8, rotY: Math.PI },
   boards: {
-    issues: { x: -WALL_X, y: 3.3, z: BOARDS_Z[0], rotY: Math.PI / 2, width: 4.4, height: 2.6, label: '📡 Incoming signals' },
-    queue: { x: -WALL_X, y: 3.3, z: BOARDS_Z[1], rotY: Math.PI / 2, width: 4.4, height: 2.6, label: '📋 Mission queue' },
-    pulls: { x: WALL_X, y: 3.3, z: BOARDS_Z[0], rotY: -Math.PI / 2, width: 4.4, height: 2.6, label: '🔀 Docking requests' },
-    services: { x: WALL_X, y: 3.3, z: BOARDS_Z[1], rotY: -Math.PI / 2, width: 4.4, height: 2.6, label: '🌐 Subsystems' },
+    issues: { x: -WALL_X, y: 3.3, z: BOARDS_Z[0], rotY: Math.PI / 2, width: 4.4, height: 2.6, label: uiText('📡 Incoming signals') },
+    queue: { x: -WALL_X, y: 3.3, z: BOARDS_Z[1], rotY: Math.PI / 2, width: 4.4, height: 2.6, label: uiText('📋 Mission queue') },
+    pulls: { x: WALL_X, y: 3.3, z: BOARDS_Z[0], rotY: -Math.PI / 2, width: 4.4, height: 2.6, label: uiText('🔀 Docking requests') },
+    services: { x: WALL_X, y: 3.3, z: BOARDS_Z[1], rotY: -Math.PI / 2, width: 4.4, height: 2.6, label: uiText('🌐 Subsystems') },
   },
   props,
   agents: { outfit: 'none', ageMinutes: 0 },
@@ -101,15 +102,15 @@ export const STATION: MapConfig = {
   airlock: { x: W / 2 - 0.4, z: AIRLOCK_Z },
   // Sent home, a worker's marched to the airlock by Security and blown out into space, for good.
   sendHome: {
-    escort: { name: 'Security', post: { x: 13.3, z: AIRLOCK_Z + 2.3, rotY: -Math.PI / 2 }, color: '#27313f' },
+    escort: { name: uiText('Security'), post: { x: 13.3, z: AIRLOCK_Z + 2.3, rotY: -Math.PI / 2 }, color: '#27313f' },
     steps: [
       { do: 'fetch' },
-      { do: 'say', who: 'escort', text: ['Captain’s orders. You’re off the crew.', 'On your feet. Your shift ends at the airlock.', 'You’ve been reassigned. To space.', 'Come quietly. Mind the vacuum.'] },
+      { do: 'say', who: 'escort', text: [uiText('Captain’s orders. You’re off the crew.'), uiText('On your feet. Your shift ends at the airlock.'), uiText('You’ve been reassigned. To space.'), uiText('Come quietly. Mind the vacuum.')] },
       { do: 'pack' },
-      { do: 'say', text: ['😨 Not the airlock!', '😰 But my pull request…', '😭 I was nearly done!', '🥺 Just one more commit!', '🫠 I didn’t pack a suit…', '😶 …'] },
+      { do: 'say', text: [uiText('😨 Not the airlock!'), uiText('😰 But my pull request…'), uiText('😭 I was nearly done!'), uiText('🥺 Just one more commit!'), uiText('🫠 I didn’t pack a suit…'), '😶 …'] },
       { do: 'walk', to: 'airlock' },
       { do: 'eject' },
-      { do: 'say', who: 'escort', text: ['🚀 Bon voyage.', '🫡 Thank you for your service.', '🌌 Mind the gap.', '👋 Should have shipped it.'] },
+      { do: 'say', who: 'escort', text: [uiText('🚀 Bon voyage.'), uiText('🫡 Thank you for your service.'), uiText('🌌 Mind the gap.'), uiText('👋 Should have shipped it.')] },
       { do: 'return' },
     ],
     starveHours: 1,

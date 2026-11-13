@@ -1,3 +1,4 @@
+import { t as uiText } from '../../shared/i18n';
 import * as THREE from 'three';
 import { ELEVATOR, ELEVATOR_CAR, ELEVATOR_FRONT, FLOOR, SLAB, STREET_Y, WALL_HEIGHT, streetBelow } from '../../shared/layout';
 import { mesh, roundedBox, textPlane, toon } from './toon';
@@ -238,7 +239,7 @@ export const elevator: Fixture<'elevator' | 'setProjectName'> = (site) => {
  */
 export const garageLift: Fixture<'garageLift'> = () => {
   const built = buildElevator(-SLAB - STREET_Y);
-  built.setSign('🛗 Garage');
+  built.setSign(uiText('🛗 Garage'));
   return {
     group: built.group,
     colliders: built.colliders,

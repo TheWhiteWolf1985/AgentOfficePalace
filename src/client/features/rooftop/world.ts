@@ -1,3 +1,4 @@
+import { t as uiText } from '../../../shared/i18n';
 import * as THREE from 'three';
 import { AXE_LANE } from '../../../shared/bargames';
 import { DANCE_FLOOR, DJ_BOOTH, ELEVATOR, ELEVATOR_FRONT, FIRE_PIT, FLOOR, ROOF_BAR, ROOF_TABLES, SEATING_BY_ID, STAGE, WALL_HEIGHT, WALL_T } from '../../../shared/layout';
@@ -293,7 +294,7 @@ export function buildRooftop(night: NightParts, floors: number): Rooftop {
 
   // The elevator, in its housing: a back wall and a roof over the shaft (as tall as a floor), with a light on top.
   const elevator = buildElevator();
-  elevator.setSign('🍸 Rooftop bar');
+  elevator.setSign(uiText('🍸 Rooftop bar'));
   group.add(elevator.group);
   colliders.push(...elevator.colliders);
   interactables.push(elevator.interactable);
@@ -569,7 +570,7 @@ export function buildRooftop(night: NightParts, floors: number): Rooftop {
       g.shadowColor = '#ff4fd8';
       g.shadowBlur = blur;
       g.fillStyle = color;
-      g.fillText('🍸 SKY BAR', 384, 100);
+      g.fillText(uiText('🍸 SKY BAR'), 384, 100);
     }
   });
   const neonMat = new THREE.MeshBasicMaterial({ map: neon, transparent: true, depthWrite: false });
@@ -578,9 +579,9 @@ export function buildRooftop(night: NightParts, floors: number): Rooftop {
   group.add(sign);
 
   // The bartender, behind the bar, facing the counter.
-  const bartender = new Worker('Bartender', '#e76f51');
+  const bartender = new Worker(uiText('Bartender'), '#e76f51');
   bartender.setStatus('idle', false);
-  bartender.setTask({ name: '🍸 Bartender', summary: "What'll it be? E at the bar" });
+  bartender.setTask({ name: uiText('🍸 Bartender'), summary: uiText("What'll it be? E at the bar") });
   const tendX = bx + ROOF_BAR.depth / 2 + 0.7;
   bartender.root.position.set(tendX, 0, bz);
   bartender.root.rotation.y = -Math.PI / 2;
@@ -825,7 +826,7 @@ export function buildRooftop(night: NightParts, floors: number): Rooftop {
       }
       g.globalAlpha = 0.85;
     }
-    const words = f.part === 'drop' ? 'AGENT OFFICE' : f.part === 'build' ? 'GET READY' : 'DJ MERGE CONFLICT';
+    const words = f.part === 'drop' ? 'AGENT OFFICE' : f.part === 'build' ? uiText('GET READY') : 'DJ MERGE CONFLICT';
     fitFont(g, words, 60, W - 40);
     g.textAlign = 'center';
     g.textBaseline = 'middle';

@@ -1,3 +1,4 @@
+import { t as uiText } from '../../../shared/i18n';
 import * as THREE from 'three';
 import { adrift, adriftFrom, wasting, type Drift, type SendHomePlan } from '../../../shared/maps';
 import type { JailState, Prisoner } from '../../../shared/protocol';
@@ -20,7 +21,7 @@ const MIDDLE = 0.45;
 /** How big they are: as they were at their seats. */
 export const ADRIFT_SCALE = 0.82;
 /** What they say, now and then, while there's breath in them and you're near enough to see. */
-const MUTTERS = ['🥶 so cold…', '👋 hello? anyone?', '🫁 …air?', '🌍 nice view, though', '😩 I can fix it, I swear', '📡 mayday… mayday…', '🧑‍🚀 should’ve worn a suit', '😵 …', '🎵 ground control to…', '📜 I’ll write the tests!'];
+const MUTTERS = [uiText('🥶 so cold…'), uiText('👋 hello? anyone?'), uiText('🫁 …air?'), uiText('🌍 nice view, though'), uiText('😩 I can fix it, I swear'), uiText('📡 mayday… mayday…'), uiText('🧑‍🚀 should’ve worn a suit'), '😵 …', uiText('🎵 ground control to…'), uiText('📜 I’ll write the tests!')];
 const EARSHOT = 34;
 
 const turn = new THREE.Euler();

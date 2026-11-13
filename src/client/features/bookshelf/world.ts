@@ -1,3 +1,4 @@
+import { t as uiText } from '../../../shared/i18n';
 import * as THREE from 'three';
 import { BOOKSHELF, FLOOR } from '../../../shared/layout';
 import { mergeByMaterial, mesh, textPlane, toon } from '../../world/toon';
@@ -106,7 +107,7 @@ export function buildBookshelf(): BookshelfModel {
   group.add(mergeByMaterial(parts));
 
   // A sign along the crown.
-  const sign = textPlane('📚 Docs', { size: 40, bg: '#fffaf3' });
+  const sign = textPlane(uiText('📚 Docs'), { size: 40, bg: '#fffaf3' });
   sign.position.set(0, H + 0.3, 0.02);
   group.add(sign);
 

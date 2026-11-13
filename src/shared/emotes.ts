@@ -1,13 +1,14 @@
+import { t as uiText } from './i18n';
 // Emotes: a quick reaction (a wave, a thumbs up…) your character does for everyone on your floor.
 // Server and client share the list, so an emote is just its id on the wire.
 
 export const EMOTES = [
-  { id: 'wave', emoji: '👋', label: 'Wave', seconds: 2.2 },
-  { id: 'thumbs', emoji: '👍', label: 'Thumbs up', seconds: 1.8 },
-  { id: 'clap', emoji: '👏', label: 'Clap', seconds: 2.2 },
-  { id: 'dance', emoji: '🕺', label: 'Dance', seconds: 4 },
-  { id: 'point', emoji: '👉', label: 'Point', seconds: 2 },
-  { id: 'facepalm', emoji: '🤦', label: 'Facepalm', seconds: 2.4 },
+  { id: 'wave', emoji: '👋', label: uiText('Wave'), seconds: 2.2 },
+  { id: 'thumbs', emoji: '👍', label: uiText('Thumbs up'), seconds: 1.8 },
+  { id: 'clap', emoji: '👏', label: uiText('Clap'), seconds: 2.2 },
+  { id: 'dance', emoji: '🕺', label: uiText('Dance'), seconds: 4 },
+  { id: 'point', emoji: '👉', label: uiText('Point'), seconds: 2 },
+  { id: 'facepalm', emoji: '🤦', label: uiText('Facepalm'), seconds: 2.4 },
 ] as const;
 
 export type Emote = (typeof EMOTES)[number];

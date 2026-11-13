@@ -1,3 +1,4 @@
+import { t as uiText } from '../../../shared/i18n';
 import { JUKEBOX } from '../../../shared/layout';
 import { STREAM } from '../../../shared/jukebox';
 import type { AudioCore } from '../../sound/core';
@@ -138,7 +139,7 @@ export class Jukebox {
     a.src = url;
     a.addEventListener('loadedmetadata', () => this.seekStream(a));
     a.addEventListener('error', () => {
-      if (this.stream === a) this.onError("📻 The jukebox can't play that stream in your browser");
+      if (this.stream === a) this.onError(uiText("📻 The jukebox can't play that stream in your browser"));
     });
     this.stream = a;
     this.hearStream();
