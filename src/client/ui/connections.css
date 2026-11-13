@@ -1,4 +1,5 @@
 .connections, .agent-management { display: grid; gap: 12px; min-width: 0; }
+.connections [hidden], .agent-management [hidden] { display: none !important; }
 .modal.settings.settings-wide { width: min(1380px, calc(100vw - 32px)); }
 .connection-tabs, .connection-actions, .connection-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .connection-toolbar { justify-content: space-between; }

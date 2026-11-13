@@ -52,7 +52,7 @@ export function openIssue(first: GhIssue, net: Net, actions: BoardActions) {
     h(
       'footer',
       {},
-      h('a.grow', { href: it.url, target: '_blank', rel: 'noopener noreferrer' }, uiText('Open on GitHub ↗')),
+      h('a.grow', { href: it.url, target: '_blank', rel: 'noopener noreferrer' }, uiText('Open repository ↗')),
       h('button.btn', { type: 'button', title: uiText('Send a worker your own prompt about this issue'), onclick: () => actions.ask(issueContext(it), uiText`Ask about issue #${it.number}`) }, uiText('✍️ Ask a worker…')),
       h('button.btn', { type: 'button', title: uiText('Workers take it on together in the meeting room: a debate, lead & team, map-reduce or red / blue'), onclick: () => actions.meeting(issueMeeting(it.number, it.title)) }, uiText('🤝 Meeting…')),
       closeIssue,

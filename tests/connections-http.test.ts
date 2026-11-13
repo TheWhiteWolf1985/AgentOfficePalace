@@ -5,8 +5,22 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import type { Ctx } from '../src/server/office/context.js';
-import { connectionsRoute } from '../src/server/http/routes/connections.js';
+import { connectionsRoute, managedProviders } from '../src/server/http/routes/connections.js';
 import { connections } from '../src/server/connections/store.js';
+
+test('central management offers only engines supported by the deployed runner', () => {
+  const previous = process.env.AGENT_OFFICE_MANAGED_PROVIDERS;
+  try {
+    process.env.AGENT_OFFICE_MANAGED_PROVIDERS = 'codex';
+    assert.deepEqual(managedProviders(['claude', 'codex', 'pi']), ['codex']);
+    process.env.AGENT_OFFICE_MANAGED_PROVIDERS = 'unavailable';
+    assert.deepEqual(managedProviders(['codex']), []);
+    delete process.env.AGENT_OFFICE_MANAGED_PROVIDERS;
+    assert.deepEqual(managedProviders(['claude', 'codex']), ['claude', 'codex']);
+  } finally {
+    if (previous === undefined) delete process.env.AGENT_OFFICE_MANAGED_PROVIDERS; else process.env.AGENT_OFFICE_MANAGED_PROVIDERS = previous;
+  }
+});
 
 test('connection endpoints enforce admin and origin checks and never return stored credentials', async () => {
   const root = mkdtempSync(path.join(os.tmpdir(), 'connections-http-'));

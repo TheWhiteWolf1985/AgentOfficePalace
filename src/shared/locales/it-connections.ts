@@ -1,4 +1,11 @@
 export const italianConnections: Record<string, string> = {
+  "Name": "Nome",
+  "Edit": "Modifica",
+  "Refresh": "Aggiorna",
+  "Open repository ↗": "Apri la repository ↗",
+  "Reload from repository": "Ricarica dalla repository",
+  "Refresh from repository": "Aggiorna dalla repository",
+  "Couldn't load from repository: {0}": "Impossibile caricare dalla repository: {0}",
   "GitHub and Forgejo": "GitHub e Forgejo",
   "Agent management": "Gestione agenti",
   "Individual agents, properties and repository identities across all offices.": "Singoli agenti, proprietà e identità delle repository in tutti gli uffici.",

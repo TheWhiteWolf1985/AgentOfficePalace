@@ -53,6 +53,8 @@ dall'applicazione; i segreti non vengono restituiti dalla pagina di elenco.
 
 Nome, colore e scrivania compatibile sono modificabili. Provider, modello,
 ragionamento e istruzioni iniziali seguono la validazione dei provider nativi.
+La VM111 offre Codex nel runner isolato; AGENT_OFFICE_MANAGED_PROVIDERS limita
+le scelte della gestione centrale ai motori effettivamente supportati.
 Le modifiche al motore o alle istruzioni richiedono, se la sessione gira, la
 conferma di una nuova sessione. Lo storico del terminale viene conservato.
 Turni attivi, domande aperte e riunioni impediscono i riavvii incompatibili.

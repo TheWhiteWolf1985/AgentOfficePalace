@@ -245,7 +245,7 @@ export function openChanges(net: Net, workerId: string, onTerminal?: () => void,
     commitBtn.textContent = uncommitted ? uiText`✅ Commit ${uncommitted} file${uncommitted > 1 ? 's' : ''}…` : uiText('✅ Commit…');
     prSlot.replaceChildren();
     if (!s) return;
-    if (s.pr) prSlot.append(h('a.btn.primary', { href: s.pr.url, target: '_blank', rel: 'noopener', title: uiText('Open on GitHub') }, uiText`🔀 PR #${s.pr.number} ↗`));
+    if (s.pr) prSlot.append(h('a.btn.primary', { href: s.pr.url, target: '_blank', rel: 'noopener', title: uiText('Open repository ↗') }, uiText`🔀 PR #${s.pr.number} ↗`));
     else if (s.prBase) {
       const why = busy ? '' : uncommitted ? uiText('Commit first') : !s.ahead ? uiText`Nothing on ${s.branch} that ${s.prBase} lacks yet` : '';
       const pr = h('button.btn.primary', { type: 'button', title: why || uiText`Push ${s.branch} and open a pull request against ${s.prBase}` }, uiText('🔀 Open PR…'));

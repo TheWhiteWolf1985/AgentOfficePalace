@@ -8,6 +8,13 @@ import type { GitBinding } from '../../../shared/connections.js';
 import { DESK_BY_ID, deskBuilt } from '../../../shared/layout.js';
 import { readBody, sameOrigin, send } from '../util.js';
 import type { Route } from '../router.js';
+import type { AgentProvider } from '../../../shared/protocol.js';
+
+/** A deployment may offer only engines its isolated runner actually supports. */
+export function managedProviders(available: AgentProvider[]): AgentProvider[] {
+  const configured = process.env.AGENT_OFFICE_MANAGED_PROVIDERS;
+  return configured ? available.filter((p) => configured.split(',').map((s) => s.trim()).includes(p)) : available;
+}
 
 export const connectionsRoute: Route = {
   path: '/api/connections', auth: 'session',
@@ -19,7 +26,7 @@ export const connectionsRoute: Route = {
     try {
       if (req.method === 'GET') {
         if (url.searchParams.has('login')) return send(res, 200, await githubLoginState(checkedId(url.searchParams.get('login'))));
-        return send(res, 200, { ...store.snapshot(), admin: true, floors: [...ctx.floors.values()].map((f) => ({ id: f.id, name: f.def.name, dir: f.def.dir, project: f.project, workers: f.workers.list() })) });
+        return send(res, 200, { ...store.snapshot(), admin: true, floors: [...ctx.floors.values()].map((f) => ({ id: f.id, name: f.def.name, dir: f.def.dir, project: { ...f.project, agentProviders: managedProviders(f.project.agentProviders) }, workers: f.workers.list() })) });
       }
       const body = JSON.parse(await readBody(req, 65536));
       switch (body.action) {
@@ -39,7 +46,7 @@ export const connectionsRoute: Route = {
           if (!floor || !floor.workers.get(checkedId(body.workerId))) throw Error('Agente non trovato');
           const desk = DESK_BY_ID.get(body.configuration?.deskId);
           if (!desk || !deskBuilt(desk, floor.workers.wing())) throw Error('La scrivania non e disponibile su questo piano');
-          if (body.configuration?.provider && !floor.project.agentProviders.includes(body.configuration.provider)) throw Error('Provider non disponibile su questo server');
+          if (body.configuration?.provider && !managedProviders(floor.project.agentProviders).includes(body.configuration.provider)) throw Error('Provider non disponibile su questo server');
           await floor.workers.configure(body.workerId, body.configuration);
           return send(res, 200, { ok: true });
         }

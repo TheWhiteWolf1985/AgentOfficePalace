@@ -24,10 +24,14 @@ export function gitEnvironment(store: ConnectionsStore, accountId: string, repos
 export function workerConnections(dir: string, workerId: string, env: Record<string, string>): void {
   const store = connections(), selected = store.selected(dir, workerId);
   if (!selected) return;
-  for (const key of Object.keys(env)) if (/^(GH_TOKEN|GITHUB_TOKEN|GH_ENTERPRISE_TOKEN|GITHUB_ENTERPRISE_TOKEN|AGENT_OFFICE_REMOTE_|GIT_CONFIG_)/.test(key)) delete env[key];
+  for (const key of Object.keys(env)) if (/^(GH_HOST|GH_TOKEN|GITHUB_TOKEN|GH_ENTERPRISE_TOKEN|GITHUB_ENTERPRISE_TOKEN|AGENT_OFFICE_REMOTE_|GIT_CONFIG_)/.test(key)) delete env[key];
   Object.assign(env, gitEnvironment(store, selected.account.id, selected.binding.repository, selected.role));
   env.GIT_CONFIG_VALUE_1 = execFileSync('git', ['-C', dir, 'remote', 'get-url', 'origin'], { encoding: 'utf8', timeout: 5000 }).trim();
-  if (selected.server.provider === 'github') env.GH_TOKEN = store.token(selected.account.id);
+  if (selected.server.provider === 'github') {
+    const host = new URL(selected.server.url).hostname;
+    env.GH_HOST = host;
+    env[host === 'github.com' ? 'GH_TOKEN' : 'GH_ENTERPRISE_TOKEN'] = store.token(selected.account.id);
+  }
   for (const role of ['caporedattore', 'capoanalista', 'capoeditore'] as const) {
     const accountId = selected.binding.roles[role];
     if (accountId) env['AGENT_OFFICE_ROLE_' + role.toUpperCase()] = store.account(accountId).username;

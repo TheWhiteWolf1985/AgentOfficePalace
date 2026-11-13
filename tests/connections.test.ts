@@ -106,6 +106,19 @@ test('Git authentication is confined to the requested process and no credential 
   } finally { f.close(); }
 });
 
+test('rotating a token during an API verification cannot approve the untested replacement', async () => {
+  const f = fixture();
+  try {
+    const a = f.account('reader');
+    const api = new RemoteApi(f.store, a.id, (async () => {
+      f.store.putAccount({ ...a, token: 'rotated_token' });
+      return Response.json({ login: 'reader' });
+    }) as typeof fetch);
+    await assert.rejects(api.verify(), /cambiata durante/);
+    assert.equal(f.store.account(a.id).verifiedAt, undefined);
+  } finally { f.close(); }
+});
+
 test('issue adaptation omits pull requests and controlled repositories refuse direct merge', async () => {
   const f = fixture();
   try {
