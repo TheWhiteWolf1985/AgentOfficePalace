@@ -119,6 +119,15 @@ test('rotating a token during an API verification cannot approve the untested re
   } finally { f.close(); }
 });
 
+test('successful Forgejo operations may return HTTP 200 with an empty body', async () => {
+  const f = fixture();
+  try {
+    const a = f.account('reader');
+    const api = new RemoteApi(f.store, a.id, (async () => new Response('', { status: 200 })) as typeof fetch);
+    assert.equal(await api.request('/repos/org/wiki/pulls/1/merge', 'POST', {}), undefined);
+  } finally { f.close(); }
+});
+
 test('issue adaptation omits pull requests and controlled repositories refuse direct merge', async () => {
   const f = fixture();
   try {

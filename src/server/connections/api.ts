@@ -21,7 +21,8 @@ export class RemoteApi {
     });
     if (!response.ok) throw Error(`${this.server.provider === 'github' ? 'GitHub' : 'Forgejo'}: HTTP ${response.status}${response.status === 401 ? ' — credenziale non valida' : response.status === 403 ? ' — permessi insufficienti' : response.status === 404 ? ' — risorsa non accessibile' : ''}`);
     if (response.status === 204) return undefined;
-    return text ? response.text() : response.json();
+    const content = await response.text();
+    return text ? content : content.trim() ? JSON.parse(content) : undefined;
   }
   async pages(endpoint: string, limit = 1000): Promise<any[]> {
     const result: any[] = [];
