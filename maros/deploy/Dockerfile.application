@@ -9,7 +9,9 @@ RUN npm ci --ignore-scripts --no-audit --no-fund
 
 FROM dependencies AS verified
 COPY . .
-RUN npm run typecheck && npm test && npm run build
+# The size guard enumerates the source files through Git. A fresh index is
+# sufficient: the corporate checkout and its credentials never enter the image.
+RUN git init && git add src && npm run typecheck && npm test && npm run build
 
 FROM ${BASE_IMAGE} AS application
 USER root

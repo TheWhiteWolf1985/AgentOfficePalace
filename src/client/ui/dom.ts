@@ -1,4 +1,4 @@
-import { t as uiText } from '../../shared/i18n';
+import { t as uiText, remoteText } from '../../shared/i18n';
 type Attrs = Record<string, string | number | boolean | EventListener | undefined | null>;
 type Child = Node | string | number | null | undefined | false;
 
@@ -135,7 +135,7 @@ export function closeAllModals() {
 }
 
 export function toast(text: string, level: 'info' | 'warn' | 'error' = 'info'): HTMLElement {
-  const el = h('div.toast', { class: level }, text);
+  const el = h('div.toast', { class: level }, remoteText(text));
   document.getElementById('toasts')!.append(el);
   setTimeout(() => {
     el.style.transition = 'opacity .3s';

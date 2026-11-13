@@ -1,10 +1,9 @@
-import { t as uiText } from '../../../shared/i18n';
 import * as THREE from 'three';
 import { BALCONY, FLOOR, GOLF_HOLE, GOLF_TEE, ROAD, SLAB, STOREY, STREET_Y, WALL_HEIGHT, WALL_T } from '../../../shared/layout';
 import type { Collider, Interactable } from '../../world/types';
 import type { Fixture, StreetSite } from '../../world/office/fixture';
 import { bulb, neighbourBoxes, streetLamp, tree, type NightParts } from '../../world/outside';
-import { disposeSprite, mergeByMaterial, mesh, textPlane, textSprite, toon } from '../../world/toon';
+import { uiText, disposeSprite, mergeByMaterial, mesh, textPlane, textSprite, toon } from '../../world/toon';
 
 // Golf off the balcony: the tee out there (a square of turf, a ball on a tee, a bag of clubs), the
 // hole across the street it's hit at (a green with a flag on it, a fairway up to it, bunkers), and

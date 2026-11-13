@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { t, setLanguage, getLanguage, isLanguage, languageTag } from '../src/shared/i18n.js';
+import { t, setLanguage, getLanguage, isLanguage, languageTag, remoteText } from '../src/shared/i18n.js';
 import { italian } from '../src/shared/locales/it.js';
 import { savedLanguage } from '../src/client/i18n.js';
 
@@ -36,4 +36,15 @@ test('catalogue cannot introduce interpolated values absent from the English sou
     const placeholders = new Set([...source.matchAll(/\{(\d+)\}/g)].map((m) => m[1]));
     for (const match of translated.matchAll(/\{(\d+)\}/g)) assert.ok(placeholders.has(match[1]), source);
   }
+});
+
+test('server error translation preserves variable names and unknown diagnostics', () => {
+  try {
+    setLanguage('it');
+    assert.equal(remoteText('Wrong password'), 'Password errata');
+    assert.equal(remoteText('This browser can\'t take dictation in en-US.'), 'Questo browser non supporta la dettatura in en-US.');
+    assert.equal(remoteText('Unknown raw diagnostic: ECONNRESET'), 'Unknown raw diagnostic: ECONNRESET');
+    setLanguage('en');
+    assert.equal(remoteText('Wrong password'), 'Wrong password');
+  } finally { setLanguage('en'); }
 });

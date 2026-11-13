@@ -1,5 +1,5 @@
 import './i18n';
-import { t as uiText } from '../shared/i18n';
+import { t as uiText, remoteText } from '../shared/i18n';
 export {}; // a module, so its names don't clash with the other pages' scripts
 
 // An invite link, /join#<token>: make your own account, then walk in. The token rides in the
@@ -16,7 +16,7 @@ const error = $('error');
 function fail(msg: string) {
   $('sub').textContent = '';
   form.hidden = true;
-  error.textContent = msg;
+  error.textContent = remoteText(msg);
   $('login').hidden = false;
 }
 
@@ -57,7 +57,7 @@ form.addEventListener('submit', async (e) => {
   e.preventDefault();
   error.textContent = '';
   if (password.value !== again.value) {
-    error.textContent = uiText("Those passwords don't match");
+    error.textContent = remoteText(uiText("Those passwords don't match"));
     again.select();
     return;
   }
@@ -65,7 +65,7 @@ form.addEventListener('submit', async (e) => {
   try {
     const r = await post({ name: name.value.trim(), password: password.value });
     if (!r.ok) {
-      error.textContent = r.body.error ?? uiText('Could not make your account');
+      error.textContent = remoteText(r.body.error ?? uiText('Could not make your account'));
       return;
     }
     try {
@@ -75,7 +75,7 @@ form.addEventListener('submit', async (e) => {
     }
     location.replace('/');
   } catch {
-    error.textContent = uiText('Server unreachable');
+    error.textContent = remoteText(uiText('Server unreachable'));
   } finally {
     submit.disabled = false;
   }

@@ -1,5 +1,5 @@
 import './i18n';
-import { t as uiText } from '../shared/i18n';
+import { t as uiText, remoteText } from '../shared/i18n';
 // One-time password reveal: /claim?t=<token>. The server forgets the plaintext as soon as it answers.
 const $ = (id: string) => document.getElementById(id)!;
 const token = new URLSearchParams(location.search).get('t') ?? '';

@@ -1,4 +1,5 @@
 import type { ClientMsg, ServerMsg } from '../shared/protocol';
+import { remoteText } from '../shared/i18n';
 import { lastFloor, store, type Profile, type Spot } from './state';
 
 type Handler = (msg: ServerMsg) => void;
@@ -61,6 +62,9 @@ export class Net {
       } catch {
         return;
       }
+      if (msg.t === 'toast') msg.text = remoteText(msg.text);
+      const error = msg as unknown as { error?: unknown };
+      if (typeof error.error === 'string') error.error = remoteText(error.error);
       for (const h of this.handlers) h(msg);
     };
     ws.onclose = async () => {

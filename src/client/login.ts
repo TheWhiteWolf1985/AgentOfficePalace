@@ -1,5 +1,5 @@
 import './i18n';
-import { t as uiText } from '../shared/i18n';
+import { t as uiText, remoteText } from '../shared/i18n';
 export {}; // a module, so its names don't clash with the other pages' scripts
 
 const form = document.getElementById('form') as HTMLFormElement;
@@ -23,9 +23,9 @@ if (linkKey) {
   void fetch('/api/link', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ key: linkKey }) })
     .then(async (res) => {
       if (res.ok) return location.replace(NEXT);
-      error.textContent = ((await res.json().catch(() => ({}))) as { error?: string }).error ?? uiText('Could not sign in');
+      error.textContent = remoteText(((await res.json().catch(() => ({}))) as { error?: string }).error ?? uiText('Could not sign in'));
     })
-    .catch(() => void (error.textContent = uiText('Server unreachable')));
+    .catch(() => void (error.textContent = remoteText(uiText('Server unreachable'))));
 }
 
 // Ask for a name once people have accounts; it's optional while the shared password still works.
@@ -67,10 +67,10 @@ form.addEventListener('submit', async (e) => {
       return;
     }
     const body = await res.json().catch(() => ({}));
-    error.textContent = body.error ?? uiText('Could not sign in');
+    error.textContent = remoteText(body.error ?? uiText('Could not sign in'));
     input.select();
   } catch {
-    error.textContent = uiText('Server unreachable');
+    error.textContent = remoteText(uiText('Server unreachable'));
   } finally {
     submit.disabled = false;
   }
