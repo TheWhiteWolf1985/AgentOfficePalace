@@ -212,7 +212,8 @@ export default {
   "RED — ": "ROSSO — ",
   "Review gate check unavailable": "Controllo revisioni non disponibile",
   "The service rechecks reviews and document checks before merging and verifies vault synchronization.": "Il servizio ricontrolla revisioni e checker prima del merge e verifica la sincronizzazione del vault.",
-  "🙋 Workers needing you: {0}": "🙋 Agenti che richiedono il tuo intervento: {0}",
+  "🙋 {0} needs you": "🙋 {0} richiede il tuo intervento",
+  "🙋 {0} need you": "🙋 {0} richiedono il tuo intervento",
   "🏎️ Driving {0}": "🏎️ Alla guida di {0}",
   "🏎️ Riding in {0}": "🏎️ Passeggero di {0}"
 };
