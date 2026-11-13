@@ -35,6 +35,9 @@ export interface WorkerInfo {
   model?: string;
   /** Reasoning effort requested for this worker, when one was chosen. */
   effort?: AgentEffort;
+  /** Connection pinned when this process was launched, independent of later settings edits. */
+  connectionAccountId?: string;
+  connectionRole?: string;
   deskId: string;
   name: string;
   color: string;

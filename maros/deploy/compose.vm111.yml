@@ -13,6 +13,7 @@ services:
     environment:
       HOME: /data/home
       AGENT_OFFICE_HOOK_BIND: 0.0.0.0
+      AGENT_OFFICE_CONNECTIONS_DIR: /var/lib/agent-office/connections
       USER: agentoffice
     entrypoint: ["node", "/opt/agent-office/bin/agent-office.js"]
     command: ["/data/workspace/documentazione", "--host", "0.0.0.0", "--port", "4600", "--agent", "/opt/maros-pipeline/bin/codex", "--no-open", "--projects", "/data/workspace"]
@@ -30,6 +31,7 @@ services:
     ports:
       - "192.168.1.76:4600:4600"
     volumes:
+      - /srv/data/agent-office/connessioni:/var/lib/agent-office/connections
       - /srv/data/agent-office/data:/data
       - /srv/data/agent-office/published:/second-brain:ro
       - /srv/data/agent-office/pipeline:/opt/maros-pipeline:ro
@@ -47,6 +49,7 @@ services:
     entrypoint: ["python3", "-B", "/opt/maros-pipeline/merge_service.py"]
     volumes:
       - /srv/data/agent-office/pipeline:/opt/maros-pipeline:ro
+      - /srv/data/agent-office/connessioni/public:/connections:ro
       - /srv/data/agent-office/identita/mergebot:/run/mergebot:ro
       - /srv/data/agent-office/sync:/sync:ro
       - /srv/data/agent-office/pipeline-work:/pipeline-work
@@ -71,7 +74,6 @@ services:
       - /srv/data/agent-office/data:/data
       - /srv/data/agent-office/published:/second-brain:ro
       - /srv/data/agent-office/pipeline:/opt/maros-pipeline:ro
-      - /srv/data/agent-office/identita/lettura:/run/maros-role:ro
       - /srv/data/agent-office/pipeline/bin/office-pr:/usr/local/bin/office-pr:ro
   agent_a6ad027d1c31:
     image: agent-office:forgejo-gates
@@ -92,7 +94,6 @@ services:
       - /srv/data/agent-office/data:/data
       - /srv/data/agent-office/published:/second-brain:ro
       - /srv/data/agent-office/pipeline:/opt/maros-pipeline:ro
-      - /srv/data/agent-office/identita/lettura:/run/maros-role:ro
       - /srv/data/agent-office/pipeline/bin/office-pr:/usr/local/bin/office-pr:ro
   agent_e8fa8f3593f3:
     image: agent-office:forgejo-gates
@@ -113,7 +114,6 @@ services:
       - /srv/data/agent-office/data:/data
       - /srv/data/agent-office/published:/second-brain:ro
       - /srv/data/agent-office/pipeline:/opt/maros-pipeline:ro
-      - /srv/data/agent-office/identita/caporedattore:/run/maros-role:ro
       - /srv/data/agent-office/pipeline/bin/office-pr:/usr/local/bin/office-pr:ro
   agent_060600b1cd89:
     image: agent-office:forgejo-gates
@@ -134,7 +134,6 @@ services:
       - /srv/data/agent-office/data:/data
       - /srv/data/agent-office/published:/second-brain:ro
       - /srv/data/agent-office/pipeline:/opt/maros-pipeline:ro
-      - /srv/data/agent-office/identita/lettura:/run/maros-role:ro
       - /srv/data/agent-office/pipeline/bin/office-pr:/usr/local/bin/office-pr:ro
   agent_0fbfbd67ad38:
     image: agent-office:forgejo-gates
@@ -155,7 +154,6 @@ services:
       - /srv/data/agent-office/data:/data
       - /srv/data/agent-office/published:/second-brain:ro
       - /srv/data/agent-office/pipeline:/opt/maros-pipeline:ro
-      - /srv/data/agent-office/identita/lettura:/run/maros-role:ro
       - /srv/data/agent-office/pipeline/bin/office-pr:/usr/local/bin/office-pr:ro
   agent_77067af22c79:
     image: agent-office:forgejo-gates
@@ -176,7 +174,6 @@ services:
       - /srv/data/agent-office/data:/data
       - /srv/data/agent-office/published:/second-brain:ro
       - /srv/data/agent-office/pipeline:/opt/maros-pipeline:ro
-      - /srv/data/agent-office/identita/capoanalista:/run/maros-role:ro
       - /srv/data/agent-office/pipeline/bin/office-pr:/usr/local/bin/office-pr:ro
   agent_8c8553cf4dcf:
     image: agent-office:forgejo-gates
@@ -197,7 +194,6 @@ services:
       - /srv/data/agent-office/data:/data
       - /srv/data/agent-office/published:/second-brain:ro
       - /srv/data/agent-office/pipeline:/opt/maros-pipeline:ro
-      - /srv/data/agent-office/identita/lettura:/run/maros-role:ro
       - /srv/data/agent-office/pipeline/bin/office-pr:/usr/local/bin/office-pr:ro
   agent_4fd1877a0463:
     image: agent-office:forgejo-gates
@@ -218,7 +214,6 @@ services:
       - /srv/data/agent-office/data:/data
       - /srv/data/agent-office/published:/second-brain:ro
       - /srv/data/agent-office/pipeline:/opt/maros-pipeline:ro
-      - /srv/data/agent-office/identita/lettura:/run/maros-role:ro
       - /srv/data/agent-office/pipeline/bin/office-pr:/usr/local/bin/office-pr:ro
   agent_5efb4d389c27:
     image: agent-office:forgejo-gates
@@ -239,7 +234,6 @@ services:
       - /srv/data/agent-office/data:/data
       - /srv/data/agent-office/published:/second-brain:ro
       - /srv/data/agent-office/pipeline:/opt/maros-pipeline:ro
-      - /srv/data/agent-office/identita/capoeditore:/run/maros-role:ro
       - /srv/data/agent-office/pipeline/bin/office-pr:/usr/local/bin/office-pr:ro
 
   wiki_sync:

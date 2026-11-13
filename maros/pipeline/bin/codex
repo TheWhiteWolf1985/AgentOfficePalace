@@ -9,6 +9,7 @@ case "${AGENT_OFFICE_HOOK_URL:-}" in
   *) echo 'Indirizzo del servizio agenti non riconosciuto' >&2; exit 1 ;;
 esac
 test -n "${AGENT_OFFICE_HOOK_TOKEN:-}" || exit 1
+test -n "${AGENT_OFFICE_REMOTE_ACCOUNT:-}" || { echo 'Configurare l’identita dell’agente nelle Impostazioni' >&2; exit 1; }
 workdir=$(pwd -P)
 case "$workdir" in /data/workspace/*|/data/workspace) ;; *) echo 'Cartella di lavoro non autorizzata' >&2; exit 1 ;; esac
 # Close any orphan in this worker's dedicated container before resuming its session.
@@ -19,5 +20,14 @@ exec /usr/local/bin/docker exec -it --user 1000:1000 --workdir "$workdir" \
   -e "AGENT_OFFICE_WORKER_ID=$AGENT_OFFICE_WORKER_ID" \
   -e "AGENT_OFFICE_HOOK_URL=$hook" -e "AGENT_OFFICE_HOOK_TOKEN=$AGENT_OFFICE_HOOK_TOKEN" \
   -e "GIT_CEILING_DIRECTORIES=${GIT_CEILING_DIRECTORIES:-}" \
+  -e "AGENT_OFFICE_REMOTE_PROVIDER=$AGENT_OFFICE_REMOTE_PROVIDER" -e "AGENT_OFFICE_REMOTE_URL=$AGENT_OFFICE_REMOTE_URL" \
+  -e "AGENT_OFFICE_REMOTE_ACCOUNT=$AGENT_OFFICE_REMOTE_ACCOUNT" -e "AGENT_OFFICE_REMOTE_REPOSITORY=$AGENT_OFFICE_REMOTE_REPOSITORY" \
+  -e "AGENT_OFFICE_REMOTE_TOKEN=$AGENT_OFFICE_REMOTE_TOKEN" -e "AGENT_OFFICE_REMOTE_LOGIN=$AGENT_OFFICE_REMOTE_LOGIN" \
+  -e "AGENT_OFFICE_REMOTE_ROLE=$AGENT_OFFICE_REMOTE_ROLE" \
+  -e "GH_TOKEN=${GH_TOKEN:-}" \
+  -e "AGENT_OFFICE_ROLE_CAPOREDATTORE=${AGENT_OFFICE_ROLE_CAPOREDATTORE:-}" \
+  -e "AGENT_OFFICE_ROLE_CAPOANALISTA=${AGENT_OFFICE_ROLE_CAPOANALISTA:-}" -e "AGENT_OFFICE_ROLE_CAPOEDITORE=${AGENT_OFFICE_ROLE_CAPOEDITORE:-}" \
+  -e "GIT_CONFIG_COUNT=$GIT_CONFIG_COUNT" -e "GIT_CONFIG_KEY_0=$GIT_CONFIG_KEY_0" -e "GIT_CONFIG_VALUE_0=$GIT_CONFIG_VALUE_0" \
+  -e "GIT_CONFIG_KEY_1=$GIT_CONFIG_KEY_1" -e "GIT_CONFIG_VALUE_1=$GIT_CONFIG_VALUE_1" \
   -e "GIT_SSH_COMMAND=ssh -F /dev/null -i /run/maros-role/id_ed25519 -o UserKnownHostsFile=/data/home/.ssh/known_hosts -o IdentitiesOnly=yes -o BatchMode=yes" \
   "maros-agent-$AGENT_OFFICE_WORKER_ID" /usr/local/bin/codex --ask-for-approval never --sandbox danger-full-access "$@"

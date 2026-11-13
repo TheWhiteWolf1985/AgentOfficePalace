@@ -63,7 +63,7 @@ if __name__ == "__main__":
     import sys
     try:
         obj = json.load(sys.stdin)
-        result = valuta_gate(obj.get("head"), obj.get("reviews"))
+        result = valuta_gate(obj.get("head"), obj.get("reviews"), obj.get("analista") or "capoanalista", obj.get("editore") or "capoeditore")
         json.dump({"verde": result.verde, "motivo": result.motivo}, sys.stdout)
     except Exception:
         json.dump({"verde": False, "motivo": "Impossibile verificare le revisioni"}, sys.stdout)

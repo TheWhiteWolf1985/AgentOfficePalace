@@ -14,6 +14,8 @@ import { openPromptEditor, rewrittenPrompts } from './prompts';
 import { outsideSetting } from './settings-sky';
 import { choiceRow } from './settings-rows';
 import { languageSelect } from './language';
+import { connectionsPanel } from './connections';
+import { agentManagementPanel } from './agent-management';
 
 const VIEWS: [ViewMode, string, string][] = [
   ['first', uiText('👀 First person'), uiText('See through your own eyes. Click the office to look around with the mouse and click things to use them. Esc frees the mouse.')],
@@ -25,7 +27,7 @@ const THEME_LABEL: Record<ThemePick, string> = { auto: uiText('📅 By the calen
 const WEBHOOK_NAME: Record<WebhookKind, string> = { slack: 'Slack', discord: 'Discord', other: uiText('a webhook') };
 
 /** The categories down the side of ⚙️ Settings. */
-export type SettingsPane = 'you' | 'language' | 'sound' | 'notify' | 'building' | 'workers';
+export type SettingsPane = 'you' | 'language' | 'sound' | 'notify' | 'building' | 'workers' | 'connections' | 'management';
 
 const PANES: { id: SettingsPane; icon: string; label: string; blurb: string }[] = [
   { id: 'language', icon: '🌐', label: uiText('Language'), blurb: uiText('Choose the language of this interface.') },
@@ -34,6 +36,8 @@ const PANES: { id: SettingsPane; icon: string; label: string; blurb: string }[] 
   { id: 'notify', icon: '🔔', label: uiText('Notifications'), blurb: uiText('Hear about a worker that needs someone, or finished, while you’re somewhere else.') },
   { id: 'building', icon: '🏢', label: uiText('Building'), blurb: uiText('The map, the decorations, the sky, the dog, and where new floors are cloned.') },
   { id: 'workers', icon: '🤖', label: uiText('Workers'), blurb: uiText('What workers start on, how many run at once, when they go home and what the office tells them.') },
+  { id: 'management', icon: '👥', label: uiText('Agent management'), blurb: uiText('Individual agents, properties and repository identities across all offices.') },
+  { id: 'connections', icon: '🔗', label: uiText('GitHub and Forgejo'), blurb: uiText('Servers, accounts and remote repositories.') },
 ];
 
 /** Who a setting is for, shown by its name: some are yours alone, some the whole office's. */
@@ -445,7 +449,11 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
   const signOut = h('button.btn', { type: 'button' }, uiText('🚪 Sign out'));
   signOut.addEventListener('click', onSignOut);
   const character = h('button.btn', { type: 'button' }, account ? uiText('🧍 Change your look') : uiText('🧍 Change your look & name'));
+  const connections = store.me.admin ? connectionsPanel() : undefined;
+  const management = store.me.admin ? agentManagementPanel() : undefined;
   const panes: Record<SettingsPane, Node[]> = {
+    connections: [connections?.element ?? h('p', {}, uiText('Administrator access required'))],
+    management: [management?.element ?? h('p', {}, uiText('Administrator access required'))],
     language: [setting(uiText('Language'), 'you',
       languageSelect(),
       h('p.setting-note', {}, uiText('Changing language reloads this page. Your agents keep working.')))],
@@ -525,6 +533,7 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
   const modal = openModal(el, {
     doing: uiText('⚙️ in settings'),
     onClose: () => {
+      connections?.dispose(); management?.dispose();
       offNotify();
       offDog();
       offTheme();

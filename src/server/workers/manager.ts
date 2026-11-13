@@ -1,4 +1,6 @@
 import { checkBlocked } from './readiness.js';
+import { workerConnections } from '../connections/git.js';
+import { configureWorker } from './configure.js';
 import { randomBytes } from 'node:crypto';
 import path from 'node:path';
 import type { AgentChoice, AgentEffort, AgentProvider, TerminalHit, WorkerInfo, WorkerKind, WorkerRepo, WorkerStatus } from '../../shared/protocol.js';
@@ -186,6 +188,7 @@ export class WorkerManager {
   get(id: string): WorkerInfo | undefined {
     return this.workers.get(id)?.info;
   }
+  configure(id: string, input: import('../../shared/connections.js').WorkerConfiguration): Promise<void> { return configureWorker(this.ctx, id, input); }
 
   /** The account a worker runs as (see RunAs), if not the office. */
   ownerOf(id: string): string | undefined {
@@ -696,6 +699,8 @@ export class WorkerManager {
       }
       this.runAs.apply(w.owner, env, [this.dir, cwd]);
     }
+    try { workerConnections(this.dir, info.id, env); } catch (error) { this.startFailed(w, (error as Error).message); return; }
+    info.connectionAccountId = env.AGENT_OFFICE_REMOTE_ACCOUNT; info.connectionRole = env.AGENT_OFFICE_REMOTE_ROLE;
     adapter?.usage?.locate?.(this.handleOf(w), cwd, env);
 
     if (adapter?.transport === 'acp') {

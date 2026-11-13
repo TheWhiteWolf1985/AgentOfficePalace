@@ -2,9 +2,16 @@
 import { execFileSync, spawnSync } from 'node:child_process';
 import { readFile } from 'node:fs/promises';
 import type { GhPull, GhPullDetail, GhComment } from '../shared/protocol.js';
+import { connections } from './connections/store.js';
 
-type FRepo = { base: string; path: string; token: string };
+type FRepo = { base: string; path: string; token: string; analista?: string; editore?: string };
 async function forgejoRepo(dir: string): Promise<FRepo | undefined> {
+  const store = connections(), selected = store.selected(dir);
+  if (selected) {
+    if (selected.server.provider !== 'forgejo') return undefined;
+    const role = (name: 'capoanalista' | 'capoeditore') => selected.binding.roles[name] ? store.account(selected.binding.roles[name]!).username : undefined;
+    return { base: selected.server.url, path: '/api/v1/repos/' + selected.binding.repository.split('/').map(encodeURIComponent).join('/'), token: store.token(selected.account.id), analista: role('capoanalista'), editore: role('capoeditore') };
+  }
   let remote: string;
   try { remote = execFileSync('git', ['-C', dir, 'remote', 'get-url', 'origin'], { encoding: 'utf8', timeout: 5000 }).trim(); }
   catch { return undefined; }
@@ -43,7 +50,7 @@ export async function forgejoList(dir: string): Promise<GhPull[] | undefined> {
           const reviews = await get(r, '/pulls/' + p.number + '/reviews?limit=50');
           if (Array.isArray(reviews) && reviews.length < 50) {
             const gate = spawnSync('python3', ['-B', '/opt/maros-pipeline/gate_revisioni.py'], {
-              input: JSON.stringify({head: p.head?.sha, reviews}), encoding: 'utf8', timeout: 5000, maxBuffer: 65536,
+              input: JSON.stringify({head: p.head?.sha, reviews, analista: r.analista, editore: r.editore}), encoding: 'utf8', timeout: 5000, maxBuffer: 65536,
             });
             if (gate.status === 0 && JSON.parse(gate.stdout).verde === true) decision = 'APPROVED';
           }
@@ -71,7 +78,7 @@ export async function forgejoDetail(dir: string, n: number): Promise<GhPullDetai
     gateRevisioni.motivo = 'Troppe revisioni: necessario leggere tutte le pagine';
   } else {
     const evaluated = spawnSync('python3', ['-B', '/opt/maros-pipeline/gate_revisioni.py'], {
-      input: JSON.stringify({ head: p.head?.sha, reviews }), encoding: 'utf8', timeout: 5000,
+      input: JSON.stringify({ head: p.head?.sha, reviews, analista: r.analista, editore: r.editore }), encoding: 'utf8', timeout: 5000,
       maxBuffer: 65536,
     });
     if (evaluated.status === 0) {
