@@ -16,7 +16,7 @@ container="maros-agent-$AGENT_OFFICE_WORKER_ID"
 existing() { exec /usr/local/bin/docker exec -it --user 1000:1000 --workdir "$workdir" "$@"; }
 ephemeral() {
   network=$(/usr/local/bin/docker inspect --format '{{range $name, $value := .NetworkSettings.Networks}}{{$name}}{{end}}' agent-office)
-  exec /usr/local/bin/docker run --rm -it --name "$container" --user 1000:1000 --workdir "$workdir" \
+  exec /usr/local/bin/docker run --rm --init -it --entrypoint /usr/bin/env --name "$container" --user 1000:1000 --workdir "$workdir" \
     --cap-drop ALL --security-opt seccomp:unconfined --security-opt apparmor:unconfined --network "$network" \
     --mount type=bind,src=/srv/data/agent-office/data,dst=/data \
     --mount type=bind,src=/srv/data/agent-office/published,dst=/second-brain,readonly \
