@@ -1,4 +1,4 @@
-import { t as uiText } from '../i18n';
+import { t as uiText } from '../i18n.js';
 import type { Bounds, NavGrid, Pt, Rect } from '../nav.js';
 import { MapError, isObj, num } from './check.js';
 import { boxFootprint } from './props.js';

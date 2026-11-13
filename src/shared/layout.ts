@@ -1,4 +1,4 @@
-import { t as uiText } from './i18n';
+import { t as uiText } from './i18n.js';
 // Static office layout shared by the server (validation) and client (rendering).
 // Units are meters; +y is up. The office floor spans FLOOR.minX..maxX / minZ..maxZ at y = 0,
 // upstairs over a garage whose floor is level with the street (STREET_Y).

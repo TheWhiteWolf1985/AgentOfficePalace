@@ -1,4 +1,4 @@
-import { t as uiText } from '../i18n';
+import { t as uiText } from '../i18n.js';
 import type { Circle, Rect } from '../nav.js';
 import type { PropConfig } from './types.js';
 

@@ -1,4 +1,4 @@
-import { t as uiText } from './i18n';
+import { t as uiText } from './i18n.js';
 // The office dog. Every floor has one. The server decides what it does (see server/dog.ts) and sends
 // one DogState per leg of its day. Every browser works out from that state where the dog is at any
 // moment, so everyone on the floor sees it in the same spot without a stream of moves.

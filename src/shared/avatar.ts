@@ -1,4 +1,4 @@
-import { t as uiText } from './i18n';
+import { t as uiText } from './i18n.js';
 // What a person looks like in the office, picked on the character select screen.
 // Server and client share these lists so a look is just three small indexes on the wire.
 

@@ -1,4 +1,4 @@
-import { t as uiText } from './i18n';
+import { t as uiText } from './i18n.js';
 // Pictures people hang on the office walls. The server keeps the list; every browser draws them
 // in frames, loading each image through the office (GET /api/image), so any image host works.
 

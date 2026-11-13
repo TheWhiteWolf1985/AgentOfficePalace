@@ -1,4 +1,4 @@
-import { t as uiText } from './i18n';
+import { t as uiText } from './i18n.js';
 // A floor's own layout on top of the office everyone shares: the signs hung over its desks, and how
 // far its back office is built out (see WING in layout.ts). Saved by server/floorplan.ts.
 

@@ -1,4 +1,4 @@
-import { t as uiText } from './i18n';
+import { t as uiText } from './i18n.js';
 import { FLOOR, ROAD, WALL_T } from './layout.js';
 import { STREET_END, onLoop } from './scenic.js';
 

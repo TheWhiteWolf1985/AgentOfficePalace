@@ -1,4 +1,4 @@
-import { t as uiText } from './i18n';
+import { t as uiText } from './i18n.js';
 // Emotes: a quick reaction (a wave, a thumbs up…) your character does for everyone on your floor.
 // Server and client share the list, so an emote is just its id on the wire.
 

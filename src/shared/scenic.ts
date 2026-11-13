@@ -1,4 +1,4 @@
-import { t as uiText } from './i18n';
+import { t as uiText } from './i18n.js';
 import { ROAD } from './layout.js';
 
 // The scenic loop: a country road out of either end of the street that goes the long way round and

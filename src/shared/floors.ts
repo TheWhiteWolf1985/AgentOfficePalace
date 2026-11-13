@@ -1,4 +1,4 @@
-import { t as uiText } from './i18n';
+import { t as uiText } from './i18n.js';
 // The building: every project is a floor you ride the elevator to. Shared by the server (which
 // assigns each floor its look) and the client (which paints it).
 

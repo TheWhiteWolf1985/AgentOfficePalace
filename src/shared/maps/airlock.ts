@@ -1,4 +1,4 @@
-import { t as uiText } from '../i18n';
+import { t as uiText } from '../i18n.js';
 import type { Bounds, Pt } from '../nav.js';
 import { MapError, isObj, num } from './check.js';
 import type { AirlockConfig, AirlockPlan, MapConfig, WallOpening, WallSide } from './types.js';

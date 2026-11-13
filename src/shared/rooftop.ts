@@ -1,4 +1,4 @@
-import { t as uiText } from './i18n';
+import { t as uiText } from './i18n.js';
 // The rooftop bar: the roof of the building, over its top floor. Nobody works up there. There's a DJ
 // playing drum and bass under a rig of lights, a bar to drink at, and the city all around. The
 // elevator goes up there from every floor. Shared by the server (who's up there, what they're

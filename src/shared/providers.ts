@@ -1,4 +1,4 @@
-import { t as uiText } from './i18n';
+import { t as uiText } from './i18n.js';
 // The agents a worker can run, and what the office knows about each of them, in one table: its
 // name, the executable it runs as, which models and reasoning efforts it takes and how its spend
 // shows. How the server starts and follows each one is its adapter in server/providers/.

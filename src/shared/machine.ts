@@ -1,4 +1,4 @@
-import { t as uiText } from './i18n';
+import { t as uiText } from './i18n.js';
 // What the office's machine says (see MachineState), for the hire dialogs, the queue and the monitor on the wall.
 
 import type { MachineState } from './protocol.js';

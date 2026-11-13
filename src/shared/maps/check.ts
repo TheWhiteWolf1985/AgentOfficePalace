@@ -1,4 +1,4 @@
-import { t as uiText } from '../i18n';
+import { t as uiText } from '../i18n.js';
 /*
  * Checking what a map's file says (see planMap in ./index.ts): nothing in it is taken on trust, and
  * whatever's wrong is said in words for Settings.

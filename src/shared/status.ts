@@ -1,4 +1,4 @@
-import { t as uiText } from './i18n';
+import { t as uiText } from './i18n.js';
 // What a worker's status means, for the checks the server and the browser both make.
 
 import type { GhPull, QueueTask, WorkerInfo, WorkerStatus } from './protocol.js';

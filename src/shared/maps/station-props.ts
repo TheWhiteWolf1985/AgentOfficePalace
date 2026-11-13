@@ -1,4 +1,4 @@
-import { t as uiText } from '../i18n';
+import { t as uiText } from '../i18n.js';
 import type { Circle, Rect } from '../nav.js';
 import { VIEWPORT } from './airlock.js';
 import { PROP_SIZE, boxFootprint } from './props.js';

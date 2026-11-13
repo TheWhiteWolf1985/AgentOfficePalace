@@ -1,4 +1,4 @@
-import { italian } from './locales/it';
+import { italian } from './locales/it.js';
 
 export const LANGUAGES = ['it', 'en'] as const;
 export type Language = (typeof LANGUAGES)[number];

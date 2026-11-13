@@ -1,4 +1,4 @@
-import { t as uiText } from '../i18n';
+import { t as uiText } from '../i18n.js';
 import type { MapConfig, PropConfig } from './types.js';
 
 /*

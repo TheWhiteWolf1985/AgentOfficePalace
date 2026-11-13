@@ -1,4 +1,4 @@
-import { t as uiText } from './i18n';
+import { t as uiText } from './i18n.js';
 // The whiteboard: an Excalidraw drawing everyone on a floor draws on together. The server keeps
 // each floor's elements and passes every change on; browsers merge them the way Excalidraw's own
 // live collaboration does, by each element's version (see `newer`).

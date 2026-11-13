@@ -1,4 +1,4 @@
-import { t as uiText } from './i18n';
+import { t as uiText } from './i18n.js';
 // The games in the rooftop bar's north-west corner: an axe-throwing lane and a dart board. You step
 // up to the line (or the oche) and throw. Your page works out where it lands; the office passes that
 // on to everyone else up there (see the client's features/bargames/controller.ts), and every page scores it the same way
