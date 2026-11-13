@@ -116,7 +116,7 @@ export class ConnectionsStore {
   }
   selected(dir: string, workerId?: string): { binding: GitBinding; account: GitAccount; server: GitServer; role?: ConnectionRole } | undefined {
     const binding = this.binding(dir); if (!binding) return;
-    const assignment = workerId && binding.agents[workerId];
+    const assignment = workerId ? binding.agents[workerId] : undefined;
     const role = workerId ? assignment?.role ?? 'lettura' : undefined;
     const accountId = workerId ? assignment?.accountId ?? binding.roles[role!] : binding.accountId;
     if (!accountId) throw Error('Nessun account assegnato al ruolo');

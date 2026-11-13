@@ -25,8 +25,8 @@ def repo_path():
     if os.environ.get("AGENT_OFFICE_REMOTE_ACCOUNT"):
         repo = os.environ.get("AGENT_OFFICE_REMOTE_REPOSITORY", "")
         base_host = urllib.parse.urlsplit(BASE).hostname
-        parsed_url = urllib.parse.urlsplit(url.replace("git@" + str(base_host) + ":", "ssh://git@" + str(base_host) + "/"))
-        if not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repo) or parsed_url.hostname != base_host or parsed_url.path.removesuffix(".git").strip("/") != repo:
+        parsed_url = urllib.parse.urlsplit(re.sub(r"^git@" + re.escape(str(base_host)) + ":", "ssh://git@" + str(base_host) + "/", url))
+        if not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repo) or parsed_url.hostname != base_host or not parsed_url.path.removesuffix(".git").endswith("/" + repo):
             raise ValueError("Il checkout non corrisponde alla connessione assegnata")
         return "/repos/" + "/".join(urllib.parse.quote(p, safe="") for p in repo.split("/"))
     m = re.fullmatch(r"ssh://git@192\.168\.1\.76:2222/([A-Za-z0-9_.-]+)/([A-Za-z0-9_.-]+?)(?:\.git)?/?", url)

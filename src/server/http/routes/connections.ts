@@ -48,7 +48,7 @@ export const connectionsRoute: Route = {
           if (remote.hostname !== new URL(server.url).hostname || !remote.pathname.endsWith('/' + repository) || (remote.protocol !== 'ssh:' && normalized !== server.url + '/' + repository)) throw Error('La repository scelta non coincide con il checkout dell’ufficio');
           await verifyGit(store, accountId, repository);
           const old = store.binding(floor.def.dir);
-          if (old?.controlled && floor.github.pulls.items.some((p) => p.state === 'OPEN')) throw Error('Completare prima le PR documentali aperte prima di cambiare le identita');
+          if (old?.controlled && floor.github.pulls.items.some((p) => p.state === 'OPEN') && ['capoanalista', 'capoeditore'].some((role) => body.roles?.[role] !== old.roles[role as 'capoanalista' | 'capoeditore'])) throw Error('Completare le PR documentali aperte prima di cambiare le identita dei revisori');
           const binding: GitBinding = { dir: floor.def.dir, floorId: floor.id, repository, accountId, controlled: old?.controlled ?? false, roles: body.roles ?? {}, agents: body.agents ?? {} };
           const workerIds = new Set(floor.workers.list().map((w) => w.id));
           for (const workerId of Object.keys(binding.agents)) if (!workerIds.has(workerId)) throw Error('Agente non presente nell’ufficio');
