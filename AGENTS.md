@@ -16,3 +16,29 @@ Credenziali, token ChatGPT/Codex/Forgejo, chiavi SSH, database, sessioni e dati 
 restano esterni a Git. Non aggiungere dati runtime per rendere una prova verde.
 Le istruzioni originali upstream sono conservate in docs/upstream/AGENTS.original.md come riferimento storico.
 Le istruzioni del progetto non autorizzano scritture nella wiki o modifiche ai servizi di produzione.
+
+
+## Collegamento al progetto LLM Wiki e obbligo Git
+
+Decisione dell utente del 13/11/2026: ogni modifica al codice, alle configurazioni
+versionabili e alle istruzioni operative di AgentOfficePalace deve avere commit
+e push sul Forgejo aziendale, con confronto dello SHA remoto prima della chiusura.
+Non dichiarare concluso un intervento se la VM111 contiene modifiche operative
+non riportate nel repository o se il push non e confermato.
+
+Il progetto Codex LLM Wiki mantiene la radice IT/RAG per la continuita; questo
+checkout AgentOfficePalace e il repository del software. Non cambiare origin
+del repository storico RAG_maros e non mescolare le cronologie.
+La mappa delle destinazioni e in maros/project-link.json.
+Il repository documentale degli agenti e separato: i documenti seguono i loro
+gate e la pubblicazione nel vault; non vanno aggiunti al repository del software.
+
+Flusso: modifica nel repository, controlli pertinenti, commit/push e PR su main;
+allineamento della VM al commit pubblicato e verifica della corrispondenza.
+Se una diagnosi richiede una correzione diretta sulla VM, riportarla subito
+nel repository nello stesso incarico e chiudere con commit/push verificati.
+Credenziali, autenticazione, database, sessioni, vault e dati degli incarichi
+rimangono esterni a Git. Non creare commit vuoti per attivita in sola lettura.
+Il controllo finale sulla VM e:
+python3 -B /srv/data/agent-office/source/maros/tools/check_runtime.py --check-image
+Questo obbligo non introduce job periodici o pubblicazioni implicite nella wiki.
