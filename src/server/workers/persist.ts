@@ -80,6 +80,8 @@ export function restoreWorkers(file: string, workers: Map<string, Worker>, defau
         provider,
         model: savedModel(provider, s.model),
         effort: savedEffort(provider, s.effort),
+        connectionAccountId: typeof s.connectionAccountId === 'string' ? s.connectionAccountId : undefined,
+        connectionRole: typeof s.connectionRole === 'string' ? s.connectionRole : undefined,
         deskId: s.deskId,
         name: s.name ?? 'Worker',
         color: s.color ?? COLORS[0],
