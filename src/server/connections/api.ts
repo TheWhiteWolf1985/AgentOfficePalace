@@ -7,14 +7,16 @@ export function apiBase(server: GitServer): string {
 }
 export class RemoteApi {
   readonly server: GitServer;
+  private readonly credential: string;
   constructor(readonly store: ConnectionsStore, readonly accountId: string, private fetcher: typeof fetch = fetch) {
     this.server = store.server(store.account(accountId).serverId);
+    this.credential = store.token(accountId);
   }
   async request(endpoint: string, method = 'GET', body?: unknown, text = false): Promise<any> {
     if (!endpoint.startsWith('/') || endpoint.startsWith('//') || endpoint.includes('://')) throw Error('Percorso API non valido');
     const response = await this.fetcher(apiBase(this.server) + endpoint, {
       method, redirect: 'error', signal: AbortSignal.timeout(20000),
-      headers: { Authorization: (this.server.provider === 'github' ? 'Bearer ' : 'token ') + this.store.token(this.accountId), Accept: text ? 'application/vnd.github.diff' : 'application/json', 'Content-Type': 'application/json' },
+      headers: { Authorization: (this.server.provider === 'github' ? 'Bearer ' : 'token ') + this.credential, Accept: text ? 'application/vnd.github.diff' : 'application/json', 'Content-Type': 'application/json' },
       body: body === undefined ? undefined : JSON.stringify(body),
     });
     if (!response.ok) throw Error(`${this.server.provider === 'github' ? 'GitHub' : 'Forgejo'}: HTTP ${response.status}${response.status === 401 ? ' — credenziale non valida' : response.status === 403 ? ' — permessi insufficienti' : response.status === 404 ? ' — risorsa non accessibile' : ''}`);
@@ -35,9 +37,10 @@ export class RemoteApi {
     try {
       const user = await this.request('/user');
       if (typeof user.login !== 'string' || !user.login) throw Error('Identita dell’account non disponibile');
+      if (this.store.token(this.accountId) !== this.credential) throw Error('La credenziale e cambiata durante la verifica: riprovare');
       this.store.verification(this.accountId, user.login); return user.login;
     } catch (error) {
-      this.store.verification(this.accountId, '', error instanceof Error ? error.message : 'Verifica non riuscita');
+      if (this.store.token(this.accountId) === this.credential) this.store.verification(this.accountId, '', error instanceof Error ? error.message : 'Verifica non riuscita');
       throw error;
     }
   }

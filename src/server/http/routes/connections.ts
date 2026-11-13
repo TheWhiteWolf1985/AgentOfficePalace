@@ -5,6 +5,7 @@ import { RemoteApi } from '../../connections/api.js';
 import { verifyGit, cloneRepository } from '../../connections/git.js';
 import { startGithubLogin, githubLoginState, cancelGithubLogin } from '../../connections/login.js';
 import type { GitBinding } from '../../../shared/connections.js';
+import { DESK_BY_ID, deskBuilt } from '../../../shared/layout.js';
 import { readBody, sameOrigin, send } from '../util.js';
 import type { Route } from '../router.js';
 
@@ -24,7 +25,10 @@ export const connectionsRoute: Route = {
       switch (body.action) {
         case 'server': return send(res, 200, store.putServer(body));
         case 'account': return send(res, 200, store.putAccount(body));
-        case 'remove': store.remove(body.kind === 'server' ? 'server' : 'account', checkedId(body.id)); return send(res, 200, { ok: true });
+        case 'remove': {
+          if (body.kind !== 'server' && [...ctx.floors.values()].some((f) => f.workers.list().some((w) => w.connectionAccountId === body.id && w.status !== 'exited' && w.status !== 'offline'))) throw Error('Account ancora in uso in una sessione: riavviare prima gli agenti con la nuova assegnazione');
+          store.remove(body.kind === 'server' ? 'server' : 'account', checkedId(body.id)); return send(res, 200, { ok: true });
+        }
         case 'verify': return send(res, 200, { username: await new RemoteApi(store, checkedId(body.accountId)).verify() });
         case 'repositories': return send(res, 200, { repositories: await new RemoteApi(store, checkedId(body.accountId)).repositories() });
         case 'git': return send(res, 200, await verifyGit(store, checkedId(body.accountId), repositoryName(body.repository)));
@@ -33,6 +37,8 @@ export const connectionsRoute: Route = {
         case 'worker': {
           const floor = ctx.floors.get(checkedId(body.floorId));
           if (!floor || !floor.workers.get(checkedId(body.workerId))) throw Error('Agente non trovato');
+          const desk = DESK_BY_ID.get(body.configuration?.deskId);
+          if (!desk || !deskBuilt(desk, floor.workers.wing())) throw Error('La scrivania non e disponibile su questo piano');
           if (body.configuration?.provider && !floor.project.agentProviders.includes(body.configuration.provider)) throw Error('Provider non disponibile su questo server');
           await floor.workers.configure(body.workerId, body.configuration);
           return send(res, 200, { ok: true });

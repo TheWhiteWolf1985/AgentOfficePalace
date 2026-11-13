@@ -11,7 +11,7 @@ export function checkedId(value: unknown): string {
   return value;
 }
 export function repositoryName(value: unknown): string {
-  if (typeof value !== 'string' || !/^[\w.-]+\/[\w.-]+$/.test(value) || value.split('/').some((p) => p === '.' || p === '..')) throw Error('Repository non valida: usare proprietario/nome');
+  if (typeof value !== 'string' || value.length > 200 || !/^[\w.-]+\/[\w.-]+$/.test(value) || value.split('/').some((p) => p === '.' || p === '..')) throw Error('Repository non valida: usare proprietario/nome');
   return value;
 }
 export function serverUrl(value: unknown): string {
