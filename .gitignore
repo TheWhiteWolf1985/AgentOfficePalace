@@ -5,3 +5,15 @@ dist
 .DS_Store
 pw.txt
 __pycache__/
+
+# Dati MAROS esterni al codice
+.env
+.env.*
+!.env.example
+/maros/**/identita/
+/maros/**/data/
+/maros/**/published/
+/maros/**/sync/
+/maros/**/pipeline-work/
+/maros/**/evidenze/
+*.bundle

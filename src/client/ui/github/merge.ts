@@ -137,3 +137,28 @@ export function openMerge(it: GhPull, d: GhPullDetail, net: Net, handToWorker: (
   });
   setTimeout(() => (st.can ? go : cancel).focus(), 30);
 }
+
+/** Human-requested Forgejo merge; the separate service independently rechecks the displayed commit. */
+export function openForgejoMerge(it: GhPull, d: GhPullDetail, net: Net, onMerged: () => void) {
+  const result = h('div.gh-merge-result');
+  const cancel = h('button.btn', {type: 'button'}, 'Annulla');
+  const go = h('button.btn.primary', {type: 'button'}, 'Verifica e unisci');
+  const ready = !!d.gateRevisioni?.verde && !!d.headCommit && it.state === 'OPEN';
+  go.disabled = !ready;
+  const el = h('div.modal.gh-merge', {role: 'dialog', 'aria-label': 'Merge Forgejo'},
+    h('header', {}, h('h2', {}, 'Merge controllato')),
+    h('div.body', {}, h('p', {}, it.title), h('p', {}, d.gateRevisioni?.motivo ?? 'Controllo non disponibile'),
+      h('p', {}, 'Il servizio ricontrolla la revisione e cancella il branch dopo il merge.'), result),
+    h('footer', {}, cancel, go));
+  const modal = openModal(el, {onClose: () => mergeWaiters.delete(it.number)});
+  cancel.addEventListener('click', () => modal.close());
+  go.addEventListener('click', () => {
+    go.disabled = true; result.replaceChildren('Verifica in corso…');
+    mergeWaiters.set(it.number, (msg) => {
+      mergeWaiters.delete(it.number);
+      if (msg.error) {result.replaceChildren(msg.error); go.disabled = false; return;}
+      modal.close(); onMerged();
+    });
+    net.send({t: 'gh.merge', number: it.number, method: 'merge', deleteBranch: true, headCommit: d.headCommit});
+  });
+}

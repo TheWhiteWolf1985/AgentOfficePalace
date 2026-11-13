@@ -47,7 +47,7 @@ export async function startHookServer(ctx: Ctx): Promise<{ hookServer: http.Serv
   const listenHooks = (port: number) =>
     new Promise<void>((resolve, reject) => {
       hookServer.once('error', reject);
-      hookServer.listen(port, '127.0.0.1', () => {
+      hookServer.listen(port, process.env.AGENT_OFFICE_HOOK_BIND || '127.0.0.1', () => {
         hookServer.off('error', reject);
         resolve();
       });

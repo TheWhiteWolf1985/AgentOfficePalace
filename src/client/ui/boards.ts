@@ -116,7 +116,7 @@ function queueChip(issue: number): Node | '' {
   return t.pr ? h('span.qchip.done', {}, `🔀 PR #${t.pr.number} · ${provider}`) : '';
 }
 
-function card(n: number, title: string, meta: (Node | string)[], i: number, onclick: () => void, onLabels: () => void) {
+function card(n: number, title: string, meta: (Node | string)[], i: number, onclick: () => void, onLabels?: () => void) {
   return h(
     'li.card',
     {
@@ -125,7 +125,7 @@ function card(n: number, title: string, meta: (Node | string)[], i: number, oncl
       onclick,
       onkeydown: ((e: KeyboardEvent) => e.key === 'Enter' && e.target === e.currentTarget && onclick()) as EventListener,
     },
-    h('button.card-labels', { type: 'button', title: 'Change the labels', 'aria-label': `Change the labels on #${n}`, onclick: ((e: Event) => (e.stopPropagation(), onLabels())) as EventListener }, '🏷️'),
+    onLabels ? h('button.card-labels', { type: 'button', title: 'Change the labels', 'aria-label': `Change the labels on #${n}`, onclick: ((e: Event) => (e.stopPropagation(), onLabels())) as EventListener }, '🏷️') : '',
     h('div.num', {}, `#${n}`),
     h('div.ttl', {}, title),
     h('div.meta', {}, ...meta.filter((m) => m !== '').map((m) => (typeof m === 'string' ? h('span', {}, m) : m))),
@@ -288,7 +288,7 @@ export function openBoard(kind: 'issues' | 'pulls', net: Net, actions: BoardActi
               ],
               i,
               () => openPull(it, net, actions),
-              () => openLabels('pull', it, net),
+              it.readOnly ? undefined : () => openLabels('pull', it, net),
             );
           }),
         );

@@ -1,0 +1,3 @@
+FROM agent-office:forgejo-read-base
+COPY --from=agent-office:forgejo-gates /usr/local/lib/node_modules/@openai/codex /usr/local/lib/node_modules/@openai/codex
+RUN ln -s /usr/local/lib/node_modules/@openai/codex/bin/codex.js /usr/local/bin/codex

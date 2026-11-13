@@ -1,9 +1,18 @@
-# agent-office
+# AgentOfficePalace - istruzioni di progetto
 
-- Ship every code change as a PR branched from freshly fetched `origin/main`, and end with the PR URL instead of stopping at a local commit or asking first.
-- The main checkout is shared with other live sessions and board agents, so do branch work in a worktree and never stash, reset or commit anyone else's changes there.
-- Verify with `npm run typecheck`, `npm test` and `npm run build`, plus a headless-browser screenshot for visual changes, rather than slow manual playthroughs.
-- When a change affects how people run, deploy or use the office, update `README.md` and the matching `docs/*.md` page in the same PR.
-- New features plug in through the registries as modules of their own (see `docs/code-layout.md`), never by adding their code to `main.ts`, `server.ts`, the state store, `protocol.ts` or another feature's files, and `tests/size.test.ts` must stay green.
-- Every modal needs a top-right ✕, and closing it by ✕ or Esc must put the player straight back into mouse-look with no extra click.
-- When asked to merge PRs, merge only webdevcody's (anyone else's only when linked, after a security review), resolve conflicts so both sides survive, and squash-merge.
+Fork privato MAROS di AgentSystemLabs/agent-office. Conservare LICENSE e provenienza upstream.
+Il codice TypeScript e in src, i componenti documentali MAROS in maros/pipeline,
+i manifest della VM111 in maros/deploy e le istruzioni degli agenti in maros/agents.
+L origine e le personalizzazioni sono descritte in docs/maros/ARCHITETTURA.md.
+
+Per modifiche successive all importazione iniziale usare branch codex/ dedicati e pull request sul Forgejo aziendale.
+Non pubblicare al remoto upstream senza richiesta esplicita. Nessun deploy o riavvio implicito.
+Prima di pubblicare eseguire i controlli adeguati alla modifica; per TypeScript usare
+npm run typecheck, npm test e npm run build. Per la pipeline:
+python3 -B -m unittest discover -s maros/pipeline -p 'test_*.py'.
+Per cambiamenti grafici verificare anche il risultato nell interfaccia.
+
+Credenziali, token ChatGPT/Codex/Forgejo, chiavi SSH, database, sessioni e dati del vault
+restano esterni a Git. Non aggiungere dati runtime per rendere una prova verde.
+Le istruzioni originali upstream sono conservate in docs/upstream/AGENTS.original.md come riferimento storico.
+Le istruzioni del progetto non autorizzano scritture nella wiki o modifiche ai servizi di produzione.

@@ -1,0 +1,2 @@
+FROM agent-office:forgejo-read-base
+RUN npm install --global --no-audit --no-fund @openai/codex@0.167.2 && codex --version

@@ -1,6 +1,7 @@
 import { execFile } from 'node:child_process';
 import type { GhCheck, GhCloseReason, GhComment, GhIssue, GhIssueDetail, GhLabel, GhMergeMethod, GhPull, GhPullDetail, GhRepoInfo, GhReviewComment, GhState } from '../shared/protocol.js';
 import type { GhAs } from './signins.js';
+import { forgejoList, forgejoDetail, forgejoDiff, forgejoMerge } from './forgejo.js';
 
 const REFRESH_MS = 90_000;
 /** How long the repo's list of labels is kept before the label picker asks GitHub again. */
@@ -218,6 +219,8 @@ export class GitHub {
    * GitHub login of whoever asked, when they're signed in to their own; else it's the office's.
    */
   async pullDetail(n: number, me?: string): Promise<GhPullDetail> {
+    const forgejo = await forgejoDetail(this.dir, n);
+    if (forgejo) return forgejo;
     const fields = 'number,body,state,isDraft,reviewDecision,headRefName,baseRefName,mergeable,mergeStateStatus,commits,comments,reviews,statusCheckRollup';
     const jq = '.[] | {id, in_reply_to_id, path, line, side, body, user: .user.login, created_at, html_url}';
     const [view, lines, repo, viewer] = await Promise.all([
@@ -264,7 +267,9 @@ export class GitHub {
   }
 
   /** The PR's unified diff, as `git diff` prints it. */
-  pullDiff(n: number): Promise<string> {
+  async pullDiff(n: number): Promise<string> {
+    const forgejo = await forgejoDiff(this.dir, n);
+    if (forgejo !== undefined) return forgejo;
     return this.runGh(['pr', 'diff', String(n), '--color', 'never'], this.dir, 60_000);
   }
 
@@ -305,8 +310,13 @@ export class GitHub {
   }
 
   /** Merges a PR, or with `auto` has GitHub merge it once its requirements pass. Returns an error. */
-  async merge(n: number, method: GhMergeMethod, deleteBranch: boolean, auto: boolean, as?: GhAs): Promise<string | undefined> {
+  async merge(n: number, method: GhMergeMethod, deleteBranch: boolean, auto: boolean, as?: GhAs, headCommit?: string): Promise<string | undefined> {
     try {
+      const result = await forgejoMerge(this.dir, n, headCommit, method, deleteBranch, auto);
+      if (result.handled) {
+        if (!result.error) void this.refreshPulls();
+        return result.error;
+      }
       const repo = await this.repoInfo();
       // --repo keeps gh out of the office's own checkout: without it, --delete-branch also deletes
       // the local branch and switches the project folder over to the base branch.
@@ -487,6 +497,12 @@ export class GitHub {
     this.onPulls(this.pulls);
     const asked = Date.now();
     try {
+      const forgejo = await forgejoList(this.dir);
+      if (forgejo) {
+        this.pulls = { items: forgejo, fetchedAt: Date.now(), loading: false };
+        this.onPulls(this.pulls);
+        return;
+      }
       const [open, merged, closed] = await Promise.all([
         this.listPulls('open', 150),
         this.listPulls('merged', 30),

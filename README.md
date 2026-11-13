@@ -1,3 +1,20 @@
+# AgentOfficePalace
+
+Personalizzazione MAROS di [Agent Office](https://github.com/AgentSystemLabs/agent-office),
+con Codex, integrazione Forgejo e pipeline documentale revisionata a nove agenti.
+Il codice originale e la sua cronologia sono conservati; base upstream:
+`852e2ab28c4f3f31bffdf4b20353bd119c9d3270`.
+
+- [Architettura e componenti MAROS](docs/maros/ARCHITETTURA.md)
+- [Configurazione e dipendenze della VM111](maros/deploy/README.md)
+- [Istruzioni operative dei nove agenti](maros/agents/AGENTS.md)
+
+Il repository contiene codice e configurazioni prive di segreti. Non contiene vault,
+repository documentali, credenziali, database, sessioni o immagini Docker binarie.
+La documentazione originale del progetto prosegue sotto.
+
+---
+
 > [!WARNING]
 > **Work in progress.** Agent Office is built for one person's workflow — mine — and it changes fast as I iterate on it.
 > Expect breaking changes between releases: keys that move, screens that get redrawn, features that come and go
