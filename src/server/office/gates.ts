@@ -1,4 +1,5 @@
 import { WebSocket } from 'ws';
+import { connectedRepository } from '../connections/repository.js';
 import type { GhAs } from '../signins.js';
 import type { Floor } from '../floor.js';
 import type { SignInKind } from '../../shared/protocol.js';
@@ -14,6 +15,7 @@ export function gates(ctx: Ctx): Gates {
    */
   const takeIssue = (c: Client, floor: Floor, n: number) => {
     floor.queue.dropIssue(n);
+    if (connectedRepository(floor.def.dir)) { void floor.github.claim(n).then((err) => ctx.warn(c, err)); return; }
     const as = c.accountId ? ctx.signins.ghAs(c.accountId) : undefined;
     if (typeof as === 'string') return ctx.warn(c, `Couldn't assign issue #${n} on GitHub: ${as}`);
     void floor.github.claim(n, as).then((err) => ctx.warn(c, err && `Couldn't assign issue #${n} on GitHub: ${err}`));
@@ -53,7 +55,14 @@ export function gates(ctx: Ctx): Gates {
     });
   };
   /** Runs `go` with how the office acts on GitHub for `c`: as them, or as itself (no account, or an admin's choice). */
-  const withGitHub = (c: Client, go: (as: GhAs | undefined) => void, refused?: (why: string) => void) =>
+  const withGitHub = (c: Client, go: (as: GhAs | undefined) => void, refused?: (why: string) => void) => {
+    try {
+      const floor = ctx.floorOf(c);
+      if (floor && connectedRepository(floor.def.dir)) {
+        if (!ctx.meOf(c.accountId).admin) { const why = 'Solo gli amministratori possono usare l’account tecnico dell’ufficio'; if (refused) refused(why); else ctx.warn(c, why); return; }
+        return go(undefined);
+      }
+    } catch (error) { const why = (error as Error).message; if (refused) refused(why); else ctx.warn(c, why); return; }
     withSignIn(
       c,
       'github',
@@ -65,6 +74,7 @@ export function gates(ctx: Ctx): Gates {
       },
       refused,
     );
+  };
   /** Needs a Claude sign-in of its own when the worker it starts runs Claude. */
   const claudeFor = (provider: string | undefined): SignInKind | undefined => (provider === 'claude' ? 'claude' : undefined);
 

@@ -39,7 +39,7 @@ export function openPull(first: GhPull, net: Net, actions: BoardActions) {
   // --- Frame
   const pill = h('span.pill');
   const title = h('h2');
-  const reload = h('button.btn', { type: 'button', title: uiText('Reload from GitHub') }, '🔄');
+  const reload = h('button.btn', { type: 'button', title: uiText('Reload from repository') }, '🔄');
   const close = h('button.btn.close', { 'aria-label': uiText('Close') }, '✕');
   const meta = h('div.gh-meta');
   const tabConv = h('button.gh-tab', { type: 'button', role: 'tab' });
@@ -64,7 +64,7 @@ export function openPull(first: GhPull, net: Net, actions: BoardActions) {
     meta,
     h('nav.gh-tabs', { role: 'tablist' }, tabConv, tabFiles),
     h('div.gh-body', {}, conv, filesPane),
-    h('footer', {}, h('a.grow', { href: it.url, target: '_blank', rel: 'noopener noreferrer' }, it.readOnly ? uiText("Open on Forgejo ↗") : uiText('Open on GitHub ↗')), footBtns),
+    h('footer', {}, h('a.grow', { href: it.url, target: '_blank', rel: 'noopener noreferrer' }, it.readOnly ? uiText("Open on Forgejo ↗") : uiText('Open repository ↗')), footBtns),
   );
 
   const handToWorker = () => {

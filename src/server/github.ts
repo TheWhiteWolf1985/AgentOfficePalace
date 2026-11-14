@@ -2,6 +2,7 @@ import { execFile } from 'node:child_process';
 import type { GhCheck, GhCloseReason, GhComment, GhIssue, GhIssueDetail, GhLabel, GhMergeMethod, GhPull, GhPullDetail, GhRepoInfo, GhReviewComment, GhState } from '../shared/protocol.js';
 import type { GhAs } from './signins.js';
 import { forgejoList, forgejoDetail, forgejoDiff, forgejoMerge } from './forgejo.js';
+import { connectedRepository } from './connections/repository.js';
 
 const REFRESH_MS = 90_000;
 /** How long the repo's list of labels is kept before the label picker asks GitHub again. */
@@ -198,6 +199,8 @@ export class GitHub {
 
   /** The repository's full name and how it lets PRs merge. Asked once (again after a failure). */
   repoInfo(): Promise<GhRepoInfo> {
+    const remote = connectedRepository(this.dir);
+    if (remote) return Promise.resolve({ nameWithOwner: remote.repository, methods: remote.controlled ? [] : ['merge', 'squash', 'rebase'] });
     this.repo ??= this.runGh(['repo', 'view', '--json', 'nameWithOwner,squashMergeAllowed,mergeCommitAllowed,rebaseMergeAllowed'], this.dir).then((out) => {
       const r = JSON.parse(out);
       const methods = (['squash', 'merge', 'rebase'] as const).filter((m) => r[{ squash: 'squashMergeAllowed', merge: 'mergeCommitAllowed', rebase: 'rebaseMergeAllowed' }[m]]);
@@ -209,6 +212,8 @@ export class GitHub {
 
   /** Who the office's own gh is signed in as, which is who it comments as for everyone without their own. Asked once; '' when gh can't say. */
   viewer(): Promise<string> {
+    const remote = connectedRepository(this.dir);
+    if (remote) return Promise.resolve(remote.api.store.account(remote.api.accountId).username);
     this.login ??= this.runGh(['api', 'user', '--jq', '.login'], this.dir).then((out) => out.trim());
     this.login.catch(() => (this.login = undefined));
     return this.login.catch(() => '');
@@ -219,6 +224,8 @@ export class GitHub {
    * GitHub login of whoever asked, when they're signed in to their own; else it's the office's.
    */
   async pullDetail(n: number, me?: string): Promise<GhPullDetail> {
+    const remote = connectedRepository(this.dir);
+    if (remote && !remote.controlled) return remote.pull(n);
     const forgejo = await forgejoDetail(this.dir, n);
     if (forgejo) return forgejo;
     const fields = 'number,body,state,isDraft,reviewDecision,headRefName,baseRefName,mergeable,mergeStateStatus,commits,comments,reviews,statusCheckRollup';
@@ -268,12 +275,16 @@ export class GitHub {
 
   /** The PR's unified diff, as `git diff` prints it. */
   async pullDiff(n: number): Promise<string> {
+    const remote = connectedRepository(this.dir);
+    if (remote) return remote.diff(n);
     const forgejo = await forgejoDiff(this.dir, n);
     if (forgejo !== undefined) return forgejo;
     return this.runGh(['pr', 'diff', String(n), '--color', 'never'], this.dir, 60_000);
   }
 
   async issueDetail(n: number, me?: string): Promise<GhIssueDetail> {
+    const remote = connectedRepository(this.dir);
+    if (remote) return remote.issue(n);
     const [view, viewer] = await Promise.all([this.runGh(['issue', 'view', String(n), '--json', 'number,state,body,comments'], this.dir), me ?? this.viewer()]);
     const i = JSON.parse(view);
     return { number: i.number, state: i.state, body: String(i.body ?? ''), comments: commentsOf(i.comments), viewer };
@@ -286,6 +297,8 @@ export class GitHub {
   async comment(kind: 'issue' | 'pull', n: number, body: string, as?: GhAs): Promise<{ comment?: GhComment; error?: string }> {
     let comment: GhComment;
     try {
+      const remote = connectedRepository(this.dir);
+      if (remote) { const c = await remote.comment(n, body); void this.refresh(); return { comment: c }; }
       // -f sends the body as a plain string: no @file reading, no {owner} filling in.
       const jq = '{id: .node_id, author: {login: .user.login}, body, createdAt: .created_at, url: .html_url}';
       const out = await this.runGh(['api', '--method', 'POST', `repos/{owner}/{repo}/issues/${n}/comments`, '-f', `body=${body}`, '--jq', jq], this.dir, undefined, as?.env);
@@ -303,6 +316,8 @@ export class GitHub {
    * read from a file. Resolves to the review's URL.
    */
   async review(n: number, file: string, as?: GhAs): Promise<string> {
+    const remote = connectedRepository(this.dir);
+    if (remote) return remote.review(n, file);
     // -F reads @file's contents as the value; {owner}/{repo} are filled in from the checkout's remote.
     const url = (await this.runGh(['api', '--method', 'POST', `repos/{owner}/{repo}/pulls/${n}/reviews`, '-F', `body=@${file}`, '-f', 'event=COMMENT', '--jq', '.html_url'], this.dir, 60_000, as?.env)).trim();
     void this.refreshPulls();
@@ -312,6 +327,8 @@ export class GitHub {
   /** Merges a PR, or with `auto` has GitHub merge it once its requirements pass. Returns an error. */
   async merge(n: number, method: GhMergeMethod, deleteBranch: boolean, auto: boolean, as?: GhAs, headCommit?: string): Promise<string | undefined> {
     try {
+      const remote = connectedRepository(this.dir);
+      if (remote && !remote.controlled) { await remote.merge(n, method, deleteBranch, auto, headCommit); void this.refresh(); return; }
       const result = await forgejoMerge(this.dir, n, headCommit, method, deleteBranch, auto);
       if (result.handled) {
         if (!result.error) void this.refreshPulls();
@@ -334,6 +351,8 @@ export class GitHub {
   /** Closes an issue, or a pull request without merging it, optionally saying why. Returns an error. */
   async close(kind: 'issue' | 'pull', n: number, opts: { comment?: string; reason?: GhCloseReason; deleteBranch?: boolean }, as?: GhAs): Promise<string | undefined> {
     try {
+      const remote = connectedRepository(this.dir);
+      if (remote) { await remote.close(kind, n, opts.comment); void this.refresh(); return; }
       const repo = await this.repoInfo();
       // --repo for the same reason as merge: --delete-branch must leave the office's checkout alone.
       const args = [kind === 'issue' ? 'issue' : 'pr', 'close', String(n), '--repo', repo.nameWithOwner];
@@ -355,6 +374,8 @@ export class GitHub {
 
   /** Every label the repository has, for the label picker. Asked again after a minute (or a failure). */
   repoLabels(): Promise<GhLabel[]> {
+    const remote = connectedRepository(this.dir);
+    if (remote) return remote.repoLabels();
     if (!this.labelList || Date.now() - this.labelList.at > LABELS_MS) {
       const list = this.runGh(['api', 'repos/{owner}/{repo}/labels?per_page=100', '--paginate', '--jq', '.[] | {name, color, description}'], this.dir).then((out) =>
         out
@@ -374,6 +395,7 @@ export class GitHub {
    * else the office. Returns the labels it has now, or why they didn't change.
    */
   async setLabels(kind: 'issue' | 'pull', n: number, add: string[], remove: string[], as?: GhAs): Promise<{ labels?: GhLabel[]; error?: string }> {
+    try { const remote = connectedRepository(this.dir); if (remote) { const labels = await remote.setLabels(n, add, remove); void this.refresh(); return { labels }; } } catch (error) { return { error: (error as Error).message }; }
     const path = `repos/{owner}/{repo}/issues/${n}/labels`;
     const jq = '[.[] | {name, color}]';
     let now: GhLabel[] | undefined;
@@ -435,6 +457,8 @@ export class GitHub {
     const answered = this.claims.take(issue);
     this.showClaims();
     try {
+      const remote = connectedRepository(this.dir);
+      if (remote) { await remote.claim(issue); answered(true); void this.refresh(); return; }
       await this.runGh(['issue', 'edit', String(issue), '--add-assignee', '@me'], this.dir, undefined, as?.env);
     } catch (err) {
       answered(false);
@@ -464,6 +488,8 @@ export class GitHub {
     this.onIssues(this.issues);
     const asked = Date.now();
     try {
+      const remote = connectedRepository(this.dir);
+      if (remote) { this.issues = { items: this.claims.mark(await remote.issues(), asked), fetchedAt: Date.now(), loading: false }; this.onIssues(this.issues); return; }
       // Open and closed separately, so old open issues are never crowded out by recent closed ones.
       const fields = 'number,title,state,url,author,labels,assignees,createdAt,updatedAt,body,comments';
       const [open, closed] = await Promise.all([
@@ -497,6 +523,8 @@ export class GitHub {
     this.onPulls(this.pulls);
     const asked = Date.now();
     try {
+      const remote = connectedRepository(this.dir);
+      if (remote && !remote.controlled) { this.pulls = { items: await remote.pulls(), fetchedAt: Date.now(), loading: false }; this.onPulls(this.pulls); return; }
       const forgejo = await forgejoList(this.dir);
       if (forgejo) {
         this.pulls = { items: forgejo, fetchedAt: Date.now(), loading: false };

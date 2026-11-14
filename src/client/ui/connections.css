@@ -1,0 +1,30 @@
+.connections, .agent-management { display: grid; gap: 12px; min-width: 0; }
+.connections [hidden], .agent-management [hidden] { display: none !important; }
+.modal.settings.settings-wide { width: min(1380px, calc(100vw - 32px)); }
+.connection-tabs, .connection-actions, .connection-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.connection-toolbar { justify-content: space-between; }
+.connection-content { display: grid; gap: 14px; }
+.connection-card { border: 2px solid var(--ink); border-radius: 12px; padding: 14px; background: var(--paper); min-width: 0; }
+.connection-card h4 { margin: 0 0 8px; }
+.connection-card code { overflow-wrap: anywhere; }
+.connection-card p { margin: 6px 0 10px; }
+.connection-card .btn { margin: 5px 5px 0 0; }
+.connection-field { display: grid; gap: 5px; margin: 10px 0; font-weight: 800; }
+.connection-field input, .connection-field select, .connection-field textarea, .connections input, .connections select, .agent-management select { font: inherit; box-sizing: border-box; max-width: 100%; width: 100%; border: 2px solid var(--ink); border-radius: 8px; padding: 8px 10px; background: var(--paper); color: var(--ink); }
+.connection-field textarea { min-height: 120px; resize: vertical; }
+.connection-status { margin: 0; overflow-wrap: anywhere; }
+.connection-status:empty { display: none; }
+.connection-status.bad, .connection-card .bad { color: #a12626; }
+.connection-card .ok { color: #166534; }
+.connection-device-code { display: block; padding: 12px; font-size: 24px; letter-spacing: 3px; }
+.connection-repositories { display: grid; gap: 12px; max-height: 65vh; overflow: auto; }
+.agent-management .agent-table-wrap { overflow-x: auto; }
+.agent-management table { width: 100%; border-collapse: collapse; }
+.agent-management th, .agent-management td { padding: 8px; text-align: left; border-bottom: 1px solid #c5c4c9; vertical-align: top; }
+.agent-management .agent-detail { display: grid; gap: 8px; }
+.agent-management .agent-filters { display: flex; gap: 8px; flex-wrap: wrap; }
+.agent-management details { margin-top: 10px; }
+.agent-management dl { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; }
+.agent-management dd { margin: 0; overflow-wrap: anywhere; }
+.agent-management .btn { white-space: normal; }
+@media (max-width: 600px) { .connection-card { padding: 10px; } .agent-management th, .agent-management td { padding: 5px; } }

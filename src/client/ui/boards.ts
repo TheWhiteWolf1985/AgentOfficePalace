@@ -136,7 +136,7 @@ function card(n: number, title: string, meta: (Node | string)[], i: number, oncl
 export function openBoard(kind: 'issues' | 'pulls', net: Net, actions: BoardActions) {
   const body = h('div.body');
   const status = h('span.board-status');
-  const refresh = h('button.btn', { title: uiText('Refresh from GitHub'), onclick: () => net.send({ t: 'gh.refresh' }) }, uiText('🔄 Refresh'));
+  const refresh = h('button.btn', { title: uiText('Refresh from repository'), onclick: () => net.send({ t: 'gh.refresh' }) }, uiText('🔄 Refresh'));
   const close = h('button.btn.close', { 'aria-label': uiText('Close') }, '✕');
   const el = h('div.modal.board', { role: 'dialog', 'aria-label': kind === 'issues' ? uiText('Issues board') : uiText('Pull requests board') }, h('header', {}, h('h2', {}, kind === 'issues' ? uiText('📌 Issues') : uiText('🔀 Pull Requests')), status, refresh, close), body);
 
@@ -257,7 +257,7 @@ export function openBoard(kind: 'issues' | 'pulls', net: Net, actions: BoardActi
     const caret = active instanceof HTMLInputElement ? ([active.selectionStart, active.selectionEnd] as const) : null;
     body.replaceChildren();
     if (st.error && !st.items.length) {
-      body.append(h('div.board-error', {}, uiText`Couldn't load from GitHub: ${st.error}`, h('br'), h('small', {}, githubErrorHint(st.error))));
+      body.append(h('div.board-error', {}, uiText`Couldn't load from repository: ${st.error}`, h('br'), h('small', {}, githubErrorHint(st.error))));
       return;
     }
     const all = boardLabels(st.items);

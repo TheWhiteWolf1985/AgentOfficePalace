@@ -147,6 +147,15 @@ export class Building {
     return this.defs;
   }
 
+  /** Register a checkout cloned through an explicitly selected Git service. */
+  attach(dir: string, name: string, repo: string, by: string): FloorDef {
+    if (this.defs.length >= MAX_FLOORS || this.defs.some((d) => path.resolve(d.dir) === path.resolve(dir))) throw Error('Ufficio gia presente o edificio pieno');
+    const def = this.newDef(name.slice(0, 100), repo, dir, by);
+    this.defs.push(def);
+    this.save();
+    return def;
+  }
+
   /** Floors on their way: shown in the elevator, but nobody can ride there yet. */
   pending(): FloorDef[] {
     return [...this.cloning.values()].map((p) => p.def);

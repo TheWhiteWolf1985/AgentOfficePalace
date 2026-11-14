@@ -1,23 +1,48 @@
 #!/bin/sh
 set -eu
 case "${AGENT_OFFICE_WORKER_ID:-}" in
-  8808e46d9581|a6ad027d1c31|e8fa8f3593f3|060600b1cd89|0fbfbd67ad38|77067af22c79|8c8553cf4dcf|4fd1877a0463|5efb4d389c27) ;;
-  *) echo 'Agente senza ambiente autorizzato' >&2; exit 1 ;;
+  ''|*[!a-f0-9]*) echo 'Identificativo agente non valido' >&2; exit 1 ;;
 esac
+test "${#AGENT_OFFICE_WORKER_ID}" -eq 12 || exit 1
 case "${AGENT_OFFICE_HOOK_URL:-}" in
   http://127.0.0.1:*) hook="http://agent-office:${AGENT_OFFICE_HOOK_URL##*:}" ;;
   *) echo 'Indirizzo del servizio agenti non riconosciuto' >&2; exit 1 ;;
 esac
 test -n "${AGENT_OFFICE_HOOK_TOKEN:-}" || exit 1
+test -n "${AGENT_OFFICE_REMOTE_ACCOUNT:-}" || { echo 'Configurare l’identita dell’agente nelle Impostazioni' >&2; exit 1; }
 workdir=$(pwd -P)
 case "$workdir" in /data/workspace/*|/data/workspace) ;; *) echo 'Cartella di lavoro non autorizzata' >&2; exit 1 ;; esac
-# Close any orphan in this worker's dedicated container before resuming its session.
-/usr/local/bin/docker exec --user 1000:1000 "maros-agent-$AGENT_OFFICE_WORKER_ID" sh -c 'pkill -TERM -x codex || true' >/dev/null 2>&1
-exec /usr/local/bin/docker exec -it --user 1000:1000 --workdir "$workdir" \
+container="maros-agent-$AGENT_OFFICE_WORKER_ID"
+existing() { exec /usr/local/bin/docker exec -it --user 1000:1000 --workdir "$workdir" "$@"; }
+ephemeral() {
+  network=$(/usr/local/bin/docker inspect --format '{{range $name, $value := .NetworkSettings.Networks}}{{$name}}{{end}}' agent-office)
+  exec /usr/local/bin/docker run --rm --init -it --entrypoint /usr/bin/env --name "$container" --user 1000:1000 --workdir "$workdir" \
+    --cap-drop ALL --security-opt seccomp:unconfined --security-opt apparmor:unconfined --network "$network" \
+    --mount type=bind,src=/srv/data/agent-office/data,dst=/data \
+    --mount type=bind,src=/srv/data/agent-office/published,dst=/second-brain,readonly \
+    --mount type=bind,src=/srv/data/agent-office/pipeline,dst=/opt/maros-pipeline,readonly "$@"
+}
+if /usr/local/bin/docker inspect "$container" >/dev/null 2>&1; then
+  /usr/local/bin/docker exec --user 1000:1000 "$container" sh -c 'pkill -TERM -x codex || true' >/dev/null 2>&1
+  launch=existing
+  target="$container"
+else
+  launch=ephemeral
+  target=agent-office:forgejo-gates
+fi
+"$launch" \
   -e HOME=/data/home -e USER=agentoffice -e TERM=xterm-256color -e COLORTERM=truecolor \
   -e "PATH=/opt/maros-pipeline/bin:$PATH" \
   -e "AGENT_OFFICE_WORKER_ID=$AGENT_OFFICE_WORKER_ID" \
   -e "AGENT_OFFICE_HOOK_URL=$hook" -e "AGENT_OFFICE_HOOK_TOKEN=$AGENT_OFFICE_HOOK_TOKEN" \
   -e "GIT_CEILING_DIRECTORIES=${GIT_CEILING_DIRECTORIES:-}" \
-  -e "GIT_SSH_COMMAND=ssh -F /dev/null -i /run/maros-role/id_ed25519 -o UserKnownHostsFile=/data/home/.ssh/known_hosts -o IdentitiesOnly=yes -o BatchMode=yes" \
-  "maros-agent-$AGENT_OFFICE_WORKER_ID" /usr/local/bin/codex --ask-for-approval never --sandbox danger-full-access "$@"
+  -e "AGENT_OFFICE_REMOTE_PROVIDER=$AGENT_OFFICE_REMOTE_PROVIDER" -e "AGENT_OFFICE_REMOTE_URL=$AGENT_OFFICE_REMOTE_URL" \
+  -e "AGENT_OFFICE_REMOTE_ACCOUNT=$AGENT_OFFICE_REMOTE_ACCOUNT" -e "AGENT_OFFICE_REMOTE_REPOSITORY=$AGENT_OFFICE_REMOTE_REPOSITORY" \
+  -e "AGENT_OFFICE_REMOTE_TOKEN=$AGENT_OFFICE_REMOTE_TOKEN" -e "AGENT_OFFICE_REMOTE_LOGIN=$AGENT_OFFICE_REMOTE_LOGIN" \
+  -e "AGENT_OFFICE_REMOTE_ROLE=$AGENT_OFFICE_REMOTE_ROLE" \
+  -e "GH_HOST=${GH_HOST:-}" -e "GH_TOKEN=${GH_TOKEN:-}" -e "GH_ENTERPRISE_TOKEN=${GH_ENTERPRISE_TOKEN:-}" \
+  -e "AGENT_OFFICE_ROLE_CAPOREDATTORE=${AGENT_OFFICE_ROLE_CAPOREDATTORE:-}" \
+  -e "AGENT_OFFICE_ROLE_CAPOANALISTA=${AGENT_OFFICE_ROLE_CAPOANALISTA:-}" -e "AGENT_OFFICE_ROLE_CAPOEDITORE=${AGENT_OFFICE_ROLE_CAPOEDITORE:-}" \
+  -e "GIT_CONFIG_COUNT=$GIT_CONFIG_COUNT" -e "GIT_CONFIG_KEY_0=$GIT_CONFIG_KEY_0" -e "GIT_CONFIG_VALUE_0=$GIT_CONFIG_VALUE_0" \
+  -e "GIT_CONFIG_KEY_1=$GIT_CONFIG_KEY_1" -e "GIT_CONFIG_VALUE_1=$GIT_CONFIG_VALUE_1" \
+  "$target" /usr/local/bin/codex --ask-for-approval never --sandbox danger-full-access "$@"

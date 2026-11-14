@@ -12,6 +12,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from gate_revisioni import valuta_gate
+from identita_revisioni import identita_revisioni
 
 BASE = "http://192.168.1.76:3000/api/v1"
 REPO = os.environ.get("MAROS_FORGEJO_REPO", "officeagents/documentazione")
@@ -72,7 +73,7 @@ def merge(number, expected):
     ref=pr.get("head",{}).get("ref","")
     if not ref or ref=="main":
         raise GateError("Branch della PR non valido")
-    outcome=valuta_gate(head,reviews(path))
+    outcome=valuta_gate(head,reviews(path),*identita_revisioni(REPO))
     if not outcome.verde:
         raise GateError(outcome.motivo)
     base=pr.get("base",{}).get("sha","")
@@ -93,7 +94,7 @@ def merge(number, expected):
         raise GateError("Il commit e cambiato durante il controllo")
     if current.get("state") != "open" or current.get("draft"):
         raise GateError("La PR non e piu pronta al merge")
-    outcome=valuta_gate(head,reviews(path))
+    outcome=valuta_gate(head,reviews(path),*identita_revisioni(REPO))
     if not outcome.verde:
         raise GateError("Gate modificati durante i checker: "+outcome.motivo)
     api("POST",path+"/merge",{"Do":"merge","head_commit_id":head,"delete_branch_after_merge":True})

@@ -44,7 +44,7 @@ export function spinnerRow(text: string) {
 }
 
 export function errorBox(text: string, retry?: () => void) {
-  return h('div.gh-error', {}, uiText`Couldn't load from GitHub: ${text}`, retry ? h('button.btn', { type: 'button', onclick: retry }, uiText('Try again')) : null);
+  return h('div.gh-error', {}, uiText`Couldn't load from repository: ${text}`, retry ? h('button.btn', { type: 'button', onclick: retry }, uiText('Try again')) : null);
 }
 
 export function stateOf(it: { state: string; isDraft?: boolean }): [string, string] {
