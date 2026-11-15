@@ -700,7 +700,7 @@ export class WorkerManager {
       this.runAs.apply(w.owner, env, [this.dir, cwd]);
     }
     try { workerConnections(this.dir, info.id, env); } catch (error) { this.startFailed(w, (error as Error).message); return; }
-    info.connectionAccountId = env.AGENT_OFFICE_REMOTE_ACCOUNT; info.connectionRole = env.AGENT_OFFICE_REMOTE_ROLE;
+    info.connectionAccountId = env.AGENT_OFFICE_REMOTE_ACCOUNT;
     adapter?.usage?.locate?.(this.handleOf(w), cwd, env);
 
     if (adapter?.transport === 'acp') {

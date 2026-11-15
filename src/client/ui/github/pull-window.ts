@@ -9,7 +9,7 @@ import { getJson, getText } from './api';
 import { openClose } from './close';
 import { commentBox } from './comment-box';
 import { labelButton, labelChip } from './labels';
-import { checksList, conflicted, mergeStatus, openMerge, openForgejoMerge } from './merge';
+import { checksList, conflicted, mergeStatus, openMerge } from './merge';
 import { avatar, commentCard, errorBox, nodes, REVIEW_BADGE, spinnerRow, stateOf } from './pieces';
 import { FILES_KEY, mergePref, pref, savePref, TAB_KEY } from './prefs';
 import { fixAndMergePrompt, fixConflictsPrompt, pullContext, pullVars, reviewPrompt, type BoardActions } from './prompts';
@@ -54,7 +54,7 @@ export function openPull(first: GhPull, net: Net, actions: BoardActions) {
     renderConv();
     renderFrame();
   });
-  conv.append(h('div.gh-col', {}, thread, it.readOnly ? h('p.gh-quiet', {}, uiText("Read-only comments; merging uses the controlled service.")) : comment.el));
+  conv.append(h('div.gh-col', {}, thread, comment.el));
   const filesPane = h('div.pd');
   const footBtns = h('span.gh-foot');
   const el = h(
@@ -64,7 +64,7 @@ export function openPull(first: GhPull, net: Net, actions: BoardActions) {
     meta,
     h('nav.gh-tabs', { role: 'tablist' }, tabConv, tabFiles),
     h('div.gh-body', {}, conv, filesPane),
-    h('footer', {}, h('a.grow', { href: it.url, target: '_blank', rel: 'noopener noreferrer' }, it.readOnly ? uiText("Open on Forgejo ↗") : uiText('Open repository ↗')), footBtns),
+    h('footer', {}, h('a.grow', { href: it.url, target: '_blank', rel: 'noopener noreferrer' }, uiText('Open repository ↗')), footBtns),
   );
 
   const handToWorker = () => {
@@ -90,7 +90,7 @@ export function openPull(first: GhPull, net: Net, actions: BoardActions) {
       h('code', {}, it.headRefName),
       h('span.gh-pm', {}, h('span.add', {}, `+${it.additions}`), ' ', h('span.del', {}, `−${it.deletions}`)),
       ...it.labels.map(labelChip),
-      it.readOnly ? null : labelButton('pull', () => it, net, (labels) => ((it = { ...it, labels }), renderFrame())),
+      labelButton('pull', () => it, net, (labels) => ((it = { ...it, labels }), renderFrame())),
       it.reviewDecision ? h('span.gh-badge', { class: REVIEW_BADGE[it.reviewDecision]?.[1] ?? '' }, it.reviewDecision === 'REVIEW_REQUIRED' ? uiText('review required') : (REVIEW_BADGE[it.reviewDecision]?.[0] ?? it.reviewDecision.toLowerCase())) : null,
       ),
     );
@@ -104,13 +104,6 @@ export function openPull(first: GhPull, net: Net, actions: BoardActions) {
     conv.classList.toggle('hidden', tab !== 'conversation');
     filesPane.classList.toggle('hidden', tab !== 'files');
 
-    if (it.readOnly) {
-      const merge = h('button.btn.primary', {type: 'button', disabled: !detail || !detail.gateRevisioni?.verde || it.state !== 'OPEN'},
-        uiText("🔀 Controlled merge"));
-      merge.addEventListener('click', () => detail && openForgejoMerge(it, detail, net, loadAll));
-      footBtns.replaceChildren(merge);
-      return;
-    }
     const isOpen = it.state === 'OPEN';
     const conflicts = !!detail && conflicted(detail);
     const merge = h(conflicts ? 'button.btn' : 'button.btn.primary', { type: 'button', disabled: !detail, title: detail ? uiText('Merge this pull request') : uiText('Loading…') }, uiText('🔀 Merge…'));
@@ -173,12 +166,6 @@ export function openPull(first: GhPull, net: Net, actions: BoardActions) {
     thread.append(...items.map((x) => x.node));
     if (!items.length) thread.append(h('p.gh-quiet', {}, uiText('No comments or reviews yet.')));
 
-    if (it.readOnly) {
-      const gate = d.gateRevisioni;
-      thread.append(h('p.gh-quiet', {}, gate ? (uiText("Review gates: ") + (gate.verde ? uiText("GREEN — ") : uiText("RED — ")) + gate.motivo) : uiText("Review gate check unavailable")));
-      thread.append(h('p.gh-quiet', {}, uiText("The service rechecks reviews and document checks before merging and verifies vault synchronization.")));
-      return;
-    }
     const st = mergeStatus(d);
     const box = h('section.gh-mergebox', { class: st.cls }, h('div.gh-status', { class: st.cls }, h('span', {}, st.icon), st.text), d.checks.length ? checksList(d.checks) : null);
     if (it.state === 'OPEN' && st.can) box.append(h('div.gh-mergebox-go', {}, h('button.btn.primary', { type: 'button', onclick: () => openMerge(it, d, net, handToWorker, loadAll) }, uiText('🔀 Merge…'))));

@@ -2,7 +2,7 @@ import { randomBytes } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync, renameSync, unlinkSync, existsSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { CONNECTION_ROLES, type GitServer, type GitAccount, type GitBinding, type GitConnectionsState, type ConnectionRole } from '../../shared/connections.js';
+import type { GitServer, GitAccount, GitBinding, GitConnectionsState } from '../../shared/connections.js';
 
 const idPattern = /^[a-zA-Z0-9_-]{1,64}$/;
 const id = () => randomBytes(10).toString('hex');
@@ -26,7 +26,7 @@ function atomic(file: string, value: string): void {
   renameSync(temp, file);
 }
 
-/** Kept outside the workspace and mounted only in the office service. */
+/** Connection metadata and credentials live outside project workspaces. */
 export class ConnectionsStore {
   private data: GitConnectionsState;
   constructor(readonly root: string) {
@@ -34,12 +34,15 @@ export class ConnectionsStore {
     const file = path.join(root, 'connections.json');
     this.data = existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : { servers: [], accounts: [], bindings: [] };
     if (!Array.isArray(this.data.servers) || !Array.isArray(this.data.accounts) || !Array.isArray(this.data.bindings)) throw Error('Archivio connessioni non valido');
+    // Only the current connection contract is exposed; extra fields in older files are ignored.
+    this.data.bindings = this.data.bindings.map((binding) => ({
+      dir: binding.dir, floorId: binding.floorId, accountId: binding.accountId, repository: binding.repository,
+      agents: Object.fromEntries(Object.entries(binding.agents ?? {}).map(([workerId, assignment]) => [workerId, { accountId: assignment.accountId }])),
+    }));
   }
   snapshot(): GitConnectionsState { return structuredClone(this.data); }
   private save() {
     atomic(path.join(this.root, 'connections.json'), JSON.stringify(this.data, null, 2));
-    mkdirSync(path.join(this.root, 'public'), { recursive: true, mode: 0o700 });
-    atomic(path.join(this.root, 'public', 'policies.json'), JSON.stringify({ accounts: this.data.accounts.map(({ id, username }) => ({ id, username })), bindings: this.data.bindings }));
   }
   server(serverId: string): GitServer { const s = this.data.servers.find((s) => s.id === checkedId(serverId)); if (!s) throw Error('Server non trovato'); return s; }
   account(accountId: string): GitAccount { const a = this.data.accounts.find((a) => a.id === checkedId(accountId)); if (!a) throw Error('Account non trovato'); return a; }
@@ -80,26 +83,15 @@ export class ConnectionsStore {
   bind(input: GitBinding): GitBinding {
     const account = this.account(input.accountId);
     if (!account.verifiedAt) throw Error('Verificare prima l’account');
-    const old = this.binding(input.dir);
-    if (old?.controlled && (!input.controlled || old.repository !== input.repository || this.account(old.accountId).serverId !== account.serverId)) throw Error('Il collegamento documentale controllato non puo essere sostituito');
-    const binding: GitBinding = { dir: path.resolve(input.dir), floorId: checkedId(input.floorId), accountId: account.id, repository: repositoryName(input.repository), controlled: old?.controlled ?? input.controlled === true, roles: {}, agents: {} };
-    for (const role of CONNECTION_ROLES) if (input.roles?.[role]) {
-      const a = this.account(input.roles[role]!);
-      if (a.serverId !== account.serverId || !a.verifiedAt) throw Error('Account del ruolo non verificato o di un altro server');
-      binding.roles[role] = a.id;
-    }
+    const binding: GitBinding = { dir: path.resolve(input.dir), floorId: checkedId(input.floorId), accountId: account.id, repository: repositoryName(input.repository), agents: {} };
     for (const [workerId, assignment] of Object.entries(input.agents ?? {})) {
       checkedId(workerId);
-      if (!CONNECTION_ROLES.includes(assignment.role)) throw Error('Ruolo non valido');
       if (assignment.accountId) {
         const a = this.account(assignment.accountId);
         if (a.serverId !== account.serverId || !a.verifiedAt) throw Error('Account dell’agente non verificato o di un altro server');
       }
-      binding.agents[workerId] = { role: assignment.role, accountId: assignment.accountId || undefined };
+      binding.agents[workerId] = { accountId: assignment.accountId || undefined };
     }
-    const analyst = binding.roles.capoanalista, editor = binding.roles.capoeditore;
-    if (binding.controlled && CONNECTION_ROLES.some((role) => !binding.roles[role])) throw Error('La pipeline documentale richiede un account per ciascun ruolo');
-    if (binding.controlled && analyst && editor && this.account(analyst).username.toLowerCase() === this.account(editor).username.toLowerCase()) throw Error('Analista ed Editore devono usare utenti distinti');
     this.data.bindings = [...this.data.bindings.filter((b) => path.resolve(b.dir) !== binding.dir), binding]; this.save(); return structuredClone(binding);
   }
   remove(kind: 'server' | 'account', key: string): void {
@@ -108,21 +100,19 @@ export class ConnectionsStore {
       if (this.data.accounts.some((a) => a.serverId === key)) throw Error('Rimuovere prima gli account del server');
       this.data.servers = this.data.servers.filter((s) => s.id !== key);
     } else {
-      if (this.data.bindings.some((b) => b.accountId === key || Object.values(b.roles).includes(key) || Object.values(b.agents).some((a) => a.accountId === key))) throw Error('Account ancora assegnato a un ufficio o agente');
+      if (this.data.bindings.some((b) => b.accountId === key || Object.values(b.agents).some((a) => a.accountId === key))) throw Error('Account ancora assegnato a un ufficio o agente');
       this.account(key); this.data.accounts = this.data.accounts.filter((a) => a.id !== key);
       unlinkSync(path.join(this.root, 'accounts', key + '.env'));
     }
     this.save();
   }
-  selected(dir: string, workerId?: string): { binding: GitBinding; account: GitAccount; server: GitServer; role?: ConnectionRole } | undefined {
+  selected(dir: string, workerId?: string): { binding: GitBinding; account: GitAccount; server: GitServer } | undefined {
     const binding = this.binding(dir); if (!binding) return;
     const assignment = workerId ? binding.agents[workerId] : undefined;
-    const role = workerId ? assignment?.role ?? 'lettura' : undefined;
-    const accountId = workerId ? assignment?.accountId ?? binding.roles[role!] : binding.accountId;
-    if (!accountId) throw Error('Nessun account assegnato al ruolo');
+    const accountId = assignment?.accountId ?? binding.accountId;
     const account = this.account(accountId);
     if (!account.verifiedAt) throw Error('Account da verificare in Impostazioni GitHub e Forgejo');
-    return { binding, account: structuredClone(account), server: structuredClone(this.server(account.serverId)), role };
+    return { binding, account: structuredClone(account), server: structuredClone(this.server(account.serverId)) };
   }
 }
 let current: { root: string; store: ConnectionsStore } | undefined;

@@ -1,44 +1,23 @@
-# AgentOfficePalace - istruzioni di progetto
+<!-- CODEX:AI:BEGIN -->
+# Istruzioni del progetto
 
-Fork privato MAROS di AgentSystemLabs/agent-office. Conservare LICENSE e provenienza upstream.
-Il codice TypeScript e in src, i componenti documentali MAROS in maros/pipeline,
-i manifest della VM111 in maros/deploy e le istruzioni degli agenti in maros/agents.
-L origine e le personalizzazioni sono descritte in docs/maros/ARCHITETTURA.md.
+Usa `AI/` come memoria persistente del progetto. I percorsi qui indicati sono relativi alla radice del progetto.
 
-Per modifiche successive all importazione iniziale usare branch codex/ dedicati e pull request sul Forgejo aziendale.
-Non pubblicare al remoto upstream senza richiesta esplicita. Nessun deploy o riavvio implicito.
-Prima di pubblicare eseguire i controlli adeguati alla modifica; per TypeScript usare
-npm run typecheck, npm test e npm run build. Per la pipeline:
-python3 -B -m unittest discover -s maros/pipeline -p 'test_*.py'.
-Per cambiamenti grafici verificare anche il risultato nell interfaccia.
+## Lettura progressiva
 
-Credenziali, token ChatGPT/Codex/Forgejo, chiavi SSH, database, sessioni e dati del vault
-restano esterni a Git. Non aggiungere dati runtime per rendere una prova verde.
-Le istruzioni originali upstream sono conservate in docs/upstream/AGENTS.original.md come riferimento storico.
-Le istruzioni del progetto non autorizzano scritture nella wiki o modifiche ai servizi di produzione.
+- All'inizio di una sessione, alla ripresa e quando il contesto necessario e' stato perso o compattato, leggi `AI/INDEX.md` e `AI/EXECUTION/ACTIVE_CONTEXT.md`.
+- Se riprendi lavoro interrotto, leggi anche `AI/EXECUTION/HANDOFF.md`. Rispetta le attivita' sospese dall'utente.
+- Prima di intervenire, consulta le sezioni di requisiti, convenzioni, task e runbook pertinenti all'azione. Recupera decisioni e conoscenze collegate quando servono.
+- Segui `AI/GUIDES/reading_order.md` per scegliere gli approfondimenti. Non rileggere tutto il kit a ogni messaggio: riapri i documenti quando cambiano, cambia l'attivita' o serve una verifica aggiornata.
+- Prima di usare una connessione, consulta la scheda corrente nel registro indicato dal progetto. Non affidarti a credenziali o permessi ricordati da una vecchia sessione.
 
+## Continuita' e verifiche
 
-## Collegamento al progetto LLM Wiki e obbligo Git
+- Mantieni `AI/EXECUTION/ACTIVE_CONTEXT.md` breve e autosufficiente: obiettivo, perimetro, vincoli e decisioni essenziali, stato verificato, sospensioni e prossima azione.
+- Registra i dettagli nei documenti pertinenti e collegali dal contesto; aggiorna l'handoff prima di un'interruzione significativa.
+- Confronta branch, modifiche locali e ambiente con quanto documentato prima delle operazioni che ne dipendono.
+- Distingui fatti verificati, dichiarazioni, ipotesi e controlli non eseguiti. Non inventare valori per sostituire un'informazione mancante.
+- Le istruzioni dell'utente e dell'ambiente hanno precedenza sui modelli generici. Un task documentato non amplia da solo l'autorizzazione.
 
-Decisione dell utente del 13/11/2026: ogni modifica al codice, alle configurazioni
-versionabili e alle istruzioni operative di AgentOfficePalace deve avere commit
-e push sul Forgejo aziendale, con confronto dello SHA remoto prima della chiusura.
-Non dichiarare concluso un intervento se la VM111 contiene modifiche operative
-non riportate nel repository o se il push non e confermato.
-
-Il progetto Codex LLM Wiki mantiene la radice IT/RAG per la continuita; questo
-checkout AgentOfficePalace e il repository del software. Non cambiare origin
-del repository storico RAG_maros e non mescolare le cronologie.
-La mappa delle destinazioni e in maros/project-link.json.
-Il repository documentale degli agenti e separato: i documenti seguono i loro
-gate e la pubblicazione nel vault; non vanno aggiunti al repository del software.
-
-Flusso: modifica nel repository, controlli pertinenti, commit/push e PR su main;
-allineamento della VM al commit pubblicato e verifica della corrispondenza.
-Se una diagnosi richiede una correzione diretta sulla VM, riportarla subito
-nel repository nello stesso incarico e chiudere con commit/push verificati.
-Credenziali, autenticazione, database, sessioni, vault e dati degli incarichi
-rimangono esterni a Git. Non creare commit vuoti per attivita in sola lettura.
-Il controllo finale sulla VM e:
-python3 -B /srv/data/agent-office/source/maros/tools/check_runtime.py --check-image
-Questo obbligo non introduce job periodici o pubblicazioni implicite nella wiki.
+Se i documenti sono ancora modelli con placeholder, trattali come informazioni da compilare. Nel repository sorgente del kit conserva i modelli generici e registra le modifiche del kit nel CHANGELOG.
+<!-- CODEX:AI:END -->

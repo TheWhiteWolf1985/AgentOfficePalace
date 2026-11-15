@@ -1,13 +1,13 @@
 # Applicazione su Debian senza agenti
 
 Questo avvio esegue soltanto il server Node.js e il frontend compilato di Agent
-Office Palace. La destinazione iniziale e la VM112 Debian 13. Non usare gli
+Office Palace su un host Debian 13. Non usare gli
 installer generali del progetto per questa configurazione: installano anche
 strumenti degli agenti.
 
 ## Percorsi e prerequisiti
 
-- Repository software: `ssh://git@192.168.1.8/Juri/AgentOfficePalace.git`.
+- Repository software: l'URL Git del proprio checkout di Agent Office Palace.
 - Checkout: `/opt/agent-office-palace/source`, a un commit pubblicato e verificato.
 - Node.js 22 ufficiale: `/opt/node22`, collegamento alla versione installata.
 - Utente di servizio: `agentoffice`, senza sudo e con home

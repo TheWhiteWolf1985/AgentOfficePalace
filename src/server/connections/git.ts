@@ -1,11 +1,10 @@
 import { execFile, execFileSync } from 'node:child_process';
 import { promisify } from 'node:util';
 import { connections, type ConnectionsStore } from './store.js';
-import type { ConnectionRole } from '../../shared/connections.js';
 
 const exec = promisify(execFile);
 /** Only this process gets this account's credentials. No URL or Git config file contains a token. */
-export function gitEnvironment(store: ConnectionsStore, accountId: string, repository: string, role?: ConnectionRole): Record<string, string> {
+export function gitEnvironment(store: ConnectionsStore, accountId: string, repository: string): Record<string, string> {
   const account = store.account(accountId), server = store.server(account.serverId);
   if (!account.verifiedAt) throw Error('Verificare prima l’account');
   const token = store.token(accountId);
@@ -15,7 +14,7 @@ export function gitEnvironment(store: ConnectionsStore, accountId: string, repos
     AGENT_OFFICE_REMOTE_PROVIDER: server.provider, AGENT_OFFICE_REMOTE_URL: server.url,
     AGENT_OFFICE_REMOTE_TOKEN: token, AGENT_OFFICE_REMOTE_LOGIN: account.username,
     AGENT_OFFICE_REMOTE_ACCOUNT: account.id, AGENT_OFFICE_REMOTE_REPOSITORY: repository,
-    AGENT_OFFICE_REMOTE_ROLE: role ?? 'lettura', GIT_CONFIG_COUNT: '2',
+    GIT_CONFIG_COUNT: '2',
     GIT_CONFIG_KEY_0: 'http.' + server.url + '/.extraHeader', GIT_CONFIG_VALUE_0: header,
     GIT_CONFIG_KEY_1: 'url.' + server.url + '/' + repository + '.git.insteadOf', GIT_CONFIG_VALUE_1: server.url + '/' + repository + '.git',
   };
@@ -25,16 +24,12 @@ export function workerConnections(dir: string, workerId: string, env: Record<str
   const store = connections(), selected = store.selected(dir, workerId);
   if (!selected) return;
   for (const key of Object.keys(env)) if (/^(GH_HOST|GH_TOKEN|GITHUB_TOKEN|GH_ENTERPRISE_TOKEN|GITHUB_ENTERPRISE_TOKEN|AGENT_OFFICE_REMOTE_|GIT_CONFIG_)/.test(key)) delete env[key];
-  Object.assign(env, gitEnvironment(store, selected.account.id, selected.binding.repository, selected.role));
+  Object.assign(env, gitEnvironment(store, selected.account.id, selected.binding.repository));
   env.GIT_CONFIG_VALUE_1 = execFileSync('git', ['-C', dir, 'remote', 'get-url', 'origin'], { encoding: 'utf8', timeout: 5000 }).trim();
   if (selected.server.provider === 'github') {
     const host = new URL(selected.server.url).hostname;
     env.GH_HOST = host;
     env[host === 'github.com' ? 'GH_TOKEN' : 'GH_ENTERPRISE_TOKEN'] = store.token(selected.account.id);
-  }
-  for (const role of ['caporedattore', 'capoanalista', 'capoeditore'] as const) {
-    const accountId = selected.binding.roles[role];
-    if (accountId) env['AGENT_OFFICE_ROLE_' + role.toUpperCase()] = store.account(accountId).username;
   }
 }
 export async function verifyGit(store: ConnectionsStore, accountId: string, repository: string): Promise<{ read: true; write: boolean; admin: boolean }> {

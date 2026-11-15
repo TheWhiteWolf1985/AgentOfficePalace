@@ -25,7 +25,6 @@ export interface GhIssue {
 }
 
 export interface GhPull {
-  readOnly?: boolean;
   number: number;
   title: string;
   state: string;
@@ -101,7 +100,6 @@ export interface GhCheck {
 
 /** Everything the PR window shows beyond the board card: GET /api/gh/pull?number=N */
 export interface GhPullDetail {
-  gateRevisioni?: { verde: boolean; motivo: string };
   headCommit?: string;
   number: number;
   body: string;

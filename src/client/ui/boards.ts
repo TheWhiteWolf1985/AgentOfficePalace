@@ -289,7 +289,7 @@ export function openBoard(kind: 'issues' | 'pulls', net: Net, actions: BoardActi
               ],
               i,
               () => openPull(it, net, actions),
-              it.readOnly ? undefined : () => openLabels('pull', it, net),
+              () => openLabels('pull', it, net),
             );
           }),
         );

@@ -6,14 +6,11 @@ dist
 pw.txt
 __pycache__/
 
-# Dati MAROS esterni al codice
+# Local configuration and runtime data
 .env
 .env.*
 !.env.example
-/maros/**/identita/
-/maros/**/data/
-/maros/**/published/
-/maros/**/sync/
-/maros/**/pipeline-work/
-/maros/**/evidenze/
 *.bundle
+
+# Local project continuity
+/AI/

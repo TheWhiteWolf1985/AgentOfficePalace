@@ -1,13 +1,12 @@
 import './connections.css';
 import { t, remoteText } from '../../shared/i18n';
-import { CONNECTION_ROLES, type ConnectionsView, type GitBinding, type ConnectionFloor, type ConnectionRole } from '../../shared/connections';
+import type { ConnectionsView, ConnectionFloor } from '../../shared/connections';
 import type { WorkerInfo } from '../../shared/protocol';
 import { DESKS, WING_DESKS } from '../../shared/layout';
 import { h, STATUS_LABEL } from './dom';
 import { agentFields } from './provider';
 import { connectionRequest as request, loadConnections, connectionField as field, connectionSelect as select, connectionButton as button } from './connections-client';
 
-const roleName = (role: ConnectionRole) => t({ lettura: 'Specialist / read only', caporedattore: 'Editor in chief', capoanalista: 'Chief analyst', capoeditore: 'Chief publisher' }[role]);
 export function agentManagementPanel(): { element: HTMLElement; dispose(): void } {
   let data: ConnectionsView, disposed = false, busy = false;
   const status = h('p.connection-status', { role: 'status' });
@@ -28,23 +27,14 @@ export function agentManagementPanel(): { element: HTMLElement; dispose(): void 
     if (!data) return;
     const needle = filter.value.toLowerCase();
     const rows = data.floors.flatMap((floor) => floor.workers.map((worker) => ({ floor, worker }))).filter(({ floor, worker }) => `${floor.name} ${worker.name} ${worker.model ?? ''}`.toLowerCase().includes(needle));
-    const table = h('table', {}, h('thead', {}, h('tr', {}, ...['Office', 'Agent', 'Model', 'Status', 'Role', 'Configured account', 'Active account', 'Properties'].map((label) => h('th', {}, t(label))))),
+    const table = h('table', {}, h('thead', {}, h('tr', {}, ...['Office', 'Agent', 'Model', 'Status', 'Configured account', 'Active account', 'Properties'].map((label) => h('th', {}, t(label))))),
       h('tbody', {}, ...rows.map(({ floor, worker }) => {
-        const binding = bindingFor(floor), assigned = binding?.agents[worker.id], role = assigned?.role ?? 'lettura';
+        const binding = bindingFor(floor), assigned = binding?.agents[worker.id];
         return h('tr', {}, h('td', {}, floor.name), h('td', {}, worker.name), h('td', {}, `${worker.provider ?? worker.kind} · ${worker.model ?? t('Default')}`),
-          h('td', {}, STATUS_LABEL[worker.status]), h('td', {}, roleName(role)), h('td', {}, accountName(assigned?.accountId ?? binding?.roles[role])), h('td', {}, accountName(worker.connectionAccountId)), h('td', {}, button(t('Edit properties'), () => edit(floor, worker))));
+          h('td', {}, STATUS_LABEL[worker.status]), h('td', {}, accountName(assigned?.accountId ?? binding?.accountId)), h('td', {}, accountName(worker.connectionAccountId)), h('td', {}, button(t('Edit properties'), () => edit(floor, worker))));
       })));
     body.replaceChildren(h('p', {}, t`Agents: ${rows.length}`), h('div.agent-table-wrap', {}, table));
-    for (const floor of data.floors) {
-      const binding = bindingFor(floor); if (!binding) continue;
-      const account = data.accounts.find((a) => a.id === binding.accountId);
-      const accounts = [{ id: '', name: t('Not assigned') }, ...data.accounts.filter((a) => a.serverId === account?.serverId && a.verifiedAt)];
-      const fields = new Map<ConnectionRole, HTMLSelectElement>();
-      const defaults = h('details.connection-card', {}, h('summary', {}, t`Role accounts — ${floor.name}`), h('p.setting-note', {}, t('Defaults for new sessions. A specific assignment on an agent takes precedence.')));
-      for (const role of CONNECTION_ROLES) { const control = select(roleName(role), accounts, binding.roles[role]); fields.set(role, control); defaults.append(field(roleName(role), control)); }
-      defaults.append(button(t('Save role accounts'), () => run(async () => { const roles = Object.fromEntries([...fields].map(([role, control]) => [role, control.value || undefined])); await request('bind', { ...binding, roles }); await reload(); })));
-      body.append(defaults);
-    }
+
   }
   function edit(floor: ConnectionFloor, worker: WorkerInfo) {
     const name = h('input', { value: worker.name, maxlength: 100 }) as HTMLInputElement;
@@ -69,13 +59,12 @@ export function agentManagementPanel(): { element: HTMLElement; dispose(): void 
     if (binding) {
       const serverId = data.accounts.find((a) => a.id === binding.accountId)?.serverId;
       const assigned = binding.agents[worker.id];
-      const role = select(t('Role'), CONNECTION_ROLES.map((r) => ({ id: r, name: roleName(r) })), assigned?.role ?? 'lettura');
-      const account = select(t('Specific account'), [{ id: '', name: t('Inherit the role account') }, ...data.accounts.filter((a) => a.serverId === serverId && a.verifiedAt)], assigned?.accountId);
+      const account = select(t('Specific account'), [{ id: '', name: t('Use the office account') }, ...data.accounts.filter((a) => a.serverId === serverId && a.verifiedAt)], assigned?.accountId);
       const effective = h('p');
-      const paint = () => { effective.textContent = t`Effective on next session: ${accountName(account.value || binding.roles[role.value as ConnectionRole])}`; };
-      role.addEventListener('change', paint); account.addEventListener('change', paint); paint();
-      identity.append(field(t('Role'), role), field(t('Specific account'), account), effective, h('p', {}, t`Active account: ${accountName(worker.connectionAccountId)}`),
-        button(t('Save identity assignment'), () => run(async () => { await request('bind', { ...binding, agents: { ...binding.agents, [worker.id]: { role: role.value, accountId: account.value || undefined } } }); await reload(); })),
+      const paint = () => { effective.textContent = t`Effective on next session: ${accountName(account.value || binding.accountId)}`; };
+      account.addEventListener('change', paint); paint();
+      identity.append(field(t('Specific account'), account), effective, h('p', {}, t`Active account: ${accountName(worker.connectionAccountId)}`),
+        button(t('Save identity assignment'), () => run(async () => { await request('bind', { ...binding, agents: { ...binding.agents, [worker.id]: { accountId: account.value || undefined } } }); await reload(); })),
         h('p.setting-note', {}, t('Changing this assignment does not replace credentials inside an already running session.')));
     } else identity.append(h('p', {}, t('Connect this office to a repository in GitHub and Forgejo first.')));
     const details = h('details.connection-card', {}, h('summary', {}, t('Read-only runtime properties')), h('dl', {}, ...[

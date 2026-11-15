@@ -10,18 +10,18 @@ const comment = (c: any): GhComment => ({ id: String(c.id), author: c.user?.logi
 /** A binding selects exactly one identity. A failed binding never falls back to another login. */
 export function connectedRepository(dir: string): ConnectedRepository | undefined {
   const store = connections(), selected = store.selected(dir);
-  return selected && new ConnectedRepository(new RemoteApi(store, selected.account.id), selected.binding.repository, selected.binding.controlled);
+  return selected && new ConnectedRepository(new RemoteApi(store, selected.account.id), selected.binding.repository);
 }
 export class ConnectedRepository {
   readonly path: string;
-  constructor(readonly api: RemoteApi, readonly repository: string, readonly controlled = false) { this.path = api.repoPath(repository); }
+  constructor(readonly api: RemoteApi, readonly repository: string) { this.path = api.repoPath(repository); }
   async issues(): Promise<GhIssue[]> {
     return (await this.api.pages(this.path + '/issues?state=all')).filter((i) => !i.pull_request).map((i) => ({ number: i.number, title: i.title, state: state(i), url: i.html_url,
       author: i.user?.login ?? '', labels: labels(i.labels), assignees: (i.assignees ?? []).map((a: any) => a.login), createdAt: i.created_at, updatedAt: i.updated_at,
       body: String(i.body ?? '').slice(0, 4000), comments: Number(i.comments ?? 0) }));
   }
   async pulls(): Promise<GhPull[]> {
-    return (await this.api.pages(this.path + '/pulls?state=all')).map((p) => ({ readOnly: this.controlled, number: p.number, title: p.title, state: state(p), isDraft: !!p.draft || /^WIP:/i.test(p.title),
+    return (await this.api.pages(this.path + '/pulls?state=all')).map((p) => ({ number: p.number, title: p.title, state: state(p), isDraft: !!p.draft || /^WIP:/i.test(p.title),
       url: p.html_url, author: p.user?.login ?? '', labels: labels(p.labels), reviewDecision: '', headRefName: p.head?.ref ?? '', headRefOid: p.head?.sha, baseRefName: p.base?.ref ?? '',
       createdAt: p.created_at, updatedAt: p.updated_at, additions: p.additions ?? 0, deletions: p.deletions ?? 0, checks: 'none', body: String(p.body ?? '').slice(0, 4000), closes: [] }));
   }
@@ -34,7 +34,7 @@ export class ConnectedRepository {
     const [p, comments, reviews, commits] = await Promise.all([this.api.request(prefix), this.api.pages(this.path + '/issues/' + number + '/comments'), this.api.pages(prefix + '/reviews'), this.api.pages(prefix + '/commits')]);
     return { number, headCommit: p.head?.sha, body: String(p.body ?? ''), state: state(p), isDraft: !!p.draft, reviewDecision: '', headRefName: p.head?.ref, baseRefName: p.base?.ref,
       mergeable: p.mergeable === true ? 'MERGEABLE' : p.mergeable === false ? 'CONFLICTING' : 'UNKNOWN', mergeStateStatus: p.mergeable === true ? 'CLEAN' : 'UNKNOWN', commits: commits.length,
-      comments: comments.map(comment), reviews: reviews.map(comment), reviewComments: [], checks: [], repo: { nameWithOwner: this.repository, methods: this.controlled ? [] : ['merge', 'squash', 'rebase'] },
+      comments: comments.map(comment), reviews: reviews.map(comment), reviewComments: [], checks: [], repo: { nameWithOwner: this.repository, methods: ['merge', 'squash', 'rebase'] },
       viewer: this.api.store.account(this.api.accountId).username };
   }
   async diff(number: number): Promise<string> {
@@ -42,7 +42,6 @@ export class ConnectedRepository {
   }
   async comment(number: number, body: string): Promise<GhComment> { return comment(await this.api.request(this.path + '/issues/' + number + '/comments', 'POST', { body })); }
   async review(number: number, file: string): Promise<string> {
-    if (this.controlled) throw Error('Usare la revisione documentale con commit e checker');
     const r = await this.api.request(this.path + '/pulls/' + number + '/reviews', 'POST', { body: await readFile(file, 'utf8'), event: 'COMMENT' }); return r.html_url ?? '';
   }
   async repoLabels(): Promise<GhLabel[]> { return labels(await this.api.pages(this.path + '/labels')); }
@@ -58,12 +57,10 @@ export class ConnectedRepository {
     await this.api.request(this.path + '/issues/' + number + (this.api.server.provider === 'github' ? '/assignees' : ''), this.api.server.provider === 'github' ? 'POST' : 'PATCH', { assignees: [this.api.store.account(this.api.accountId).username] });
   }
   async close(kind: 'issue' | 'pull', number: number, body?: string): Promise<void> {
-    if (this.controlled && kind === 'pull') throw Error('Le PR documentali seguono il servizio controllato');
     if (body) await this.comment(number, body);
     await this.api.request(this.path + (kind === 'pull' ? '/pulls/' : '/issues/') + number, 'PATCH', { state: 'closed' });
   }
   async merge(number: number, method: string, deleteBranch: boolean, auto: boolean, head?: string): Promise<void> {
-    if (this.controlled) throw Error('Il merge documentale deve passare dal servizio dei gate');
     if (auto) throw Error('Il merge automatico non e disponibile per questa connessione');
     const p = await this.api.request(this.path + '/pulls/' + number);
     if (head && p.head?.sha !== head) throw Error('La revisione e cambiata: aggiornare la pull request');

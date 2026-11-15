@@ -10,7 +10,7 @@ import { readBody, sameOrigin, send } from '../util.js';
 import type { Route } from '../router.js';
 import type { AgentProvider } from '../../../shared/protocol.js';
 
-/** A deployment may offer only engines its isolated runner actually supports. */
+/** An installation may limit management to the engines it supports. */
 export function managedProviders(available: AgentProvider[]): AgentProvider[] {
   const configured = process.env.AGENT_OFFICE_MANAGED_PROVIDERS;
   return configured ? available.filter((p) => configured.split(',').map((s) => s.trim()).includes(p)) : available;
@@ -60,12 +60,10 @@ export const connectionsRoute: Route = {
           const remote = new URL(normalized);
           if (remote.hostname !== new URL(server.url).hostname || !remote.pathname.endsWith('/' + repository) || (remote.protocol !== 'ssh:' && normalized !== server.url + '/' + repository)) throw Error('La repository scelta non coincide con il checkout dell’ufficio');
           await verifyGit(store, accountId, repository);
-          const old = store.binding(floor.def.dir);
-          if (old?.controlled && floor.github.pulls.items.some((p) => p.state === 'OPEN') && ['capoanalista', 'capoeditore'].some((role) => body.roles?.[role] !== old.roles[role as 'capoanalista' | 'capoeditore'])) throw Error('Completare le PR documentali aperte prima di cambiare le identita dei revisori');
-          const binding: GitBinding = { dir: floor.def.dir, floorId: floor.id, repository, accountId, controlled: old?.controlled ?? false, roles: body.roles ?? {}, agents: body.agents ?? {} };
+          const binding: GitBinding = { dir: floor.def.dir, floorId: floor.id, repository, accountId, agents: body.agents ?? {} };
           const workerIds = new Set(floor.workers.list().map((w) => w.id));
           for (const workerId of Object.keys(binding.agents)) if (!workerIds.has(workerId)) throw Error('Agente non presente nell’ufficio');
-          for (const roleId of new Set([...Object.values(binding.roles), ...Object.values(binding.agents).map((a) => a.accountId)].filter((s): s is string => !!s))) await new RemoteApi(store, roleId).repository(repository);
+          for (const agentAccount of new Set(Object.values(binding.agents).map((a) => a.accountId).filter((s): s is string => !!s))) await new RemoteApi(store, agentAccount).repository(repository);
           const saved = store.bind(binding);
           await floor.github.refresh();
           return send(res, 200, saved);
@@ -77,7 +75,7 @@ export const connectionsRoute: Route = {
           if (ctx.building.list().some((f) => path.resolve(f.dir) === destination)) throw Error('Questa repository ha gia un ufficio');
           await cloneRepository(store, accountId, repository, destination);
           const def = ctx.building.attach(destination, String(body.name ?? '').trim() || repository.split('/')[1], repository, session.account?.name ?? 'amministratore');
-          store.bind({ dir: def.dir, floorId: def.id, accountId, repository, controlled: false, roles: { lettura: accountId }, agents: {} });
+          store.bind({ dir: def.dir, floorId: def.id, accountId, repository, agents: {} });
           if (!ctx.openFloor(def)) throw Error('Repository clonata ma ufficio non aperto: consultare il log');
           ctx.floorsChanged();
           return send(res, 200, { floorId: def.id });

@@ -1,7 +1,6 @@
 import { execFile } from 'node:child_process';
 import type { GhCheck, GhCloseReason, GhComment, GhIssue, GhIssueDetail, GhLabel, GhMergeMethod, GhPull, GhPullDetail, GhRepoInfo, GhReviewComment, GhState } from '../shared/protocol.js';
 import type { GhAs } from './signins.js';
-import { forgejoList, forgejoDetail, forgejoDiff, forgejoMerge } from './forgejo.js';
 import { connectedRepository } from './connections/repository.js';
 
 const REFRESH_MS = 90_000;
@@ -200,7 +199,7 @@ export class GitHub {
   /** The repository's full name and how it lets PRs merge. Asked once (again after a failure). */
   repoInfo(): Promise<GhRepoInfo> {
     const remote = connectedRepository(this.dir);
-    if (remote) return Promise.resolve({ nameWithOwner: remote.repository, methods: remote.controlled ? [] : ['merge', 'squash', 'rebase'] });
+    if (remote) return Promise.resolve({ nameWithOwner: remote.repository, methods: ['merge', 'squash', 'rebase'] });
     this.repo ??= this.runGh(['repo', 'view', '--json', 'nameWithOwner,squashMergeAllowed,mergeCommitAllowed,rebaseMergeAllowed'], this.dir).then((out) => {
       const r = JSON.parse(out);
       const methods = (['squash', 'merge', 'rebase'] as const).filter((m) => r[{ squash: 'squashMergeAllowed', merge: 'mergeCommitAllowed', rebase: 'rebaseMergeAllowed' }[m]]);
@@ -225,9 +224,7 @@ export class GitHub {
    */
   async pullDetail(n: number, me?: string): Promise<GhPullDetail> {
     const remote = connectedRepository(this.dir);
-    if (remote && !remote.controlled) return remote.pull(n);
-    const forgejo = await forgejoDetail(this.dir, n);
-    if (forgejo) return forgejo;
+    if (remote) return remote.pull(n);
     const fields = 'number,body,state,isDraft,reviewDecision,headRefName,baseRefName,mergeable,mergeStateStatus,commits,comments,reviews,statusCheckRollup';
     const jq = '.[] | {id, in_reply_to_id, path, line, side, body, user: .user.login, created_at, html_url}';
     const [view, lines, repo, viewer] = await Promise.all([
@@ -277,8 +274,6 @@ export class GitHub {
   async pullDiff(n: number): Promise<string> {
     const remote = connectedRepository(this.dir);
     if (remote) return remote.diff(n);
-    const forgejo = await forgejoDiff(this.dir, n);
-    if (forgejo !== undefined) return forgejo;
     return this.runGh(['pr', 'diff', String(n), '--color', 'never'], this.dir, 60_000);
   }
 
@@ -328,12 +323,7 @@ export class GitHub {
   async merge(n: number, method: GhMergeMethod, deleteBranch: boolean, auto: boolean, as?: GhAs, headCommit?: string): Promise<string | undefined> {
     try {
       const remote = connectedRepository(this.dir);
-      if (remote && !remote.controlled) { await remote.merge(n, method, deleteBranch, auto, headCommit); void this.refresh(); return; }
-      const result = await forgejoMerge(this.dir, n, headCommit, method, deleteBranch, auto);
-      if (result.handled) {
-        if (!result.error) void this.refreshPulls();
-        return result.error;
-      }
+      if (remote) { await remote.merge(n, method, deleteBranch, auto, headCommit); void this.refresh(); return; }
       const repo = await this.repoInfo();
       // --repo keeps gh out of the office's own checkout: without it, --delete-branch also deletes
       // the local branch and switches the project folder over to the base branch.
@@ -524,13 +514,7 @@ export class GitHub {
     const asked = Date.now();
     try {
       const remote = connectedRepository(this.dir);
-      if (remote && !remote.controlled) { this.pulls = { items: await remote.pulls(), fetchedAt: Date.now(), loading: false }; this.onPulls(this.pulls); return; }
-      const forgejo = await forgejoList(this.dir);
-      if (forgejo) {
-        this.pulls = { items: forgejo, fetchedAt: Date.now(), loading: false };
-        this.onPulls(this.pulls);
-        return;
-      }
+      if (remote) { this.pulls = { items: await remote.pulls(), fetchedAt: Date.now(), loading: false }; this.onPulls(this.pulls); return; }
       const [open, merged, closed] = await Promise.all([
         this.listPulls('open', 150),
         this.listPulls('merged', 30),

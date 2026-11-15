@@ -37,7 +37,6 @@ export interface WorkerInfo {
   effort?: AgentEffort;
   /** Connection pinned when this process was launched, independent of later settings edits. */
   connectionAccountId?: string;
-  connectionRole?: string;
   deskId: string;
   name: string;
   color: string;

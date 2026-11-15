@@ -96,13 +96,13 @@ export function connectionsPanel(): { element: HTMLElement; dispose(): void } {
       return h('article.connection-card', {}, h('h4', {}, repo.name), h('p', {}, repo.description), h('p', {}, repo.permissions.write ? t('Read and write access') : t('Read access')),
         button(t('Verify Git access'), () => run(async () => { const result = await request('git', { accountId: account.value, repository: repo.name }); status.textContent = result.write ? t('Git read access verified; server reports write permission') : t('Git read access verified'); })),
         data.floors.length ? field(t('Existing office'), target) : null,
-        data.floors.length ? button(t('Link to office'), () => run(async () => { const floor = data.floors.find((f) => f.id === target.value)!; const old = data.bindings.find((b) => b.dir === floor.dir); await request('bind', { ...old, floorId: floor.id, accountId: account.value, repository: repo.name, roles: old?.roles ?? { lettura: account.value }, agents: old?.agents ?? {} }); await reload(); })) : null,
+        data.floors.length ? button(t('Link to office'), () => run(async () => { const floor = data.floors.find((f) => f.id === target.value)!; const old = data.bindings.find((b) => b.dir === floor.dir); await request('bind', { ...old, floorId: floor.id, accountId: account.value, repository: repo.name, agents: old?.agents ?? {} }); await reload(); })) : null,
         field(t('New office'), officeName), button(t('Clone and create office'), () => confirmDialog(t('Create an office?'), repo.name, t('Clone and create office'), () => void run(async () => { await request('office', { accountId: account.value, repository: repo.name, name: officeName.value }); await reload(); }))));
     }));
     filter.addEventListener('input', paint);
     account.addEventListener('change', () => { selectedAccount = account.value; list = []; paint(); });
     body.append(field(t('Account'), account), button(t('Load remote repositories'), () => run(async () => { selectedAccount = account.value; list = (await request('repositories', { accountId: account.value })).repositories; paint(); })), filter, rows);
-    body.append(h('h4', {}, t('Linked offices')), ...data.bindings.map((b) => h('p', {}, `${data.floors.find((f) => f.id === b.floorId)?.name ?? b.floorId} → ${b.repository} · ${data.accounts.find((a) => a.id === b.accountId)?.name ?? ''}${b.controlled ? ' · ' + t('Controlled document pipeline') : ''}`)));
+    body.append(h('h4', {}, t('Linked offices')), ...data.bindings.map((b) => h('p', {}, `${data.floors.find((f) => f.id === b.floorId)?.name ?? b.floorId} → ${b.repository} · ${data.accounts.find((a) => a.id === b.accountId)?.name ?? ''}`)));
   }
   void run(reload);
   return { element, dispose() { disposed = true; clearTimeout(loginTimer); if (login) void request('cancel-login', { flow: login }).catch(() => {}); } };

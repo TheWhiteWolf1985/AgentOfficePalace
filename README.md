@@ -1,28 +1,19 @@
-# AgentOfficePalace
+# Agent Office Palace
 
-Personalizzazione MAROS di [Agent Office](https://github.com/AgentSystemLabs/agent-office),
-con Codex, integrazione Forgejo e pipeline documentale revisionata a nove agenti.
-Il codice originale e la sua cronologia sono conservati; base upstream:
-`852e2ab28c4f3f31bffdf4b20353bd119c9d3270`.
+A general-purpose fork of [Agent Office](https://github.com/AgentSystemLabs/agent-office)
+with configurable GitHub/Forgejo connections and English/Italian interface support.
+See [upstream provenance](docs/UPSTREAM.md) and the preserved [MIT license](LICENSE).
 
-- [Architettura e componenti MAROS](docs/maros/ARCHITETTURA.md)
-- [Configurazione e dipendenze della VM111](maros/deploy/README.md)
-- [Istruzioni operative dei nove agenti](maros/agents/AGENTS.md)
+- [GitHub and Forgejo connections](docs/connections.md)
+- [Native Debian application setup](deploy/debian/README.md)
+- [Application configuration](docs/configuration.md)
 
-Il repository contiene codice e configurazioni prive di segreti. Non contiene vault,
-repository documentali, credenziali, database, sessioni o immagini Docker binarie.
-La documentazione originale del progetto prosegue sotto.
+Credentials, session data and installation-specific settings stay outside the source repository.
+The application does not require a document pipeline or preconfigured agents.
 
 ---
 
-> [!WARNING]
-> **Work in progress.** Agent Office is built for one person's workflow — mine — and it changes fast as I iterate on it.
-> Expect breaking changes between releases: keys that move, screens that get redrawn, features that come and go
-> without notice. If it's close to what you want, fork or clone it and bend it into what you need it to be.
-
 <div align="center">
-
-*"Whatever you do, work heartily, as for the Lord and not for men."* — Colossians 3:23 (ESV)
 
 # 🏢 Agent Office
 
