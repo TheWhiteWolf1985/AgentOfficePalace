@@ -1,0 +1,2231 @@
+{
+  "source_contract": "1.0.0",
+  "kit_version": "1.0.0",
+  "blender_version": "5.3.0",
+  "asset_name": "conference_room",
+  "units": "meters",
+  "coordinate_system": "blender_z_up",
+  "root_node": "aop_conference_room",
+  "ceiling_height_m": 5.2,
+  "architecture": {
+    "floor_nodes": [
+      "floor_main",
+      "floor_north_west",
+      "floor_north_east"
+    ],
+    "wall_nodes": [
+      "wall_north_west",
+      "wall_north_east",
+      "wall_west_base",
+      "wall_west_header",
+      "window_west_00",
+      "window_west_01",
+      "window_west_02",
+      "window_west_03",
+      "window_west_04",
+      "window_west_05",
+      "wall_west_pier_0",
+      "wall_west_pier_1",
+      "wall_west_pier_2",
+      "wall_west_pier_3",
+      "wall_west_pier_4",
+      "wall_west_pier_5",
+      "wall_east_base",
+      "wall_east_header",
+      "window_east_00",
+      "window_east_01",
+      "window_east_02",
+      "window_east_03",
+      "window_east_04",
+      "window_east_05",
+      "wall_east_pier_0",
+      "wall_east_pier_1",
+      "wall_east_pier_2",
+      "wall_east_pier_3",
+      "wall_east_pier_4",
+      "wall_east_pier_5",
+      "partition_glass_south_0",
+      "partition_south_0_post",
+      "partition_south_0_base",
+      "partition_south_0_top",
+      "partition_glass_south_1",
+      "partition_south_1_post",
+      "partition_south_1_base",
+      "partition_south_1_top",
+      "partition_glass_south_2",
+      "partition_south_2_post",
+      "partition_south_2_base",
+      "partition_south_2_top",
+      "partition_glass_south_3",
+      "partition_south_3_post",
+      "partition_south_3_base",
+      "partition_south_3_top",
+      "partition_glass_south_4",
+      "partition_south_4_post",
+      "partition_south_4_base",
+      "partition_south_4_top",
+      "partition_glass_north_0",
+      "partition_north_0_post",
+      "partition_north_0_base",
+      "partition_north_0_top",
+      "partition_glass_north_1",
+      "partition_north_1_post",
+      "partition_north_1_base",
+      "partition_north_1_top",
+      "partition_glass_north_2",
+      "partition_north_2_post",
+      "partition_north_2_base",
+      "partition_north_2_top",
+      "partition_glass_north_3",
+      "partition_north_3_post",
+      "partition_north_3_base",
+      "partition_north_3_top",
+      "partition_glass_north_4",
+      "partition_north_4_post",
+      "partition_north_4_base",
+      "partition_north_4_top",
+      "meeting_door_jamb_south",
+      "meeting_door_jamb_north",
+      "meeting_door_header",
+      "meeting_door_transom_top",
+      "meeting_door_transom_glass",
+      "wall_south_base",
+      "wall_south_header",
+      "wall_south_pier_0",
+      "window_south_0",
+      "wall_south_pier_1",
+      "window_south_1",
+      "wall_south_pier_2",
+      "window_south_2",
+      "wall_south_pier_3",
+      "window_south_3",
+      "wall_south_pier_4",
+      "window_south_4",
+      "wall_south_pier_5",
+      "window_south_5",
+      "wall_south_pier_6",
+      "window_south_6",
+      "wall_south_pier_7",
+      "window_south_7"
+    ],
+    "ceiling_nodes": [
+      "ceiling_main",
+      "ceiling_north_west",
+      "ceiling_north_east"
+    ]
+  },
+  "whiteboard": {
+    "surface_node": "whiteboard_surface",
+    "material": "mat_whiteboard_dynamic",
+    "width_m": 8.0,
+    "height_m": 2.7,
+    "additional_surfaces": [],
+    "normal_blender": [
+      0,
+      -1,
+      0
+    ],
+    "uv_orientation": "U=+X, V=+Z viewed from -Y"
+  },
+  "seats": [
+    {
+      "anchor": "seat_001",
+      "stand": "stand_001",
+      "allowed_occupants": [
+        "person",
+        "agent"
+      ],
+      "position_blender_m": [
+        -8.479999542236328,
+        -6.0,
+        0.6050000190734863
+      ],
+      "stand_blender_m": [
+        -9.950000762939453,
+        -6.0,
+        0.0
+      ],
+      "facing_blender": [
+        1.0,
+        4.371138828673793e-08,
+        0.0
+      ],
+      "role": "participant",
+      "chair_node": "chair_001",
+      "monitor_node": "monitor_001"
+    },
+    {
+      "anchor": "seat_002",
+      "stand": "stand_002",
+      "allowed_occupants": [
+        "person",
+        "agent"
+      ],
+      "position_blender_m": [
+        -8.479999542236328,
+        -3.5999999046325684,
+        0.6050000190734863
+      ],
+      "stand_blender_m": [
+        -9.950000762939453,
+        -3.5999999046325684,
+        0.0
+      ],
+      "facing_blender": [
+        1.0,
+        4.371138828673793e-08,
+        0.0
+      ],
+      "role": "participant",
+      "chair_node": "chair_002",
+      "monitor_node": "monitor_002"
+    },
+    {
+      "anchor": "seat_003",
+      "stand": "stand_003",
+      "allowed_occupants": [
+        "person",
+        "agent"
+      ],
+      "position_blender_m": [
+        -8.479999542236328,
+        -1.2000000476837158,
+        0.6050000190734863
+      ],
+      "stand_blender_m": [
+        -9.950000762939453,
+        -1.2000000476837158,
+        0.0
+      ],
+      "facing_blender": [
+        1.0,
+        4.371138828673793e-08,
+        0.0
+      ],
+      "role": "participant",
+      "chair_node": "chair_003",
+      "monitor_node": "monitor_003"
+    },
+    {
+      "anchor": "seat_004",
+      "stand": "stand_004",
+      "allowed_occupants": [
+        "person",
+        "agent"
+      ],
+      "position_blender_m": [
+        -8.479999542236328,
+        1.2000000476837158,
+        0.6050000190734863
+      ],
+      "stand_blender_m": [
+        -9.950000762939453,
+        1.2000000476837158,
+        0.0
+      ],
+      "facing_blender": [
+        1.0,
+        4.371138828673793e-08,
+        0.0
+      ],
+      "role": "participant",
+      "chair_node": "chair_004",
+      "monitor_node": "monitor_004"
+    },
+    {
+      "anchor": "seat_005",
+      "stand": "stand_005",
+      "allowed_occupants": [
+        "person",
+        "agent"
+      ],
+      "position_blender_m": [
+        -8.479999542236328,
+        3.5999999046325684,
+        0.6050000190734863
+      ],
+      "stand_blender_m": [
+        -9.950000762939453,
+        3.5999999046325684,
+        0.0
+      ],
+      "facing_blender": [
+        1.0,
+        4.371138828673793e-08,
+        0.0
+      ],
+      "role": "participant",
+      "chair_node": "chair_005",
+      "monitor_node": "monitor_005"
+    },
+    {
+      "anchor": "seat_006",
+      "stand": "stand_006",
+      "allowed_occupants": [
+        "person",
+        "agent"
+      ],
+      "position_blender_m": [
+        -8.479999542236328,
+        6.0,
+        0.6050000190734863
+      ],
+      "stand_blender_m": [
+        -9.950000762939453,
+        6.0,
+        0.0
+      ],
+      "facing_blender": [
+        1.0,
+        4.371138828673793e-08,
+        0.0
+      ],
+      "role": "participant",
+      "chair_node": "chair_006",
+      "monitor_node": "monitor_006"
+    },
+    {
+      "anchor": "seat_007",
+      "stand": "stand_007",
+      "allowed_occupants": [
+        "person",
+        "agent"
+      ],
+      "position_blender_m": [
+        -2.320000171661377,
+        -6.0,
+        0.6050000190734863
+      ],
+      "stand_blender_m": [
+        -0.8499999046325684,
+        -6.0,
+        0.0
+      ],
+      "facing_blender": [
+        -1.0,
+        4.371138828673793e-08,
+        0.0
+      ],
+      "role": "participant",
+      "chair_node": "chair_007",
+      "monitor_node": "monitor_007"
+    },
+    {
+      "anchor": "seat_008",
+      "stand": "stand_008",
+      "allowed_occupants": [
+        "person",
+        "agent"
+      ],
+      "position_blender_m": [
+        -2.320000171661377,
+        -3.5999999046325684,
+        0.6050000190734863
+      ],
+      "stand_blender_m": [
+        -0.8499999046325684,
+        -3.5999999046325684,
+        0.0
+      ],
+      "facing_blender": [
+        -1.0,
+        4.371138828673793e-08,
+        0.0
+      ],
+      "role": "participant",
+      "chair_node": "chair_008",
+      "monitor_node": "monitor_008"
+    },
+    {
+      "anchor": "seat_009",
+      "stand": "stand_009",
+      "allowed_occupants": [
+        "person",
+        "agent"
+      ],
+      "position_blender_m": [
+        -2.320000171661377,
+        -1.2000000476837158,
+        0.6050000190734863
+      ],
+      "stand_blender_m": [
+        -0.8499999046325684,
+        -1.2000000476837158,
+        0.0
+      ],
+      "facing_blender": [
+        -1.0,
+        4.371138828673793e-08,
+        0.0
+      ],
+      "role": "participant",
+      "chair_node": "chair_009",
+      "monitor_node": "monitor_009"
+    },
+    {
+      "anchor": "seat_010",
+      "stand": "stand_010",
+      "allowed_occupants": [
+        "person",
+        "agent"
+      ],
+      "position_blender_m": [
+        -2.320000171661377,
+        1.2000000476837158,
+        0.6050000190734863
+      ],
+      "stand_blender_m": [
+        -0.8499999046325684,
+        1.2000000476837158,
+        0.0
+      ],
+      "facing_blender": [
+        -1.0,
+        4.371138828673793e-08,
+        0.0
+      ],
+      "role": "participant",
+      "chair_node": "chair_010",
+      "monitor_node": "monitor_010"
+    },
+    {
+      "anchor": "seat_011",
+      "stand": "stand_011",
+      "allowed_occupants": [
+        "person",
+        "agent"
+      ],
+      "position_blender_m": [
+        -2.320000171661377,
+        3.5999999046325684,
+        0.6050000190734863
+      ],
+      "stand_blender_m": [
+        -0.8499999046325684,
+        3.5999999046325684,
+        0.0
+      ],
+      "facing_blender": [
+        -1.0,
+        4.371138828673793e-08,
+        0.0
+      ],
+      "role": "participant",
+      "chair_node": "chair_011",
+      "monitor_node": "monitor_011"
+    },
+    {
+      "anchor": "seat_012",
+      "stand": "stand_012",
+      "allowed_occupants": [
+        "person",
+        "agent"
+      ],
+      "position_blender_m": [
+        -2.320000171661377,
+        6.0,
+        0.6050000190734863
+      ],
+      "stand_blender_m": [
+        -0.8499999046325684,
+        6.0,
+        0.0
+      ],
+      "facing_blender": [
+        -1.0,
+        4.371138828673793e-08,
+        0.0
+      ],
+      "role": "participant",
+      "chair_node": "chair_012",
+      "monitor_node": "monitor_012"
+    },
+    {
+      "anchor": "seat_013",
+      "stand": "stand_013",
+      "allowed_occupants": [
+        "person",
+        "agent"
+      ],
+      "position_blender_m": [
+        -5.400000095367432,
+        7.900000095367432,
+        0.6050000190734863
+      ],
+      "stand_blender_m": [
+        -5.400000095367432,
+        9.5,
+        0.0
+      ],
+      "facing_blender": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "role": "speaker",
+      "chair_node": "chair_013",
+      "monitor_node": "monitor_013"
+    },
+    {
+      "anchor": "seat_014",
+      "stand": "stand_014",
+      "allowed_occupants": [
+        "person",
+        "agent"
+      ],
+      "position_blender_m": [
+        12.335000038146973,
+        -8.970000267028809,
+        0.6399999856948853
+      ],
+      "stand_blender_m": [
+        12.335000038146973,
+        -7.650000095367432,
+        0.0
+      ],
+      "facing_blender": [
+        -8.742277657347586e-08,
+        1.0,
+        0.0
+      ],
+      "role": "lounge",
+      "chair_node": "lounge_sofa_teal"
+    },
+    {
+      "anchor": "seat_015",
+      "stand": "stand_015",
+      "allowed_occupants": [
+        "person",
+        "agent"
+      ],
+      "position_blender_m": [
+        11.0649995803833,
+        -8.970000267028809,
+        0.6399999856948853
+      ],
+      "stand_blender_m": [
+        11.0649995803833,
+        -7.650000095367432,
+        0.0
+      ],
+      "facing_blender": [
+        -8.742277657347586e-08,
+        1.0,
+        0.0
+      ],
+      "role": "lounge",
+      "chair_node": "lounge_sofa_teal"
+    },
+    {
+      "anchor": "seat_016",
+      "stand": "stand_016",
+      "allowed_occupants": [
+        "person",
+        "agent"
+      ],
+      "position_blender_m": [
+        15.170000076293945,
+        -5.614999771118164,
+        0.6399999856948853
+      ],
+      "stand_blender_m": [
+        13.850000381469727,
+        -5.614999771118164,
+        0.0
+      ],
+      "facing_blender": [
+        -1.0,
+        4.371138828673793e-08,
+        0.0
+      ],
+      "role": "lounge",
+      "chair_node": "lounge_sofa_orange"
+    },
+    {
+      "anchor": "seat_017",
+      "stand": "stand_017",
+      "allowed_occupants": [
+        "person",
+        "agent"
+      ],
+      "position_blender_m": [
+        15.170000076293945,
+        -6.885000228881836,
+        0.6399999856948853
+      ],
+      "stand_blender_m": [
+        13.850000381469727,
+        -6.885000228881836,
+        0.0
+      ],
+      "facing_blender": [
+        -1.0,
+        4.371138828673793e-08,
+        0.0
+      ],
+      "role": "lounge",
+      "chair_node": "lounge_sofa_orange"
+    },
+    {
+      "anchor": "seat_018",
+      "stand": "stand_018",
+      "allowed_occupants": [
+        "person",
+        "agent"
+      ],
+      "position_blender_m": [
+        12.029999732971191,
+        5.599999904632568,
+        0.6399999856948853
+      ],
+      "stand_blender_m": [
+        12.0,
+        7.099999904632568,
+        0.0
+      ],
+      "facing_blender": [
+        1.0,
+        4.371138828673793e-08,
+        0.0
+      ],
+      "role": "lounge",
+      "chair_node": "lounge_armchair_mauve"
+    },
+    {
+      "anchor": "seat_019",
+      "stand": "stand_019",
+      "allowed_occupants": [
+        "person",
+        "agent"
+      ],
+      "position_blender_m": [
+        15.970000267028809,
+        5.599999904632568,
+        0.6399999856948853
+      ],
+      "stand_blender_m": [
+        16.0,
+        4.099999904632568,
+        0.0
+      ],
+      "facing_blender": [
+        -1.0,
+        4.371138828673793e-08,
+        0.0
+      ],
+      "role": "lounge",
+      "chair_node": "lounge_armchair_teal"
+    }
+  ],
+  "colliders": [
+    {
+      "id": "col_floor_main",
+      "min_blender_m": [
+        -18.3,
+        -13.3,
+        -0.2
+      ],
+      "max_blender_m": [
+        18.3,
+        10.6,
+        0
+      ],
+      "role": "floor"
+    },
+    {
+      "id": "col_ceiling_main",
+      "min_blender_m": [
+        -18.3,
+        -13.3,
+        5.2
+      ],
+      "max_blender_m": [
+        18.3,
+        10.6,
+        5.38
+      ],
+      "role": "ceiling"
+    },
+    {
+      "id": "col_floor_north_west",
+      "min_blender_m": [
+        -18.3,
+        10.6,
+        -0.2
+      ],
+      "max_blender_m": [
+        7.2,
+        13.3,
+        0
+      ],
+      "role": "floor"
+    },
+    {
+      "id": "col_ceiling_north_west",
+      "min_blender_m": [
+        -18.3,
+        10.6,
+        5.2
+      ],
+      "max_blender_m": [
+        7.2,
+        13.3,
+        5.38
+      ],
+      "role": "ceiling"
+    },
+    {
+      "id": "col_floor_north_east",
+      "min_blender_m": [
+        9.8,
+        10.6,
+        -0.2
+      ],
+      "max_blender_m": [
+        18.3,
+        13.3,
+        0
+      ],
+      "role": "floor"
+    },
+    {
+      "id": "col_ceiling_north_east",
+      "min_blender_m": [
+        9.8,
+        10.6,
+        5.2
+      ],
+      "max_blender_m": [
+        18.3,
+        13.3,
+        5.38
+      ],
+      "role": "ceiling"
+    },
+    {
+      "id": "col_wall_north_west",
+      "min_blender_m": [
+        -18.3,
+        13.02,
+        0
+      ],
+      "max_blender_m": [
+        7.2,
+        13.3,
+        5.2
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_wall_north_east",
+      "min_blender_m": [
+        9.8,
+        13.02,
+        0
+      ],
+      "max_blender_m": [
+        18.3,
+        13.3,
+        5.2
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_wall_west_base",
+      "min_blender_m": [
+        -18.3,
+        -13.02,
+        0
+      ],
+      "max_blender_m": [
+        -18.02,
+        13.02,
+        1.05
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_wall_west_header",
+      "min_blender_m": [
+        -18.3,
+        -13.02,
+        4.55
+      ],
+      "max_blender_m": [
+        -18.02,
+        13.02,
+        5.2
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_window_west_00",
+      "min_blender_m": [
+        -18.3,
+        -12.719999999999999,
+        1.05
+      ],
+      "max_blender_m": [
+        -18.02,
+        -8.68,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_window_west_01",
+      "min_blender_m": [
+        -18.3,
+        -8.379999999999999,
+        1.05
+      ],
+      "max_blender_m": [
+        -18.02,
+        -4.34,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_window_west_02",
+      "min_blender_m": [
+        -18.3,
+        -4.04,
+        1.05
+      ],
+      "max_blender_m": [
+        -18.02,
+        0.0,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_window_west_03",
+      "min_blender_m": [
+        -18.3,
+        0.3,
+        1.05
+      ],
+      "max_blender_m": [
+        -18.02,
+        4.34,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_window_west_04",
+      "min_blender_m": [
+        -18.3,
+        4.64,
+        1.05
+      ],
+      "max_blender_m": [
+        -18.02,
+        8.68,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_window_west_05",
+      "min_blender_m": [
+        -18.3,
+        8.98,
+        1.05
+      ],
+      "max_blender_m": [
+        -18.02,
+        13.02,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_wall_west_pier_0",
+      "min_blender_m": [
+        -18.3,
+        -13.02,
+        1.05
+      ],
+      "max_blender_m": [
+        -18.02,
+        -12.719999999999999,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_wall_west_pier_1",
+      "min_blender_m": [
+        -18.3,
+        -8.68,
+        1.05
+      ],
+      "max_blender_m": [
+        -18.02,
+        -8.379999999999999,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_wall_west_pier_2",
+      "min_blender_m": [
+        -18.3,
+        -4.34,
+        1.05
+      ],
+      "max_blender_m": [
+        -18.02,
+        -4.04,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_wall_west_pier_3",
+      "min_blender_m": [
+        -18.3,
+        0.0,
+        1.05
+      ],
+      "max_blender_m": [
+        -18.02,
+        0.3,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_wall_west_pier_4",
+      "min_blender_m": [
+        -18.3,
+        4.34,
+        1.05
+      ],
+      "max_blender_m": [
+        -18.02,
+        4.64,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_wall_west_pier_5",
+      "min_blender_m": [
+        -18.3,
+        8.68,
+        1.05
+      ],
+      "max_blender_m": [
+        -18.02,
+        8.98,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_wall_east_base",
+      "min_blender_m": [
+        18.02,
+        -13.02,
+        0
+      ],
+      "max_blender_m": [
+        18.3,
+        13.02,
+        1.05
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_wall_east_header",
+      "min_blender_m": [
+        18.02,
+        -13.02,
+        4.55
+      ],
+      "max_blender_m": [
+        18.3,
+        13.02,
+        5.2
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_window_east_00",
+      "min_blender_m": [
+        18.02,
+        -12.719999999999999,
+        1.05
+      ],
+      "max_blender_m": [
+        18.3,
+        -8.68,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_window_east_01",
+      "min_blender_m": [
+        18.02,
+        -8.379999999999999,
+        1.05
+      ],
+      "max_blender_m": [
+        18.3,
+        -4.34,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_window_east_02",
+      "min_blender_m": [
+        18.02,
+        -4.04,
+        1.05
+      ],
+      "max_blender_m": [
+        18.3,
+        0.0,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_window_east_03",
+      "min_blender_m": [
+        18.02,
+        0.3,
+        1.05
+      ],
+      "max_blender_m": [
+        18.3,
+        4.34,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_window_east_04",
+      "min_blender_m": [
+        18.02,
+        4.64,
+        1.05
+      ],
+      "max_blender_m": [
+        18.3,
+        8.68,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_window_east_05",
+      "min_blender_m": [
+        18.02,
+        8.98,
+        1.05
+      ],
+      "max_blender_m": [
+        18.3,
+        13.02,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_wall_east_pier_0",
+      "min_blender_m": [
+        18.02,
+        -13.02,
+        1.05
+      ],
+      "max_blender_m": [
+        18.3,
+        -12.719999999999999,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_wall_east_pier_1",
+      "min_blender_m": [
+        18.02,
+        -8.68,
+        1.05
+      ],
+      "max_blender_m": [
+        18.3,
+        -8.379999999999999,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_wall_east_pier_2",
+      "min_blender_m": [
+        18.02,
+        -4.34,
+        1.05
+      ],
+      "max_blender_m": [
+        18.3,
+        -4.04,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_wall_east_pier_3",
+      "min_blender_m": [
+        18.02,
+        0.0,
+        1.05
+      ],
+      "max_blender_m": [
+        18.3,
+        0.3,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_wall_east_pier_4",
+      "min_blender_m": [
+        18.02,
+        4.34,
+        1.05
+      ],
+      "max_blender_m": [
+        18.3,
+        4.64,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_wall_east_pier_5",
+      "min_blender_m": [
+        18.02,
+        8.68,
+        1.05
+      ],
+      "max_blender_m": [
+        18.3,
+        8.98,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_table",
+      "min_blender_m": [
+        -7.6000000000000005,
+        -7.6,
+        0
+      ],
+      "max_blender_m": [
+        -3.2,
+        6.8,
+        0.94
+      ],
+      "role": "table"
+    },
+    {
+      "id": "col_chair_001",
+      "min_blender_m": [
+        -9.0,
+        -6.52,
+        0
+      ],
+      "max_blender_m": [
+        -7.960000000000001,
+        -5.48,
+        1.31
+      ],
+      "role": "chair"
+    },
+    {
+      "id": "col_chair_007",
+      "min_blender_m": [
+        -2.8400000000000003,
+        -6.52,
+        0
+      ],
+      "max_blender_m": [
+        -1.8000000000000003,
+        -5.48,
+        1.31
+      ],
+      "role": "chair"
+    },
+    {
+      "id": "col_chair_002",
+      "min_blender_m": [
+        -9.0,
+        -4.12,
+        0
+      ],
+      "max_blender_m": [
+        -7.960000000000001,
+        -3.08,
+        1.31
+      ],
+      "role": "chair"
+    },
+    {
+      "id": "col_chair_008",
+      "min_blender_m": [
+        -2.8400000000000003,
+        -4.12,
+        0
+      ],
+      "max_blender_m": [
+        -1.8000000000000003,
+        -3.08,
+        1.31
+      ],
+      "role": "chair"
+    },
+    {
+      "id": "col_chair_003",
+      "min_blender_m": [
+        -9.0,
+        -1.72,
+        0
+      ],
+      "max_blender_m": [
+        -7.960000000000001,
+        -0.6799999999999999,
+        1.31
+      ],
+      "role": "chair"
+    },
+    {
+      "id": "col_chair_009",
+      "min_blender_m": [
+        -2.8400000000000003,
+        -1.72,
+        0
+      ],
+      "max_blender_m": [
+        -1.8000000000000003,
+        -0.6799999999999999,
+        1.31
+      ],
+      "role": "chair"
+    },
+    {
+      "id": "col_chair_004",
+      "min_blender_m": [
+        -9.0,
+        0.6799999999999999,
+        0
+      ],
+      "max_blender_m": [
+        -7.960000000000001,
+        1.72,
+        1.31
+      ],
+      "role": "chair"
+    },
+    {
+      "id": "col_chair_010",
+      "min_blender_m": [
+        -2.8400000000000003,
+        0.6799999999999999,
+        0
+      ],
+      "max_blender_m": [
+        -1.8000000000000003,
+        1.72,
+        1.31
+      ],
+      "role": "chair"
+    },
+    {
+      "id": "col_chair_005",
+      "min_blender_m": [
+        -9.0,
+        3.08,
+        0
+      ],
+      "max_blender_m": [
+        -7.960000000000001,
+        4.12,
+        1.31
+      ],
+      "role": "chair"
+    },
+    {
+      "id": "col_chair_011",
+      "min_blender_m": [
+        -2.8400000000000003,
+        3.08,
+        0
+      ],
+      "max_blender_m": [
+        -1.8000000000000003,
+        4.12,
+        1.31
+      ],
+      "role": "chair"
+    },
+    {
+      "id": "col_chair_006",
+      "min_blender_m": [
+        -9.0,
+        5.48,
+        0
+      ],
+      "max_blender_m": [
+        -7.960000000000001,
+        6.52,
+        1.31
+      ],
+      "role": "chair"
+    },
+    {
+      "id": "col_chair_012",
+      "min_blender_m": [
+        -2.8400000000000003,
+        5.48,
+        0
+      ],
+      "max_blender_m": [
+        -1.8000000000000003,
+        6.52,
+        1.31
+      ],
+      "role": "chair"
+    },
+    {
+      "id": "col_chair_013",
+      "min_blender_m": [
+        -5.92,
+        7.380000000000001,
+        0
+      ],
+      "max_blender_m": [
+        -4.880000000000001,
+        8.42,
+        1.31
+      ],
+      "role": "chair"
+    },
+    {
+      "id": "col_whiteboard",
+      "min_blender_m": [
+        -9.52,
+        12.03,
+        1.4100000000000001
+      ],
+      "max_blender_m": [
+        -1.2800000000000002,
+        12.459999999999999,
+        4.37
+      ],
+      "role": "whiteboard"
+    },
+    {
+      "id": "col_plant_left",
+      "min_blender_m": [
+        -11.879999999999999,
+        10.77,
+        0
+      ],
+      "max_blender_m": [
+        -10.120000000000001,
+        12.53,
+        2.9
+      ],
+      "role": "plant"
+    },
+    {
+      "id": "col_plant_right",
+      "min_blender_m": [
+        -0.6800000000000006,
+        10.77,
+        0
+      ],
+      "max_blender_m": [
+        1.0799999999999992,
+        12.53,
+        2.9
+      ],
+      "role": "plant"
+    },
+    {
+      "id": "col_partition_south",
+      "min_blender_m": [
+        3.54,
+        -13,
+        0
+      ],
+      "max_blender_m": [
+        3.66,
+        -0.95,
+        5.2
+      ],
+      "role": "partition"
+    },
+    {
+      "id": "col_partition_north",
+      "min_blender_m": [
+        3.54,
+        0.95,
+        0
+      ],
+      "max_blender_m": [
+        3.66,
+        13,
+        5.2
+      ],
+      "role": "partition"
+    },
+    {
+      "id": "col_door_transom",
+      "min_blender_m": [
+        3.52,
+        -0.95,
+        2.6
+      ],
+      "max_blender_m": [
+        3.68,
+        0.95,
+        5.2
+      ],
+      "role": "partition"
+    },
+    {
+      "id": "col_meeting_door",
+      "min_blender_m": [
+        3.56,
+        -0.9,
+        0.035
+      ],
+      "max_blender_m": [
+        3.64,
+        0.9,
+        2.565
+      ],
+      "role": "door_closed",
+      "active_when": "door_closed"
+    },
+    {
+      "id": "col_wall_south_base",
+      "min_blender_m": [
+        -18.3,
+        -13.3,
+        0
+      ],
+      "max_blender_m": [
+        18.3,
+        -13.02,
+        1.05
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_wall_south_header",
+      "min_blender_m": [
+        -18.3,
+        -13.3,
+        4.55
+      ],
+      "max_blender_m": [
+        18.3,
+        -13.02,
+        5.2
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_wall_south_pier_0",
+      "min_blender_m": [
+        -18.3,
+        -13.3,
+        1.05
+      ],
+      "max_blender_m": [
+        -18.0,
+        -13.02,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_window_south_0",
+      "min_blender_m": [
+        -18.0,
+        -13.3,
+        1.05
+      ],
+      "max_blender_m": [
+        -13.725000000000001,
+        -13.02,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_wall_south_pier_1",
+      "min_blender_m": [
+        -13.725000000000001,
+        -13.3,
+        1.05
+      ],
+      "max_blender_m": [
+        -13.425,
+        -13.02,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_window_south_1",
+      "min_blender_m": [
+        -13.425,
+        -13.3,
+        1.05
+      ],
+      "max_blender_m": [
+        -9.15,
+        -13.02,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_wall_south_pier_2",
+      "min_blender_m": [
+        -9.15,
+        -13.3,
+        1.05
+      ],
+      "max_blender_m": [
+        -8.85,
+        -13.02,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_window_south_2",
+      "min_blender_m": [
+        -8.85,
+        -13.3,
+        1.05
+      ],
+      "max_blender_m": [
+        -4.574999999999999,
+        -13.02,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_wall_south_pier_3",
+      "min_blender_m": [
+        -4.574999999999999,
+        -13.3,
+        1.05
+      ],
+      "max_blender_m": [
+        -4.2749999999999995,
+        -13.02,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_window_south_3",
+      "min_blender_m": [
+        -4.2749999999999995,
+        -13.3,
+        1.05
+      ],
+      "max_blender_m": [
+        0.0,
+        -13.02,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_wall_south_pier_4",
+      "min_blender_m": [
+        0.0,
+        -13.3,
+        1.05
+      ],
+      "max_blender_m": [
+        0.3,
+        -13.02,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_window_south_4",
+      "min_blender_m": [
+        0.3,
+        -13.3,
+        1.05
+      ],
+      "max_blender_m": [
+        4.574999999999999,
+        -13.02,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_wall_south_pier_5",
+      "min_blender_m": [
+        4.574999999999999,
+        -13.3,
+        1.05
+      ],
+      "max_blender_m": [
+        4.874999999999999,
+        -13.02,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_window_south_5",
+      "min_blender_m": [
+        4.874999999999999,
+        -13.3,
+        1.05
+      ],
+      "max_blender_m": [
+        9.150000000000002,
+        -13.02,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_wall_south_pier_6",
+      "min_blender_m": [
+        9.150000000000002,
+        -13.3,
+        1.05
+      ],
+      "max_blender_m": [
+        9.450000000000003,
+        -13.02,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_window_south_6",
+      "min_blender_m": [
+        9.450000000000003,
+        -13.3,
+        1.05
+      ],
+      "max_blender_m": [
+        13.724999999999998,
+        -13.02,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_wall_south_pier_7",
+      "min_blender_m": [
+        13.724999999999998,
+        -13.3,
+        1.05
+      ],
+      "max_blender_m": [
+        14.024999999999999,
+        -13.02,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_window_south_7",
+      "min_blender_m": [
+        14.024999999999999,
+        -13.3,
+        1.05
+      ],
+      "max_blender_m": [
+        18.3,
+        -13.02,
+        4.55
+      ],
+      "role": "wall"
+    },
+    {
+      "id": "col_lounge_sofa_teal",
+      "min_blender_m": [
+        10.274999618530273,
+        -9.59000015258789,
+        0.0
+      ],
+      "max_blender_m": [
+        13.125,
+        -8.40999984741211,
+        1.2200000286102295
+      ],
+      "role": "lounge_seating"
+    },
+    {
+      "id": "col_lounge_sofa_orange",
+      "min_blender_m": [
+        14.609999656677246,
+        -7.675000190734863,
+        0.0
+      ],
+      "max_blender_m": [
+        15.789999961853027,
+        -4.824999809265137,
+        1.2200000286102295
+      ],
+      "role": "lounge_seating"
+    },
+    {
+      "id": "col_lounge_armchair_mauve",
+      "min_blender_m": [
+        11.40999984741211,
+        4.984999656677246,
+        0.0
+      ],
+      "max_blender_m": [
+        12.59000015258789,
+        6.215000152587891,
+        1.2200000286102295
+      ],
+      "role": "lounge_seating"
+    },
+    {
+      "id": "col_lounge_armchair_teal",
+      "min_blender_m": [
+        15.40999984741211,
+        4.984999656677246,
+        0.0
+      ],
+      "max_blender_m": [
+        16.59000015258789,
+        6.215000152587891,
+        1.2200000286102295
+      ],
+      "role": "lounge_seating"
+    },
+    {
+      "id": "col_lounge_coffee_table",
+      "min_blender_m": [
+        10.75,
+        -7.2,
+        0
+      ],
+      "max_blender_m": [
+        12.649999999999999,
+        -5.3,
+        0.46
+      ],
+      "role": "lounge_table"
+    },
+    {
+      "id": "col_lounge_conversation_table",
+      "min_blender_m": [
+        13.32,
+        4.92,
+        0
+      ],
+      "max_blender_m": [
+        14.68,
+        6.279999999999999,
+        0.52
+      ],
+      "role": "lounge_table"
+    },
+    {
+      "id": "col_lounge_side_table",
+      "min_blender_m": [
+        9.08,
+        -9.12,
+        0
+      ],
+      "max_blender_m": [
+        9.92,
+        -8.28,
+        0.62
+      ],
+      "role": "lounge_table"
+    },
+    {
+      "id": "col_lounge_console",
+      "min_blender_m": [
+        16.93,
+        -1.6,
+        0.1
+      ],
+      "max_blender_m": [
+        17.57,
+        1.6,
+        1.32
+      ],
+      "role": "lounge_storage"
+    },
+    {
+      "id": "col_lounge_plant_00",
+      "min_blender_m": [
+        5.22,
+        -12.08,
+        0
+      ],
+      "max_blender_m": [
+        6.9799999999999995,
+        -10.319999999999999,
+        2.9
+      ],
+      "role": "lounge_plant"
+    },
+    {
+      "id": "col_lounge_plant_01",
+      "min_blender_m": [
+        15.819999999999999,
+        -11.98,
+        0
+      ],
+      "max_blender_m": [
+        17.58,
+        -10.219999999999999,
+        2.9
+      ],
+      "role": "lounge_plant"
+    },
+    {
+      "id": "col_lounge_plant_02",
+      "min_blender_m": [
+        15.92,
+        9.719999999999999,
+        0
+      ],
+      "max_blender_m": [
+        17.68,
+        11.48,
+        2.9
+      ],
+      "role": "lounge_plant"
+    },
+    {
+      "id": "col_lounge_plant_03",
+      "min_blender_m": [
+        11.12,
+        9.62,
+        0
+      ],
+      "max_blender_m": [
+        12.88,
+        11.38,
+        2.9
+      ],
+      "role": "lounge_plant"
+    }
+  ],
+  "materials": [
+    {
+      "name": "mat_accent_gold",
+      "base_color_rgba": [
+        1.0,
+        0.6899999976158142,
+        0.17000000178813934,
+        1.0
+      ],
+      "role": "static_design"
+    },
+    {
+      "name": "mat_ceiling",
+      "base_color_rgba": [
+        0.9100000262260437,
+        0.8600000143051147,
+        0.7300000190734863,
+        1.0
+      ],
+      "role": "static_design"
+    },
+    {
+      "name": "mat_frame_slate",
+      "base_color_rgba": [
+        0.4000000059604645,
+        0.4699999988079071,
+        0.46000000834465027,
+        1.0
+      ],
+      "role": "static_design"
+    },
+    {
+      "name": "mat_glass_blue",
+      "base_color_rgba": [
+        0.27000001072883606,
+        0.38999998569488525,
+        0.47999998927116394,
+        1.0
+      ],
+      "role": "static_design"
+    },
+    {
+      "name": "mat_glass_reflection",
+      "base_color_rgba": [
+        0.4699999988079071,
+        0.6100000143051147,
+        0.6600000262260437,
+        1.0
+      ],
+      "role": "static_design"
+    },
+    {
+      "name": "mat_ink",
+      "base_color_rgba": [
+        0.17000000178813934,
+        0.23000000417232513,
+        0.25,
+        1.0
+      ],
+      "role": "static_design"
+    },
+    {
+      "name": "mat_keycaps",
+      "base_color_rgba": [
+        0.6000000238418579,
+        0.6600000262260437,
+        0.6299999952316284,
+        1.0
+      ],
+      "role": "static_design"
+    },
+    {
+      "name": "mat_lamp_glow",
+      "base_color_rgba": [
+        1.0,
+        0.9100000262260437,
+        0.6399999856948853,
+        1.0
+      ],
+      "role": "static_design"
+    },
+    {
+      "name": "mat_leaf_green",
+      "base_color_rgba": [
+        0.28999999165534973,
+        0.5799999833106995,
+        0.25,
+        1.0
+      ],
+      "role": "static_design"
+    },
+    {
+      "name": "mat_leaf_light",
+      "base_color_rgba": [
+        0.46000000834465027,
+        0.699999988079071,
+        0.3199999928474426,
+        1.0
+      ],
+      "role": "static_design"
+    },
+    {
+      "name": "mat_lounge_cushion_cream",
+      "base_color_rgba": [
+        0.9399999976158142,
+        0.8399999737739563,
+        0.6299999952316284,
+        1.0
+      ],
+      "role": "static_design"
+    },
+    {
+      "name": "mat_lounge_rug_sand",
+      "base_color_rgba": [
+        0.7699999809265137,
+        0.6200000047683716,
+        0.4399999976158142,
+        1.0
+      ],
+      "role": "static_design"
+    },
+    {
+      "name": "mat_lounge_rug_teal",
+      "base_color_rgba": [
+        0.3400000035762787,
+        0.550000011920929,
+        0.5400000214576721,
+        1.0
+      ],
+      "role": "static_design"
+    },
+    {
+      "name": "mat_partition_glass",
+      "base_color_rgba": [
+        0.550000011920929,
+        0.7599999904632568,
+        0.7900000214576721,
+        0.18000000715255737
+      ],
+      "role": "static_design"
+    },
+    {
+      "name": "mat_plant_rim",
+      "base_color_rgba": [
+        0.9200000166893005,
+        0.41999998688697815,
+        0.20999999344348907,
+        1.0
+      ],
+      "role": "static_design"
+    },
+    {
+      "name": "mat_plant_soil",
+      "base_color_rgba": [
+        0.25,
+        0.18000000715255737,
+        0.11999999731779099,
+        1.0
+      ],
+      "role": "static_design"
+    },
+    {
+      "name": "mat_plant_stem",
+      "base_color_rgba": [
+        0.25,
+        0.4000000059604645,
+        0.1899999976158142,
+        1.0
+      ],
+      "role": "static_design"
+    },
+    {
+      "name": "mat_plant_terracotta",
+      "base_color_rgba": [
+        0.75,
+        0.28999999165534973,
+        0.14000000059604645,
+        1.0
+      ],
+      "role": "static_design"
+    },
+    {
+      "name": "mat_screen",
+      "base_color_rgba": [
+        0.1899999976158142,
+        0.36000001430511475,
+        0.41999998688697815,
+        1.0
+      ],
+      "role": "static_design"
+    },
+    {
+      "name": "mat_screen_detail",
+      "base_color_rgba": [
+        0.4300000071525574,
+        0.7799999713897705,
+        0.75,
+        1.0
+      ],
+      "role": "static_design"
+    },
+    {
+      "name": "mat_upholstery_mauve",
+      "base_color_rgba": [
+        0.6700000166893005,
+        0.4399999976158142,
+        0.6200000047683716,
+        1.0
+      ],
+      "role": "static_design"
+    },
+    {
+      "name": "mat_upholstery_orange",
+      "base_color_rgba": [
+        0.9399999976158142,
+        0.4000000059604645,
+        0.20000000298023224,
+        1.0
+      ],
+      "role": "static_design"
+    },
+    {
+      "name": "mat_upholstery_teal",
+      "base_color_rgba": [
+        0.23000000417232513,
+        0.6200000047683716,
+        0.6299999952316284,
+        1.0
+      ],
+      "role": "static_design"
+    },
+    {
+      "name": "mat_wall_cream",
+      "base_color_rgba": [
+        0.9399999976158142,
+        0.8500000238418579,
+        0.6800000071525574,
+        1.0
+      ],
+      "role": "static_design"
+    },
+    {
+      "name": "mat_wall_sand",
+      "base_color_rgba": [
+        0.8600000143051147,
+        0.6899999976158142,
+        0.49000000953674316,
+        1.0
+      ],
+      "role": "static_design"
+    },
+    {
+      "name": "mat_whiteboard_dynamic",
+      "base_color_rgba": [
+        0.9800000190734863,
+        0.9800000190734863,
+        0.9300000071525574,
+        1.0
+      ],
+      "role": "dynamic_whiteboard"
+    },
+    {
+      "name": "mat_wood_edge",
+      "base_color_rgba": [
+        0.6700000166893005,
+        0.4300000071525574,
+        0.23999999463558197,
+        1.0
+      ],
+      "role": "static_design"
+    },
+    {
+      "name": "mat_wood_honey",
+      "base_color_rgba": [
+        0.8700000047683716,
+        0.6200000047683716,
+        0.3400000035762787,
+        1.0
+      ],
+      "role": "static_design"
+    },
+    {
+      "name": "mat_wood_light",
+      "base_color_rgba": [
+        0.9399999976158142,
+        0.7300000190734863,
+        0.4399999976158142,
+        1.0
+      ],
+      "role": "static_design"
+    },
+    {
+      "name": "mat_wood_warm",
+      "base_color_rgba": [
+        0.8899999856948853,
+        0.6600000262260437,
+        0.3799999952316284,
+        1.0
+      ],
+      "role": "static_design"
+    }
+  ],
+  "stats": {
+    "mesh_count": 267,
+    "triangles_evaluated": 23376,
+    "seat_count": 19,
+    "glb_bytes": 1401296
+  },
+  "approved_deviations": [],
+  "notes": [
+    "Prima bozza richiesta da Juri: 6 posti per lato lungo, 1 relatore, 13 monitor, lavagna dietro al relatore.",
+    "Palette e forme ispirate allo screenshot Agent Office; proporzioni e finiture della bozza da rivedere con Juri.",
+    "Ascensore e suo vano non modellati: intaglio in pavimento, parete nord e soffitto.",
+    "La superficie lavagna e vuota e dinamica; integrazione Excalidraw e materiali toon a carico del software.",
+    "Intaglio ascensore aperto: la copertura definitiva dipende dalla geometria generata dall applicazione.",
+    "Correzioni di Juri: lato leggibile dei PC verso le sedie e due piante ai lati della lavagna.",
+    "Parete vetrata X=3.6m con porta centrale separabile; collider porta attivo a porta chiusa, apertura da integrare nel software.",
+    "Finestre sulla parete sud opposta ascensore, con davanzali e montanti come sui lati corti. Vetrata divisoria interna trasparente con porta centrale.",
+    "Lounge esterna autorizzata da Juri: 2 divanetti biposto, 2 poltrone, 3 tavolini, 4 piante, consolle e 4 sospensioni.",
+    "13 posti riunione invariati; 6 posti lounge aggiuntivi distinti per role=lounge.",
+    "Percorso principale fra ascensore e porta della sala lasciato libero."
+  ],
+  "schema_notes": {
+    "seats": "Elenco di oggetti con anchor, stand, allowed_occupants, position_blender_m, stand_blender_m e facing_blender; vedere scripts/USAGE.md",
+    "colliders": "Box numerici con id, min_blender_m, max_blender_m e role; nessun helper col_* nel GLB visibile",
+    "materials": "Elenco nome, colore RGBA e ruolo; compilato anche dall\u2019exporter"
+  },
+  "design_stage": "v01_pending_visual_review",
+  "layout_alignment": {
+    "reference": "muro ovest -> bordo ovest ascensore",
+    "span_x_m": [
+      -18,
+      7.2
+    ],
+    "center_x_m": -5.4
+  },
+  "glb_sha256": "492539fd3a6b90e77facd7f22568d41340c2e2377e2028f33783e33866ba9c78",
+  "room_partition": {
+    "axis_x_m": 3.6,
+    "span_y_m": [
+      -13,
+      13
+    ],
+    "glass_material": "mat_partition_glass",
+    "door_pivot": "meeting_door_pivot",
+    "door_surface": "meeting_door_glass",
+    "door_center_blender_m": [
+      3.6,
+      0,
+      0
+    ],
+    "door_clear_width_m": 1.8,
+    "door_clear_height_m": 2.6,
+    "preview_state": "closed",
+    "runtime_open_close": "not_implemented_in_asset_task"
+  },
+  "lounge_nodes": [
+    "lounge_rug_south",
+    "lounge_rug_north",
+    "lounge_sofa_teal",
+    "lounge_sofa_orange",
+    "lounge_armchair_mauve",
+    "lounge_armchair_teal",
+    "lounge_coffee_table_top",
+    "lounge_coffee_table_legs",
+    "lounge_conversation_table_top",
+    "lounge_conversation_table_legs",
+    "lounge_side_table_top",
+    "lounge_side_table_legs",
+    "lounge_console",
+    "lounge_book_stack_0",
+    "lounge_book_stack_1",
+    "lounge_book_stack_2",
+    "lounge_plant_00",
+    "lounge_plant_01",
+    "lounge_plant_02",
+    "lounge_plant_03",
+    "lounge_pendant_cable_0",
+    "lounge_pendant_shade_0",
+    "lounge_pendant_cable_1",
+    "lounge_pendant_shade_1",
+    "lounge_pendant_cable_2",
+    "lounge_pendant_shade_2",
+    "lounge_pendant_cable_3",
+    "lounge_pendant_shade_3"
+  ],
+  "seat_counts_by_role": {
+    "meeting": 13,
+    "lounge": 6
+  }
+}

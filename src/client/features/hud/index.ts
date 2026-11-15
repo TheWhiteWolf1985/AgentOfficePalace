@@ -69,7 +69,7 @@ export function installHud(ctx: Ctx, core: CoreState, parts: HudParts) {
       { id: 'search', icon: '🔎', label: uiText('Search'), section: 'Open', key: '/', title: () => uiText('Search the chat and every terminal'), run: waiting.showSearch },
       { id: 'docs', icon: '📚', label: uiText('Docs'), section: 'Open', shown: () => !inOffice(), title: () => uiText('Read the project’s docs'), run: parts.bookshelf.showBookshelf },
       { id: 'elevator', icon: '🛗', label: () => (inOffice() ? uiText('Elevator') : uiText('Floors')), section: 'Open', count: () => store.floors.reduce((n, f) => n + (f.id === store.floor ? 0 : f.waiting), 0), title: () => (inOffice() ? uiText('Ride to another project') : uiText('Go to another project, or add one')), run: travel.showElevator },
-      { id: 'roof', icon: '🍸', label: uiText('Rooftop bar'), section: 'Open', shown: () => !core.upTop && inOffice() && builtFloors().length > 0, title: () => uiText('Ride the elevator up to the roof: a DJ, drinks and the city'), run: () => travel.ride(ROOF) },
+      { id: 'roof', icon: '🤝', label: uiText('Meeting room'), section: 'Open', shown: () => !core.upTop, title: () => uiText('Visit the shared meeting room'), run: () => travel.ride(ROOF) },
       // In voice, V is push to talk, so leaving is only from here.
       { id: 'voice', icon: '🎙️', label: () => (voice.inVoice ? uiText('Leave voice') : uiText('Join voice')), section: 'Together', key: () => (voice.inVoice ? undefined : 'V'), on: () => voice.inVoice, blocked: noMedia, run: () => void talk.toggleVoice() },
       // While you're in voice, the top bar keeps the mute button handy. Muted is the usual with push to talk, so it doesn't stand out then.
@@ -160,7 +160,6 @@ export function installHud(ctx: Ctx, core: CoreState, parts: HudParts) {
         }
         player.setView(settings.view);
         sound.setVolume(settings.volume, settings.muted);
-        sound.setMusicVolume(settings.music, settings.musicMuted);
       },
       editProfile,
       sound,

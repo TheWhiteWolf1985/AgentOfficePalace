@@ -1,0 +1,285 @@
+{
+  "package_version": "1.0.0",
+  "source_contract": "1.0.0",
+  "date": "2026-11-15",
+  "asset_glb_sha256": "492539fd3a6b90e77facd7f22568d41340c2e2377e2028f33783e33866ba9c78",
+  "file_count": 55,
+  "scope": "Asset, dipendenze del kit e prove selezionate. Nessun software applicativo o credenziale.",
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "bytes": 3024,
+      "sha256": "b5f7c653cb4b7de417b6ed69f21d6102e5af522965f2977664ec605f5fce1080"
+    },
+    {
+      "path": "delivery/build_scene.py",
+      "bytes": 44830,
+      "sha256": "23f4d4864925646ea469bec610d4206836dbad33d1ac8723bf6ac301f6ecbac4"
+    },
+    {
+      "path": "delivery/check_reimport.py",
+      "bytes": 6434,
+      "sha256": "57dda6797d2aafee4463d287084936576ad12379609e989f88e5f60b20429483"
+    },
+    {
+      "path": "delivery/conference_room.blend",
+      "bytes": 294468,
+      "sha256": "9633884ac7bcad512e934cf76a821e84316a9cbd517d96a0e77d13e931675461"
+    },
+    {
+      "path": "delivery/conference_room.glb",
+      "bytes": 1401296,
+      "sha256": "492539fd3a6b90e77facd7f22568d41340c2e2377e2028f33783e33866ba9c78"
+    },
+    {
+      "path": "delivery/conference_room.manifest.json",
+      "bytes": 45919,
+      "sha256": "5988d0b94470be9366991f73d21904703d000cc6c5cd474c6bff1935aedfd213"
+    },
+    {
+      "path": "delivery/export_checked.py",
+      "bytes": 604,
+      "sha256": "d565efaf1fd305a27afa9ac702a442feda226283ce4555e1d4bc70e5baf23835"
+    },
+    {
+      "path": "delivery/glb_check.json",
+      "bytes": 68674,
+      "sha256": "f4b434f60c35ded496de9335882fc3972fe628675eccc5b62fabecf2bbebeec5"
+    },
+    {
+      "path": "delivery/NOTES.md",
+      "bytes": 4257,
+      "sha256": "1ab430e6ab09a48d1b4e7ef85a521934a44134b15e86b066cf3629197000e0bf"
+    },
+    {
+      "path": "delivery/README.md",
+      "bytes": 115,
+      "sha256": "9f4e2e2548bee9df979e44016cdcc616c5fd5b18d253cc2114e86f521b180675"
+    },
+    {
+      "path": "delivery/reimport_check.json",
+      "bytes": 8410,
+      "sha256": "86788c012c1e1d0cad8ec43fd4b89da2e00a4d142058e9974c2d8d8ad1669837"
+    },
+    {
+      "path": "delivery/render_views.py",
+      "bytes": 1064,
+      "sha256": "5abdedf0aa25030cb6c07a036b532cae02dafa94a0ff114b2fc047d719362c8b"
+    },
+    {
+      "path": "delivery/scene_check.json",
+      "bytes": 222226,
+      "sha256": "6296034b5a5f2bef300599103d0b03a04ab65933be1886955843bfe3091a31e6"
+    },
+    {
+      "path": "delivery/VALIDATION.json",
+      "bytes": 3746,
+      "sha256": "e62745ada8e23c37d1f47ac6c04f35ee9f9c1c21c0c198d1cb190796e98e33b0"
+    },
+    {
+      "path": "delivery/views/entrance.png",
+      "bytes": 2494220,
+      "sha256": "5630483ff5130a08d2c969e2bf198ed3ca5906d0e6139036d94be949cca80bfb"
+    },
+    {
+      "path": "delivery/views/lounge.png",
+      "bytes": 1877974,
+      "sha256": "a2a3945b8bf7323781dd09924fe13a9f606465373c414dd3355d20e0ca2c4d9e"
+    },
+    {
+      "path": "delivery/views/top.png",
+      "bytes": 1774254,
+      "sha256": "5ee0124c9e25d0095019b1abec342d3c9b81ffdd6e6fcd83b9d6068e29d5610f"
+    },
+    {
+      "path": "delivery/views/whiteboard_from_seat.png",
+      "bytes": 1917506,
+      "sha256": "9da43d0c867b2aea7f9f373f15e415f6d88a629f19dd6584b5de7496d17f2ee7"
+    },
+    {
+      "path": "KIT_MANIFEST.json",
+      "bytes": 4251,
+      "sha256": "f180ecceab896357e5493b660f7c595b7b423a8e5c5eab4fd1b29ac3370229b4"
+    },
+    {
+      "path": "PROMPT_CODEX.md",
+      "bytes": 1179,
+      "sha256": "fc7ac1d72a83dc8f937e4d9bc5043bf6ae5cac9a0013400b48e784105dca0c6a"
+    },
+    {
+      "path": "README_CONSEGNA.md",
+      "bytes": 1565,
+      "sha256": "8aebed18bd08b7a400264f98d3b15618c488efb80a453b8c3b1753d3c9e9bc5b"
+    },
+    {
+      "path": "README_INIZIA_QUI.md",
+      "bytes": 3078,
+      "sha256": "e8f1328bd3ceb6cafac68afec214dca63b81e2537b034a97249680e715fec87e"
+    },
+    {
+      "path": "reference/INTEGRATION_NOTES.md",
+      "bytes": 1873,
+      "sha256": "e7421c4d01efec615893ca094dd2dcc10d170c17d3dee568041bf1d69fc61444"
+    },
+    {
+      "path": "reference/ROOFTOP_BLENDER_ENVELOPE.png",
+      "bytes": 39609,
+      "sha256": "7fbe0dcf2956be60c9add0ef17ba48ced2d762e8eb52ec9f30fcb22281e0c85a"
+    },
+    {
+      "path": "reference/ROOFTOP_BLENDER_ENVELOPE.svg",
+      "bytes": 2308,
+      "sha256": "22b1ae391ea2e5f08a3b44da3f26ad4ddeb34a62539fa50c257671b6a82ac460"
+    },
+    {
+      "path": "reference/SOURCES.md",
+      "bytes": 1541,
+      "sha256": "bcf188c6f7456d9613dc894b2c2bde2664b30e6cb312f29a5f13819e327aeb94"
+    },
+    {
+      "path": "reference/starter_reference.glb",
+      "bytes": 4740,
+      "sha256": "600e51934c65f006e9c204917065c46cf43ded4f49f429a5a42634b6c85730c2"
+    },
+    {
+      "path": "rules/constraints.json",
+      "bytes": 2208,
+      "sha256": "00a0c81df1a99f08e9afef43d9a5714e57352b4058f9a668f46b651500dc0555"
+    },
+    {
+      "path": "rules/CONSTRAINTS.md",
+      "bytes": 6546,
+      "sha256": "71e8187af377bdfd71e391a377e9d3f0e5576f35a40142a97cf540f0ffaff5a5"
+    },
+    {
+      "path": "rules/DELIVERY.md",
+      "bytes": 2665,
+      "sha256": "12ab8d92639e31b20dc6d766888468798350435bbae4dba773595700f22453e5"
+    },
+    {
+      "path": "scripts/create_starter.py",
+      "bytes": 3537,
+      "sha256": "73058fb6a5d8c5fe63c902af48e97d117a627084fdd76b968795772f63941c75"
+    },
+    {
+      "path": "scripts/export_asset.py",
+      "bytes": 3546,
+      "sha256": "e634e97df3d23208a1829af872bac0b068781e95861fd8d68a8fa714b5b94f80"
+    },
+    {
+      "path": "scripts/inspect_glb.py",
+      "bytes": 12920,
+      "sha256": "d25467a098b0ef5927b3a7695c4e9f0e6c7aa22523c5c40f8b3610d6fc5fa4f0"
+    },
+    {
+      "path": "scripts/USAGE.md",
+      "bytes": 3072,
+      "sha256": "05b6fdbe5a806dfb1bb977f4a9687cc9250872b5018dbd5f3d2a5e892167d667"
+    },
+    {
+      "path": "scripts/validate_scene.py",
+      "bytes": 7961,
+      "sha256": "0ac146000670c29602e6b0f42e5afc45fc1303115a08535dc6e0d31df30a4241"
+    },
+    {
+      "path": "scripts/verify_kit.py",
+      "bytes": 1051,
+      "sha256": "10cce6f47ba5137ef23207fc498b0fda2c8c9687e507633306e6579bea33f3aa"
+    },
+    {
+      "path": "templates/conference_room.manifest.json",
+      "bytes": 1140,
+      "sha256": "a0dde0216bdc8f46f8bb532968ad241aa9c54862259b2b84bf96edfe79ec3f4f"
+    },
+    {
+      "path": "templates/VALIDATION.json",
+      "bytes": 1034,
+      "sha256": "76cc010a44ab3166707b29080a41540dfc1535d5787910c9f40611758779300c"
+    },
+    {
+      "path": "verification/PACKAGE_VALIDATION.json",
+      "bytes": 1691,
+      "sha256": "3eee1c1d0ed9e4d765f8b1c2a47ccd06121f8406e83517a532c15d3bbd380090"
+    },
+    {
+      "path": "verification/reference_glb_check.json",
+      "bytes": 1888,
+      "sha256": "24361d87a59661f93d58466bfd6401c4dc5a97f58aba7f650a7f59ad9a5d390f"
+    },
+    {
+      "path": "verification/THREE_REFERENCE_LOAD.json",
+      "bytes": 450,
+      "sha256": "267db163fb79c3f1c399aa6726e7b33dccd8c4fad557e09baa4a33edc05acabb"
+    },
+    {
+      "path": "work/asset_snapshot.py",
+      "bytes": 1545,
+      "sha256": "5cb377d1475231ba8993cf1e1a76a31176730794668ef372719b30cc9f55e2a2"
+    },
+    {
+      "path": "work/design_references/01_sala_fotografica.png",
+      "bytes": 338633,
+      "sha256": "577244f2a628e8b1f729919aacb3a5c5175510ab15a9d01c30c32e378cb1474c"
+    },
+    {
+      "path": "work/design_references/02_stile_agent_office.png",
+      "bytes": 310160,
+      "sha256": "25dbd30b4207042cb8171c172cbad1ae3f62edc06f5629bfc99b7886a71af1cf"
+    },
+    {
+      "path": "work/design_references/03_posizione_vetrata.png",
+      "bytes": 335446,
+      "sha256": "b58fc595bcf2669d1c2da5d56ac788733bffba7b2f0792657b73895efb6f8fbd"
+    },
+    {
+      "path": "work/design_references/sources.json",
+      "bytes": 557,
+      "sha256": "4270a2f61b5be3a63bd9ca15dab464b59f3a09c6f0dcb70d102bd1c6d201d2e4"
+    },
+    {
+      "path": "work/final_export.log",
+      "bytes": 28209,
+      "sha256": "76dcbf7be60ffcea0c463db533eb31582e7b68498fd488820d7cffbf6168a697"
+    },
+    {
+      "path": "work/final_reimport.log",
+      "bytes": 18025,
+      "sha256": "a06dfa96fd43a5aa0187da400029148b80aa722c961c8d36458cd270a8049eba"
+    },
+    {
+      "path": "work/glb_initial_export_check.json",
+      "bytes": 38685,
+      "sha256": "90699132e6bc7ede32b091fe6aeca696cfb72506ec0f676d63573a602852d4aa"
+    },
+    {
+      "path": "work/live_source_comparison.json",
+      "bytes": 269,
+      "sha256": "c228951330efd590110eb5ae3b0be00db10dcf11c80ba83032762874be0bd5d5"
+    },
+    {
+      "path": "work/monitor_orientation_check.json",
+      "bytes": 1513,
+      "sha256": "1afe1da705c1d5e618e77da6ec171d25962914d15972f318e16aeab7877b3052"
+    },
+    {
+      "path": "work/README.md",
+      "bytes": 99,
+      "sha256": "b5557ea543b2cb8a18c2ada0cdbf6f913c0ed012a29316638b200dc5b405f610"
+    },
+    {
+      "path": "work/reimport_check.blend",
+      "bytes": 362719,
+      "sha256": "b3a15495761c64bc4cd7ce72326e0c21c09a0998e302ad301998768e384c4580"
+    },
+    {
+      "path": "work/repro_square_lights.log",
+      "bytes": 1769,
+      "sha256": "2c6ec30ca8ee186cce93e156d708f742668d1d2339fc24b98e624f389d9750d9"
+    },
+    {
+      "path": "work/source_asset_snapshot.json",
+      "bytes": 176598,
+      "sha256": "01a5352a4f35da8f92c406cbebb5e020c68d9d2674871c09bf2c91ecb62d6cda"
+    }
+  ]
+}

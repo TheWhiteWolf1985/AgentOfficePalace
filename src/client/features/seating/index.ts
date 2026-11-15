@@ -19,8 +19,6 @@ export interface SeatingDeps {
   shares(): [string, MediaStream][];
   /** Watches what's on the TV full screen (see features/voice). */
   watchShare(): void;
-  /** The bar's menu (see features/bar). */
-  showBar(): void;
   /** What you can use where you are, and what's in the way of looking at it (see usable in input/pointer.ts). */
   usable(): (readonly Interactable[])[];
 }
@@ -56,7 +54,6 @@ export function installSeating(ctx: Ctx, deps: SeatingDeps) {
     const player = ctx.player;
     if (player.seat?.seatId === seatId) {
       if (seat.tv && tvShowing()) deps.watchShare();
-      else if (seat.bar) deps.showBar();
       else standUp();
       return;
     }
@@ -106,7 +103,7 @@ export function installSeating(ctx: Ctx, deps: SeatingDeps) {
       if (!seat) return { k: '', parts: [] };
       if (ctx.player.seat?.seatId === seat.id) {
         const tv = !!seat.tv && tvShowing();
-        const use = tv ? uiText('Watch the TV') : seat.bar ? uiText('Order a drink') : '';
+        const use = tv ? uiText('Watch the TV') : '';
         return { k: `${seat.id}|sitting|${tv}`, parts: [hintTitle(seat.label), aside('sitting'), ...(use ? [key('E', use), key('W A S D', uiText('Get up'))] : [key('E', uiText('Get up'))])] };
       }
       const full = !freePlace(seat);

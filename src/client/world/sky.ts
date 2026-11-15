@@ -472,14 +472,13 @@ export class Sky {
   }
 
   /**
-   * Up on the roof, `drop` over the street (or back down on a floor). Up there it's all outdoors: no
-   * lamplight from the office under your feet, no pools of light from the street lamps far below, and
-   * rain everywhere. The haze thins out with height over the street far below (see HAZE).
+   * The shared room is enclosed, above the street by drop. Keep its interior lit and dry;
+   * the city and its lamps remain far below, and the haze follows the building height.
    */
   setRoof(on: boolean, drop = 0) {
     this.roof = on;
     this.roofStreet = -drop;
-    uniforms.skyInside.value = uniforms.skyClearRooms.value = on ? 0 : 1;
+    uniforms.skyInside.value = uniforms.skyClearRooms.value = 1;
   }
 
   /**
@@ -495,7 +494,7 @@ export class Sky {
 
   /** Under a roof, out of the rain: the building, unless you're up on top of it. */
   private sheltered(x: number, z: number): boolean {
-    return !this.roof && sheltered(x, z);
+    return this.roof ? x > FLOOR.minX && x < FLOOR.maxX && z > FLOOR.minZ && z < FLOOR.maxZ : sheltered(x, z);
   }
 
   /** Whether the lamps' light (and wet and snow) apply: off while your hands are drawn. */
@@ -505,7 +504,7 @@ export class Sky {
 
   /** How lit it is at `p`, 0–1 (1 is a clear day, or a room with its lights on), for your hands. */
   lightAt(p: THREE.Vector3): number {
-    const inside = !this.roof && ((p.x > FLOOR.minX && p.x < FLOOR.maxX && p.z > FLOOR.minZ && p.z < FLOOR.maxZ) || (sheltered(p.x, p.z) && (p.y < 0 || p.z < FLOOR.minZ)));
+    const inside = ((p.x > FLOOR.minX && p.x < FLOOR.maxX && p.z > FLOOR.minZ && p.z < FLOOR.maxZ) || (!this.roof && sheltered(p.x, p.z) && (p.y < 0 || p.z < FLOOR.minZ)));
     if (inside) return 1;
     let lamp = 0;
     if (!this.roof) {

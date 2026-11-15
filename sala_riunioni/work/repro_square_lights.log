@@ -1,0 +1,17 @@
+C:\Users\Juri\Documents\Codex\agent-office-grafica\Sala_riunioni\delivery\build_scene.py:407: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  mat.use_nodes = True
+C:\Users\Juri\Documents\Codex\agent-office-grafica\Sala_riunioni\delivery\build_scene.py:159: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m=bpy.data.materials.new(name);m.use_nodes=True;m.diffuse_color=(*rgb,1)
+C:\Users\Juri\Documents\Codex\agent-office-grafica\Sala_riunioni\delivery\build_scene.py:638: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  world=bpy.data.worlds.new('AOP_Preview_World');scene.world=world;world.use_nodes=True
+C:\Users\Juri\Documents\Codex\agent-office-grafica\Sala_riunioni\delivery\build_scene.py:86: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  glass=bpy.data.materials.new('mat_partition_glass');glass.use_nodes=True
+C:\Users\Juri\Documents\Codex\agent-office-grafica\Sala_riunioni\delivery\build_scene.py:255: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m=bpy.data.materials.new(name);m.use_nodes=True;m.diffuse_color=(*rgb,1)
+BlenderMCP addon registered
+Info: Saved as "conference_room.blend"
+{"scene": "AOP_Sala_Riunioni_v01", "blend": "C:\\Users\\Juri\\Documents\\Codex\\agent-office-grafica\\Sala_riunioni\\work\\repro_square_lights\\conference_room.blend", "manifest": "C:\\Users\\Juri\\Documents\\Codex\\agent-office-grafica\\Sala_riunioni\\work\\repro_square_lights\\conference_room.manifest.json", "meeting_seats": 13, "lounge_seats": 6, "height_m": 5.2}
+BlenderMCP addon unregistered
+Blender 5.3.0 (hash 02f0899d78e3 built 2026-11-10 01:33:43)
+
+Blender quit

@@ -1,23 +1,19 @@
-/** Office sounds and alerts, weather, footsteps and the rooftop DJ. */
+/** Office sounds and alerts, weather and footsteps. */
+import { construction } from './construction';
 import type { GongWhy } from '../../shared/protocol';
 import { birdsong, Fridge, nightCrickets, startRoomTone, startWind } from './ambience';
 import { ding } from './alerts';
-import { Dj, hiccup, pour } from '../features/bar/sound';
 import { bonk, hatch, poleLanding, rung, slide, twirl } from '../features/climbing/sound';
-import { MusicBus } from './music-bus';
 import { AudioCore, type Listener } from './core';
 import { gong } from '../features/gong/sound';
 import { needsYou } from '../features/needsyou/sound';
 import type { Pos } from './places';
 import { Footsteps, pageTurn, paper } from './steps';
-import { toss, type TossSound } from '../features/bargames/sound';
 import { fidgeting, Typing } from './typing';
 import { Rain, thunder } from './weather';
 
 export class OfficeSound {
   private readonly a: AudioCore = new AudioCore({ start: (ctx) => this.start(ctx) });
-  private readonly music = new MusicBus();
-  private readonly dj = new Dj(this.a);
   private readonly typing = new Typing(this.a);
   private readonly feet = new Footsteps(this.a);
   private readonly fridge = new Fridge(this.a);
@@ -38,17 +34,14 @@ export class OfficeSound {
     this.a.every((now) => this.fidgets.tick(now));
   }
 
-  /** Audio has just started (see AudioCore.unlock): the DJ joins the graph, and the room starts up. */
+  /** Audio has just started (see AudioCore.unlock): start the room ambience. */
   private start(ctx: AudioContext) {
-    this.music.connect(ctx);
-    this.dj.connect(this.music.bus);
     this.a.applyVolume();
     this.a.applyVisibility();
     startRoomTone(this.a);
     this.fridge.startFridge();
     startWind(this.a);
     this.a.applyOutdoors();
-    this.dj.applyDj();
     const now = ctx.currentTime;
     this.birds.start(now);
     this.crickets.start(now);
@@ -70,11 +63,6 @@ export class OfficeSound {
   /** Output level (RMS) right now, for headless checks. */
   level(): number {
     return this.a.level();
-  }
-
-  /** The rooftop music level (RMS), after your music volume. */
-  musicLevel(): number {
-    return this.music.level();
   }
 
   get state(): AudioContextState | 'locked' {
@@ -160,9 +148,7 @@ export class OfficeSound {
     poleLanding(this.a, speed, at);
   }
 
-  toss(kind: TossSound, at: Pos) {
-    toss(this.a, kind, at);
-  }
+  construction(at: Pos) { construction(this.a, at); }
 
   thunder(delay: number, loud: number) {
     thunder(this.a, delay, loud);
@@ -179,30 +165,6 @@ export class OfficeSound {
   /** The alarm for a worker that needs you, or (`again`) the soft reminder while it still does. */
   needsYou(again = false) {
     needsYou(this.a, again);
-  }
-
-  // ---- The rooftop bar (features/bar) -------------------------------------------------------------
-
-  /** The DJ's set on the roof, `clock` saying how far into it it is (see djTime); null stops it. */
-  setDj(clock: (() => number) | null) {
-    this.dj.setDj(clock);
-  }
-
-  horn() {
-    this.dj.horn();
-  }
-
-  pour(at: Pos) {
-    pour(this.a, at);
-  }
-
-  hiccup() {
-    hiccup(this.a);
-  }
-
-  /** Your own rooftop music volume, 0–1, apart from the office sounds'. */
-  setMusicVolume(volume: number, muted: boolean) {
-    this.music.setVolume(volume, muted);
   }
 
 }

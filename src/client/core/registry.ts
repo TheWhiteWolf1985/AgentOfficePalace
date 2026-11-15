@@ -281,7 +281,7 @@ export class Activities<Why extends string = string, E = unknown, El = unknown> 
 // ---- Your view -------------------------------------------------------------------------------------
 
 /**
- * A filter the frame's drawn through (the drunk vision): `begin` before the frame's drawn, true when
+ * A filter the frame is drawn through: `begin` before the frame's drawn, true when
  * it's on this frame, and then `end` once it's drawn.
  */
 export interface FrameFilter {

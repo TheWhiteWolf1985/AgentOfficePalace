@@ -102,14 +102,8 @@ export function aimCamera(camera: THREE.PerspectiveCamera, p: Followed, bob: num
   camera.lookAt(target);
 }
 
-/** The jitters: the view trembles a little, on top of wherever you're looking. Drunk, it rolls and sways. `t` is the jitters' clock. */
-export function shakeCamera(camera: THREE.PerspectiveCamera, t: number, drunk: number, jitter: number) {
-  if (drunk > 0) {
-    const d = drunk;
-    camera.rotation.z += d * (0.07 * Math.sin(t * 0.9) + 0.025 * Math.sin(t * 2.3 + 1));
-    camera.rotation.x += d * 0.03 * Math.sin(t * 0.7 + 2);
-    camera.rotation.y += d * 0.04 * Math.sin(t * 0.55 + 4);
-  }
+/** The jitters: the view trembles a little, on top of wherever you're looking. `t` is the jitters' clock. */
+export function shakeCamera(camera: THREE.PerspectiveCamera, t: number, jitter: number) {
   if (jitter <= 0) return;
   const a = jitter * 0.01;
   camera.rotation.x += a * (Math.sin(t * 71) + 0.6 * Math.sin(t * 131 + 1));

@@ -14,3 +14,8 @@ __pycache__/
 
 # Local project continuity
 /AI/
+
+# Original Blender delivery reports covered by PACKAGE_MANIFEST.json.
+!/sala_riunioni/work/final_export.log
+!/sala_riunioni/work/final_reimport.log
+!/sala_riunioni/work/repro_square_lights.log

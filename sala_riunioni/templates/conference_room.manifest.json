@@ -1,0 +1,35 @@
+{
+  "source_contract": "1.0.0",
+  "kit_version": "1.0.0",
+  "blender_version": null,
+  "asset_name": "conference_room",
+  "units": "meters",
+  "coordinate_system": "blender_z_up",
+  "root_node": "aop_conference_room",
+  "ceiling_height_m": null,
+  "architecture": {
+    "floor_nodes": [],
+    "wall_nodes": [],
+    "ceiling_nodes": []
+  },
+  "whiteboard": {
+    "surface_node": "whiteboard_surface",
+    "material": "mat_whiteboard_dynamic",
+    "width_m": null,
+    "height_m": null,
+    "additional_surfaces": []
+  },
+  "seats": [],
+  "colliders": [],
+  "materials": [],
+  "stats": {},
+  "approved_deviations": [],
+  "notes": [
+    "Template: dati da compilare sul modello reale; nessuna capienza o estetica predefinita."
+  ],
+  "schema_notes": {
+    "seats": "Elenco di oggetti con anchor, stand, allowed_occupants, position_blender_m, stand_blender_m e facing_blender; vedere scripts/USAGE.md",
+    "colliders": "Box numerici con id, min_blender_m, max_blender_m e role; nessun helper col_* nel GLB visibile",
+    "materials": "Elenco nome, colore RGBA e ruolo; compilato anche dall’exporter"
+  }
+}

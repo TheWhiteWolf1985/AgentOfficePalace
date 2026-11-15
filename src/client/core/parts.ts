@@ -15,8 +15,6 @@ import type { Person } from '../world/character';
 import type { Confetti } from '../world/confetti';
 import type { Hands } from '../world/hands';
 import type { Dust } from '../world/dust';
-import type { installBar } from '../features/bar';
-import type { installBarGames } from '../features/bargames';
 import type { installBoards } from '../features/boards';
 import type { installBookshelf } from '../features/bookshelf';
 import type { installCarrying } from '../features/carrying';
@@ -84,7 +82,6 @@ export interface Parts {
   gallery: Made<typeof installGallery>;
   tv: Made<typeof installTv>;
   rooftop: Made<typeof installRooftop>;
-  bargames: Made<typeof installBarGames>;
   hanging: Made<typeof installHanging>;
   climbing: Made<typeof installClimbing>;
   peers: Made<typeof installPeers>;
@@ -95,7 +92,6 @@ export interface Parts {
   needsYou: Made<typeof installNeedsYou>;
   meeting: Made<typeof installMeeting>;
   bookshelf: Made<typeof installBookshelf>;
-  bar: Made<typeof installBar>;
   cards: Made<typeof installCarrying>;
   seating: Made<typeof installSeating>;
   talk: Made<typeof installVoice>;

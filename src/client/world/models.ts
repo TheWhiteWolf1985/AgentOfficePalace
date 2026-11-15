@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader, type GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { clone } from 'three/examples/jsm/utils/SkeletonUtils.js';
+import conferenceRoomUrl from '../models/conference_room.glb?url';
 import deskPropsUrl from '../models/desk_props.glb?url';
 import kitchenUrl from '../models/kitchen.glb?url';
 import loungeUrl from '../models/lounge.glb?url';
@@ -12,6 +13,7 @@ import { toon } from './toon';
 // `preload` ones are loaded before the world is built, for builders that take theirs with model();
 
 const MODELS = {
+  conference_room: { url: conferenceRoomUrl, preload: true },
   desk_props: { url: deskPropsUrl, preload: true },
   kitchen: { url: kitchenUrl, preload: true },
   lounge: { url: loungeUrl, preload: true },

@@ -1,0 +1,104 @@
+{
+  "kit_version": "1.0.0",
+  "contract_version": "1.0.0",
+  "software_version": "0.1.0",
+  "source_commit": "ab4040a14e6f3387f5ecc9ac44e1fc5f896218c5",
+  "units": "meters",
+  "blender_axes": {
+    "up": "+Z",
+    "north": "+Y",
+    "avatar_forward": "-Y"
+  },
+  "gltf_from_blender": [
+    "x",
+    "z",
+    "-y"
+  ],
+  "design_xy_m": {
+    "min_x": -18.0,
+    "max_x": 18.0,
+    "min_y": -13.0,
+    "max_y": 13.0
+  },
+  "outer_xy_m": {
+    "min_x": -18.3,
+    "max_x": 18.3,
+    "min_y": -13.3,
+    "max_y": 13.3
+  },
+  "finished_floor_z_m": 0.0,
+  "minimum_mesh_z_m": -0.3,
+  "tolerance_m": 0.01,
+  "elevator_reserved_xy_m": {
+    "min_x": 7.2,
+    "max_x": 9.8,
+    "min_y": 10.6,
+    "max_y": 13.0
+  },
+  "elevator_center_blender_m": [
+    8.5,
+    11.8,
+    0.0
+  ],
+  "door": {
+    "center_blender_m": [
+      8.5,
+      10.6,
+      0.0
+    ],
+    "width_m": 1.4,
+    "height_m": 2.4,
+    "opens_towards": "-Y"
+  },
+  "reference_module_height_m": 6.8,
+  "avatar": {
+    "collision_radius_m": 0.32,
+    "collision_height_m": 1.7,
+    "maximum_step_m": 0.3
+  },
+  "recommended_not_hard": {
+    "clear_depth_in_front_of_door_m": 2.0,
+    "corridor_width_m": [
+      1.5,
+      2.0
+    ]
+  },
+  "root_node": "aop_conference_room",
+  "asset_groups": [
+    "architecture",
+    "furniture",
+    "anchors"
+  ],
+  "required_exported_nodes": [
+    "aop_conference_room",
+    "architecture",
+    "furniture",
+    "anchors",
+    "whiteboard_surface"
+  ],
+  "whiteboard_material": "mat_whiteboard_dynamic",
+  "seat_regex": "^seat_[0-9]{3,}$",
+  "stand_regex": "^stand_[0-9]{3,}$",
+  "forbidden_export_prefixes": [
+    "ref_",
+    "col_",
+    "guide_"
+  ],
+  "delivery_files": [
+    "conference_room.blend",
+    "conference_room.glb",
+    "conference_room.manifest.json",
+    "build_scene.py",
+    "VALIDATION.json"
+  ],
+  "manual_checks_required": [
+    "elevator_volume_clear",
+    "door_and_route_walkable",
+    "whiteboard_visible_from_seats",
+    "whiteboard_uv_not_mirrored",
+    "normals_correct",
+    "no_surface_z_fighting",
+    "ceiling_and_weather_cover",
+    "only_user_approved_visual_design"
+  ]
+}

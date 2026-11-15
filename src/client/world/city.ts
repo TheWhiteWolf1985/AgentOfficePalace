@@ -6,7 +6,7 @@ import { tilingCanvasTexture } from './texture';
 import { mergeByMaterial, mesh, toon } from './toon';
 import { buildTower } from './tower';
 
-// The city around the rooftop bar: the building's own floors going down to the street (as the tower
+// The city around the shared meeting room: the building's own floors going down to the street (as the tower
 
 // blocks of buildings out to the haze, most of them lower than the roof so you look out over them,
 // with a skyline of towers further off. At night their windows light up, the street lamps come on

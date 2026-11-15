@@ -1,0 +1,9945 @@
+{
+  "nodes": 312,
+  "sha256": "21cbed8f868d82a10b6aee491565c13fbac4019eb3914f792b6032de0a499a82",
+  "objects": [
+    {
+      "name": "anchors",
+      "parent": "aop_conference_room",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -5.4
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "aop_conference_room",
+      "parent": null,
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "architecture",
+      "parent": "aop_conference_room",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "ceiling_main",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "c22c09060ac0238f8dd959214c439798a136fc572adadd5121f92a5e2e976e9f"
+    },
+    {
+      "name": "ceiling_north_east",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "2f8c41257b647b7245f24de110baa32c2976e82eaa3b7acf2e4c6715df5d069a"
+    },
+    {
+      "name": "ceiling_north_west",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "2ef561c13aee640078a3f80c2d53881470f0de58404d14587fa8d9ef9e4bde82"
+    },
+    {
+      "name": "chair_001",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          -0.0,
+          -1.0,
+          0.0,
+          -8.48
+        ],
+        [
+          1.0,
+          -0.0,
+          0.0,
+          -6.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "f3e33dc0bcb410c81100157c366ceb4865d3ed313453ae318c79ed3d65adc215"
+    },
+    {
+      "name": "chair_002",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          -0.0,
+          -1.0,
+          0.0,
+          -8.48
+        ],
+        [
+          1.0,
+          -0.0,
+          0.0,
+          -3.6
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "872a83e75888e051fd71016f39f6f07836dc7c96605211ba4b56baf102b7421d"
+    },
+    {
+      "name": "chair_003",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          -0.0,
+          -1.0,
+          0.0,
+          -8.48
+        ],
+        [
+          1.0,
+          -0.0,
+          0.0,
+          -1.2
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "f3e33dc0bcb410c81100157c366ceb4865d3ed313453ae318c79ed3d65adc215"
+    },
+    {
+      "name": "chair_004",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          -0.0,
+          -1.0,
+          0.0,
+          -8.48
+        ],
+        [
+          1.0,
+          -0.0,
+          0.0,
+          1.2
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "f3e33dc0bcb410c81100157c366ceb4865d3ed313453ae318c79ed3d65adc215"
+    },
+    {
+      "name": "chair_005",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          -0.0,
+          -1.0,
+          0.0,
+          -8.48
+        ],
+        [
+          1.0,
+          -0.0,
+          0.0,
+          3.6
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "872a83e75888e051fd71016f39f6f07836dc7c96605211ba4b56baf102b7421d"
+    },
+    {
+      "name": "chair_006",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          -0.0,
+          -1.0,
+          0.0,
+          -8.48
+        ],
+        [
+          1.0,
+          -0.0,
+          0.0,
+          6.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "f3e33dc0bcb410c81100157c366ceb4865d3ed313453ae318c79ed3d65adc215"
+    },
+    {
+      "name": "chair_007",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          -0.0,
+          1.0,
+          0.0,
+          -2.32
+        ],
+        [
+          -1.0,
+          -0.0,
+          0.0,
+          -6.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "185f63b664661a029e492f8adc8713e8d296bb4e136e4d306d7ec263cfc6202c"
+    },
+    {
+      "name": "chair_008",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          -0.0,
+          1.0,
+          0.0,
+          -2.32
+        ],
+        [
+          -1.0,
+          -0.0,
+          0.0,
+          -3.6
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "872a83e75888e051fd71016f39f6f07836dc7c96605211ba4b56baf102b7421d"
+    },
+    {
+      "name": "chair_009",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          -0.0,
+          1.0,
+          0.0,
+          -2.32
+        ],
+        [
+          -1.0,
+          -0.0,
+          0.0,
+          -1.2
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "185f63b664661a029e492f8adc8713e8d296bb4e136e4d306d7ec263cfc6202c"
+    },
+    {
+      "name": "chair_010",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          -0.0,
+          1.0,
+          0.0,
+          -2.32
+        ],
+        [
+          -1.0,
+          -0.0,
+          0.0,
+          1.2
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "185f63b664661a029e492f8adc8713e8d296bb4e136e4d306d7ec263cfc6202c"
+    },
+    {
+      "name": "chair_011",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          -0.0,
+          1.0,
+          0.0,
+          -2.32
+        ],
+        [
+          -1.0,
+          -0.0,
+          0.0,
+          3.6
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "872a83e75888e051fd71016f39f6f07836dc7c96605211ba4b56baf102b7421d"
+    },
+    {
+      "name": "chair_012",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          -0.0,
+          1.0,
+          0.0,
+          -2.32
+        ],
+        [
+          -1.0,
+          -0.0,
+          0.0,
+          6.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "185f63b664661a029e492f8adc8713e8d296bb4e136e4d306d7ec263cfc6202c"
+    },
+    {
+      "name": "chair_013",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -5.4
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          7.9
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "185f63b664661a029e492f8adc8713e8d296bb4e136e4d306d7ec263cfc6202c"
+    },
+    {
+      "name": "floor_main",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "661e517a4621766280cd163fa92492d08466f766dbaf8e7fe88706761086105c"
+    },
+    {
+      "name": "floor_north_east",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "a956a4894a3858dead5e0e9595fe7ea3560e5f8c4611dac36eec2fd5695de335"
+    },
+    {
+      "name": "floor_north_west",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "ffb128cb4ff80e1e0d79fa46b23811591f6e9a8ecebb0bba612584e857e1ec22"
+    },
+    {
+      "name": "furniture",
+      "parent": "aop_conference_room",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -5.4
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "lounge_anchors",
+      "parent": "anchors",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "lounge_armchair_mauve",
+      "parent": "lounge_furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          -0.0,
+          -1.0,
+          0.0,
+          12.0
+        ],
+        [
+          1.0,
+          -0.0,
+          0.0,
+          5.6
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "d8c94211a3d846123e06be6bea1cbc20dfde1eab4f66536d0ea14629eae8ba58"
+    },
+    {
+      "name": "lounge_armchair_teal",
+      "parent": "lounge_furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          -0.0,
+          1.0,
+          0.0,
+          16.0
+        ],
+        [
+          -1.0,
+          -0.0,
+          0.0,
+          5.6
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "a9b84b0d0e9353e0999a48028f1bb45647a7416c41248842c23cf156b10221b5"
+    },
+    {
+      "name": "lounge_book_stack_0",
+      "parent": "lounge_furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "6032e36c5f9dbefacc82f48ab92047a312efb012886064ab97af0ccbd6603292"
+    },
+    {
+      "name": "lounge_book_stack_1",
+      "parent": "lounge_furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "d5161e1311caea49bfe5e7caff26ffd239fa84e8cfd7fdea40d57709350100c5"
+    },
+    {
+      "name": "lounge_book_stack_2",
+      "parent": "lounge_furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "49550b43d9f6913f82ab221901fed3268747f9581bc847d247b20ca37006de47"
+    },
+    {
+      "name": "lounge_coffee_table_legs",
+      "parent": "lounge_furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          11.7
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          -6.25
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "e0950afa18801be466607731ed14cf1f9449122c0ed8d1b7ad4ccbb63f590bca"
+    },
+    {
+      "name": "lounge_coffee_table_top",
+      "parent": "lounge_furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          11.7
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          -6.25
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "18f6ab21bf284021a5fb416d7104f4f9c562f7825537a80dc4d7a6b6ac42c8d5"
+    },
+    {
+      "name": "lounge_console",
+      "parent": "lounge_furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "9dd22761ae8530e0264795f2e3028985dc0203f0ab17dfca226b94306f0fd353"
+    },
+    {
+      "name": "lounge_conversation_table_legs",
+      "parent": "lounge_furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          14.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          5.6
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "fd37cc4a818b56ad19d2873d6b362d1f5caf49c9e62daf5613492c39923232bb"
+    },
+    {
+      "name": "lounge_conversation_table_top",
+      "parent": "lounge_furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          14.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          5.6
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "feb0efe1758296885050a3e2dbaf4923333e26217c7b077fcbba797851511840"
+    },
+    {
+      "name": "lounge_furniture",
+      "parent": "furniture",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "lounge_pendant_cable_0",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "9a3d5acec6588cd218086208ee97277e0ece5e8d7677611f07ab432a7d3a602b"
+    },
+    {
+      "name": "lounge_pendant_cable_1",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "c41ba3630f1008c6b3b335ff870e0d0a931a5e5fad7d1cdf5198388590ac9a7a"
+    },
+    {
+      "name": "lounge_pendant_cable_2",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "2f1374b782430a62c40fe68e99c9e94cb3cef1684b30e99ee80df827db2a6b97"
+    },
+    {
+      "name": "lounge_pendant_cable_3",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "e7569a99af0504ef88ce328451ada36a438459810e0691558059e80359f455a0"
+    },
+    {
+      "name": "lounge_pendant_shade_0",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "f911195946f1f92acc665f00a8cdb4b9506015dee11b87692c1332784255220d"
+    },
+    {
+      "name": "lounge_pendant_shade_1",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "7e7fb1e22a4fd70e73db21272a2eb5d04ccabc53266970b3dc7c26d86d988224"
+    },
+    {
+      "name": "lounge_pendant_shade_2",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "e52c88e02bf5e8c1822b57e86431cd68523448c235d96c5d01d812adf1ce3142"
+    },
+    {
+      "name": "lounge_pendant_shade_3",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "9cf6b058218ac18a0c903ea6e0a354ef4a553aaeaab551183b50cbbf144a2db1"
+    },
+    {
+      "name": "lounge_plant_00",
+      "parent": "lounge_furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          6.1
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          -11.2
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "7ff530a3cfd034ec98dc63cf5bb41fb5e36b2f74de7b1b9e3976ab2df881acd0"
+    },
+    {
+      "name": "lounge_plant_01",
+      "parent": "lounge_furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          16.7
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          -11.1
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "7ff530a3cfd034ec98dc63cf5bb41fb5e36b2f74de7b1b9e3976ab2df881acd0"
+    },
+    {
+      "name": "lounge_plant_02",
+      "parent": "lounge_furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          16.8
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          10.6
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "7ff530a3cfd034ec98dc63cf5bb41fb5e36b2f74de7b1b9e3976ab2df881acd0"
+    },
+    {
+      "name": "lounge_plant_03",
+      "parent": "lounge_furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          12.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          10.5
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "7ff530a3cfd034ec98dc63cf5bb41fb5e36b2f74de7b1b9e3976ab2df881acd0"
+    },
+    {
+      "name": "lounge_rug_north",
+      "parent": "lounge_furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "bc1a52a72d8b7c08ed37304a193262ba0f82663d27e56550982787b9026b36e8"
+    },
+    {
+      "name": "lounge_rug_south",
+      "parent": "lounge_furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "b80b0ee7ba9ba90619ac7c32f5d13faf6ce09a257d7cff0f638e42f28c177309"
+    },
+    {
+      "name": "lounge_side_table_legs",
+      "parent": "lounge_furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          9.5
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          -8.7
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "870b2ecc6683295cb1facab52ed50a33ecad397e7c35a1534cff379a5f06e025"
+    },
+    {
+      "name": "lounge_side_table_top",
+      "parent": "lounge_furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          9.5
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          -8.7
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "27a95c4fb796228f59ffa4758dea1a7666ff3158592f883e5363d381568b36e8"
+    },
+    {
+      "name": "lounge_sofa_orange",
+      "parent": "lounge_furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          -0.0,
+          1.0,
+          0.0,
+          15.2
+        ],
+        [
+          -1.0,
+          -0.0,
+          0.0,
+          -6.25
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "17a5e2eed1c9a1d8ce17cdf93a4b5f299fd38a253ad957b87933e23a417a7b3a"
+    },
+    {
+      "name": "lounge_sofa_teal",
+      "parent": "lounge_furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          -1.0,
+          0.0,
+          0.0,
+          11.7
+        ],
+        [
+          -0.0,
+          -1.0,
+          0.0,
+          -9.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "ee0b432546d19a4288b964bac722b24e2b0581d01bf600cde4991b2a283d6780"
+    },
+    {
+      "name": "meeting_door_glass",
+      "parent": "meeting_door_pivot",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          3.6
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          -0.9
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "84dd371e90d9ba48487cce173e2d7d315cf7182c910820d1e9ef06b2ca45e5ef"
+    },
+    {
+      "name": "meeting_door_handle_inside",
+      "parent": "meeting_door_pivot",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          3.6
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          -0.9
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "d1d1bdbd43fa664f41c08c9df03b4f2248918fb8ec1cc043300cc6d91b4d7d65"
+    },
+    {
+      "name": "meeting_door_handle_outside",
+      "parent": "meeting_door_pivot",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          3.6
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          -0.9
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "521c333d427b60f9293ba5c17b13847adb6d263645e94d9516634af158e04b82"
+    },
+    {
+      "name": "meeting_door_header",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "87ea4b27cfdd7c472aae318395caf8067d433456a7b1aaf297924f317739c989"
+    },
+    {
+      "name": "meeting_door_jamb_north",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "c26aecd09e0efe131d0d9d9923ac2ce3a1f1bf35e8614ba533d15ad3128fa4b4"
+    },
+    {
+      "name": "meeting_door_jamb_south",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "394aaf560609eeb31b4fa454f2051ec1592ef3b82383ae9ea691f4e3bd9ca329"
+    },
+    {
+      "name": "meeting_door_leaf_bottom",
+      "parent": "meeting_door_pivot",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          3.6
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          -0.9
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "61c3651aad2cd289b42c949a91b2a42afa00358c65627433f272d3e58212f208"
+    },
+    {
+      "name": "meeting_door_leaf_hinge",
+      "parent": "meeting_door_pivot",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          3.6
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          -0.9
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "ee7fae8eb48f0ddac60bb2d83f9605638cdeb6b78f867c5847ee1827497e8dc7"
+    },
+    {
+      "name": "meeting_door_leaf_latch",
+      "parent": "meeting_door_pivot",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          3.6
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          -0.9
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "eb17b25b0d01d86381a8fc0f9a513c96899dba91da3c6c2cc8799189759f6e1a"
+    },
+    {
+      "name": "meeting_door_leaf_top",
+      "parent": "meeting_door_pivot",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          3.6
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          -0.9
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "9cc02f043b8af5d5068277c30f81508840166d165b6f740caa3b3ac276bf3755"
+    },
+    {
+      "name": "meeting_door_pivot",
+      "parent": "architecture",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          3.6
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          -0.9
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "meeting_door_transom_glass",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "3ac1c7c7aa327f39327c9b0b07241d64945e9f7ddf6466073d2661bc3f5265da"
+    },
+    {
+      "name": "meeting_door_transom_top",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "54f012f597550cce1b478adef78bab349451d387b11e0337cf432c3dc58e1f7d"
+    },
+    {
+      "name": "monitor_001",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          0.0,
+          1.0,
+          0.0,
+          -6.88
+        ],
+        [
+          -1.0,
+          0.0,
+          0.0,
+          -6.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "63c26707bbe5ab6b8ece89d17dd4ae119f19335a4e03d908385b65336ddfd5c5"
+    },
+    {
+      "name": "monitor_002",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          0.0,
+          1.0,
+          0.0,
+          -6.88
+        ],
+        [
+          -1.0,
+          0.0,
+          0.0,
+          -3.6
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "63c26707bbe5ab6b8ece89d17dd4ae119f19335a4e03d908385b65336ddfd5c5"
+    },
+    {
+      "name": "monitor_003",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          0.0,
+          1.0,
+          0.0,
+          -6.88
+        ],
+        [
+          -1.0,
+          0.0,
+          0.0,
+          -1.2
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "63c26707bbe5ab6b8ece89d17dd4ae119f19335a4e03d908385b65336ddfd5c5"
+    },
+    {
+      "name": "monitor_004",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          0.0,
+          1.0,
+          0.0,
+          -6.88
+        ],
+        [
+          -1.0,
+          0.0,
+          0.0,
+          1.2
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "63c26707bbe5ab6b8ece89d17dd4ae119f19335a4e03d908385b65336ddfd5c5"
+    },
+    {
+      "name": "monitor_005",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          0.0,
+          1.0,
+          0.0,
+          -6.88
+        ],
+        [
+          -1.0,
+          0.0,
+          0.0,
+          3.6
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "63c26707bbe5ab6b8ece89d17dd4ae119f19335a4e03d908385b65336ddfd5c5"
+    },
+    {
+      "name": "monitor_006",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          0.0,
+          1.0,
+          0.0,
+          -6.88
+        ],
+        [
+          -1.0,
+          0.0,
+          0.0,
+          6.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "63c26707bbe5ab6b8ece89d17dd4ae119f19335a4e03d908385b65336ddfd5c5"
+    },
+    {
+      "name": "monitor_007",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          0.0,
+          -1.0,
+          0.0,
+          -3.92
+        ],
+        [
+          1.0,
+          0.0,
+          0.0,
+          -6.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "63c26707bbe5ab6b8ece89d17dd4ae119f19335a4e03d908385b65336ddfd5c5"
+    },
+    {
+      "name": "monitor_008",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          0.0,
+          -1.0,
+          0.0,
+          -3.92
+        ],
+        [
+          1.0,
+          0.0,
+          0.0,
+          -3.6
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "63c26707bbe5ab6b8ece89d17dd4ae119f19335a4e03d908385b65336ddfd5c5"
+    },
+    {
+      "name": "monitor_009",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          0.0,
+          -1.0,
+          0.0,
+          -3.92
+        ],
+        [
+          1.0,
+          0.0,
+          0.0,
+          -1.2
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "63c26707bbe5ab6b8ece89d17dd4ae119f19335a4e03d908385b65336ddfd5c5"
+    },
+    {
+      "name": "monitor_010",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          0.0,
+          -1.0,
+          0.0,
+          -3.92
+        ],
+        [
+          1.0,
+          0.0,
+          0.0,
+          1.2
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "63c26707bbe5ab6b8ece89d17dd4ae119f19335a4e03d908385b65336ddfd5c5"
+    },
+    {
+      "name": "monitor_011",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          0.0,
+          -1.0,
+          0.0,
+          -3.92
+        ],
+        [
+          1.0,
+          0.0,
+          0.0,
+          3.6
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "63c26707bbe5ab6b8ece89d17dd4ae119f19335a4e03d908385b65336ddfd5c5"
+    },
+    {
+      "name": "monitor_012",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          0.0,
+          -1.0,
+          0.0,
+          -3.92
+        ],
+        [
+          1.0,
+          0.0,
+          0.0,
+          6.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "63c26707bbe5ab6b8ece89d17dd4ae119f19335a4e03d908385b65336ddfd5c5"
+    },
+    {
+      "name": "monitor_013",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          -1.0,
+          0.0,
+          0.0,
+          -5.4
+        ],
+        [
+          -0.0,
+          -1.0,
+          0.0,
+          6.15
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "63c26707bbe5ab6b8ece89d17dd4ae119f19335a4e03d908385b65336ddfd5c5"
+    },
+    {
+      "name": "north_acoustic_panel_00",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "8fc6b2f3c066104dee35c543ca9632176673559588473391a0d229eeef79d6ab"
+    },
+    {
+      "name": "north_acoustic_panel_01",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "eee4d4fd51ec258748daa7a7235439b392ddc090b4cee20f159170b4aa45e84e"
+    },
+    {
+      "name": "north_acoustic_panel_02",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "3832dda04e4f7258f2f3a62c939c55d917e507f80040d4d7879dd78c3d2c81d9"
+    },
+    {
+      "name": "north_acoustic_panel_03",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "1df3c20416e9972d4f617aa55c2ccd58d21f7fdb80431f382ffed3ed8fe2ac2c"
+    },
+    {
+      "name": "north_acoustic_panel_04",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "14c5f90fdeabc2910336c72a75abed7bf6fab357e67843fc435e0c45210e61a2"
+    },
+    {
+      "name": "north_acoustic_panel_05",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "917c3ad09b6dabe0fb4cc184379b4f3bd82eba70e05da346e60b1cea26df7ba3"
+    },
+    {
+      "name": "north_acoustic_panel_06",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "171fbfd74867bcde022ff1551fda4ef731fc36aaa67842a7704a1213eeb7a274"
+    },
+    {
+      "name": "north_acoustic_panel_07",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "fb7c836aa21b12aa491728075bdb8eb17914d03377d6578156a4294d193c37ad"
+    },
+    {
+      "name": "north_acoustic_panel_08",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "453683c990b890ea4485d1bffe0bcdfa234f195a5672e6507203c4ff922886e8"
+    },
+    {
+      "name": "north_acoustic_panel_09",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "d86256d88929b05b842f89832f7840d5ff823c3ba94c56706329e8bbdd61f0e9"
+    },
+    {
+      "name": "north_acoustic_panel_10",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "59baead1cbb4faabf39afc5deb6691eb518d04d8bc79e2303556e6a99df90b8b"
+    },
+    {
+      "name": "north_acoustic_panel_11",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "1ff968b5a50c925e66588b798bb1a672f74805ee5038c904cbae6a31b56ca66c"
+    },
+    {
+      "name": "north_acoustic_panel_12",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "e5802fa524462bf760ee383d85d9208badca0bcdf678a74ac35434be6aefc320"
+    },
+    {
+      "name": "north_acoustic_panel_13",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "d3915053610d72752ec8ef0036b7159408ef66fb77229ecbd0ba58dba8c4436e"
+    },
+    {
+      "name": "partition_glass_north_0",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "c4379f2d0ee0d1acdb84a793f6d0db38c323b377cfe928cc19f7e3937274b3ac"
+    },
+    {
+      "name": "partition_glass_north_1",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "b87e7f03d4fec62ed0f6abbc8dc2d43217d81f73104d18a418cfeeb5e4825613"
+    },
+    {
+      "name": "partition_glass_north_2",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "cb59ca38de2cc224af656b31077169af71891637a7ee8676e927843fc50e8aca"
+    },
+    {
+      "name": "partition_glass_north_3",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "c4bffaead35d715a5d6596d3583cc335708d957006e21be138a7999dc4935cc0"
+    },
+    {
+      "name": "partition_glass_north_4",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "4099a54278631ea19a4150c1f01b800d17d321e37bc52e1ba84984475a750418"
+    },
+    {
+      "name": "partition_glass_south_0",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "5fc0a49c05c64a999b36d54585d939964c6b4adf874d4538efaa3dff7fb9e667"
+    },
+    {
+      "name": "partition_glass_south_1",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "df69e05dd23ea5568a3ca58e86c137567247dd6b039341241682e416021ad654"
+    },
+    {
+      "name": "partition_glass_south_2",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "ad1e71ce46e3187e57a91e78c7972b2450e30ef4632b0d0c556660ae22a849de"
+    },
+    {
+      "name": "partition_glass_south_3",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "b057da704f1c3e21ab6bd1d462b5eea8e67db2e18d819cd343a7ce895d901209"
+    },
+    {
+      "name": "partition_glass_south_4",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "b7fdfdef0eb4360e543fa591cabd6ee16c2b7dcec92068181344848a12f87a25"
+    },
+    {
+      "name": "partition_north_0_base",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "7f06aecbfc5a0b3e448483bfe26c6baff3a1797b064409b3f280e1815b0c29b5"
+    },
+    {
+      "name": "partition_north_0_post",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "6dd9fd395d5b65185331674aa895b172b1577d6c1339bd94fad26fa7cced0ef5"
+    },
+    {
+      "name": "partition_north_0_top",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "e4c3f6d98cb3d08e09dabeeb09c1d74b12007767f7e95ffc11c6f47b033365ed"
+    },
+    {
+      "name": "partition_north_1_base",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "0afd8d144cc3babb4c3d140d39a50faea67e068c0301f510614ea8501f4193dd"
+    },
+    {
+      "name": "partition_north_1_post",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "d5c4187db0e153fa17a73331be9f890faa43abc4410e8d7ed8dc1aed8bf46797"
+    },
+    {
+      "name": "partition_north_1_top",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "29e3130f19f18e0a5947a1ba9fb163a4d43646a9715fac11d8ada002e4712164"
+    },
+    {
+      "name": "partition_north_2_base",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "08c15392e66114dd98420cde7af4d9d288b5620882300192e7c06c53eb4bd516"
+    },
+    {
+      "name": "partition_north_2_post",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "2a1e0f57aaabb1167b8d8fa0c3ed69693968d08f30d61bbf4c6925366da68d2e"
+    },
+    {
+      "name": "partition_north_2_top",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "6214b6145fdbdea8bb492c5e261829e7ebe36312e4707a641565249f27c3a199"
+    },
+    {
+      "name": "partition_north_3_base",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "d7f447c1e79391c2261cc3cb038f6d84d2d5e61b2dca60fac224ff5f674dfa60"
+    },
+    {
+      "name": "partition_north_3_post",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "88fb9f47a707fb5a0bb88dd98951f2ba318db34b7d21c691de909cd44383d49a"
+    },
+    {
+      "name": "partition_north_3_top",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "2e8904edc9c6f8ad7d494e34e871fe3724dd188da20e32ba71efdd18daecb173"
+    },
+    {
+      "name": "partition_north_4_base",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "aafd97e9ffb5efb27ececf3414f71d191194a9800422bcbbcc56443160d06f63"
+    },
+    {
+      "name": "partition_north_4_post",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "04afd06181ef4a7bfe361a9d2cdfd0ffd5555b18d93914bae29d75a6bb84af56"
+    },
+    {
+      "name": "partition_north_4_top",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "dca95d3179eb1836a137d6979f48ae213841bb6dbcaedfd8ae4a9fd3731ca18e"
+    },
+    {
+      "name": "partition_south_0_base",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "25c30f99d98bcc62f92394efb95f085018b14e9746c290e8c40acc8fa0f22487"
+    },
+    {
+      "name": "partition_south_0_post",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "2809b6cf4a11561d0cffb9c7036c85c3fa21bc2851d619077254b004915fcd27"
+    },
+    {
+      "name": "partition_south_0_top",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "0cee242ef16407ef0360417f25877ec26c47b42fce3d40be606c74ca1c785a1a"
+    },
+    {
+      "name": "partition_south_1_base",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "4194eaa15095a6eb9a0156908a9373405d22af4098686f616bfe52d8eaa4c8d7"
+    },
+    {
+      "name": "partition_south_1_post",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "2b42a7ce03def178ced8acb26c85a2d9e1b827025b5f9a3c41d9bce561b933b6"
+    },
+    {
+      "name": "partition_south_1_top",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "828c0f0dd6a762056643171dc011bd2f7f566fc6f8e2269d7ab9f2f167bf7bd3"
+    },
+    {
+      "name": "partition_south_2_base",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "7d07a059cda22d8b3d67bc94f9a7b1a326750efbc1c5b406969566a057cd0b18"
+    },
+    {
+      "name": "partition_south_2_post",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "cfa9ecc24233e487e51eb7315999e41065aedc053e75da09db4131203885b57e"
+    },
+    {
+      "name": "partition_south_2_top",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "cff0fec9396ea75637a1319384269220f6c897368e76c83e9d91e430959d388d"
+    },
+    {
+      "name": "partition_south_3_base",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "b017bd8e834093d871c7b562a186c4ca372b4f8f72dc9db531479bc8eea568e5"
+    },
+    {
+      "name": "partition_south_3_post",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "2b1a29d55dedea10d0d63b5ca27109342619ec38851c3989e5feff98da6d8c46"
+    },
+    {
+      "name": "partition_south_3_top",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "72eb2f9494fd5ea502f1b82972f2f2114cc5a1a56a700badb752a6459fa99c7a"
+    },
+    {
+      "name": "partition_south_4_base",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "be5b6741f750f2ec5319267e4a0f7995373cf8afb8b636a85153d768decce3f2"
+    },
+    {
+      "name": "partition_south_4_post",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "d847aab635af2fbb6f045ab78fa3894f30f2198ee0b3ce5e704966dbd7f38e74"
+    },
+    {
+      "name": "partition_south_4_top",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "ddcfbb37aadd3fc5ba9d76ad73b27c3851e88c72ece5bdf2550e0d4cb70e0b32"
+    },
+    {
+      "name": "pc_interface_001",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          0.0,
+          1.0,
+          0.0,
+          -6.88
+        ],
+        [
+          -1.0,
+          0.0,
+          0.0,
+          -6.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "a429caad61fea51576e0520f7b46b57605d1fd942884dbc75a52436a1ad5b778"
+    },
+    {
+      "name": "pc_interface_002",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          0.0,
+          1.0,
+          0.0,
+          -6.88
+        ],
+        [
+          -1.0,
+          0.0,
+          0.0,
+          -3.6
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "a429caad61fea51576e0520f7b46b57605d1fd942884dbc75a52436a1ad5b778"
+    },
+    {
+      "name": "pc_interface_003",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          0.0,
+          1.0,
+          0.0,
+          -6.88
+        ],
+        [
+          -1.0,
+          0.0,
+          0.0,
+          -1.2
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "a429caad61fea51576e0520f7b46b57605d1fd942884dbc75a52436a1ad5b778"
+    },
+    {
+      "name": "pc_interface_004",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          0.0,
+          1.0,
+          0.0,
+          -6.88
+        ],
+        [
+          -1.0,
+          0.0,
+          0.0,
+          1.2
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "a429caad61fea51576e0520f7b46b57605d1fd942884dbc75a52436a1ad5b778"
+    },
+    {
+      "name": "pc_interface_005",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          0.0,
+          1.0,
+          0.0,
+          -6.88
+        ],
+        [
+          -1.0,
+          0.0,
+          0.0,
+          3.6
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "a429caad61fea51576e0520f7b46b57605d1fd942884dbc75a52436a1ad5b778"
+    },
+    {
+      "name": "pc_interface_006",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          0.0,
+          1.0,
+          0.0,
+          -6.88
+        ],
+        [
+          -1.0,
+          0.0,
+          0.0,
+          6.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "a429caad61fea51576e0520f7b46b57605d1fd942884dbc75a52436a1ad5b778"
+    },
+    {
+      "name": "pc_interface_007",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          0.0,
+          -1.0,
+          0.0,
+          -3.92
+        ],
+        [
+          1.0,
+          0.0,
+          0.0,
+          -6.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "a429caad61fea51576e0520f7b46b57605d1fd942884dbc75a52436a1ad5b778"
+    },
+    {
+      "name": "pc_interface_008",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          0.0,
+          -1.0,
+          0.0,
+          -3.92
+        ],
+        [
+          1.0,
+          0.0,
+          0.0,
+          -3.6
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "a429caad61fea51576e0520f7b46b57605d1fd942884dbc75a52436a1ad5b778"
+    },
+    {
+      "name": "pc_interface_009",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          0.0,
+          -1.0,
+          0.0,
+          -3.92
+        ],
+        [
+          1.0,
+          0.0,
+          0.0,
+          -1.2
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "a429caad61fea51576e0520f7b46b57605d1fd942884dbc75a52436a1ad5b778"
+    },
+    {
+      "name": "pc_interface_010",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          0.0,
+          -1.0,
+          0.0,
+          -3.92
+        ],
+        [
+          1.0,
+          0.0,
+          0.0,
+          1.2
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "a429caad61fea51576e0520f7b46b57605d1fd942884dbc75a52436a1ad5b778"
+    },
+    {
+      "name": "pc_interface_011",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          0.0,
+          -1.0,
+          0.0,
+          -3.92
+        ],
+        [
+          1.0,
+          0.0,
+          0.0,
+          3.6
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "a429caad61fea51576e0520f7b46b57605d1fd942884dbc75a52436a1ad5b778"
+    },
+    {
+      "name": "pc_interface_012",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          0.0,
+          -1.0,
+          0.0,
+          -3.92
+        ],
+        [
+          1.0,
+          0.0,
+          0.0,
+          6.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "a429caad61fea51576e0520f7b46b57605d1fd942884dbc75a52436a1ad5b778"
+    },
+    {
+      "name": "pc_interface_013",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          -1.0,
+          0.0,
+          0.0,
+          -5.4
+        ],
+        [
+          -0.0,
+          -1.0,
+          0.0,
+          6.15
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "a429caad61fea51576e0520f7b46b57605d1fd942884dbc75a52436a1ad5b778"
+    },
+    {
+      "name": "pc_screen_001",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          0.0,
+          1.0,
+          0.0,
+          -6.88
+        ],
+        [
+          -1.0,
+          0.0,
+          0.0,
+          -6.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "6dece99b58effec4e7f1e15efedb5b927dbf5f41e75fdedb84990d13abc28150"
+    },
+    {
+      "name": "pc_screen_002",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          0.0,
+          1.0,
+          0.0,
+          -6.88
+        ],
+        [
+          -1.0,
+          0.0,
+          0.0,
+          -3.6
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "6dece99b58effec4e7f1e15efedb5b927dbf5f41e75fdedb84990d13abc28150"
+    },
+    {
+      "name": "pc_screen_003",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          0.0,
+          1.0,
+          0.0,
+          -6.88
+        ],
+        [
+          -1.0,
+          0.0,
+          0.0,
+          -1.2
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "6dece99b58effec4e7f1e15efedb5b927dbf5f41e75fdedb84990d13abc28150"
+    },
+    {
+      "name": "pc_screen_004",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          0.0,
+          1.0,
+          0.0,
+          -6.88
+        ],
+        [
+          -1.0,
+          0.0,
+          0.0,
+          1.2
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "6dece99b58effec4e7f1e15efedb5b927dbf5f41e75fdedb84990d13abc28150"
+    },
+    {
+      "name": "pc_screen_005",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          0.0,
+          1.0,
+          0.0,
+          -6.88
+        ],
+        [
+          -1.0,
+          0.0,
+          0.0,
+          3.6
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "6dece99b58effec4e7f1e15efedb5b927dbf5f41e75fdedb84990d13abc28150"
+    },
+    {
+      "name": "pc_screen_006",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          0.0,
+          1.0,
+          0.0,
+          -6.88
+        ],
+        [
+          -1.0,
+          0.0,
+          0.0,
+          6.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "6dece99b58effec4e7f1e15efedb5b927dbf5f41e75fdedb84990d13abc28150"
+    },
+    {
+      "name": "pc_screen_007",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          0.0,
+          -1.0,
+          0.0,
+          -3.92
+        ],
+        [
+          1.0,
+          0.0,
+          0.0,
+          -6.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "6dece99b58effec4e7f1e15efedb5b927dbf5f41e75fdedb84990d13abc28150"
+    },
+    {
+      "name": "pc_screen_008",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          0.0,
+          -1.0,
+          0.0,
+          -3.92
+        ],
+        [
+          1.0,
+          0.0,
+          0.0,
+          -3.6
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "6dece99b58effec4e7f1e15efedb5b927dbf5f41e75fdedb84990d13abc28150"
+    },
+    {
+      "name": "pc_screen_009",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          0.0,
+          -1.0,
+          0.0,
+          -3.92
+        ],
+        [
+          1.0,
+          0.0,
+          0.0,
+          -1.2
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "6dece99b58effec4e7f1e15efedb5b927dbf5f41e75fdedb84990d13abc28150"
+    },
+    {
+      "name": "pc_screen_010",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          0.0,
+          -1.0,
+          0.0,
+          -3.92
+        ],
+        [
+          1.0,
+          0.0,
+          0.0,
+          1.2
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "6dece99b58effec4e7f1e15efedb5b927dbf5f41e75fdedb84990d13abc28150"
+    },
+    {
+      "name": "pc_screen_011",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          0.0,
+          -1.0,
+          0.0,
+          -3.92
+        ],
+        [
+          1.0,
+          0.0,
+          0.0,
+          3.6
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "6dece99b58effec4e7f1e15efedb5b927dbf5f41e75fdedb84990d13abc28150"
+    },
+    {
+      "name": "pc_screen_012",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          0.0,
+          -1.0,
+          0.0,
+          -3.92
+        ],
+        [
+          1.0,
+          0.0,
+          0.0,
+          6.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "6dece99b58effec4e7f1e15efedb5b927dbf5f41e75fdedb84990d13abc28150"
+    },
+    {
+      "name": "pc_screen_013",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          -1.0,
+          0.0,
+          0.0,
+          -5.4
+        ],
+        [
+          -0.0,
+          -1.0,
+          0.0,
+          6.15
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "6dece99b58effec4e7f1e15efedb5b927dbf5f41e75fdedb84990d13abc28150"
+    },
+    {
+      "name": "pendant_cable_0",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -17.1
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.75
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "9a3d5acec6588cd218086208ee97277e0ece5e8d7677611f07ab432a7d3a602b"
+    },
+    {
+      "name": "pendant_cable_1",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -17.1
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          4.55
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "9a3d5acec6588cd218086208ee97277e0ece5e8d7677611f07ab432a7d3a602b"
+    },
+    {
+      "name": "pendant_cable_2",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -17.1
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          8.35
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "9a3d5acec6588cd218086208ee97277e0ece5e8d7677611f07ab432a7d3a602b"
+    },
+    {
+      "name": "pendant_cable_3",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -17.1
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          12.15
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "9a3d5acec6588cd218086208ee97277e0ece5e8d7677611f07ab432a7d3a602b"
+    },
+    {
+      "name": "pendant_shade_0",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -17.1
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.75
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "f911195946f1f92acc665f00a8cdb4b9506015dee11b87692c1332784255220d"
+    },
+    {
+      "name": "pendant_shade_1",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -17.1
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          4.55
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "f911195946f1f92acc665f00a8cdb4b9506015dee11b87692c1332784255220d"
+    },
+    {
+      "name": "pendant_shade_2",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -17.1
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          8.35
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "f911195946f1f92acc665f00a8cdb4b9506015dee11b87692c1332784255220d"
+    },
+    {
+      "name": "pendant_shade_3",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -17.1
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          12.15
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "f911195946f1f92acc665f00a8cdb4b9506015dee11b87692c1332784255220d"
+    },
+    {
+      "name": "plant_left",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -11.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          11.65
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "7ff530a3cfd034ec98dc63cf5bb41fb5e36b2f74de7b1b9e3976ab2df881acd0"
+    },
+    {
+      "name": "plant_right",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.2
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          11.65
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "66dcab938134d2723dddc64dc30c5b9a18c7d34d63563493b71fad5406148e18"
+    },
+    {
+      "name": "seat_001",
+      "parent": "anchors",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          -0.0,
+          -1.0,
+          0.0,
+          -8.48
+        ],
+        [
+          1.0,
+          -0.0,
+          0.0,
+          -6.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.605
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "seat_002",
+      "parent": "anchors",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          -0.0,
+          -1.0,
+          0.0,
+          -8.48
+        ],
+        [
+          1.0,
+          -0.0,
+          0.0,
+          -3.6
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.605
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "seat_003",
+      "parent": "anchors",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          -0.0,
+          -1.0,
+          0.0,
+          -8.48
+        ],
+        [
+          1.0,
+          -0.0,
+          0.0,
+          -1.2
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.605
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "seat_004",
+      "parent": "anchors",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          -0.0,
+          -1.0,
+          0.0,
+          -8.48
+        ],
+        [
+          1.0,
+          -0.0,
+          0.0,
+          1.2
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.605
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "seat_005",
+      "parent": "anchors",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          -0.0,
+          -1.0,
+          0.0,
+          -8.48
+        ],
+        [
+          1.0,
+          -0.0,
+          0.0,
+          3.6
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.605
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "seat_006",
+      "parent": "anchors",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          -0.0,
+          -1.0,
+          0.0,
+          -8.48
+        ],
+        [
+          1.0,
+          -0.0,
+          0.0,
+          6.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.605
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "seat_007",
+      "parent": "anchors",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          -0.0,
+          1.0,
+          0.0,
+          -2.32
+        ],
+        [
+          -1.0,
+          -0.0,
+          0.0,
+          -6.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.605
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "seat_008",
+      "parent": "anchors",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          -0.0,
+          1.0,
+          0.0,
+          -2.32
+        ],
+        [
+          -1.0,
+          -0.0,
+          0.0,
+          -3.6
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.605
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "seat_009",
+      "parent": "anchors",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          -0.0,
+          1.0,
+          0.0,
+          -2.32
+        ],
+        [
+          -1.0,
+          -0.0,
+          0.0,
+          -1.2
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.605
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "seat_010",
+      "parent": "anchors",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          -0.0,
+          1.0,
+          0.0,
+          -2.32
+        ],
+        [
+          -1.0,
+          -0.0,
+          0.0,
+          1.2
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.605
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "seat_011",
+      "parent": "anchors",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          -0.0,
+          1.0,
+          0.0,
+          -2.32
+        ],
+        [
+          -1.0,
+          -0.0,
+          0.0,
+          3.6
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.605
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "seat_012",
+      "parent": "anchors",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          -0.0,
+          1.0,
+          0.0,
+          -2.32
+        ],
+        [
+          -1.0,
+          -0.0,
+          0.0,
+          6.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.605
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "seat_013",
+      "parent": "anchors",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -5.4
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          7.9
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.605
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "seat_014",
+      "parent": "lounge_anchors",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          -1.0,
+          0.0,
+          0.0,
+          12.335
+        ],
+        [
+          -0.0,
+          -1.0,
+          0.0,
+          -8.97
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.64
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "seat_015",
+      "parent": "lounge_anchors",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          -1.0,
+          0.0,
+          0.0,
+          11.065
+        ],
+        [
+          -0.0,
+          -1.0,
+          0.0,
+          -8.97
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.64
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "seat_016",
+      "parent": "lounge_anchors",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          -0.0,
+          1.0,
+          0.0,
+          15.17
+        ],
+        [
+          -1.0,
+          -0.0,
+          0.0,
+          -5.615
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.64
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "seat_017",
+      "parent": "lounge_anchors",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          -0.0,
+          1.0,
+          0.0,
+          15.17
+        ],
+        [
+          -1.0,
+          -0.0,
+          0.0,
+          -6.885
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.64
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "seat_018",
+      "parent": "lounge_anchors",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          -0.0,
+          -1.0,
+          0.0,
+          12.03
+        ],
+        [
+          1.0,
+          -0.0,
+          0.0,
+          5.6
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.64
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "seat_019",
+      "parent": "lounge_anchors",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          -0.0,
+          1.0,
+          0.0,
+          15.97
+        ],
+        [
+          -1.0,
+          -0.0,
+          0.0,
+          5.6
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.64
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "skirting_east",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "42349a7bb2751335a82501b9448e20fdc065e6aeaee10d0c0190af3846702e6e"
+    },
+    {
+      "name": "skirting_west",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "e13bb7d16ccb4a4f8a52d7c2eb55b6ba9f23c07ffd4def49313a27dfedf8f81a"
+    },
+    {
+      "name": "stand_001",
+      "parent": "anchors",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          -0.0,
+          -1.0,
+          0.0,
+          -9.95
+        ],
+        [
+          1.0,
+          -0.0,
+          0.0,
+          -6.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "stand_002",
+      "parent": "anchors",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          -0.0,
+          -1.0,
+          0.0,
+          -9.95
+        ],
+        [
+          1.0,
+          -0.0,
+          0.0,
+          -3.6
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "stand_003",
+      "parent": "anchors",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          -0.0,
+          -1.0,
+          0.0,
+          -9.95
+        ],
+        [
+          1.0,
+          -0.0,
+          0.0,
+          -1.2
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "stand_004",
+      "parent": "anchors",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          -0.0,
+          -1.0,
+          0.0,
+          -9.95
+        ],
+        [
+          1.0,
+          -0.0,
+          0.0,
+          1.2
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "stand_005",
+      "parent": "anchors",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          -0.0,
+          -1.0,
+          0.0,
+          -9.95
+        ],
+        [
+          1.0,
+          -0.0,
+          0.0,
+          3.6
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "stand_006",
+      "parent": "anchors",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          -0.0,
+          -1.0,
+          0.0,
+          -9.95
+        ],
+        [
+          1.0,
+          -0.0,
+          0.0,
+          6.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "stand_007",
+      "parent": "anchors",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          -0.0,
+          1.0,
+          0.0,
+          -0.85
+        ],
+        [
+          -1.0,
+          -0.0,
+          0.0,
+          -6.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "stand_008",
+      "parent": "anchors",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          -0.0,
+          1.0,
+          0.0,
+          -0.85
+        ],
+        [
+          -1.0,
+          -0.0,
+          0.0,
+          -3.6
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "stand_009",
+      "parent": "anchors",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          -0.0,
+          1.0,
+          0.0,
+          -0.85
+        ],
+        [
+          -1.0,
+          -0.0,
+          0.0,
+          -1.2
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "stand_010",
+      "parent": "anchors",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          -0.0,
+          1.0,
+          0.0,
+          -0.85
+        ],
+        [
+          -1.0,
+          -0.0,
+          0.0,
+          1.2
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "stand_011",
+      "parent": "anchors",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          -0.0,
+          1.0,
+          0.0,
+          -0.85
+        ],
+        [
+          -1.0,
+          -0.0,
+          0.0,
+          3.6
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "stand_012",
+      "parent": "anchors",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          -0.0,
+          1.0,
+          0.0,
+          -0.85
+        ],
+        [
+          -1.0,
+          -0.0,
+          0.0,
+          6.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "stand_013",
+      "parent": "anchors",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -5.4
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          9.5
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "stand_014",
+      "parent": "lounge_anchors",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          -1.0,
+          0.0,
+          0.0,
+          12.335
+        ],
+        [
+          -0.0,
+          -1.0,
+          0.0,
+          -7.65
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "stand_015",
+      "parent": "lounge_anchors",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          -1.0,
+          0.0,
+          0.0,
+          11.065
+        ],
+        [
+          -0.0,
+          -1.0,
+          0.0,
+          -7.65
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "stand_016",
+      "parent": "lounge_anchors",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          -0.0,
+          1.0,
+          0.0,
+          13.85
+        ],
+        [
+          -1.0,
+          -0.0,
+          0.0,
+          -5.615
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "stand_017",
+      "parent": "lounge_anchors",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          -0.0,
+          1.0,
+          0.0,
+          13.85
+        ],
+        [
+          -1.0,
+          -0.0,
+          0.0,
+          -6.885
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "stand_018",
+      "parent": "lounge_anchors",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          -0.0,
+          -1.0,
+          0.0,
+          12.0
+        ],
+        [
+          1.0,
+          -0.0,
+          0.0,
+          7.1
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "stand_019",
+      "parent": "lounge_anchors",
+      "type": "EMPTY",
+      "world_matrix": [
+        [
+          -0.0,
+          1.0,
+          0.0,
+          16.0
+        ],
+        [
+          -1.0,
+          -0.0,
+          0.0,
+          4.1
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "table_edge",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -5.4
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "bf9a2d5f6b598c075fc65d0f850de87c756eb68dd2b4e452b4765c1566c4ae06"
+    },
+    {
+      "name": "table_foot_0",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -5.4
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "e3b7f7ffb2a997273b8d4e9ca9b9b7debb203c0261c46b885537ab21d85da807"
+    },
+    {
+      "name": "table_foot_1",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -5.4
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "5577bef8680fad4e9dd29888fa052a510bb6da715abc30ce08ed283673df22f0"
+    },
+    {
+      "name": "table_foot_2",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -5.4
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "54709eff1ef11c331e9f20bc264db5d21c18c1bc34535a615f9e2a7b82bbc45e"
+    },
+    {
+      "name": "table_pedestal_0",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -5.4
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "ee21729cd56868532c6dd8b16a0ba9c0959b85c5f0cfb33a5e18f032ab617af9"
+    },
+    {
+      "name": "table_pedestal_1",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -5.4
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "b372e2743d25471fa6e39805ac16b707ba6b659ec55b8a12083d3b58a00f0a15"
+    },
+    {
+      "name": "table_pedestal_2",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -5.4
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "b404aa2901e000109f316839c752482779d61c3c0412511ad643321d8de8f475"
+    },
+    {
+      "name": "table_top",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -5.4
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "16d79aaae39c5386ae49264a1feda6d388630b8eff27abdf8338442c0600c98a"
+    },
+    {
+      "name": "wall_east_base",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "0c20daef1118f6a1a75a3b7b94145ed7605fec169e4cf4d8fef68e97fdc30250"
+    },
+    {
+      "name": "wall_east_header",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "1e0222ea5c1f4399da035896ead79f61e3bdfd9ac415cbd45a66b91f934ddf85"
+    },
+    {
+      "name": "wall_east_pier_0",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "653158697d59c641874e3991d7fbfe431a7181e4f262727019bf7333a509717b"
+    },
+    {
+      "name": "wall_east_pier_1",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "9371fec7a34a92b463bf7ff042e7e2b52f1a522e7f7cc809435594fadf30cf6d"
+    },
+    {
+      "name": "wall_east_pier_2",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "fb28f2a7d0cb2cf9644c0ec17f2758ff98d60dcb30adec65861e3b2993fbb80e"
+    },
+    {
+      "name": "wall_east_pier_3",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "47e468e44b6a6e4f39f6b5cd5721892753f9fe60e83623f347d0df435404eccb"
+    },
+    {
+      "name": "wall_east_pier_4",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "8d76f09fbeb54a4ba590dafafbb95071d745f8aa8b16b4da56fe4a0c064bf3ea"
+    },
+    {
+      "name": "wall_east_pier_5",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "6df1bff5bef2f0590c23d09fd944b608149c71ae9d7c9c664af35946fe55b7cd"
+    },
+    {
+      "name": "wall_north_east",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "b3707f114419bf032217ba040b57887245ce1cc8b8157a996b6fc2b5a6e231bb"
+    },
+    {
+      "name": "wall_north_west",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "cc14060be5eb3fc427a2ee0d1df8c6ad8858a52fefe1029e8ac27abb5ac82c81"
+    },
+    {
+      "name": "wall_south_base",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "038fd49458a194ea93cf2632a5efba57392875b8b9899bb019851bf9f3e2a5bf"
+    },
+    {
+      "name": "wall_south_header",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "f7dcf2b139f780aabecdc4a16198748d43afc395da1f3ac05468299f169ee810"
+    },
+    {
+      "name": "wall_south_pier_0",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "f39faa7243c865510dff66a13384c0ddab864771e3798938e2ee0e539985fcb0"
+    },
+    {
+      "name": "wall_south_pier_1",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "8e3985b9aaff9fab0de511c958217af8fb971ecaf903d863c2a37df841e74bb4"
+    },
+    {
+      "name": "wall_south_pier_2",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "0f320b19f11747f8c5b87150c3a7d545ccef4f6fddf1ccdc1c220cc1cb48c543"
+    },
+    {
+      "name": "wall_south_pier_3",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "978b004a71283e0dae5a1e6f7aa14c246d947860435bbe3bc49dc63dc3117f09"
+    },
+    {
+      "name": "wall_south_pier_4",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "6d3e8a914a089badb904969915eee1a11548b67fe1dac91ac3d31642710ade60"
+    },
+    {
+      "name": "wall_south_pier_5",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "9b6c4d4100c4fe82e38cfdc340183ecbee531700ece9deafff5ac85aacc2dd53"
+    },
+    {
+      "name": "wall_south_pier_6",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "eab7791c337897cb2bf37517534fb955f20954355385bd1a9bae8d5e2fb69539"
+    },
+    {
+      "name": "wall_south_pier_7",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "fe6c97be8663100de0204f2a9ac30259dddaa5767aed9bf959c61eb0251b5fb1"
+    },
+    {
+      "name": "wall_west_base",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "1491594714ff84a1d3ef65196c6b880e4789c7b616396ea42e5c0fadd0763723"
+    },
+    {
+      "name": "wall_west_header",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "2ff06efcb8546b94fa979b7bdb3554435c1b07cfc3315ecb82313a276a635c3c"
+    },
+    {
+      "name": "wall_west_pier_0",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "7af766108a5f5a02e6b7e42b591b13105396e198c6dfbcb30c1fa2f391592e39"
+    },
+    {
+      "name": "wall_west_pier_1",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "97087275106a4fee536ab0e3da897a450c6ff181165416d50e6c438f12a6a1d0"
+    },
+    {
+      "name": "wall_west_pier_2",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "75b26b8240662957a229bfb396d8ce787a632db447a5b8a49f6c98af2b6df164"
+    },
+    {
+      "name": "wall_west_pier_3",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "582e31108baf9ef01a092f05e42febda5a579174db7d43beb07e2016869f4fdd"
+    },
+    {
+      "name": "wall_west_pier_4",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "3579fef6388b6149bd3097e1c8571500a05a6adfbfbfae2a2234d2df62b05861"
+    },
+    {
+      "name": "wall_west_pier_5",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "ee05a6fad3465f7ebd9a0e88825e87a7d950d6446d399c54ff99056a5703d197"
+    },
+    {
+      "name": "whiteboard_backing",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -5.4
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "3c9d4e425f82d091d3112dd130971bc65e1b216135619e6cec8dcca6bff2f1ea"
+    },
+    {
+      "name": "whiteboard_frame_bottom",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -5.4
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "c2d5101934485f2299c7fa7253b1fb5f3fac248471e39f6cd4b9575ccd157f2a"
+    },
+    {
+      "name": "whiteboard_frame_left",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -5.4
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "32228aa62c036ce3869c68b06e2c5a8057ce4402445fa21d59517ac1de23bfe5"
+    },
+    {
+      "name": "whiteboard_frame_right",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -5.4
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "3f11bf1baa29e4ada98f8d441e8ee3baab2b65d1991504c5a6a3325883c30339"
+    },
+    {
+      "name": "whiteboard_frame_top",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -5.4
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "ed19285400c36fd5a8228cd889be272b74dc1cb3e92c12033234930333fe7322"
+    },
+    {
+      "name": "whiteboard_surface",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -5.4
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "7b6372a6a8779690400ce89ce1612d32c723aede922a03cc21601c96f4a3b319"
+    },
+    {
+      "name": "whiteboard_tray",
+      "parent": "furniture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -5.4
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "8d7b12aaad1df6c8d30e459ecc885348db64e6b308d8114f1647b430cfde0141"
+    },
+    {
+      "name": "window_east_00",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "bbe96ebe44c595bf9c54f1a4b21f679f0da39863ac612a80bae73dd80f916ea8"
+    },
+    {
+      "name": "window_east_01",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "157170f6d05b1d6aabeec63d64bf8b6f56736c088804d28c1faf01a176709793"
+    },
+    {
+      "name": "window_east_02",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "72167d7085fc9816ba6f786d299906049836ce71f638a117f1a451c969c92eb8"
+    },
+    {
+      "name": "window_east_03",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "e7324684724555ffccabe9c3824b7d612b41eb3d301349cd9abe83de8ca18908"
+    },
+    {
+      "name": "window_east_04",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "18cbf869e8d25c8fbb0045c2464609107bcc47e13da25bea6d8f1463a5465851"
+    },
+    {
+      "name": "window_east_05",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "004bf50b50a6c05defe6dffc51ba1b0d5e9ed899ed4f1e183bfb4dfe4e94cb62"
+    },
+    {
+      "name": "window_mullion_east_00",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "94450b6220aa40e342711acbba83cae4d958ee4359bd502aa320a9e9a19d7116"
+    },
+    {
+      "name": "window_mullion_east_01",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "d51d5b456a08d4123a1667985a2b66deb3502a0d633175701769726752a74452"
+    },
+    {
+      "name": "window_mullion_east_02",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "4341d850e96babdf48ff1a7baec6a768cf6eae6a9fd66c2bd12a6794733e6f7b"
+    },
+    {
+      "name": "window_mullion_east_03",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "924851f2f8fd17e0758df1819b4386993197aef391b0d22eeec678a32c8d3ff3"
+    },
+    {
+      "name": "window_mullion_east_04",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "f825b813855e7bcf2535278fb3479291eefe31f4a12068d598ea979bdb5fc6bb"
+    },
+    {
+      "name": "window_mullion_east_05",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "c1d4ed0238c5651670d972dbf2ae72feefe1607b8b89db2ff6fc2c7a45610d40"
+    },
+    {
+      "name": "window_mullion_south_0",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "5ab2928825b66c77d2b937056c2f6ebf978133e7c897e39fbe0f3d6506e48723"
+    },
+    {
+      "name": "window_mullion_south_1",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "f256d15db4964974eb1a5d67f6d137dd81f55c5cd6f5f59a54d80ff9c8c130d2"
+    },
+    {
+      "name": "window_mullion_south_2",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "864a35baa6b5c41e7814a17eb5ccbce563a73b7381926f30dd8dac2907d9fb68"
+    },
+    {
+      "name": "window_mullion_south_3",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "e748a59dc9f9e4c123e74ff00fd9983ed6c8656722633cafdbb2f5ac1bb4faab"
+    },
+    {
+      "name": "window_mullion_south_4",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "579e08f82683e1e356f5890bf341afded5cd6f2bffbc57ef0a745ecf0adb0ead"
+    },
+    {
+      "name": "window_mullion_south_5",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "7065824695b9f9a0c96f12a3388e7e459d711410f8e1b59f10b6e86cd5868e47"
+    },
+    {
+      "name": "window_mullion_south_6",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "c268e5559aa951bedabaa8ccfbe113239109f05ce6c01bef44784987359d5b2b"
+    },
+    {
+      "name": "window_mullion_south_7",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "625f549755ce3d0bdd2cc58cc7a91ac83ebfae6c0f63ed7eca99554355b26a2d"
+    },
+    {
+      "name": "window_mullion_west_00",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "3d69a07ef57d79f4b324c2569869cec52350d7303c9ac0167df35d9b4a49eb32"
+    },
+    {
+      "name": "window_mullion_west_01",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "e13759cb2551f45913b5497ebe73b016178a17cabdc656881554e3b5adee5a59"
+    },
+    {
+      "name": "window_mullion_west_02",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "e74a2a25c095730ae2b3cfdb31b46830d8711b06b08940eb0425691be844890b"
+    },
+    {
+      "name": "window_mullion_west_03",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "0a49ba9164d4ac24f28b8d124b7a844a1c2973f2299b98e3af574b53e524ad87"
+    },
+    {
+      "name": "window_mullion_west_04",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "80712f4758f69cc6dbb3fc860230f97d84198cf6152147c65108644cab305cc6"
+    },
+    {
+      "name": "window_mullion_west_05",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "b8ad60c7a0fe302b685fa4a9c0a903d2734dcfec6ca0f48ff318d331631f228f"
+    },
+    {
+      "name": "window_reflection_east_00",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "33f853e66195ea9a748440ccac6c93533b77b682967611d940f93eb8a0fc8df5"
+    },
+    {
+      "name": "window_reflection_east_01",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "b952716b2eaae647b142589ef89f4929e900f5a9f913a02f489eec4b7399cc7a"
+    },
+    {
+      "name": "window_reflection_east_02",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "29f8fc18c09ec7ade0d2812e93f429ccfa78d3477792acf9a3373257a154c317"
+    },
+    {
+      "name": "window_reflection_east_03",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "be9f746912447c085bacbab50cafdbb13316fd76d65297168d7acfa3e97363da"
+    },
+    {
+      "name": "window_reflection_east_04",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "7f910b2c528d693b9d04d0bf2165f387fb3c1eeebd39aae54b90d66cf155cbaf"
+    },
+    {
+      "name": "window_reflection_east_05",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "f307f4db15d2d31c5dd9bdc9a2de10d60e8b3e324eec6a6f91eb454046c35390"
+    },
+    {
+      "name": "window_reflection_south_0",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "e2a02a8462e058fb87c0b310916e142f4a12e83a579e9d57bf6ee39a23ca21e8"
+    },
+    {
+      "name": "window_reflection_south_1",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "0fce5275d99211f699da5e1dc96d3467a72ebdedcdb644eace92845fc1e971b0"
+    },
+    {
+      "name": "window_reflection_south_2",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "4b3f13ea668af31f824140a292c60058419e1abc13a313dd1e33f7d04a2164c7"
+    },
+    {
+      "name": "window_reflection_south_3",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "8bf7ce832a67f18e2bef19c889f18555a2e8f7116fe2d08e1a2305ba5f25cefc"
+    },
+    {
+      "name": "window_reflection_south_4",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "a3ab440c80d47598de2b458a8cacc5b486fc3e31ed6a8b1fb36e9471798d4cbe"
+    },
+    {
+      "name": "window_reflection_south_5",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "c444f6056754347def1c6f4416d9de9cdd87b681266eaa670f2e926a6798fe59"
+    },
+    {
+      "name": "window_reflection_south_6",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "593676b1ee13ca121e09298f5133534eb0c7a09a40242bdf134f4cd40ec5c535"
+    },
+    {
+      "name": "window_reflection_south_7",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "c35bf75b406391bd481aa3056e9a05ade88bfccbf4a9b578be11f26339bb62fb"
+    },
+    {
+      "name": "window_reflection_west_00",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "9ab7af7dd6f0704cc184b74cb2749eef4c9e8dcd0ee05e66812fc29a1b76aaa1"
+    },
+    {
+      "name": "window_reflection_west_01",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "695baa0e16b2285f6af34ac4b88584222cb74ac541412c3d544d573bba368813"
+    },
+    {
+      "name": "window_reflection_west_02",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "21df046e39f506ac0d6042e95f8f3feeadbff24d57f3d3a8077a2975fea6efa2"
+    },
+    {
+      "name": "window_reflection_west_03",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "418117e0effeadc0a1fd8df7940ad9ae8e2c9617b344082df837fbff4a7c44c3"
+    },
+    {
+      "name": "window_reflection_west_04",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "667cc4d7df30457552808340b09d3db126f68cdf8212807b3fa49319285857f2"
+    },
+    {
+      "name": "window_reflection_west_05",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "304d3a3cadd84ae967eff09a696c9ad65aba14f8c7e930c6c1db507c4371f935"
+    },
+    {
+      "name": "window_south_0",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "7b7795e95f1dbca8ef7797306cc70b6fa5f07be2c88c014f4d4866c6630c2d0c"
+    },
+    {
+      "name": "window_south_1",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "b1166ac02cf79e2e4cfd075b4c7a948742f0ae9620ade415b7b7d1a3c577c5c8"
+    },
+    {
+      "name": "window_south_2",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "2eab66962724cd664260539f0e70a869dad4154e711fd3945f9572afeb199763"
+    },
+    {
+      "name": "window_south_3",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "3d5f22e2850bc9f0eb2d47e94cdc7214063e5adf069d690892ffbd2148c201c4"
+    },
+    {
+      "name": "window_south_4",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "b6a35e0952b8db966a73246edb08a1f6efa920e9f8a5a2e35b97d91fd595f7be"
+    },
+    {
+      "name": "window_south_5",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "fbafe96b989edd323b746de7bd07ccb5e41c26c95e0951180bbeeb69150c16c3"
+    },
+    {
+      "name": "window_south_6",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "41cf21c08f188034d8c230070d0906477386093e7e49021b7018885a154db9b0"
+    },
+    {
+      "name": "window_south_7",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "ce3eb819115fee6342b160f9d7e9cbbabfbee0eaa26ec839820cfbc1559929cc"
+    },
+    {
+      "name": "window_west_00",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "70f66564f29fedf3156b9e1ef9926367bf5cf7dec6521a67e7d8a0d229a50e32"
+    },
+    {
+      "name": "window_west_01",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "a8cb503f548af45c3b92645c17cd9a0111b1257fd1040bd28ddcbcdf09f7703d"
+    },
+    {
+      "name": "window_west_02",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "dd0087156e8fad1450c3a12738fb1002eaade6c497edd1a56bd19857f2ac87d9"
+    },
+    {
+      "name": "window_west_03",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "7e815272890321493012afe69e35872bae55048a9a83640f8b7db8b7124ec36c"
+    },
+    {
+      "name": "window_west_04",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "585cac15d4afe2982e1e6ffae6bfb7cc16d035f68a9650f731bc29291921cfc2"
+    },
+    {
+      "name": "window_west_05",
+      "parent": "architecture",
+      "type": "MESH",
+      "world_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "geometry_sha256": "9000247b114d19e71a614fcbe0cba86cf1d181657768e4a9e5fbb2c8f9263a21"
+    }
+  ]
+}

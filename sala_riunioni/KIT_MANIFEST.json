@@ -1,0 +1,128 @@
+{
+  "kit_version": "1.0.0",
+  "source_commit": "ab4040a14e6f3387f5ecc9ac44e1fc5f896218c5",
+  "hash_algorithm": "sha256",
+  "scope": "Files included in this distribution, excluding this manifest itself; future user work/delivery assets are not part of kit integrity.",
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "bytes": 3024,
+      "sha256": "b5f7c653cb4b7de417b6ed69f21d6102e5af522965f2977664ec605f5fce1080"
+    },
+    {
+      "path": "delivery/README.md",
+      "bytes": 115,
+      "sha256": "9f4e2e2548bee9df979e44016cdcc616c5fd5b18d253cc2114e86f521b180675"
+    },
+    {
+      "path": "PROMPT_CODEX.md",
+      "bytes": 1179,
+      "sha256": "fc7ac1d72a83dc8f937e4d9bc5043bf6ae5cac9a0013400b48e784105dca0c6a"
+    },
+    {
+      "path": "README_INIZIA_QUI.md",
+      "bytes": 3078,
+      "sha256": "e8f1328bd3ceb6cafac68afec214dca63b81e2537b034a97249680e715fec87e"
+    },
+    {
+      "path": "reference/INTEGRATION_NOTES.md",
+      "bytes": 1873,
+      "sha256": "e7421c4d01efec615893ca094dd2dcc10d170c17d3dee568041bf1d69fc61444"
+    },
+    {
+      "path": "reference/ROOFTOP_BLENDER_ENVELOPE.png",
+      "bytes": 39609,
+      "sha256": "7fbe0dcf2956be60c9add0ef17ba48ced2d762e8eb52ec9f30fcb22281e0c85a"
+    },
+    {
+      "path": "reference/ROOFTOP_BLENDER_ENVELOPE.svg",
+      "bytes": 2308,
+      "sha256": "22b1ae391ea2e5f08a3b44da3f26ad4ddeb34a62539fa50c257671b6a82ac460"
+    },
+    {
+      "path": "reference/SOURCES.md",
+      "bytes": 1541,
+      "sha256": "bcf188c6f7456d9613dc894b2c2bde2664b30e6cb312f29a5f13819e327aeb94"
+    },
+    {
+      "path": "reference/starter_reference.glb",
+      "bytes": 4740,
+      "sha256": "600e51934c65f006e9c204917065c46cf43ded4f49f429a5a42634b6c85730c2"
+    },
+    {
+      "path": "rules/constraints.json",
+      "bytes": 2208,
+      "sha256": "00a0c81df1a99f08e9afef43d9a5714e57352b4058f9a668f46b651500dc0555"
+    },
+    {
+      "path": "rules/CONSTRAINTS.md",
+      "bytes": 6546,
+      "sha256": "71e8187af377bdfd71e391a377e9d3f0e5576f35a40142a97cf540f0ffaff5a5"
+    },
+    {
+      "path": "rules/DELIVERY.md",
+      "bytes": 2665,
+      "sha256": "12ab8d92639e31b20dc6d766888468798350435bbae4dba773595700f22453e5"
+    },
+    {
+      "path": "scripts/create_starter.py",
+      "bytes": 3537,
+      "sha256": "73058fb6a5d8c5fe63c902af48e97d117a627084fdd76b968795772f63941c75"
+    },
+    {
+      "path": "scripts/export_asset.py",
+      "bytes": 3546,
+      "sha256": "e634e97df3d23208a1829af872bac0b068781e95861fd8d68a8fa714b5b94f80"
+    },
+    {
+      "path": "scripts/inspect_glb.py",
+      "bytes": 12920,
+      "sha256": "d25467a098b0ef5927b3a7695c4e9f0e6c7aa22523c5c40f8b3610d6fc5fa4f0"
+    },
+    {
+      "path": "scripts/USAGE.md",
+      "bytes": 3072,
+      "sha256": "05b6fdbe5a806dfb1bb977f4a9687cc9250872b5018dbd5f3d2a5e892167d667"
+    },
+    {
+      "path": "scripts/validate_scene.py",
+      "bytes": 7961,
+      "sha256": "0ac146000670c29602e6b0f42e5afc45fc1303115a08535dc6e0d31df30a4241"
+    },
+    {
+      "path": "scripts/verify_kit.py",
+      "bytes": 1051,
+      "sha256": "10cce6f47ba5137ef23207fc498b0fda2c8c9687e507633306e6579bea33f3aa"
+    },
+    {
+      "path": "templates/conference_room.manifest.json",
+      "bytes": 1140,
+      "sha256": "a0dde0216bdc8f46f8bb532968ad241aa9c54862259b2b84bf96edfe79ec3f4f"
+    },
+    {
+      "path": "templates/VALIDATION.json",
+      "bytes": 1034,
+      "sha256": "76cc010a44ab3166707b29080a41540dfc1535d5787910c9f40611758779300c"
+    },
+    {
+      "path": "verification/PACKAGE_VALIDATION.json",
+      "bytes": 1691,
+      "sha256": "3eee1c1d0ed9e4d765f8b1c2a47ccd06121f8406e83517a532c15d3bbd380090"
+    },
+    {
+      "path": "verification/reference_glb_check.json",
+      "bytes": 1888,
+      "sha256": "24361d87a59661f93d58466bfd6401c4dc5a97f58aba7f650a7f59ad9a5d390f"
+    },
+    {
+      "path": "verification/THREE_REFERENCE_LOAD.json",
+      "bytes": 450,
+      "sha256": "267db163fb79c3f1c399aa6726e7b33dccd8c4fad557e09baa4a33edc05acabb"
+    },
+    {
+      "path": "work/README.md",
+      "bytes": 99,
+      "sha256": "b5557ea543b2cb8a18c2ada0cdbf6f913c0ed012a29316638b200dc5b405f610"
+    }
+  ]
+}

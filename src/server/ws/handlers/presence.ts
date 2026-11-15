@@ -2,8 +2,7 @@
 import type { ChatLine, PresenceClientMsg } from '../../../shared/protocol.js';
 import { OFFICE_PLAN, seatHereOn } from '../../../shared/maps/index.js';
 import { sanitizeLook } from '../../../shared/avatar.js';
-import { ROOF, isDrink } from '../../../shared/rooftop.js';
-import { isBarGame } from '../../../shared/bargames.js';
+import { ROOF } from '../../../shared/rooftop.js';
 import { throttle } from '../../office/client.js';
 import { COLOR_RE, issueNumber, num, str } from '../../office/input.js';
 import type { HandlerMap } from './types.js';
@@ -19,25 +18,7 @@ export const presenceHandlers = {
     ctx.toNeighbors(c, { t: 'peer.move', id: c.id, x: p.x, y: p.y, z: p.z, rotY: p.rotY, moving: p.moving }, true);
   },
   act(ctx, c, msg) {
-    if ('smoke' in msg) return; // Ignore an obsolete client without replaying an interaction.
-    if (msg.drink !== undefined) {
-      // A drink from the rooftop bar, which stays up there.
-      const drink = isDrink(msg.drink) && c.peer.floor === ROOF ? msg.drink : undefined;
-      if (drink === c.peer.drink) return;
-      if (drink) c.peer.drink = drink;
-      else delete c.peer.drink;
-      ctx.broadcast({ t: 'peer.act', id: c.id, drink: drink ?? null }, c.id, true);
-      return;
-    }
-    if (msg.throwing !== undefined) {
-      // The dart board and the axe lane are up on the roof.
-      const game = isBarGame(msg.throwing) && c.peer.floor === ROOF ? msg.throwing : undefined;
-      if (game === c.peer.throwing) return;
-      if (game) c.peer.throwing = game;
-      else delete c.peer.throwing;
-      ctx.broadcast({ t: 'peer.act', id: c.id, throwing: game ?? null }, c.id, true);
-      return;
-    }
+    if ('smoke' in msg || 'drink' in msg || 'throwing' in msg) return;
     if (!throttle(c, 'act', 100)) return;
     ctx.toNeighbors(c, { t: 'peer.act', id: c.id }, true);
   },

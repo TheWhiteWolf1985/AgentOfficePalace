@@ -2,7 +2,7 @@ import type { Slice } from '../store';
 declare module '../store' {
   interface Store {
     clock?: { offset: number; rtt: number };
-    /** Shared server clock for weather and the rooftop DJ. */
+    /** Shared server clock for weather and presence. */
     officeNow(): number;
   }
 }

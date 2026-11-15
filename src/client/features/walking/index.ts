@@ -4,6 +4,7 @@ import { t as uiText } from '../../../shared/i18n';
  * they're on another floor; and walking over to something to use it (Shift+Enter in the palette).
  * A key of yours takes over.
  */
+import { conferenceRoute } from '../../../shared/conference-room-nav';
 import { seatOn } from '../../../shared/maps';
 import type { PeerInfo } from '../../../shared/protocol';
 import type { Ctx } from '../../core/context';
@@ -78,7 +79,7 @@ export function installWalking(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'wo
     if (now < walkingTo.replanAt) return;
     walkingTo.replanAt = now + 800;
     // Navigate the office rooms, stairs and back office.
-    player.walkPath(wayTo(player.pos, at, officeWing()));
+    player.walkPath(ctx.upTop() ? conferenceRoute(player.pos, at) : wayTo(player.pos, at, officeWing()));
   }
 
   ctx.ticks.add('steer', ({ now }) => walkTick(now));

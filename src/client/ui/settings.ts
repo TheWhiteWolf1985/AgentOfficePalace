@@ -80,7 +80,7 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
   paint();
 
   /** A volume slider with its mute button. Dragging it turns the sound back on; letting go plays `preview`. */
-  const volumeRow = (label: string, level: 'volume' | 'music', muted: 'muted' | 'musicMuted', preview?: () => void) => {
+  const volumeRow = (label: string, level: 'volume', muted: 'muted', preview?: () => void) => {
     const slider = h('input', { type: 'range', min: 0, max: 100, step: 1, 'aria-label': label });
     const pct = h('span.vol-pct');
     const mute = h('button.btn', { type: 'button' });
@@ -119,7 +119,6 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
   };
   // Voice chat: an open mic, or muted until you hold V.
   const talkRow = choiceRow(uiText('Voice chat'), [[false, uiText('🎙️ Open mic')], [true, uiText('✋ Push to talk')]], () => settings.pushToTalk, (pushToTalk) => change({ pushToTalk }));
-  const musicRow = volumeRow(uiText('Rooftop music volume'), 'music', 'musicMuted');
 
   // The swish of the book's pages at the bookshelf, on or off.
   const pagesRow = choiceRow(uiText('Page turns at the bookshelf'), [[true, uiText('📖 On')], [false, uiText('Off')]], () => settings.pageTurns, (pageTurns) => change({ pageTurns }));
@@ -389,7 +388,6 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
       setting(uiText('Office sounds'), 'you', soundRow, h('p.setting-note', {}, uiText('Workers typing, footsteps, birds and rain outside, the ding when a worker is done and the alarm when one needs you. Voice chat isn’t affected.'))),
       setting(uiText('When a worker needs you'), 'you', alarmRow, h('p.setting-note', {}, uiText('An alarm the moment a worker stops to ask you something or wants a permission. Keep reminding me rings it again, softly, every 30 seconds until someone opens that worker’s terminal. It’s as loud as the office sounds are.'))),
       setting(uiText('Page turns at the bookshelf'), 'you', pagesRow, h('p.setting-note', {}, uiText('A soft swish each time the book in your hands turns a page, as you open a doc or scroll through one. The 🔈 at the top of the bookshelf turns it off too.'))),
-      setting(uiText('Rooftop music'), 'you', musicRow, h('p.setting-note', {}, uiText('The DJ on the rooftop. This sets the music volume for you alone.'))),
       setting(uiText('Voice chat'), 'you', talkRow, h('p.setting-note', {}, uiText('Either way, V joins voice, holding V talks and you’re muted once you let go, and M mutes or unmutes. With push to talk you join muted. Leave voice from the ☰ menu.'))),
     ],
     notify: [

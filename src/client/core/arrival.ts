@@ -23,10 +23,10 @@ import { restarting, showRestarting, showUpgraded } from '../ui/upgrade';
 import { routeWhiteboardMessage } from '../features/whiteboard/ui';
 import type { Ctx } from './context';
 import type { CoreState } from './ctx';
-import { builtFloors, pastTheWing } from './floors';
+import { pastTheWing } from './floors';
 import type { Parts } from './parts';
 
-export type ArrivalParts = Pick<Parts, 'worlds' | 'place' | 'travel' | 'views' | 'cards' | 'bar' | 'bargames' | 'focus'>;
+export type ArrivalParts = Pick<Parts, 'worlds' | 'place' | 'travel' | 'views' | 'cards' | 'focus'>;
 
 /**
  * Registers arriving's messages and the routers (see the order below), and what follows the upgrade,
@@ -98,10 +98,6 @@ export function installArrival(ctx: Ctx, core: CoreState, parts: ArrivalParts) {
     if (player.seat) net.send({ t: 'sit', seat: player.seat.key });
     const carrying = core.carrying;
     if (carrying) net.send({ t: 'carry', issue: carrying.issue, title: carrying.title });
-    const shownDrink = parts.bar.shownDrink();
-    if (shownDrink) net.send({ t: 'act', drink: shownDrink });
-    const { thrower } = parts.bargames;
-    if (thrower.playing) net.send({ t: 'act', throwing: thrower.playing });
     // After a reconnect the server has forgotten which terminal we had open, and what we're doing.
     parts.focus.sendDoing(true);
     const openId = openTerminalFor();
@@ -132,7 +128,7 @@ export function installArrival(ctx: Ctx, core: CoreState, parts: ArrivalParts) {
     // Someone who just joined starts here: their workers need their own Claude sign-in first.
     if (!signInsGreeted) {
       signInsGreeted = true;
-      if (needsSigningIn()) openSignIns(net, uiText('Welcome! Sign in to Claude so the workers you hire run on your own plan, and to GitHub so what you do on the boards is yours.'));
+      if (store.project && needsSigningIn()) openSignIns(net, uiText('Welcome! Sign in to Claude so the workers you hire run on your own plan, and to GitHub so what you do on the boards is yours.'));
     }
   });
   ctx.messages.on('signins.needed', (msg) => openSignIns(net, msg.why));
@@ -155,15 +151,14 @@ export function installArrival(ctx: Ctx, core: CoreState, parts: ArrivalParts) {
     const p = store.project;
     renderTitle();
     if (store.floor === ROOF) {
-      const n = builtFloors().length;
       $('project-meta').classList.remove('lobby');
-      $('project-name').textContent = `🍸 ${ROOF_NAME}`;
-      $('project-meta').textContent = uiText`🛗 on top of ${n} floor${n === 1 ? '' : 's'} · 🎧 drum & bass`;
+      $('project-name').textContent = `🤝 ${ROOF_NAME}`;
+      $('project-meta').textContent = uiText('Shared meeting room · 19 seats');
       return;
     }
     if (!p) {
       $('project-name').textContent = '🏢 Agent Office';
-      $('project-meta').textContent = store.floors.length ? uiText('🛗 Take the elevator to a floor') : uiText('🛗 No floors yet — add a project in the elevator');
+      $('project-meta').textContent = store.floors.length ? uiText('🛗 Take the elevator to a floor') : uiText('🛗 Visit the meeting room or add a project in the elevator');
       // Where to go next, so it shows even with the floor details turned off.
       $('project-meta').classList.add('lobby');
       ctx.world().setProjectName(store.floors.length ? uiText('Pick a floor') : uiText('Lobby'));

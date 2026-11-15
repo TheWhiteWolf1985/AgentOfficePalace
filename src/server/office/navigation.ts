@@ -25,7 +25,7 @@ export function navigation(ctx: Ctx): Navigation {
     ctx.floorsChanged();
   };
 
-  /** Up to the rooftop bar, by elevator. */
+  /** Up to the shared meeting room, by elevator. */
   const goToRoof = (c: Client) => {
     if (c.peer.floor === ROOF) return;
     const left = leave(c);
@@ -52,10 +52,8 @@ export function navigation(ctx: Ctx): Navigation {
     const spot = at ?? { ...elevatorSpot(), y: 0, rotY: 0 };
     Object.assign(c.peer, { x: spot.x, y: spot.y, z: spot.z, rotY: spot.rotY, moving: false });
     delete c.peer.seat;
-    delete c.peer.throwing;
-    // An issue card belongs to the board it came off, which is on the floor they left; a drink stays at the bar.
+    // An issue card belongs to the board it came off, which is on the floor they left.
     delete c.peer.carrying;
-    delete c.peer.drink;
     return after;
   };
 

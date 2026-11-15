@@ -1,9 +1,8 @@
 import * as THREE from 'three';
 import type { CarriedIssue } from '../../shared/protocol';
-import type { Drink } from '../../shared/rooftop';
 import { OpenBook } from '../features/bookshelf/book';
 import { HeldCard } from '../features/carrying/card';
-import { REACH_TIME, drinkGlass, putDownGlass, reachCurve } from './character';
+import { REACH_TIME, reachCurve } from './character';
 import { mesh, toonUnique } from './toon';
 
 export interface HandsInput {
@@ -20,8 +19,6 @@ export interface HandsInput {
 
 const CLASSIC = { x: 0.25, y: -0.185, z: -0.44, rx: 0.2, ry: 0.22, rz: -0.25 } as const;
 
-/** Lifting the mug for a sip and lowering it again, in seconds. */
-const SIP_TIME = 1.1;
 
 interface Arm {
   group: THREE.Group;
@@ -42,12 +39,7 @@ export class Hands {
   private right: Arm;
   private left: Arm;
   private reachT = -1;
-  private showDrink() {
-    if (this.glass) this.glass.group.visible = !this.card.held && !this.book;
-  }
 
-  /** A drink from the rooftop bar, held where the mug goes (and in its place). */
-  private glass: { id: string; group: THREE.Group } | null = null;
   /** An issue card off the board, held low in front of you in both hands. */
   private holder = new THREE.Group();
   private card: HeldCard;
@@ -56,8 +48,6 @@ export class Hands {
   private book: OpenBook | null = null;
   /** 0 → 1 as the card (or the book) comes up into view and the hands close in on it. */
   private carryK = 0;
-  /** Seconds into a sip (negative while it waits for the reach to finish), or null. */
-  private sipT: number | null = null;
   private sway = new THREE.Vector2();
   private last: { yaw: number; pitch: number } | null = null;
   private air = 0;
@@ -127,29 +117,12 @@ export class Hands {
     this.reachT = 0;
   }
 
-  /** A drink from the rooftop bar in the left hand, or none (null). */
-  holdDrink(d: Drink | null) {
-    if ((d?.id ?? null) === (this.glass?.id ?? null)) return;
-    if (this.glass) {
-      putDownGlass(this.glass.group);
-      this.glass = null;
-    }
-    if (d) {
-      const group = drinkGlass(d);
-      group.position.set(0.09, -0.035, -0.03);
-      group.quaternion.setFromEuler(this.left.baseRot).invert();
-      this.left.group.add(group);
-      this.glass = { id: d.id, group };
-    }
-    this.showDrink();
-  }
 
   /** An issue card in both hands, or none (null). The mug waits while the hands are full. */
   carry(card: CarriedIssue | null) {
     const was = this.card.held;
     this.card.set(card);
     if (!was) this.carryK = 0;
-    this.showDrink();
   }
 
   /** An open book in both hands, its pages turning, or none. A card you carry waits. */
@@ -165,7 +138,6 @@ export class Hands {
       this.book = null;
     }
     this.holder.visible = !on;
-    this.showDrink();
   }
 
   /** Turns a page of the book you're reading now. */
@@ -173,10 +145,6 @@ export class Hands {
     this.book?.turn();
   }
 
-  /** Raise the mug for a sip, once the right hand is back from the coffee machine. */
-  sip() {
-    this.sipT = -REACH_TIME * 0.6;
-  }
 
   private arm(side: 1 | -1): Arm {
     const group = new THREE.Group();
@@ -218,12 +186,6 @@ export class Hands {
     if (this.reachT >= 0) {
       this.reachT += dt;
       if (this.reachT >= REACH_TIME) this.reachT = -1;
-    }
-    let sip = 0;
-    if (this.sipT !== null) {
-      this.sipT += dt;
-      sip = reachCurve(this.sipT / SIP_TIME);
-      if (this.sipT >= SIP_TIME) this.sipT = null;
     }
     const shake = s.jitter * 0.004;
     this.carryK += ((this.card.held || this.book ? 1 : 0) - this.carryK) * Math.min(1, dt * 7);
@@ -285,12 +247,6 @@ export class Hands {
     r.rotation.z += 0.22 * k;
     this.left.group.position.y -= 0.025 * k;
     this.left.group.position.z += 0.03 * k;
-    // The sip: the mug comes up to your mouth and tips toward you.
-    const l = this.left.group;
-    l.position.x += 0.17 * sip;
-    l.position.y += 0.13 * sip;
-    l.position.z += 0.14 * sip;
-    l.rotation.x += 0.7 * sip;
   }
 
   private classic(arm: Arm, w: number) {

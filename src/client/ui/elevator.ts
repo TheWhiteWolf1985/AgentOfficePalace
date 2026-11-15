@@ -2,7 +2,7 @@ import { t as uiText } from '../../shared/i18n';
 import './elevator.css';
 import type { CloneProgress, FloorInfo, RepoChoice, ServerMsg } from '../../shared/protocol';
 import { cloneLabel, cloneStep, floorPalette, normalizeRepo, sameRepo } from '../../shared/floors';
-import { ROOF, ROOF_NAME } from '../../shared/rooftop';
+import { LOBBY, ROOF, ROOF_NAME } from '../../shared/rooftop';
 import type { Net } from '../net';
 import { store } from '../state';
 import { h, openModal, timeAgo, toast, type Modal } from './dom';
@@ -71,7 +71,7 @@ export function openElevator(opts: ElevatorOptions): void {
   let seen = false;
   let startTimer: number | undefined;
   let error = '';
-  let showAdd = setup || !store.floors.length;
+  let showAdd = setup;
   /** The search box and list are in place (rebuilding them would lose the focus mid-typing). */
   let built = false;
 
@@ -176,15 +176,15 @@ export function openElevator(opts: ElevatorOptions): void {
     confirmDialog(uiText`Take ${f.name} off the building?`, uiText`${workers}${people}Nothing is deleted: its checkout stays in ${f.dir}, .agent-office folder and all.${own}`, uiText('🗑 Remove floor'), () => net.send({ t: 'floor.remove', floor: f.id }));
   };
 
-  /** The roof, over every floor: the rooftop bar. */
+  /** The roof, over every floor: the shared meeting room. */
   const roofButton = () => {
     const here = store.floor === ROOF;
     const people = [...store.peers.values()].filter((p) => p.floor === ROOF).length;
     const btn = h(
       'button.floor-btn',
       { type: 'button', class: here ? 'here' : '', disabled: here, title: here ? uiText("You're up on the roof") : uiText`Ride up to the ${ROOF_NAME.toLowerCase()}` },
-      h('span.floor-no', { style: 'background:#2b2d42' }, '🍸'),
-      h('span.floor-text', {}, h('span.floor-name', {}, ROOF_NAME, here ? h('span.here-tag', {}, uiText('you are here')) : null), h('span.floor-sub', {}, uiText('The roof: a DJ playing drum and bass, a bar, and the city all around'))),
+      h('span.floor-no', { style: 'background:#2b2d42' }, '🤝'),
+      h('span.floor-text', {}, h('span.floor-name', {}, ROOF_NAME, here ? h('span.here-tag', {}, uiText('you are here')) : null), h('span.floor-sub', {}, uiText('Shared meeting room · 19 seats'))),
       h('span.floor-stats', {}, people ? h('span', { title: uiText('People up there') }, `🧑 ${people}`) : ''),
     );
     btn.addEventListener('click', () => {
@@ -220,9 +220,10 @@ export function openElevator(opts: ElevatorOptions): void {
     const built = floors.some((f) => !f.cloning);
     // Top floor first, the way an elevator's buttons stack, with the roof over them, floor 1 and then the garage at the bottom.
     floorsEl.replaceChildren(
-      ...(built ? [roofButton()] : []),
+      roofButton(),
       ...(floors.length ? floors.map(floorRow).reverse() : [h('p.empty', {}, uiText('No floors yet.'))]),
       ...(built ? [garageButton()] : []),
+      ...(store.floor === ROOF ? [h('button.floor-btn', { type: 'button', onclick: () => { modal.close(); opts.ride(LOBBY); } }, uiText('🏢 Lobby'))] : []),
     );
   };
 
@@ -391,7 +392,7 @@ export function openElevator(opts: ElevatorOptions): void {
         {},
         store.floors.length
           ? uiText('Every project is a floor of this building. Pick a floor to ride to, or add another project.')
-          : uiText("Every project is a floor of this building, and it doesn't have any yet. Pick one of your repositories: the office clones it and it becomes the first floor."),
+          : uiText('The meeting room is ready to visit. You can add a project whenever you need an office floor.'),
       )
     : null;
   const el = h(

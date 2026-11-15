@@ -4,7 +4,7 @@ import { t as uiText } from '../../shared/i18n';
  * down to the garage), straight to another floor from the floor list, through the ceiling up the
  * ladder or down a pole; and arriving, up on the roof or on a floor, with the doors opening onto it.
  */
-import { inElevator, roofDrop, streetBelow } from '../../shared/layout';
+import { FLOOR, WALL_T, inElevator, roofDrop, streetBelow } from '../../shared/layout';
 import { ROOF } from '../../shared/rooftop';
 import type { Arrival, Grip } from '../features/climbing/controller';
 import { lastSpot, store } from '../state';
@@ -24,7 +24,7 @@ declare module '../world/types' {
   }
 }
 
-export type TravelParts = Pick<Parts, 'stage' | 'worlds' | 'place' | 'walking' | 'seating' | 'climbing' | 'rooftop' | 'bar' | 'bargames' | 'hanging' | 'floorStatus' | 'arrival'>;
+export type TravelParts = Pick<Parts, 'stage' | 'worlds' | 'place' | 'walking' | 'seating' | 'climbing' | 'rooftop' | 'hanging' | 'floorStatus' | 'arrival'>;
 
 /** Registers what follows the building's floors (store 'floors'). */
 export function installTravel(ctx: Ctx, core: CoreState, parts: TravelParts) {
@@ -128,13 +128,8 @@ export function installTravel(ctx: Ctx, core: CoreState, parts: TravelParts) {
     );
   }
 
-  /**
-   * Off to another floor: whatever you were doing stops. The picture, the ladder or a pole and the car
-   * go before the darts, the order they always went in (the activities' own order has the
-   * car last, for keys and the hint bar).
-   */
+  /** Stop current activities before travelling to another floor. */
   function stopForTrip() {
-    ctx.activities.stopAll('trip', ['thrower']);
     ctx.activities.stopAll('trip');
   }
 
@@ -212,15 +207,11 @@ export function installTravel(ctx: Ctx, core: CoreState, parts: TravelParts) {
     if (r) r.group.visible = up;
     player.colliders = up ? r!.colliders : world.colliders;
     sky.setRoof(up, roofDrop(rooftop.roofFloors()));
-    sound.setOutdoors(up);
-    sound.setDj(up ? rooftop.djAt : null);
+    sound.setOutdoors(false);
+    player.room = { ...FLOOR, wall: WALL_T, enclosed: up };
     // You can see the whole city from up there (and its clouds); from the top floors, as far as the haze.
     camera.far = up ? 700 : FAR;
     camera.updateProjectionMatrix();
-    // Drinks stay at the bar (what you've had comes down with you).
-    if (!up) parts.bar.booze.putDown();
-    // Whatever was thrown up there while you were away, you didn't see: the boards start clean.
-    if (up) parts.bargames.freshBoards(r!);
     const { hanger } = parts.hanging;
     if (hanger.active) hanger.cancel();
     ctx.hint.invalidate();

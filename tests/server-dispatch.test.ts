@@ -470,3 +470,39 @@ test('the hook server answers only workers, with their own token', async () => {
     assert.match(((await res.json()) as { error: string }).error, /AGENT_OFFICE_WORKER_ID/);
   }
 });
+
+test('the shared meeting room survives the last project removal and accepts visits with no offices', async () => {
+  const a = await Browser.open('?name=RoomA&floor=%40roof');
+  const b = await Browser.open('?name=RoomB');
+  let c: Browser | undefined;
+  try {
+    const welcome = await a.take('welcome');
+    assert.equal(welcome.floor, '@roof');
+    await b.take('welcome');
+    const floor = office.floors()[0];
+    b.send({ t: 'floor.remove', floor: floor.id });
+    assert.equal((await b.take('floor.enter')).floor, null);
+    a.send({ t: 'ping', at: 711 });
+    await a.take('pong');
+    assert.deepEqual(a.pending('floor.enter'), [], 'removing an office must not evacuate the shared room');
+    assert.equal(office.floors().length, 0);
+    a.send({ t: 'sit', seat: 'seat_001:0' });
+    a.send({ t: 'ping', at: 712 });
+    await a.take('pong');
+    c = await Browser.open('?name=RoomC&floor=%40roof');
+    const back = await c.take('welcome');
+    assert.equal(back.floor, '@roof');
+    assert.deepEqual(back.workers, []);
+    assert.equal(back.peers.find((p) => p.id === welcome.you)?.seat, 'seat_001:0');
+    c.send({ t: 'sit', seat: 'seat_001:0' });
+    assert.equal((await c.take('sit.refused')).seat, 'seat_001:0');
+    a.send({ t: 'floor.go', floor: '@lobby' });
+    assert.equal((await a.take('floor.enter')).floor, null);
+    a.send({ t: 'floor.go', floor: '@roof' });
+    assert.equal((await a.take('floor.enter')).floor, '@roof');
+  } finally {
+    await a.close();
+    await b.close();
+    await c?.close();
+  }
+});

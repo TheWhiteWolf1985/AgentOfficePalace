@@ -231,7 +231,7 @@ export function installWorkerViews(ctx: Ctx, core: CoreState, parts: WorkerViews
     if (was.floor === store.floor && level > was.wing) {
       const at = { x: (WING.minX + WING.maxX) / 2, y: 1.2, z: wingRowZ(level) };
       confetti.burst(at.x, 2.4, at.z, 140, 0.8);
-      sound.toss('thunk', at);
+      sound.construction(at);
     }
   }
   store.on('floorPlan', syncPlan);

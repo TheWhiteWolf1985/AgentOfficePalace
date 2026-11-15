@@ -1,0 +1,46 @@
+{
+  "source_contract": "1.0.0",
+  "asset_sha256": null,
+  "blender_version": null,
+  "automatic_checks": [],
+  "manual_checks": {
+    "elevator_volume_clear": {
+      "status": "NOT_RUN",
+      "evidence": null
+    },
+    "door_and_route_walkable": {
+      "status": "NOT_RUN",
+      "evidence": null
+    },
+    "whiteboard_visible_from_seats": {
+      "status": "NOT_RUN",
+      "evidence": null
+    },
+    "whiteboard_uv_not_mirrored": {
+      "status": "NOT_RUN",
+      "evidence": null
+    },
+    "normals_correct": {
+      "status": "NOT_RUN",
+      "evidence": null
+    },
+    "no_surface_z_fighting": {
+      "status": "NOT_RUN",
+      "evidence": null
+    },
+    "ceiling_and_weather_cover": {
+      "status": "NOT_RUN",
+      "evidence": null
+    },
+    "only_user_approved_visual_design": {
+      "status": "NOT_RUN",
+      "evidence": null
+    }
+  },
+  "reimport_check": {
+    "status": "NOT_RUN",
+    "evidence": null
+  },
+  "ready_for_delivery": false,
+  "limitations": []
+}

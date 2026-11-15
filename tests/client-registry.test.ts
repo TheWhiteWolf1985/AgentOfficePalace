@@ -400,7 +400,7 @@ test('InteractKind is the kinds added to InteractKinds, and world/types.ts adds 
 test('every kind of thing you can use has exactly one definition, in the file that adds the kind, and nothing else is defined', () => {
   const added = interactKinds();
   const kinds = added.map((k) => k.kind);
-  assert.ok(kinds.length >= 20, `found ${kinds.length} kinds`);
+  assert.ok(kinds.length >= 17, `found ${kinds.length} kinds`);
   assert.deepEqual(
     kinds.filter((k, i) => kinds.indexOf(k) !== i),
     [],

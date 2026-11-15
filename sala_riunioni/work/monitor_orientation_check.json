@@ -1,0 +1,70 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "seat": "seat_001",
+      "screen": "pc_screen_001",
+      "dot_normal_toward_seat": 1.0
+    },
+    {
+      "seat": "seat_002",
+      "screen": "pc_screen_002",
+      "dot_normal_toward_seat": 1.0
+    },
+    {
+      "seat": "seat_003",
+      "screen": "pc_screen_003",
+      "dot_normal_toward_seat": 1.0
+    },
+    {
+      "seat": "seat_004",
+      "screen": "pc_screen_004",
+      "dot_normal_toward_seat": 1.0
+    },
+    {
+      "seat": "seat_005",
+      "screen": "pc_screen_005",
+      "dot_normal_toward_seat": 1.0
+    },
+    {
+      "seat": "seat_006",
+      "screen": "pc_screen_006",
+      "dot_normal_toward_seat": 1.0
+    },
+    {
+      "seat": "seat_007",
+      "screen": "pc_screen_007",
+      "dot_normal_toward_seat": 1.0
+    },
+    {
+      "seat": "seat_008",
+      "screen": "pc_screen_008",
+      "dot_normal_toward_seat": 1.0
+    },
+    {
+      "seat": "seat_009",
+      "screen": "pc_screen_009",
+      "dot_normal_toward_seat": 1.0
+    },
+    {
+      "seat": "seat_010",
+      "screen": "pc_screen_010",
+      "dot_normal_toward_seat": 1.0
+    },
+    {
+      "seat": "seat_011",
+      "screen": "pc_screen_011",
+      "dot_normal_toward_seat": 1.0
+    },
+    {
+      "seat": "seat_012",
+      "screen": "pc_screen_012",
+      "dot_normal_toward_seat": 1.0
+    },
+    {
+      "seat": "seat_013",
+      "screen": "pc_screen_013",
+      "dot_normal_toward_seat": 1.0
+    }
+  ]
+}

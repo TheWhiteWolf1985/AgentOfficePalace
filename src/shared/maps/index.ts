@@ -18,7 +18,7 @@ function officePlan(): MapPlan {
     id: OFFICE_MAP,
     name: uiText('Office'),
     icon: '🏢',
-    description: uiText('The office: desks, a lounge, the boss’s loft upstairs, a floor for every project, and a bar on the roof.'),
+    description: uiText('The office: desks, a lounge, the boss’s loft upstairs, a floor for every project, and a shared meeting room on the roof.'),
     style: 'office',
     bounds: { ...FLOOR },
     height: WALL_HEIGHT,

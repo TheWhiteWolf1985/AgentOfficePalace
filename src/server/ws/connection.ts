@@ -25,7 +25,7 @@ export function onConnection(ctx: Ctx, ws: WebSocket, url: URL, session: Session
   // Their floor's gone since (taken off the building, or its checkout deleted): up to the roof instead.
   const gone = !!wanted && wanted !== ROOF && !floors.has(wanted);
   // Up on the roof, as long as there's a building under it.
-  const onRoof = (wanted === ROOF || gone) && floors.size > 0;
+  const onRoof = wanted === ROOF || gone;
   const floor = onRoof ? undefined : arrivalFloor(wanted);
   // Back where they were standing on it too; anywhere else, they arrive by elevator.
   const back = !gone && wanted !== null && (onRoof || floor?.id === wanted);

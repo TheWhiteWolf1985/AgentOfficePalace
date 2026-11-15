@@ -1,8 +1,6 @@
 // People in the office: where they are and what they do, chat, voice and the welcome.
 
 import type { Look } from '../avatar.js';
-import type { BarGame } from '../bargames.js';
-import type { DrinkId } from '../rooftop.js';
 import type { Me } from './accounts.js';
 import type { FloorInfo, FloorView, ProjectsDirState } from './floors.js';
 import type { LeaveOnMergeState, MachineState, NotifyState, PromptsState, SkyState, UpgradeState } from './settings.js';
@@ -28,14 +26,10 @@ export interface PeerInfo {
   voice: boolean;
   muted: boolean;
   sharing: boolean;
-  /** At the rooftop bar's dart board or axe lane, a dart or an axe in hand. */
-  throwing?: BarGame;
   /** Sitting down: the place they're in (see seatAt in layout), like "couch:1". */
   seat?: string;
   /** An issue card they took off the issues board, on its way to a desk or the queue. */
   carrying?: CarriedIssue;
-  /** A drink from the rooftop bar in their hand. */
-  drink?: DrinkId;
   /** Signed in with their own account, so `name` is theirs and nobody else can take it. */
   account?: boolean;
   /** The floor they're on (see FloorInfo); none while the building has no floors yet. */
@@ -79,13 +73,8 @@ export interface SearchResults {
 
 export type PresenceClientMsg =
   | { t: 'move'; x: number; y: number; z: number; rotY: number; moving: boolean }
-  /**
-   * You reached out to use something; everyone else sees your character's arm do it. With
-   * `drink`, you took a drink from
-   * the rooftop bar (or finished it,
-   * null); with `throwing`, you stepped up to the dart board or the axe lane up there (or back, null).
-   */
-  | { t: 'act'; drink?: DrinkId | null; throwing?: BarGame | null }
+  /** Reach out to use something. */
+  | { t: 'act' }
   /** You sat down in a place on a couch, a beanbag, a chair or the bench (see seatAt in layout), or got up again (no seat). */
   | { t: 'sit'; seat?: string }
   /** You picked an issue card up off the board (or put it down again, no issue): everyone sees it in your hands. */
@@ -129,7 +118,7 @@ export type PresenceServerMsg =
   | { t: 'peer.update'; peer: PeerInfo }
   | { t: 'peer.move'; id: string; x: number; y: number; z: number; rotY: number; moving: boolean }
   | { t: 'peer.leave'; id: string }
-  | { t: 'peer.act'; id: string; drink?: DrinkId | null; throwing?: BarGame | null }
+  | { t: 'peer.act'; id: string }
   | { t: 'rtc'; from: string; data: unknown }
   | ({ t: 'chat' } & ChatLine)
   | { t: 'toast'; text: string; level: 'info' | 'warn' | 'error' }

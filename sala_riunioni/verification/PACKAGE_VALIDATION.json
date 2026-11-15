@@ -1,0 +1,59 @@
+{
+  "kit_version": "1.0.0",
+  "date": "2026-11-15",
+  "source_commit": "ab4040a14e6f3387f5ecc9ac44e1fc5f896218c5",
+  "passed_checks": {
+    "python_syntax": [
+      "create_starter.py",
+      "export_asset.py",
+      "inspect_glb.py",
+      "validate_scene.py",
+      "verify_kit.py"
+    ],
+    "glb_inspector_cases": [
+      {
+        "name": "valid_reference_geometry",
+        "passed": true
+      },
+      {
+        "name": "reference_rejected_as_production",
+        "passed": true
+      },
+      {
+        "name": "truncated_binary_rejected",
+        "passed": true
+      },
+      {
+        "name": "wrong_magic_rejected",
+        "passed": true
+      },
+      {
+        "name": "external_resource_rejected",
+        "passed": true
+      },
+      {
+        "name": "cyclic_hierarchy_rejected",
+        "passed": true
+      },
+      {
+        "name": "geometry_outside_envelope_rejected",
+        "passed": true
+      }
+    ],
+    "three_reference_loader": true,
+    "integrity_checker_detects_tampering": true,
+    "reference_plan_png_and_svg": "copied from dimensioned plan previously rendered and visually reviewed"
+  },
+  "blender_execution": {
+    "status": "NOT_RUN",
+    "reason": "Blender executable not found in PATH/default location checked; no Blender installation or download performed"
+  },
+  "not_claimed": [
+    "Blender runtime compatibility or importer tested",
+    "Finished room .blend or production GLB delivered",
+    "Complete Khronos glTF validation",
+    "Application integration, performance or user visual design approved"
+  ],
+  "design_included": false,
+  "contains_only_reference_geometry": true
+}

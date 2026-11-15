@@ -1,0 +1,92 @@
+{
+  "source_contract": "1.0.0",
+  "asset_sha256": "492539fd3a6b90e77facd7f22568d41340c2e2377e2028f33783e33866ba9c78",
+  "blender_version": "5.3.0",
+  "automatic_checks": [
+    {
+      "check": "scene",
+      "status": "PASS",
+      "command": "blender --background delivery/conference_room.blend --python delivery/export_checked.py",
+      "evidence": "scene_check.json"
+    },
+    {
+      "check": "glb",
+      "status": "PASS",
+      "command": "python scripts/inspect_glb.py delivery/conference_room.glb --contract rules/constraints.json --manifest delivery/conference_room.manifest.json --report delivery/glb_check.json",
+      "evidence": "glb_check.json"
+    },
+    {
+      "check": "reimport",
+      "status": "PASS",
+      "command": "blender --background --python delivery/check_reimport.py",
+      "evidence": "reimport_check.json"
+    },
+    {
+      "check": "script_rebuild",
+      "status": "PASS",
+      "command": "blender --background --python delivery/build_scene.py -- --output-dir work/repro_square_lights",
+      "evidence": "../work/repro_square_lights.log"
+    },
+    {
+      "check": "kit_integrity",
+      "status": "PASS",
+      "files_checked": 24,
+      "command": "python scripts/verify_kit.py",
+      "evidence": "Originali del kit verificati in questa sessione"
+    },
+    {
+      "check": "live_source_match",
+      "status": "PASS",
+      "evidence": "../work/live_source_comparison.json"
+    }
+  ],
+  "manual_checks": {
+    "elevator_volume_clear": {
+      "status": "NOT_RUN",
+      "evidence": "Controllo automatico dei triangoli nel prisma riservato superato; review finale manuale da completare."
+    },
+    "door_and_route_walkable": {
+      "status": "PARTIAL",
+      "evidence": "Percorsi su griglia verso 19 stand verificati a porta aperta. Nessuna prova di navigazione nell applicazione."
+    },
+    "whiteboard_visible_from_seats": {
+      "status": "PARTIAL",
+      "evidence": "Vista da una seduta renderizzata e osservata; review completa dai 13 posti riunione non eseguita."
+    },
+    "whiteboard_uv_not_mirrored": {
+      "status": "NOT_RUN",
+      "evidence": "Orientamento UV geometrico sul GLB reimportato verificato. Prova manuale di scrittura/disegno dinamico non eseguita."
+    },
+    "normals_correct": {
+      "status": "PARTIAL",
+      "evidence": "Viste di insieme osservate; non eseguita review sistematica di tutte le superfici."
+    },
+    "no_surface_z_fighting": {
+      "status": "PARTIAL",
+      "evidence": "Nessun difetto evidente nelle viste osservate; review completa non eseguita."
+    },
+    "ceiling_and_weather_cover": {
+      "status": "PARTIAL",
+      "evidence": "Soffitto separato e intaglio ascensore presenti. Geometria runtime ascensore e meteo nell app non collaudati."
+    },
+    "only_user_approved_visual_design": {
+      "status": "PASS",
+      "evidence": "Juri, 15 novembre 2026: \"Bene, ora esporta tutto quello che serve\"; versione visiva accettata per questa esportazione."
+    }
+  },
+  "reimport_check": {
+    "status": "PASS",
+    "evidence": "reimport_check.json e ../work/reimport_check.blend",
+    "scope": "Controlli geometrici e metadati; non certifica le review manuali pendenti."
+  },
+  "ready_for_delivery": false,
+  "limitations": [
+    "Versione visiva accettata per esportazione; review tecniche manuali ancora parziali o non eseguite.",
+    "Review manuali obbligatorie parziali o non eseguite; vedere i dettagli.",
+    "Nessun test nel software applicativo.",
+    "Collisioni approssimate a box; percorsi automatici su griglia da 0.25m con porta aperta."
+  ],
+  "export_requested": true,
+  "export_date": "2026-11-15",
+  "export_complete": true
+}

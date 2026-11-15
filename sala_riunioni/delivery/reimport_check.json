@@ -1,0 +1,437 @@
+{
+  "automatic_pass": true,
+  "blender_version": "5.3.0",
+  "checks": [
+    {
+      "check": "only_asset_root",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "root_identity",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "groups",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "source_vs_reimport_bounds",
+      "passed": true,
+      "details": []
+    },
+    {
+      "check": "anchor:seat_001",
+      "passed": true,
+      "details": {
+        "delta_m": 0.0
+      }
+    },
+    {
+      "check": "anchor:stand_001",
+      "passed": true,
+      "details": {
+        "delta_m": 0.0
+      }
+    },
+    {
+      "check": "anchor:seat_002",
+      "passed": true,
+      "details": {
+        "delta_m": 0.0
+      }
+    },
+    {
+      "check": "anchor:stand_002",
+      "passed": true,
+      "details": {
+        "delta_m": 0.0
+      }
+    },
+    {
+      "check": "anchor:seat_003",
+      "passed": true,
+      "details": {
+        "delta_m": 0.0
+      }
+    },
+    {
+      "check": "anchor:stand_003",
+      "passed": true,
+      "details": {
+        "delta_m": 0.0
+      }
+    },
+    {
+      "check": "anchor:seat_004",
+      "passed": true,
+      "details": {
+        "delta_m": 0.0
+      }
+    },
+    {
+      "check": "anchor:stand_004",
+      "passed": true,
+      "details": {
+        "delta_m": 0.0
+      }
+    },
+    {
+      "check": "anchor:seat_005",
+      "passed": true,
+      "details": {
+        "delta_m": 0.0
+      }
+    },
+    {
+      "check": "anchor:stand_005",
+      "passed": true,
+      "details": {
+        "delta_m": 0.0
+      }
+    },
+    {
+      "check": "anchor:seat_006",
+      "passed": true,
+      "details": {
+        "delta_m": 0.0
+      }
+    },
+    {
+      "check": "anchor:stand_006",
+      "passed": true,
+      "details": {
+        "delta_m": 0.0
+      }
+    },
+    {
+      "check": "anchor:seat_007",
+      "passed": true,
+      "details": {
+        "delta_m": 0.0
+      }
+    },
+    {
+      "check": "anchor:stand_007",
+      "passed": true,
+      "details": {
+        "delta_m": 0.0
+      }
+    },
+    {
+      "check": "anchor:seat_008",
+      "passed": true,
+      "details": {
+        "delta_m": 0.0
+      }
+    },
+    {
+      "check": "anchor:stand_008",
+      "passed": true,
+      "details": {
+        "delta_m": 0.0
+      }
+    },
+    {
+      "check": "anchor:seat_009",
+      "passed": true,
+      "details": {
+        "delta_m": 0.0
+      }
+    },
+    {
+      "check": "anchor:stand_009",
+      "passed": true,
+      "details": {
+        "delta_m": 0.0
+      }
+    },
+    {
+      "check": "anchor:seat_010",
+      "passed": true,
+      "details": {
+        "delta_m": 0.0
+      }
+    },
+    {
+      "check": "anchor:stand_010",
+      "passed": true,
+      "details": {
+        "delta_m": 0.0
+      }
+    },
+    {
+      "check": "anchor:seat_011",
+      "passed": true,
+      "details": {
+        "delta_m": 0.0
+      }
+    },
+    {
+      "check": "anchor:stand_011",
+      "passed": true,
+      "details": {
+        "delta_m": 0.0
+      }
+    },
+    {
+      "check": "anchor:seat_012",
+      "passed": true,
+      "details": {
+        "delta_m": 0.0
+      }
+    },
+    {
+      "check": "anchor:stand_012",
+      "passed": true,
+      "details": {
+        "delta_m": 0.0
+      }
+    },
+    {
+      "check": "anchor:seat_013",
+      "passed": true,
+      "details": {
+        "delta_m": 0.0
+      }
+    },
+    {
+      "check": "anchor:stand_013",
+      "passed": true,
+      "details": {
+        "delta_m": 0.0
+      }
+    },
+    {
+      "check": "anchor:seat_014",
+      "passed": true,
+      "details": {
+        "delta_m": 0.0
+      }
+    },
+    {
+      "check": "anchor:stand_014",
+      "passed": true,
+      "details": {
+        "delta_m": 0.0
+      }
+    },
+    {
+      "check": "anchor:seat_015",
+      "passed": true,
+      "details": {
+        "delta_m": 0.0
+      }
+    },
+    {
+      "check": "anchor:stand_015",
+      "passed": true,
+      "details": {
+        "delta_m": 0.0
+      }
+    },
+    {
+      "check": "anchor:seat_016",
+      "passed": true,
+      "details": {
+        "delta_m": 0.0
+      }
+    },
+    {
+      "check": "anchor:stand_016",
+      "passed": true,
+      "details": {
+        "delta_m": 0.0
+      }
+    },
+    {
+      "check": "anchor:seat_017",
+      "passed": true,
+      "details": {
+        "delta_m": 0.0
+      }
+    },
+    {
+      "check": "anchor:stand_017",
+      "passed": true,
+      "details": {
+        "delta_m": 0.0
+      }
+    },
+    {
+      "check": "anchor:seat_018",
+      "passed": true,
+      "details": {
+        "delta_m": 0.0
+      }
+    },
+    {
+      "check": "anchor:stand_018",
+      "passed": true,
+      "details": {
+        "delta_m": 0.0
+      }
+    },
+    {
+      "check": "anchor:seat_019",
+      "passed": true,
+      "details": {
+        "delta_m": 0.0
+      }
+    },
+    {
+      "check": "anchor:stand_019",
+      "passed": true,
+      "details": {
+        "delta_m": 0.0
+      }
+    },
+    {
+      "check": "13_monitors_face_seats",
+      "passed": true,
+      "details": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "check": "whiteboard_uv_not_mirrored",
+      "passed": true,
+      "details": {
+        "U_world": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "V_world": [
+          0.0,
+          0.0,
+          1.0
+        ],
+        "normal": [
+          0.0,
+          -1.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "check": "material_names",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "elevator_actual_mesh_triangles_clear",
+      "passed": true,
+      "details": []
+    },
+    {
+      "check": "routes_to_all_stands_box_grid",
+      "passed": true,
+      "details": {
+        "grid_m": 0.25,
+        "radius_m": 0.32,
+        "door_state": "open; collider door_closed escluso esplicitamente",
+        "results": [
+          {
+            "seat": "seat_001",
+            "reachable": true
+          },
+          {
+            "seat": "seat_002",
+            "reachable": true
+          },
+          {
+            "seat": "seat_003",
+            "reachable": true
+          },
+          {
+            "seat": "seat_004",
+            "reachable": true
+          },
+          {
+            "seat": "seat_005",
+            "reachable": true
+          },
+          {
+            "seat": "seat_006",
+            "reachable": true
+          },
+          {
+            "seat": "seat_007",
+            "reachable": true
+          },
+          {
+            "seat": "seat_008",
+            "reachable": true
+          },
+          {
+            "seat": "seat_009",
+            "reachable": true
+          },
+          {
+            "seat": "seat_010",
+            "reachable": true
+          },
+          {
+            "seat": "seat_011",
+            "reachable": true
+          },
+          {
+            "seat": "seat_012",
+            "reachable": true
+          },
+          {
+            "seat": "seat_013",
+            "reachable": true
+          },
+          {
+            "seat": "seat_014",
+            "reachable": true
+          },
+          {
+            "seat": "seat_015",
+            "reachable": true
+          },
+          {
+            "seat": "seat_016",
+            "reachable": true
+          },
+          {
+            "seat": "seat_017",
+            "reachable": true
+          },
+          {
+            "seat": "seat_018",
+            "reachable": true
+          },
+          {
+            "seat": "seat_019",
+            "reachable": true
+          }
+        ]
+      }
+    }
+  ],
+  "triangles_checked": 23376,
+  "scope": "Geometria GLB reimportata, UV e percorsi su box/griglia. Review visiva e runtime separati.",
+  "manual_checks_not_certified": [
+    "no_surface_z_fighting",
+    "all_seat_views",
+    "weather_runtime",
+    "visual_approval"
+  ]
+}

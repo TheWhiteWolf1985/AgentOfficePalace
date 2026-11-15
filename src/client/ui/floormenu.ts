@@ -17,7 +17,7 @@ export interface FloorMenuOptions {
   indoors(): boolean;
   /** Open the elevator's panel, to add a project. */
   elevator(): void;
-  /** Up to the rooftop bar, by elevator; null on a map with no roof to go up to. */
+  /** Up to the shared meeting room, by elevator; null on a map with no roof to go up to. */
   roof: (() => void) | null;
 }
 
@@ -79,8 +79,8 @@ export function toggleFloorMenu(anchor: HTMLElement, opts: FloorMenuOptions): vo
     const roof = h(
       'button.floor-item',
       { type: 'button', role: 'menuitem', class: onRoof ? 'here' : '', disabled: onRoof, title: onRoof ? uiText("You're up on the roof") : uiText('Take the elevator up to the roof') },
-      h('span.floor-no', { style: 'background:#2b2d42' }, '🍸'),
-      h('span.floor-text', {}, h('span.floor-name', {}, ROOF_NAME), h('span.floor-sub', {}, onRoof ? uiText('you are here') : uiText('A DJ, drinks and the city'))),
+      h('span.floor-no', { style: 'background:#2b2d42' }, '🤝'),
+      h('span.floor-text', {}, h('span.floor-name', {}, ROOF_NAME), h('span.floor-sub', {}, onRoof ? uiText('you are here') : uiText('Shared meeting room · 19 seats'))),
       h('span.floor-stats', {}, people ? h('span', { title: uiText('People up there') }, `🧑 ${people}`) : ''),
     );
     roof.addEventListener('click', () => {
@@ -88,7 +88,7 @@ export function toggleFloorMenu(anchor: HTMLElement, opts: FloorMenuOptions): vo
       close();
       opts.roof?.();
     });
-    el.replaceChildren(h('div.floor-menu-head', {}, uiText`🏢 ${floors.length} floor${floors.length === 1 ? '' : 's'}`), ...(floors.length && opts.roof ? [roof] : []), ...items, add);
+    el.replaceChildren(h('div.floor-menu-head', {}, uiText`🏢 ${floors.length} floor${floors.length === 1 ? '' : 's'}`), ...(opts.roof ? [roof] : []), ...items, add);
   };
 
   const place = () => {
