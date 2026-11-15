@@ -14,29 +14,20 @@ import type { Voice } from '../voice';
 import type { Person } from '../world/character';
 import type { Confetti } from '../world/confetti';
 import type { Hands } from '../world/hands';
-import type { Smoke } from '../world/smoke';
-import type { installArcade } from '../features/arcade';
+import type { Dust } from '../world/dust';
 import type { installBar } from '../features/bar';
 import type { installBarGames } from '../features/bargames';
 import type { installBoards } from '../features/boards';
 import type { installBookshelf } from '../features/bookshelf';
-import type { installCabinet } from '../features/cabinet';
 import type { installCarrying } from '../features/carrying';
-import type { installCars } from '../features/cars';
 import type { installClimbing } from '../features/climbing';
-import type { installCoffee } from '../features/coffee';
-import type { installDog } from '../features/dog';
-import type { installEmotes } from '../features/emotes';
 import type { installGallery, installHanging } from '../features/hanging';
 import type { installHud } from '../features/hud';
-import type { installJukebox } from '../features/jukebox';
 import type { installMeeting } from '../features/meeting';
 import type { installNeedsYou } from '../features/needsyou';
 import type { installPeers } from '../features/peers';
 import type { installRooftop } from '../features/rooftop';
 import type { installSeating } from '../features/seating';
-import type { installSmoke } from '../features/smoke';
-import type { installTelescope } from '../features/telescope';
 import type { installTv } from '../features/tv';
 import type { installVoice } from '../features/voice';
 import type { installWaiting } from '../features/waiting';
@@ -52,7 +43,7 @@ import type { installPlace } from './place';
 import type { Stage } from './scene';
 import type { installTravel } from './travel';
 import type { createWorlds } from './worlds';
-import type { Puff, installYou } from './you';
+import type { installYou } from './you';
 
 type Made<F extends (...args: never[]) => unknown> = ReturnType<F>;
 
@@ -71,10 +62,8 @@ export interface Parts {
   hands: Hands;
   /** The system asks for less motion: no shaking the view, no swaying. */
   reduceMotion: MediaQueryList;
-  /** Cigarette smoke, from anyone on a smoke break. */
-  smoke: Smoke;
-  /** A puff of it off someone's cigarette. */
-  puff: Puff;
+
+  dust: Dust;
   sound: OfficeSound;
   /** Confetti for merges, landing on whatever it falls on. */
   confetti: Confetti;
@@ -94,16 +83,10 @@ export interface Parts {
   boards: Made<typeof installBoards>;
   gallery: Made<typeof installGallery>;
   tv: Made<typeof installTv>;
-  arcade: Made<typeof installArcade>;
   rooftop: Made<typeof installRooftop>;
-  telescope: Made<typeof installTelescope>;
-  dog: Made<typeof installDog>;
-  jukebox: Made<typeof installJukebox>;
-  cabinet: Made<typeof installCabinet>;
   bargames: Made<typeof installBarGames>;
   hanging: Made<typeof installHanging>;
   climbing: Made<typeof installClimbing>;
-  cars: Made<typeof installCars>;
   peers: Made<typeof installPeers>;
   walking: Made<typeof installWalking>;
   views: Made<typeof installWorkerViews>;
@@ -113,11 +96,8 @@ export interface Parts {
   meeting: Made<typeof installMeeting>;
   bookshelf: Made<typeof installBookshelf>;
   bar: Made<typeof installBar>;
-  coffee: Made<typeof installCoffee>;
-  smoking: Made<typeof installSmoke>;
   cards: Made<typeof installCarrying>;
   seating: Made<typeof installSeating>;
-  emotes: Made<typeof installEmotes>;
   talk: Made<typeof installVoice>;
   hud: Made<typeof installHud>;
 }

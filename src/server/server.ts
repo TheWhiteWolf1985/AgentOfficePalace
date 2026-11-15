@@ -55,14 +55,12 @@ export async function startServer(cfg: Config, opts: StartOptions = {}) {
   const shutdown = (keep = false) => {
     stopTimers();
     ctx.cancelFloorsChanged();
-    ctx.arcade.flush();
     ctx.upgrader.stop();
     services.stop();
     tailnet.stop();
     ctx.webhook.stop();
     ctx.machine.stop();
     ctx.sky.stop();
-    ctx.themes.stop();
     for (const f of ctx.floors.values()) f.shutdown(keep);
     ctx.building.shutdown(keep);
     ctx.ledger.flush();

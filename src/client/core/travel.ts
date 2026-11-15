@@ -24,12 +24,11 @@ declare module '../world/types' {
   }
 }
 
-export type TravelParts = Pick<Parts, 'stage' | 'worlds' | 'place' | 'walking' | 'seating' | 'climbing' | 'cars' | 'rooftop' | 'telescope' | 'bar' | 'bargames' | 'hanging' | 'floorStatus' | 'arrival'>;
+export type TravelParts = Pick<Parts, 'stage' | 'worlds' | 'place' | 'walking' | 'seating' | 'climbing' | 'rooftop' | 'bar' | 'bargames' | 'hanging' | 'floorStatus' | 'arrival'>;
 
 /** Registers what follows the building's floors (store 'floors'). */
 export function installTravel(ctx: Ctx, core: CoreState, parts: TravelParts) {
   const { player, office, net, sound, sky, camera } = ctx;
-  const { holiday } = parts.stage;
   const { inOffice, plan } = parts.worlds;
   const { placeInCar, downstairs, indoors, standingAt, unstick } = parts.place;
 
@@ -68,10 +67,6 @@ export function installTravel(ctx: Ctx, core: CoreState, parts: TravelParts) {
   // Closing the tab, or reloading: the frame loop saves it every second, and here's the last word.
   window.addEventListener('pagehide', () => {
     parts.place.saveSpot();
-    // Mid-drive, the car stops right where you left it, not where the office last heard it was.
-    const { driver } = parts.cars;
-    const p = driver.driving ? driver.pose : null;
-    if (p) net.send({ t: 'car.drive', car: driver.car!, x: p.x, z: p.z, rotY: p.rotY, speed: 0, steer: p.steer });
   });
 
   function fade(on: boolean, quick = false) {
@@ -207,7 +202,6 @@ export function installTravel(ctx: Ctx, core: CoreState, parts: TravelParts) {
    * looks as it does there.
    */
   function setPlace() {
-    parts.telescope.exit();
     const up = store.floor === ROOF;
     if (up === core.upTop) return;
     core.upTop = up;
@@ -215,8 +209,6 @@ export function installTravel(ctx: Ctx, core: CoreState, parts: TravelParts) {
     const r = up ? rooftop.theRoof() : rooftop.roof();
     const world = ctx.world();
     world.group.visible = !up;
-    // The holiday decorations are dressed round the office and the street below it, not up here.
-    holiday.group.visible = !up;
     if (r) r.group.visible = up;
     player.colliders = up ? r!.colliders : world.colliders;
     sky.setRoof(up, roofDrop(rooftop.roofFloors()));

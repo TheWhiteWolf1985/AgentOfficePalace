@@ -2,12 +2,6 @@ import * as THREE from 'three';
 import { GLTFLoader, type GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { clone } from 'three/examples/jsm/utils/SkeletonUtils.js';
 import deskPropsUrl from '../models/desk_props.glb?url';
-import dogCorgiUrl from '../models/dog-corgi.glb?url';
-import dogDachshundUrl from '../models/dog-dachshund.glb?url';
-import dogPugUrl from '../models/dog-pug.glb?url';
-import dogPupUrl from '../models/dog-pup.glb?url';
-import dogPomeranianUrl from '../models/dog-pomeranian.glb?url';
-import dogShibaUrl from '../models/dog-shiba.glb?url';
 import kitchenUrl from '../models/kitchen.glb?url';
 import loungeUrl from '../models/lounge.glb?url';
 import plantsUrl from '../models/plants.glb?url';
@@ -16,14 +10,8 @@ import { toon } from './toon';
 // The things in the world modelled in Blender rather than built in code. Each .glb is exported by a
 // script in blender/scripts/ (blender/README.md has the conventions they keep); add it here by name.
 // `preload` ones are loaded before the world is built, for builders that take theirs with model();
-// the rest load the first time loadModel() asks for them (a floor's dog is only ever one breed).
+
 const MODELS = {
-  'dog-pup': { url: dogPupUrl, preload: false },
-  'dog-corgi': { url: dogCorgiUrl, preload: false },
-  'dog-dachshund': { url: dogDachshundUrl, preload: false },
-  'dog-pug': { url: dogPugUrl, preload: false },
-  'dog-shiba': { url: dogShibaUrl, preload: false },
-  'dog-pomeranian': { url: dogPomeranianUrl, preload: false },
   desk_props: { url: deskPropsUrl, preload: true },
   kitchen: { url: kitchenUrl, preload: true },
   lounge: { url: loungeUrl, preload: true },

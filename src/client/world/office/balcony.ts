@@ -1,15 +1,13 @@
 import { t as uiText } from '../../../shared/i18n';
 import * as THREE from 'three';
-import { ASHTRAY, BALCONY, EXIT_STAIRS, SLAB, STREET_Y } from '../../../shared/layout';
+import { BALCONY, EXIT_STAIRS, SLAB, STREET_Y } from '../../../shared/layout';
 import { bulb, type NightParts } from '../outside';
-import { mergeByMaterial, mesh, roundedBox, textPlane, toon } from '../toon';
+import { mergeByMaterial, mesh, roundedBox, toon } from '../toon';
 import type { Collider, Interactable } from '../types';
 import type { Fixture } from './fixture';
 import { PALETTE, box, floorTexture, glassPane } from './materials';
 import { floorPlant, plant } from './props';
 import { seatable } from './seats';
-
-// Outside the office's walls: the smoking balcony off the south wall, the posts under the bottom
 // floor's, and the steps from the exit door down to the street.
 
 /** A sagging string of party bulbs from `a` to `b`, in `bulbs` (one per color); they light up at night. */
@@ -29,11 +27,6 @@ function stringLights(a: THREE.Vector3, b: THREE.Vector3, sag: number, bulbs: [s
   return mergeByMaterial(g);
 }
 
-/**
- * The smoking balcony off the south wall, over the garage entrance: a deck with a glass railing on
- * its three open sides, string lights, a bench under the window, a bistro table, plants and the
- * ashtray, where you take a smoke break.
- */
 export function buildBalcony(group: THREE.Group, colliders: Collider[], interactables: Interactable[], night: NightParts) {
   const { minX, maxX, minZ, maxZ } = BALCONY;
   const w = maxX - minX;
@@ -138,35 +131,9 @@ export function buildBalcony(group: THREE.Group, colliders: Collider[], interact
   group.add(mergeByMaterial(parts));
 
   // The ashtray: a standing bin with a sand-filled bowl and a couple of butts in it.
-  const tray = new THREE.Group();
-  const steel = toon('#8d99ae');
-  tray.add(mesh(new THREE.CylinderGeometry(0.2, 0.22, 0.05, 16), steel, 0, 0.025, 0));
-  tray.add(mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.8, 10), steel, 0, 0.45, 0));
-  tray.add(mesh(new THREE.CylinderGeometry(0.2, 0.14, 0.14, 16), steel, 0, 0.9, 0));
-  tray.add(mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.02, 16), toon('#e9d8a6'), 0, 0.965, 0, false));
-  for (const [bx, bz, a] of [
-    [0.06, 0.02, 0.4],
-    [-0.05, -0.06, 2.1],
-    [-0.02, 0.08, 1.2],
-  ]) {
-    const butt = mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.07, 6).rotateZ(Math.PI / 2), toon(a > 1 ? '#fffaf3' : '#e9a03b'), bx, 0.98, bz, false);
-    butt.rotation.y = a;
-    tray.add(butt);
-  }
-  tray.position.set(ASHTRAY.x, 0, ASHTRAY.z);
-  group.add(tray);
-  colliders.push({ minX: ASHTRAY.x - 0.2, maxX: ASHTRAY.x + 0.2, minZ: ASHTRAY.z - 0.2, maxZ: ASHTRAY.z + 0.2, top: 1 });
-  const it: Interactable = { kind: 'smoke', x: ASHTRAY.x, z: ASHTRAY.z, radius: 1.8 };
-  interactables.push(it);
-  tray.userData.interact = it;
 
-  const sign = textPlane(uiText('🚬 Smoke break'), { bg: '#2b2d42', color: '#fffaf3', size: 56, border: '#fffaf3' });
-  sign.scale.multiplyScalar(0.8);
-  sign.position.set(-6.5, 2.2, minZ + 0.02);
-  group.add(sign);
 }
 
-/** The smoking balcony, out the glass doors on the south wall. */
 export const balcony: Fixture = (site) => {
   buildBalcony(site.group, site.colliders, site.interactables, site.get('night'));
   return {};

@@ -86,7 +86,7 @@ export function installClimbing(ctx: Ctx, deps: ClimbingDeps) {
     for (let i = 0; i < 10; i++) {
       const a = (i / 10) * Math.PI * 2;
       at.set(player.pos.x + Math.sin(a) * 0.3, player.pos.y + 0.08, player.pos.z + Math.cos(a) * 0.3);
-      ctx.smoke.exhale(at, dir.set(Math.sin(a), 0.15, Math.cos(a)).normalize());
+      ctx.dust.burst(at, dir.set(Math.sin(a), 0.15, Math.cos(a)).normalize());
     }
     const f = store.currentFloor();
     toast(uiText`🚒 Wheee! Down to ${f?.name ?? uiText('the floor below')}`);
@@ -116,7 +116,6 @@ export function installClimbing(ctx: Ctx, deps: ClimbingDeps) {
     if (office.stack.polesGoDown()) climber.slide(spot);
     else climber.twirl(spot);
   }
-  // Before the cars get a go at you (see their 'moved' tick): a car only shoves you down at the street, never at a pole's hole up on a floor.
   ctx.ticks.add('moved', () => {
     const player = ctx.player;
     // Walked into a pole's hole: you grab the pole on your way down it.

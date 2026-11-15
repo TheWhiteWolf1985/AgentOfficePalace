@@ -15,9 +15,6 @@ import { Changes } from './changes.js';
 import { Decor } from './decor.js';
 import { FloorPlanStore } from './floorplan.js';
 import { Docs } from './docs.js';
-import { Dog } from './dog.js';
-import { Garage } from './garage.js';
-import { Jukebox } from './jukebox.js';
 import { Whiteboard } from './whiteboard.js';
 import { MeetingRoom } from './meetings.js';
 import { Worktrees, type WorktreeCleanup } from './worktrees.js';
@@ -100,10 +97,6 @@ export function projectInfo(dir: string, name: string, agentCmd: string, agentAr
   };
 }
 
-/**
- * One floor of the building: a project's checkout with its own desks and workers, issues and PR
- * boards, task queue, pictures and jukebox, all kept in that checkout's .agent-office folder.
- */
 export class Floor {
   readonly id: string;
   readonly dir: string;
@@ -115,7 +108,6 @@ export class Floor {
   readonly decor: Decor;
   /** The signs over its desks, and how far its back office is built out. */
   readonly plan: FloorPlanStore;
-  readonly jukebox: Jukebox;
   /** The whiteboard everyone on the floor draws on together. */
   readonly whiteboard: Whiteboard;
   /** The meeting room, where workers work through a question together (see meetings.ts). */
@@ -124,9 +116,6 @@ export class Floor {
   readonly docs: Docs;
   /** Settles once the workers whose terminals outlived the last office are picked back up, and the rest woken. */
   readonly ready: Promise<void>;
-  readonly dog: Dog;
-  /** The cars in the garage: who's in which, and where their drivers have left them. */
-  readonly garage = new Garage();
   private timer: NodeJS.Timeout;
   /** Pull requests merging, to ring the gong for. */
   private merges = new MergeWatch();
@@ -146,16 +135,8 @@ export class Floor {
     excludeFromGit(def.dir);
     this.project = projectInfo(def.dir, def.name, ctx.agentCmd, ctx.agentArgs);
     this.docs = new Docs(def.dir);
-    // Before the workers and the dog: the back office's desks are only there once it's built.
-    this.plan = new FloorPlanStore(dataDir);
 
-    // Before the workers, so it hears about the ones who wake up needing input.
-    this.dog = new Dog(def.id, dataDir, {
-      workers: () => this.workers?.list() ?? [],
-      people: () => ctx.peers(this),
-      send: (dog) => ctx.emit(this, { t: 'dog', dog }),
-      wing: () => this.plan.wing,
-    });
+    this.plan = new FloorPlanStore(dataDir);
 
     this.workers = new WorkerManager(
       def.dir,
@@ -169,7 +150,6 @@ export class Floor {
           // Still being built: the first updates come from waking the workers already at their desks.
           this.queue?.onWorker(worker);
           this.meetings?.onWorker(worker);
-          this.dog.onWorker(worker);
           ctx.workerChanged(this, worker);
           // Its turn ended, or whoever had its terminal open closed it: it may be free to go now.
           this.sendLandedHome();
@@ -179,7 +159,6 @@ export class Floor {
           ctx.emit(this, { t: 'worker.remove', workerId });
           this.queue?.onWorkerGone(workerId);
           this.meetings?.onWorkerGone(workerId);
-          this.dog.onWorkerGone(workerId);
           ctx.workerChanged(this, workerId);
         },
         data: (workerId, data, viewers) => ctx.termData(workerId, data, viewers),
@@ -293,7 +272,6 @@ export class Floor {
     );
 
     this.decor = new Decor(dataDir);
-    this.jukebox = new Jukebox(dataDir);
     this.whiteboard = new Whiteboard(dataDir);
     this.ready = this.workers.start();
 
@@ -399,7 +377,6 @@ export class Floor {
   shutdown(keep = false) {
     clearInterval(this.timer);
     clearTimeout(this.landedTimer);
-    this.dog.stop();
     this.github.stop();
     this.queue.shutdown();
     this.meetings.shutdown();

@@ -13,14 +13,13 @@ const props = openModel('desk_props');
 const { gltf, nodes, byName } = props;
 
 const BOOKS = ['books_upright', 'books_leaning', 'books_stack'];
-const PIECES = ['mug', ...BOOKS];
+const PIECES = BOOKS;
 const COVERS = ['CoverRed', 'CoverBlue', 'CoverOrange'];
 
 /** DESK_PROP_COLORS in world/office/props.ts, and the mug's body, which each desk paints in its chair's color. */
-const PAINTED = ['CoverRed', 'CoverBlue', 'CoverOrange', 'Pages', 'Coffee', 'Mug'];
+const PAINTED = ['CoverRed', 'CoverBlue', 'CoverOrange', 'Pages'];
 
 /** Where buildDesk() puts them, in the desk's own frame (x along it, z out toward the chair). */
-const MUG_AT = { x: DESK_SIZE.width / 2 - 0.25, z: -0.2 };
 const BOOKS_AT = { x: DESK_SIZE.width / 2 - 0.26, z: -0.3 };
 
 type Primitive = { attributes: Record<string, number>; material?: number; indices?: number };
@@ -59,26 +58,13 @@ test('each piece is a root node of its own, at the origin and facing +z as model
   }
 });
 
-test('its materials are the ones world/office/props.ts paints, and only those, the mug\'s on the mug and the books\' on the books', () => {
+test('its materials are the ones world/office/props.ts paints, and only those, the books\' on the books', () => {
   const names = props.materials();
   for (const m of PAINTED) assert.ok(names.includes(m), `a material called ${m}`);
   for (const m of names) assert.ok(PAINTED.includes(m), `${m} isn't a material the code knows (it would come out magenta)`);
-  assert.deepEqual(primitives('mug').map(materialOf).sort(), ['Coffee', 'Mug'], 'the mug is its body and its coffee');
   for (const name of BOOKS) {
     assert.deepEqual(primitives(name).map(materialOf).sort(), [...COVERS, 'Pages'].sort(), `${name} is a book in each cover and their pages`);
   }
-});
-
-test('the mug is the old one\'s size, its body round its origin and its handle out to +x', () => {
-  const coffee = boundsOf('mug', ['Coffee']);
-  const middle = coffee.getCenter(new Vector3());
-  assert.ok(Math.hypot(middle.x, middle.z) < 1e-3, `the coffee (and so the body) is centred on the origin (${fmt(middle)})`);
-  const mug = boundsOf('mug');
-  assert.ok(near(mug.max.y, 0.12), `${mug.max.y.toFixed(3)} m tall`);
-  assert.ok(coffee.max.y < mug.max.y - 0.01 && coffee.max.y > mug.max.y - 0.04, `the coffee is a little down from the rim (${coffee.max.y.toFixed(3)})`);
-  // The old cylinder was 0.06 round at the top: the body keeps to that everywhere but where the handle is.
-  assert.ok(-mug.min.x <= 0.06 && -mug.min.z <= 0.06 && mug.max.z <= 0.06, `the body is ${span(mug)}`);
-  assert.ok(mug.max.x > 0.085 && mug.max.x < 0.11, `the handle reaches ${mug.max.x.toFixed(3)} out to +x`);
 });
 
 test('every arrangement of books fits the old books\' footprint, centred on its origin, spines to +z', () => {
@@ -99,17 +85,17 @@ test('every arrangement of books fits the old books\' footprint, centred on its 
   }
 });
 
-test('where buildDesk puts them they stay in the desk\'s back corner, clear of the laptop, the stage and the holiday spot', () => {
+test('where buildDesk puts them they stay in the desk\'s back corner, clear of the laptop, the stage', () => {
   const top = { x: DESK_SIZE.width / 2 - 0.03, z: DESK_SIZE.depth / 2 - 0.02 };
   const placed = (name: string, at: { x: number; z: number }) => {
     const box = boundsOf(name);
     return { minX: at.x + box.min.x, maxX: at.x + box.max.x, minZ: at.z + box.min.z, maxZ: at.z + box.max.z };
   };
-  for (const [name, at] of [['mug', MUG_AT], ...BOOKS.map((b) => [b, BOOKS_AT] as const)] as const) {
+  for (const [name, at] of BOOKS.map((b) => [b, BOOKS_AT] as const) as const) {
     const p = placed(name, at);
     const where = `${name} runs x ${p.minX.toFixed(3)} to ${p.maxX.toFixed(3)}, z ${p.minZ.toFixed(3)} to ${p.maxZ.toFixed(3)}`;
     assert.ok(p.maxX < top.x && p.minZ > -top.z, `${where}: on the desk`);
-    // The laptop (0.78 wide at 1.3 times, in the middle) and the holiday present (at x -0.78 on these desks).
+    // The laptop (0.78 wide at 1.3 times, in the middle) .
     assert.ok(p.minX > 0.51 + 0.05, `${where}: clear of the laptop`);
     // Whoever dances on the desk stands at (0.72, 0.18), up front.
     assert.ok(p.maxZ < 0.18 - 0.2, `${where}: behind the stage`);
@@ -122,7 +108,6 @@ test('where buildDesk puts them they stay in the desk\'s back corner, clear of t
   }
 });
 
-test('each piece is cheap: the mug under 400 triangles, an arrangement of books under 500', () => {
-  assert.ok(trianglesOf('mug') <= 400, `mug: ${trianglesOf('mug')} triangles`);
+test('each piece is cheap: an arrangement of books under 500', () => {
   for (const name of BOOKS) assert.ok(trianglesOf(name) <= 500, `${name}: ${trianglesOf(name)} triangles`);
 });

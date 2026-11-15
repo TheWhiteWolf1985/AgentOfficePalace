@@ -14,15 +14,8 @@ export interface AudioHooks {
   /** Audio just started: the rest of the graph goes up, and whatever plays all the time starts. */
   start(ctx: AudioContext): void;
   /** Audio was already going and the page was touched (or a ding came) again. */
-  touched(): void;
 }
 
-/**
- * The audio every sound shares: the context (started on the first click or key, as browsers want),
- * the buses a sound goes out on, your volume, the tab hiding, where your ears are and what's round
- * them, the samples, and what runs every frame. The recipes (weather.ts, features/dog/sound.ts and the rest) are
- * functions of one of these; OfficeSound (index.ts) puts them together.
- */
 export class AudioCore {
   ctx: AudioContext | null = null;
   private master!: GainNode;
@@ -83,7 +76,6 @@ export class AudioCore {
     if (this.ctx) {
       if (this.ctx.state === 'suspended') void this.ctx.resume();
       // A ding can start audio before you've touched the page, when a stream isn't allowed to play yet.
-      this.hooks.touched();
       return;
     }
     let ctx: AudioContext;

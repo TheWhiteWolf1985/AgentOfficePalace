@@ -1,4 +1,4 @@
-import { PAVEMENT, type Box } from '../../shared/garage';
+import { PAVEMENT, type Box } from '../../shared/ground';
 import { BALCONY, FLOOR, ROAD, inWing } from '../../shared/layout';
 import type { AudioCore } from './core';
 import { biquad, envelope, pick, rand } from './dsp';

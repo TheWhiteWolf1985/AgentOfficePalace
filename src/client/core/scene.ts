@@ -1,11 +1,6 @@
-/**
- * What the office is drawn on and with: the renderer on its canvas, the scene and its lights, the
- * camera, the office building, the sky and the holiday decorations.
- */
 import * as THREE from 'three';
 import { OutlineEffect } from 'three/examples/jsm/effects/OutlineEffect.js';
 import { store } from '../state';
-import { Holiday } from '../world/holiday';
 import { buildOffice } from '../world/office';
 import type { Office } from '../world/types';
 import { HAZE_MAX, Sky } from '../world/sky';
@@ -31,8 +26,7 @@ export interface Stage {
   readonly sun: THREE.DirectionalLight;
   readonly office: Office;
   readonly sky: Sky;
-  /** Halloween or Christmas decorations, up while the building's dressed up for one (see dressUp in features/workers/views.ts). */
-  readonly holiday: Holiday;
+
 }
 
 export function makeRenderer(canvas: HTMLCanvasElement): THREE.WebGLRenderer | null {
@@ -81,13 +75,9 @@ export function createScene(canvas: HTMLCanvasElement, renderer: THREE.WebGLRend
   const office = buildOffice();
   scene.add(office.group);
   const sky = new Sky(scene, { sun, hemi, ambient }, office.night, () => store.officeNow());
-  // Halloween or Christmas decorations, up while the building's dressed up for one (see dressUp).
-  const holiday = new Holiday(office);
-  scene.add(holiday.group);
 
   noOutline(office.group);
-  noOutline(holiday.group);
-  return { canvas, renderer, effect, scene, camera, hemi, ambient, sun, office, sky, holiday };
+  return { canvas, renderer, effect, scene, camera, hemi, ambient, sun, office, sky };
 }
 
 /** The sky follows the office's weather and time of day, and its thunder is heard. */

@@ -32,7 +32,6 @@ export interface Followed {
   room: Room;
   wing: number;
   rig: ((dt: number) => void) | null;
-  riding: boolean;
   colliders: Collider[];
   street: number;
 }
@@ -60,7 +59,7 @@ export function aimCamera(camera: THREE.PerspectiveCamera, p: Followed, bob: num
   const m = 0.4;
   const R = p.room;
   // On the ladder or a pole you can be down in a shaft under the floor, but you're still indoors.
-  const rigged = !!p.rig && !p.riding;
+  const rigged = !!p.rig;
   const under = p.pos.x > R.minX && p.pos.x < R.maxX && p.pos.z > R.minZ && p.pos.z < R.maxZ;
   // In the office's back office, between its walls, and out through where the north wall was into the room.
   const back = !R.enclosed && p.pos.y > -SLAB - 0.5 && inWing(p.pos.x, p.pos.z, p.wing);

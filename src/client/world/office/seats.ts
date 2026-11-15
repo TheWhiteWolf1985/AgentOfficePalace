@@ -6,7 +6,7 @@ import { mesh, roundedBox, textPlane, toon } from '../toon';
 import type { Collider, DeskView, Interactable } from '../types';
 import type { Fixture } from './fixture';
 import { PALETTE, box } from './materials';
-import { deskBooks, deskMug, plant } from './props';
+import { deskBooks, plant } from './props';
 
 // Where people sit: the seats you use (see SEATING), and the desks, bean bags and board agents' kiosks
 // that workers sit (or stand) at, with the "+" over a free one.
@@ -54,19 +54,12 @@ export function buildDesk(def: DeskDef, index: number, trimMat: THREE.Material):
   }
   // Modesty panel facing away from the worker
   group.add(mesh(box(width - 0.3, 0.32, 0.03), trimMat, 0, height - 0.26, -depth / 2 + 0.06));
-  // Little desk decorations. Which desk gets which stays as it is: the holiday present goes in whichever
-  // back corner it leaves free (DESK_SPOTS in holiday.ts).
   const deco = index % 3;
-  if (deco === 0) {
-    // In the chair's color.
-    const mug = deskMug(PALETTE.chairs[index % 6]);
-    mug.position.set(width / 2 - 0.25, height, -0.2);
-    group.add(mug);
-  } else if (deco === 1) {
+  if (deco === 1) {
     const p = plant('succulent');
     p.position.set(-width / 2 + 0.25, height, -0.25);
     group.add(p);
-  } else {
+  } else if (deco === 2) {
     // Where the old three boxes stood, the desks with books taking turns with the arrangements.
     const books = deskBooks(Math.floor(index / 3));
     books.position.set(width / 2 - 0.26, height, -0.3);

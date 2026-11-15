@@ -23,11 +23,9 @@ FPS = 24
 TAU = 2 * math.pi
 UP = (0.0, 0.0, 1.0)
 
-
 def args():
     """The script's own arguments: whatever follows `--` on Blender's command line."""
     return sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
-
 
 # ---- Scene ----------------------------------------------------------------------------------------
 
@@ -43,10 +41,8 @@ def clear():
             coll.remove(d)
     bpy.context.scene.render.fps = FPS
 
-
 def _linear(c):
     return c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
-
 
 def material(name, color):
     """A material by name, with `color` (a hex string) as its viewport colour. The office swaps
@@ -55,7 +51,6 @@ def material(name, color):
     h = color.lstrip("#")
     m.diffuse_color = tuple(_linear(int(h[i:i + 2], 16) / 255) for i in (0, 2, 4)) + (1.0,)
     return m
-
 
 def mesh_object(name, bm, mats=(), smooth=True):
     """Turns a bmesh into an object in the scene (and frees the bmesh). `mats` are its materials;
@@ -71,15 +66,12 @@ def mesh_object(name, bm, mats=(), smooth=True):
     bpy.context.scene.collection.objects.link(ob)
     return ob
 
-
 def apply_modifier(ob, name):
     with bpy.context.temp_override(object=ob, active_object=ob, selected_objects=[ob]):
         bpy.ops.object.modifier_apply(modifier=name)
 
-
 def tris(ob):
     return sum(len(p.vertices) - 2 for p in ob.data.polygons)
-
 
 def join(target, others):
     """Joins `others` into `target`: one object, a material slot per material."""
@@ -94,14 +86,12 @@ def join(target, others):
     target.data.validate()
     return target
 
-
 def set_origin(ob, at):
     """Moves an object's origin to `at` (world space) without moving its geometry: a moving part's
     origin is its pivot, the point the office turns it about."""
     local = ob.matrix_world.inverted() @ Vector(at)
     ob.data.transform(Matrix.Translation(-local))
     ob.matrix_world = ob.matrix_world @ Matrix.Translation(local)
-
 
 # ---- Shapes (added to a bmesh) --------------------------------------------------------------------
 
@@ -110,12 +100,10 @@ def _place(bm, verts, center, rot, scale=(1, 1, 1)):
     bmesh.ops.transform(bm, matrix=m, verts=verts)
     return verts
 
-
 def ellipsoid(bm, center, radii, rot=(0, 0, 0), segs=24, rings=16):
     """A squashed sphere, turned by `rot` (XYZ euler) about its own centre."""
     verts = bmesh.ops.create_uvsphere(bm, u_segments=segs, v_segments=rings, radius=1.0)["verts"]
     return _place(bm, verts, center, rot, radii)
-
 
 def limb(bm, a, b, ra, rb, segs=18, rings=14):
     """A capsule from `a` (radius ra) to `b` (radius rb)."""
@@ -128,7 +116,6 @@ def limb(bm, a, b, ra, rb, segs=18, rings=14):
     bmesh.ops.transform(bm, matrix=Matrix.Translation(a) @ turn, verts=verts)
     return verts
 
-
 def _merge(bm, part):
     """Adds a finished bmesh `part` to `bm` (and frees it). Shapes that bevel are built on their own
     first, so the bevel and the placing only ever touch that shape."""
@@ -137,7 +124,6 @@ def _merge(bm, part):
     part.free()
     bm.from_mesh(me)
     bpy.data.meshes.remove(me)
-
 
 def box(bm, center, size, bevel=0.0, rot=(0, 0, 0), segments=3):
     """A box `size` (x, y, z) big, its edges rounded over `bevel` metres (0 for sharp)."""
@@ -150,7 +136,6 @@ def box(bm, center, size, bevel=0.0, rot=(0, 0, 0), segments=3):
     _place(part, part.verts[:], center, rot)
     _merge(bm, part)
 
-
 def cylinder(bm, a, b, r, rb=None, segs=24, cap=True):
     """A cylinder (or cone, with `rb`) from point `a` to point `b`."""
     a, b = Vector(a), Vector(b)
@@ -159,7 +144,6 @@ def cylinder(bm, a, b, r, rb=None, segs=24, cap=True):
     turn = (b - a).to_track_quat('Z', 'Y').to_matrix().to_4x4()
     bmesh.ops.transform(bm, matrix=Matrix.Translation((a + b) / 2) @ turn, verts=geom["verts"])
     return geom["verts"]
-
 
 def torus(bm, center, R, r, rot=(0, 0, 0), n=28, m=8):
     """A ring of radius R, tube radius r, lying in its XY plane before `rot` turns it."""
@@ -172,7 +156,6 @@ def torus(bm, center, R, r, rot=(0, 0, 0), n=28, m=8):
         for j in range(m):
             bm.faces.new((grid[i][j], grid[(i + 1) % n][j], grid[(i + 1) % n][(j + 1) % m], grid[i][(j + 1) % m]))
     return _place(bm, [v for row in grid for v in row], center, rot)
-
 
 def lathe(bm, profile, center=(0, 0, 0), rot=(0, 0, 0), segs=32):
     """Spins a profile [(radius, height), ...] (bottom to top) about the up axis: bowls, bells,
@@ -191,10 +174,9 @@ def lathe(bm, profile, center=(0, 0, 0), rot=(0, 0, 0), segs=32):
                 bm.faces.new(quad)
     return _place(bm, [v for ring in rings for v in ring], center, rot)
 
-
 def outline(bm, points, depth, center=(0, 0, 0), rot=(0, 0, 0), bevel=0.0):
     """A flat outline [(x, z), ...] (counter-clockwise, seen from +Y) extruded `depth` along Y and
-    centred on it: a cabinet's side, a jukebox's arch, a car's silhouette. `bevel` rounds its edges."""
+    centred on it: a cabinet's side, an arch, a curved panel. `bevel` rounds its edges."""
     part = bmesh.new()
     front = [part.verts.new((x, -depth / 2, z)) for x, z in points]
     back = [part.verts.new((x, depth / 2, z)) for x, z in points]
@@ -208,7 +190,6 @@ def outline(bm, points, depth, center=(0, 0, 0), rot=(0, 0, 0), bevel=0.0):
     bmesh.ops.recalc_face_normals(part, faces=part.faces[:])
     _place(part, part.verts[:], center, rot)
     _merge(bm, part)
-
 
 # ---- One smooth skin ------------------------------------------------------------------------------
 
@@ -236,12 +217,10 @@ def fuse(ob, voxel=0.0065, smooth=10, quads=4200):
     for p in ob.data.polygons:
         p.use_smooth = True
 
-
 def blob(p, center, radii):
     """Roughly the distance outside an ellipsoid, in its own radii (negative inside). Patch fields
     are built from these: unions are min, intersections max."""
     return math.sqrt(sum(((p[i] - center[i]) / radii[i]) ** 2 for i in range(3))) - 1.0
-
 
 def cut_along(bm, field):
     """Splits every face the field's zero line crosses, exactly along that line, so a patch's edge
@@ -261,7 +240,6 @@ def cut_along(bm, field):
             bmesh.utils.face_split(f, ends[0], ends[1])
     bmesh.ops.triangulate(bm, faces=[f for f in bm.faces if len(f.verts) > 4])
     return val
-
 
 def paint(ob, base, patches):
     """Paints a skin: `base` everywhere, then each (material, field) in `patches` where its field is
@@ -284,7 +262,6 @@ def paint(ob, base, patches):
         f.smooth = True
     bm.to_mesh(me)
     bm.free()
-
 
 # ---- Rigs and clips -------------------------------------------------------------------------------
 
@@ -313,7 +290,6 @@ def armature(name, spec):
         pb.rotation_mode = 'QUATERNION'
     return arm
 
-
 def socket(arm, name, bone, at):
     """An empty on a bone, at `at` (world space) and square to the world at rest: where the office
     hangs things on a model (a hat on a head)."""
@@ -325,7 +301,6 @@ def socket(arm, name, bone, at):
     s.parent_bone = bone
     s.matrix_world = Matrix.Translation(at)
     return s
-
 
 class Pose:
     """One moment of a clip: turns (about a bone's own x/y/z, or about a world axis given as a
@@ -349,9 +324,7 @@ class Pose:
         self.turn(f"{bone}_R", axis, -angle if mirrored else angle)
         return self
 
-
 AXES = {"x": Vector((1, 0, 0)), "y": Vector((0, 1, 0)), "z": Vector((0, 0, 1))}
-
 
 def pose(arm, p):
     """Sets every bone from `p` (bones it doesn't mention go back to rest)."""
@@ -365,15 +338,12 @@ def pose(arm, p):
         off = p.moves.get(pb.name)
         pb.location = rest @ Vector(off) if off else Vector()
 
-
 def wave(t, n, phase=0.0):
     """n full sine waves over a clip's t = 0..1, so the clip loops cleanly."""
     return math.sin(TAU * (n * t + phase))
 
-
 def ease(v):
     return v * v * (3 - 2 * v)
-
 
 def key_clips(arm, clips):
     """Keys each clip {name: (frames at FPS, pose at t in 0..1)} as its own looping action, every
@@ -394,7 +364,6 @@ def key_clips(arm, clips):
     arm.animation_data.action = None
     pose(arm, Pose())
 
-
 def show(arm, clips, clip, t):
     """Puts the rig at `t` (0..1) through a clip, for a review render; clip None is the rest pose."""
     if clip is None:
@@ -403,7 +372,6 @@ def show(arm, clips, clip, t):
         return
     arm.animation_data.action = bpy.data.actions[clip]
     bpy.context.scene.frame_set(1 + round(t * clips[clip][0]))
-
 
 # ---- Export ---------------------------------------------------------------------------------------
 
@@ -437,7 +405,6 @@ def export(name, arm=None, uvs=False):
     )
     return path
 
-
 # ---- Review renders -------------------------------------------------------------------------------
 
 VIEWS = {
@@ -448,7 +415,6 @@ VIEWS = {
     "top": (0.0, -0.05, 1.0),
     "low": (0.9, -1.0, 0.1),
 }
-
 
 def shoot(name, view="tq", target=(0, 0, 0.35), dist=1.9, res=(900, 700)):
     """A Workbench render with outlines to SHOT_DIR/<name>.png, for looking at while modelling.
@@ -484,7 +450,6 @@ def shoot(name, view="tq", target=(0, 0, 0.35), dist=1.9, res=(900, 700)):
     sc.render.filepath = os.path.join(SHOT_DIR, name + ".png")
     bpy.ops.render.render(write_still=True)
     return sc.render.filepath
-
 
 def sheet(name, shots, cell=(420, 330), target=(0, 0, 0.35), dist=1.7):
     """Several renders side by side in one PNG, four to a row: `shots` is [(setup, view)], where

@@ -84,13 +84,8 @@ export interface KeyPress {
   preventDefault(): void;
 }
 
-/**
- * The stages a key press goes through before the bindings, in order: guards (nothing gets a key while
- * a window's open, say), then whatever you're in the middle of (the ladder, the tee, a car…), then the
- * emotes. A handler returns true when it took the key, which ends it there.
- */
-export type KeyStage = 'guard' | 'activity' | 'emote';
-export const KEY_STAGES: readonly KeyStage[] = ['guard', 'activity', 'emote'];
+export type KeyStage = 'guard' | 'activity';
+export const KEY_STAGES: readonly KeyStage[] = ['guard', 'activity'];
 
 /** A key of the office's own, once no stage has taken it. */
 export interface KeyBinding<E extends KeyPress = KeyPress> {
@@ -152,25 +147,7 @@ export class Keys<E extends KeyPress = KeyPress> {
 
 // ---- The frame ------------------------------------------------------------------------------------
 
-/**
- * The phases of a frame, in the order they run (see frame() in core/loop.ts, which runs them all). Within a
- * phase, callbacks run in the order they were registered: the office's own before any feature's.
- *
- * - pre: before anything moves: the frame rate, coffee and the view's shake, then drinks
- * - steer: where you're headed on your own (walking over to someone)
- * - vehicles: what you might be riding moves first (the cars)
- * - move: you move
- * - moved: what where you've got to does to you (a lap timed, a car shoving you, a pole's hole)
- * - play: games and what they hold you in (the arcade, the tee, the dart board)
- * - me: your character, your hands and the camera, what you hear, and telling the office where you are
- * - others: everyone and everything else that moves (people, cars' engines, workers and the dog)
- * - world: the building and what's in it (its doors and floors, smoke breaks, particles, a picture being hung)
- * - env: the sky, the weather and the light, then what's lit by it (the roof's strobes)
- * - aim: what you're pointing at, and the hint bar
- * - hud: the panels that follow what people are doing
- * - render: drawing the frame
- */
-export const TICK_PHASES = ['pre', 'steer', 'vehicles', 'move', 'moved', 'play', 'me', 'others', 'world', 'env', 'aim', 'hud', 'render'] as const;
+export const TICK_PHASES = ['pre', 'steer', 'move', 'moved', 'play', 'me', 'others', 'world', 'env', 'aim', 'hud', 'render'] as const;
 export type TickPhase = (typeof TICK_PHASES)[number];
 
 /** What each tick gets about the frame it's in. */
@@ -312,12 +289,6 @@ export interface FrameFilter {
   end(f: Frame): void;
 }
 
-/**
- * What something you can do makes of you and your view while it's going on: holding on to the ladder,
- * the view narrowing at the dart board or widening down a pole, the telescope or a game having the
- * screen to itself, the drunk vision. The office's own ticks (moving you, the building, drawing the
- * frame) ask each effect, in the order they were added. `G` is what you can hold on to.
- */
 export interface ViewEffect<G = unknown> {
   /** What you're holding on to (the ladder, a pole), or null. */
   grip?(): G | null;
@@ -325,7 +296,7 @@ export interface ViewEffect<G = unknown> {
   fov?(fov: number): number;
   /** Runs each frame once the view's field of view is set. */
   update?(): void;
-  /** It has the screen to itself right now (the telescope, a game up close): your hands aren't drawn over it. */
+
   covers?(): boolean;
   /** Draws the frame through this. */
   filter?: FrameFilter;
@@ -458,11 +429,10 @@ export class Hooks {
 
 // ---- What else there is to use ----------------------------------------------------------------------
 
-/** One part of the office with things of its own to use (the pictures, the dog, the ball): `I` is one of them, `O` what the aim can land on. */
 export interface UsableSource<I, O> {
   /** What there is to use of it right now. */
   usable(): readonly I[];
-  /** What the aim can land on that isn't in the building itself (the dog walks about on its own), if anything. */
+
   pickable?(): O;
 }
 

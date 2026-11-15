@@ -1,8 +1,8 @@
 import { t as uiText } from '../../shared/i18n';
 import * as THREE from 'three';
 import { ELEVATOR, ELEVATOR_FRONT, FLOOR, ROAD, SLAB, STREET_Y, WALL_T } from '../../shared/layout';
-import { LOT, SIDE_LOT } from '../../shared/garage';
-import { STREET_END, shoreX } from '../../shared/scenic';
+import { LOT, SIDE_LOT } from '../../shared/ground';
+import { GROUNDS, STREET_END } from '../../shared/ground';
 import type { Collider } from './types';
 import type { Fixture, StreetSite } from './office/fixture';
 import { canvasTexture } from './texture';
@@ -131,11 +131,6 @@ function garageFloorTexture(): THREE.CanvasTexture {
   });
 }
 
-/**
- * Downstairs: the open garage under the office's floor slab (see world/stack.ts): concrete
- * walls at the back and on the west side, columns along the open front and east side, and strip
- * lights. The Lambos and Ferraris parked in it are features/cars/world.ts's.
- */
 export function buildGarage(group: THREE.Group, colliders: Collider[]) {
   const w = B.maxX - B.minX;
   const d = B.maxZ - B.minZ;
@@ -253,14 +248,9 @@ export function streetLamp(parts: THREE.Group, night: NightParts, glass: THREE.M
   night.lamps.push({ x, y: G + H - 0.6, z: hz, reach: 10, color: '#ffcf8a', power: 4, ground: true });
 }
 
-/**
- * How far the grass goes, every way from the office: from the top floor the haze is up to HAZE_MAX
- * off (see world/sky.ts), and out at the far corners of the scenic loop too, so its edges must be
- * further than that even at the edge of the view. To the west it stops at the beach (world/scenic/).
- */
 const REACH = 900;
 /** Where the grass stops to the west, under the beach's sand, whose flat top is everywhere past here. */
-const LAWN_WEST = Math.ceil(Math.max(...Array.from({ length: 1801 }, (_, i) => shoreX(i - 900))) + 4);
+const LAWN_WEST = -REACH;
 
 /** The street's asphalt: white lines along its edges and a dashed yellow one down the middle, 8 m to a dash and a gap. */
 export function roadTexture(): THREE.CanvasTexture {
@@ -324,8 +314,6 @@ export function buildStreet(group: THREE.Group, colliders: Collider[], night: Ni
   ] as const) {
     group.add(groundPlane(b.maxX - b.minX, b.maxZ - b.minZ, (b.minX + b.maxX) / 2, y, (b.minZ + b.maxZ) / 2, null, '#9a9ea8'));
   }
-
-  // The road, out to either end of the street, where the scenic loop takes over (world/scenic/).
   const road = roadTexture();
   road.repeat.set((STREET_END * 2) / 8, 1);
   group.add(groundPlane(STREET_END * 2, ROAD.maxZ - ROAD.minZ, 0, G - 0.008, (ROAD.minZ + ROAD.maxZ) / 2, road));
@@ -335,6 +323,12 @@ export function buildStreet(group: THREE.Group, colliders: Collider[], night: Ni
   ]) {
     group.add(mesh(box(STREET_END * 2 - 4, 0.08, z1 - z0), toon('#e3ddd0'), 0, G, (z0 + z1) / 2));
   }
+  // Low barriers close the former scenic exits; collision also bounds the lawns.
+  for (const x of [GROUNDS.minX, GROUNDS.maxX]) {
+    group.add(mesh(box(0.3, 1.2, ROAD.maxZ - ROAD.minZ + 4), toon('#e3ddd0'), x, G + 0.6, (ROAD.minZ + ROAD.maxZ) / 2));
+    colliders.push({ minX: x - 0.15, maxX: x + 0.15, minZ: GROUNDS.minZ, maxZ: GROUNDS.maxZ, bottom: G, top: 99, fence: true });
+  }
+  for (const z of [GROUNDS.minZ, GROUNDS.maxZ]) colliders.push({ minX: GROUNDS.minX, maxX: GROUNDS.maxX, minZ: z - 0.15, maxZ: z + 0.15, bottom: G, top: 99, fence: true });
   const forest = new THREE.Group();
 
   // Trees along the sidewalks and around the building.

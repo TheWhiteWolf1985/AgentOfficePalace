@@ -1,5 +1,5 @@
 /**
- * The DJ on the rooftop: an endless drum and bass set, synthesized with Web Audio like the jukebox's
+ * The DJ on the rooftop: an endless drum and bass set, synthesized with Web Audio like the office's
  * tunes (sound/music.ts). The set is a run of tracks of 96 bars each: an intro, a build, the drop, a
  * breakdown, another build and a second drop. Each track has its own key, chords, groove and
  * bassline, picked from its number.

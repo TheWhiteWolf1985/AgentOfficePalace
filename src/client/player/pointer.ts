@@ -58,7 +58,7 @@ export abstract class PlayerInput {
   /** When the mouse last moved, or a lock that settles landed. */
   private movedAt = 0;
   enabled = true;
-  /** False while the mouse picks something else (an emote on the wheel), so it doesn't turn the camera. */
+
   mouseLook = true;
 
   constructor(private dom: HTMLElement) {

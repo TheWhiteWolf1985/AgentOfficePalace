@@ -9,7 +9,6 @@ import { PALETTE } from './materials';
 // The potted plants are modelled in Blender (blender/scripts/build_plants.py): each plant is a painted
 // copy of one species in plants.glb (see piece()). A species is its pot, named after it, with everything that
 // grows out of the pot hung under it as `<species>_leaves` (see plantLeaves()). The colors are the old
-// code-built plants' pot and greens, the Christmas tree's trunk brown for the soil, the street trees'
 // trunk brown for the ficus's, and the kitchen cupboards' blue for the snake plant's glazed pot.
 export type PlantSpecies = 'monstera' | 'snake_plant' | 'ficus' | 'succulent';
 /** The species that stand on the floor, which a row of plants takes turns with (see floorPlant()). */
@@ -35,11 +34,6 @@ export function floorPlant(i: number): PlantSpecies {
   return FLOOR_PLANTS[i % FLOOR_PLANTS.length];
 }
 
-/**
- * A plant's leaves, and whatever else grows out of its pot (stalks, a trunk): everything but the pot and
- * its soil. Christmas hides them and stands a little tree in the pot instead (world/holiday.ts). None if
- * the model didn't load.
- */
 export function plantLeaves(potted: THREE.Object3D): THREE.Object3D[] {
   const leaves: THREE.Object3D[] = [];
   potted.traverse((o) => {
@@ -48,24 +42,11 @@ export function plantLeaves(potted: THREE.Object3D): THREE.Object3D[] {
   return leaves;
 }
 
-// The desks' knick-knacks are modelled in Blender (blender/scripts/build_desk_props.py): a mug of coffee,
-// and books in a few arrangements, each a piece of desk_props.glb (see piece()). The colors are the old
-// code-built books' covers, features/bookshelf/book.ts's page edges and the coffee in a worker's mug (coffeeMug() in
-// character/props.ts); the mug itself is painted whatever color it's given.
-const DESK_PROP_COLORS = { CoverRed: '#e63946', CoverBlue: '#457b9d', CoverOrange: '#f4a261', Pages: '#f3ead8', Coffee: '#6f4518' };
+// The desktop books are pieces of desk_props.glb, made by build_desk_props.py.
+const DESK_PROP_COLORS = { CoverRed: '#e63946', CoverBlue: '#457b9d', CoverOrange: '#f4a261', Pages: '#f3ead8' };
 const paintDeskProp = palette(DESK_PROP_COLORS);
 /** The arrangements of books, which the desks with books take turns with (see deskBooks()). */
 export const DESK_BOOKS = ['books_upright', 'books_leaning', 'books_stack'] as const;
-
-/**
- * A mug of coffee, its body `color`, its origin on the desk under the middle of its body and its handle out
- * to +x. The body is the old code-built mug's size (0.06 round at the top, 0.12 tall). If the model didn't
- * load, an empty group.
- */
-export function deskMug(color: string): THREE.Object3D {
-  const body = toon(color);
-  return piece('desk_props', 'mug', (name) => (name === 'Mug' ? body : paintDeskProp(name)));
-}
 
 /**
  * The `i`th arrangement of books (they take turns, see DESK_BOOKS), spines to +z, its origin on the desk in
@@ -117,7 +98,6 @@ export function pouf(color: string): THREE.Object3D {
   return upholstered('pouf', color);
 }
 
-/** The lounge's round coffee table, 0.9 round, its top 0.46 up (where the holiday pumpkin stands). */
 export function coffeeTable(): THREE.Object3D {
   return piece('lounge', 'coffee_table', paintLounge);
 }

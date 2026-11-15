@@ -199,7 +199,7 @@ export function openElevator(opts: ElevatorOptions): void {
   const garageButton = () => {
     const here = opts.downstairs();
     const bottom = store.floors.find((f) => !f.cloning);
-    const under = store.floor === ROOF ? uiText`Under ${bottom?.name ?? uiText('the building')}, level with the street` : uiText('Under the building, level with the street: the cars, and the way out');
+    const under = store.floor === ROOF ? uiText`Under ${bottom?.name ?? uiText('the building')}, level with the street` : uiText('Under the building, level with the street: the garage and the way out');
     const btn = h(
       'button.floor-btn',
       { type: 'button', class: here ? 'here' : '', disabled: here, title: here ? uiText("You're down at the street") : uiText('Ride down to the garage') },

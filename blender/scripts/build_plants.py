@@ -20,7 +20,7 @@ Each species is two objects. The pot with its soil is a root of its own, named a
 (`monstera`, `snake_plant`, `ficus`, `succulent`), standing on the floor at the origin and facing
 forward. Everything that grows out of it (leaves, stems, a trunk) is one object parented under
 the pot, `<species>_leaves`, its origin there too. world/office/props.ts clones the pot, which brings its
-leaves along; at Christmas world/holiday.ts hides every object whose name ends in `_leaves` and
+leaves along; each group of leaves has its own `_leaves` object name and
 stands a little tree in the pot instead. The object and material names are a contract with
 world/office/props.ts and tests/plants-model.test.ts, so rename them in all three places.
 
@@ -50,15 +50,13 @@ COLORS = {
 
 SPECIES = ("monstera", "snake_plant", "ficus", "succulent")
 
-# How high a floor pot's soil is: holiday.ts stands the Christmas tree on it.
+# Height of the soil inside a floor pot.
 SOIL_Z = 0.45
 # The desk pot is the floor pot at this scale, the old desk plant's.
 DESK = 0.35
 
-
 def material(name):
     return ao.material(name, COLORS[name])
-
 
 # ---- Building an object from shapes --------------------------------------------------------------
 
@@ -114,7 +112,6 @@ class Shapes:
             ob.matrix_parent_inverse = Matrix.Identity(4)
         return ob
 
-
 # ---- Leaves ---------------------------------------------------------------------------------------
 #
 # A leaf is built flat in its own space (u across it, v along it from its base to its tip, w out
@@ -152,7 +149,6 @@ def solid(points, faces, loop, depth, fold=0.0, bevel=0.0, mats=None):
         f.smooth = abs(f.normal.z) < 0.8
     return part
 
-
 def frame(at, azimuth, pitch, roll=0.0):
     """Where a leaf goes: its base at `at`, pointing out toward `azimuth` (radians round from +X
     toward +Y; the front, -Y, is -pi/2) and up by `pitch`, its top facing up, then turned about
@@ -163,7 +159,6 @@ def frame(at, azimuth, pitch, roll=0.0):
     q = Quaternion(d, roll)
     return axes(at, q @ s, d, q @ n)
 
-
 def axes(at, u, v, w):
     """The matrix taking leaf space's u, v and w to the scene's `u`, `v` and `w`, its origin at `at`."""
     m = Matrix.Identity(4)
@@ -171,7 +166,6 @@ def axes(at, u, v, w):
         m[0][i], m[1][i], m[2][i] = c
     m[0][3], m[1][3], m[2][3] = at
     return m
-
 
 def smooth_curve(pts, steps=2):
     """A Catmull-Rom curve through `pts` [(x, y)], `steps` points per span (the ends kept)."""
@@ -186,7 +180,6 @@ def smooth_curve(pts, steps=2):
     out.append(tuple(pts[-1]))
     return out
 
-
 def along(line, s):
     """The point `s` of the way along a polyline, by length, and the index of the vertex after it."""
     lens = [(Vector(b) - Vector(a)).length for a, b in zip(line, line[1:])]
@@ -196,7 +189,6 @@ def along(line, s):
             t = min(1.0, goal / l) if l else 0.0
             return tuple(Vector(line[i]).lerp(Vector(line[i + 1]), t)), i + 1
         goal -= l
-
 
 def split(edge, slits):
     """Cuts slits into a leaf's edge (a polyline [(u, v)] from its base to its tip, u > 0): each
@@ -221,7 +213,6 @@ def split(edge, slits):
         out = out[:ia] + [a, tuple(qa), tuple(qb), b] + out[ib:]
     return out
 
-
 def blade(right, left, rib, depth, fold=0.0, bevel=0.0):
     """A leaf from its two edges, each a polyline [(u, v)] from its base (on the midrib, u = 0) to
     its tip (on the midrib too): `right` has u > 0, `left` u < 0. `rib` are the heights of the
@@ -237,12 +228,10 @@ def blade(right, left, rib, depth, fold=0.0, bevel=0.0):
     loop = [0] + r_idx + [t_idx] + l_idx[::-1]
     return solid(points, faces, loop, depth, fold=fold, bevel=bevel)
 
-
 # A monstera leaf's right edge, from the notch its stalk joins it at, round the lobe and up to the
 # tip, as fractions of its length.
 MONSTERA_EDGE = smooth_curve([(0.0, 0.0), (0.12, -0.12), (0.3, -0.14), (0.45, -0.04), (0.51, 0.16), (0.47, 0.4),
                               (0.36, 0.64), (0.2, 0.84), (0.0, 1.0)], 2)
-
 
 def monstera_leaf(length, slits_r, slits_l):
     """A monstera leaf, `length` from where its stalk joins it (the notch between its two round
@@ -252,7 +241,6 @@ def monstera_leaf(length, slits_r, slits_l):
     left = [(-u * length, v * length) for u, v in split(MONSTERA_EDGE, slits_l)]
     rib = [length * t for t in (0.2, 0.45, 0.7)]
     return blade(right, left, rib, 0.014, fold=math.tan(math.radians(12)), bevel=0.003)
-
 
 def strap_leaf(length, widths, bands=(), chevron=0.0, depth=0.016, fold=0.3, bevel=0.0):
     """A long leaf from rows across it: `widths` [(t, half width)] up it (t from 0 at its base to 1
@@ -277,14 +265,12 @@ def strap_leaf(length, widths, bands=(), chevron=0.0, depth=0.016, fold=0.3, bev
     loop = [0] + [R(k) for k in range(rows)] + [tip] + [L(k) for k in reversed(range(rows))]
     return solid(points, faces, loop, depth, fold=fold, bevel=bevel, mats=[int(m) for m in mats])
 
-
 def oval_leaf(length, width, depth=0.012):
     """A pointed oval leaf, its stalk end at the origin, folded a little along its midrib."""
     edge = [(0.0, 0.0), (0.32, 0.12), (0.5, 0.36), (0.44, 0.62), (0.24, 0.86), (0.0, 1.0)]
     right = [(u * width, v * length) for u, v in edge]
     left = [(-u * width, v * length) for u, v in edge]
     return blade(right, left, [length * 0.45], depth, fold=0.2)
-
 
 def stalk(bm, points, r0, r1, segs=7):
     """A round stalk along `points`, `r0` thick at its start tapering to `r1`, capped at both ends.
@@ -307,12 +293,10 @@ def stalk(bm, points, r0, r1, segs=7):
             faces.append(bm.faces.new((lo[k], lo[(k + 1) % segs], hi[(k + 1) % segs], hi[k])))
     bmesh.ops.recalc_face_normals(bm, faces=faces)
 
-
 def bezier(a, b, c, n=6):
     """n + 1 points along the quadratic curve from `a` to `c`, pulled toward `b`."""
     a, b, c = Vector(a), Vector(b), Vector(c)
     return [tuple((1 - t) ** 2 * a + 2 * (1 - t) * t * b + t * t * c) for t in (i / n for i in range(n + 1))]
-
 
 # ---- Pots -----------------------------------------------------------------------------------------
 
@@ -325,7 +309,6 @@ def terracotta(s, scale=1.0, segs=20, soil_z=SOIL_Z):
     s.add("Pot", ao.lathe, [(r * k, z * k) for r, z in profile], segs=segs, smooth=True)
     soil(s, 0.247 * k, soil_z * k, segs)
 
-
 def glazed(s, segs=20):
     """A glazed planter, straight-sided and round-lipped, and the soil in it."""
     profile = [(0.0, 0.0), (0.195, 0.0), (0.216, 0.012), (0.222, 0.03), (0.27, 0.46), (0.28, 0.485), (0.27, 0.5),
@@ -333,11 +316,9 @@ def glazed(s, segs=20):
     s.add("Glaze", ao.lathe, profile, segs=segs, smooth=True)
     soil(s, 0.249, SOIL_Z, segs)
 
-
 def soil(s, r, z, segs):
     """Earth filling a pot to `z`, `r` round (a little into the pot's wall), heaped a touch."""
     s.add("Soil", ao.lathe, [(r, z - 0.006 * r / 0.25), (r * 0.6, z), (0.0, z + 0.004 * r / 0.25)], segs=segs)
-
 
 # ---- The monstera ---------------------------------------------------------------------------------
 #
@@ -364,7 +345,6 @@ MONSTERA = [
     (88, 0.05, 1.2, 14, 0, 0.34, False, "c", "c"),
 ]
 
-
 def monstera():
     pot = Shapes()
     terracotta(pot)
@@ -381,7 +361,6 @@ def monstera():
         s.add_part(("LeafDark" if dark else "Leaf",), leaf, frame(base, a, math.radians(pitch), math.radians(roll)))
     s.finish("monstera_leaves", parent=root)
     return root
-
 
 # ---- The snake plant ------------------------------------------------------------------------------
 #
@@ -403,7 +382,6 @@ SNAKE = [
     (5, 0.04, 9, 50, 0.8, (1, 3, 6, 9)),
 ]
 
-
 def snake_plant():
     pot = Shapes()
     glazed(pot)
@@ -416,7 +394,6 @@ def snake_plant():
         s.add_part(("LeafDark", "Leaf"), leaf, frame(foot, a, math.radians(90 - lean), math.radians(roll)))
     s.finish("snake_plant_leaves", parent=root)
     return root
-
 
 # ---- The ficus ------------------------------------------------------------------------------------
 #
@@ -432,7 +409,6 @@ MASS = [
     ((-0.11, 0.08, 1.0), (0.17, 0.17, 0.15)),
 ]
 
-
 def fib(n):
     """`n` directions spread evenly over a sphere."""
     out = []
@@ -442,7 +418,6 @@ def fib(n):
         r = math.sqrt(1 - z * z)
         out.append(Vector((math.cos(g * i) * r, math.sin(g * i) * r, z)))
     return out
-
 
 def ficus():
     pot = Shapes()
@@ -479,7 +454,6 @@ def ficus():
     s.finish("ficus_leaves", parent=root)
     return root
 
-
 # ---- The succulent --------------------------------------------------------------------------------
 #
 # An echeveria for a desk: a rosette of plump spoon-shaped leaves sitting up on the rim of a little
@@ -497,7 +471,6 @@ ROSETTE = [
     (3, 0.036, 0.026, 0.016, 78, 0.004, 0.018),
 ]
 
-
 def plump(bm, length, width, thick):
     """A fleshy leaf along +Y from the origin: narrow where it grows, widest past its middle and
     pointed at its tip, flat on top and round underneath."""
@@ -510,7 +483,6 @@ def plump(bm, length, width, thick):
         spoon = 0.55 + 0.85 * t
         v.co = Vector((x * width / 2 * spoon, t * length, (z * 0.4 if z > 0 else z) * thick / 2 * (1.15 - 0.5 * t)))
     return verts
-
 
 def succulent():
     pot = Shapes()
@@ -530,9 +502,7 @@ def succulent():
     s.finish("succulent_leaves", parent=root)
     return root
 
-
 MAKERS = {"monstera": monstera, "snake_plant": snake_plant, "ficus": ficus, "succulent": succulent}
-
 
 def main(write=True):
     ao.clear()
@@ -544,7 +514,6 @@ def main(write=True):
     if write:
         ao.export("plants")
     return roots
-
 
 # ---- Review renders -------------------------------------------------------------------------------
 
@@ -562,7 +531,6 @@ def only(name, lineup=False):
             if lineup:
                 x += 0.5 if species == "ficus" else 1.2
     return setup
-
 
 def review():
     # three's toon materials draw front faces only; show the same, so a face turned the wrong way
@@ -582,7 +550,6 @@ def review():
         for ob in (root, *root.children):
             ob.hide_render = False
     return paths
-
 
 if __name__ == "__main__" and bpy.app.background:
     main()

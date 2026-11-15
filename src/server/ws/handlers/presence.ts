@@ -1,9 +1,7 @@
-// People in the office: walking about, reaching for things, sitting, carrying issue cards, emotes,
 // their name and look, what they have open, voice and screen sharing, and chat.
 import type { ChatLine, PresenceClientMsg } from '../../../shared/protocol.js';
 import { OFFICE_PLAN, seatHereOn } from '../../../shared/maps/index.js';
 import { sanitizeLook } from '../../../shared/avatar.js';
-import { isEmote } from '../../../shared/emotes.js';
 import { ROOF, isDrink } from '../../../shared/rooftop.js';
 import { isBarGame } from '../../../shared/bargames.js';
 import { throttle } from '../../office/client.js';
@@ -21,6 +19,7 @@ export const presenceHandlers = {
     ctx.toNeighbors(c, { t: 'peer.move', id: c.id, x: p.x, y: p.y, z: p.z, rotY: p.rotY, moving: p.moving }, true);
   },
   act(ctx, c, msg) {
+    if ('smoke' in msg) return; // Ignore an obsolete client without replaying an interaction.
     if (msg.drink !== undefined) {
       // A drink from the rooftop bar, which stays up there.
       const drink = isDrink(msg.drink) && c.peer.floor === ROOF ? msg.drink : undefined;
@@ -28,12 +27,6 @@ export const presenceHandlers = {
       if (drink) c.peer.drink = drink;
       else delete c.peer.drink;
       ctx.broadcast({ t: 'peer.act', id: c.id, drink: drink ?? null }, c.id, true);
-      return;
-    }
-    if (typeof msg.smoke === 'boolean') {
-      if (msg.smoke === !!c.peer.smoking) return;
-      c.peer.smoking = msg.smoke;
-      ctx.broadcast({ t: 'peer.act', id: c.id, smoke: msg.smoke }, c.id, true);
       return;
     }
     if (msg.throwing !== undefined) {
@@ -47,9 +40,6 @@ export const presenceHandlers = {
     }
     if (!throttle(c, 'act', 100)) return;
     ctx.toNeighbors(c, { t: 'peer.act', id: c.id }, true);
-  },
-  emote(ctx, c, msg) {
-    if (isEmote(msg.emote) && c.emotes.take(Date.now())) ctx.toNeighbors(c, { t: 'peer.emote', id: c.id, emote: msg.emote }, true);
   },
   sit(ctx, c, msg) {
     // Everyone sees them sit down (or get up), and anyone who comes in later finds them sitting.

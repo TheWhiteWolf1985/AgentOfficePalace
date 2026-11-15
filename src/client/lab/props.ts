@@ -12,13 +12,10 @@
 
 import * as THREE from 'three';
 import { DESKS } from '../../shared/layout';
-import { buildCabinet } from '../features/cabinet/world';
-import { supercar } from '../features/cars/world';
 import { buildGong } from '../features/gong/world';
-import { buildJukebox } from '../features/jukebox/world';
 import { buildKitchen } from '../world/kitchen';
 import { preloadModels } from '../world/models';
-import { DESK_BOOKS, FLOOR_PLANTS, buildDesk, coffeeTable, deskBooks, deskMug, loungeCouch, plant, pouf } from '../world/office';
+import { DESK_BOOKS, FLOOR_PLANTS, buildDesk, coffeeTable, deskBooks, loungeCouch, plant, pouf } from '../world/office';
 import { toon } from '../world/toon';
 import { ready, stage } from './stage';
 
@@ -30,17 +27,11 @@ interface Shown {
 
 /** Every prop, built the way the office builds it. Add yours here. */
 const SHOW: Record<string, () => Shown> = {
-  jukebox: () => {
-    const j = buildJukebox();
-    j.show(true, 'Lab tune');
-    return { object: j.group, update: (dt, t) => j.update(t, dt, Math.max(0, 1 - ((t * 2) % 1) * 4)) };
-  },
   gong: () => {
     const g = buildGong();
     g.strike(1);
     return { object: g.group, update: (dt) => g.update(dt) };
   },
-  cabinet: () => ({ object: buildCabinet().group }),
   kitchen: () => ({ object: buildKitchen().group }),
   plants: () => {
     // The floor plants at scale 1 side by side, then the desk succulent, to compare them. A param of
@@ -64,7 +55,7 @@ const SHOW: Record<string, () => Shown> = {
         object.add(desk.group);
       });
     } else {
-      [deskMug('#ff8a5b'), ...DESK_BOOKS.map((_, i) => deskBooks(i))].forEach((p, i) => object.add(p.translateX(i * 0.36)));
+      DESK_BOOKS.map((_, i) => deskBooks(i)).forEach((p, i) => object.add(p.translateX(i * 0.36)));
     }
     return { object };
   },
@@ -76,8 +67,6 @@ const SHOW: Record<string, () => Shown> = {
     [loungeCouch(), coffeeTable(), pouf('#06d6a0'), pouf('#ffd166')].forEach((o, i) => object.add(o.translateX(at[i])));
     return { object };
   },
-  lambo: () => ({ object: supercar('lambo', '#ffd166').root }),
-  ferrari: () => ({ object: supercar('ferrari', '#ef476f').root }),
 };
 
 const q = new URLSearchParams(location.search);

@@ -16,12 +16,12 @@ import { store } from '../state';
 import { modalOpen, toast } from '../ui/dom';
 import type { Interactable } from '../world/types';
 
-export type PointerParts = Pick<Parts, 'worlds' | 'rooftop' | 'place' | 'you' | 'boards' | 'cards' | 'seating' | 'emotes' | 'hanging' | 'telescope' | 'hintbar'>;
+export type PointerParts = Pick<Parts, 'worlds' | 'rooftop' | 'place' | 'you' | 'boards' | 'cards' | 'seating' | 'hanging' | 'hintbar'>;
 
 /** Listens for the mouse over the canvas, registers the aim tick ('aim'), and takes the player's clicks. */
 export function installPointer(ctx: Ctx, core: CoreState, parts: PointerParts) {
   const { player, camera, canvas, office } = ctx;
-  const { inOffice, plan } = parts.worlds;
+  const { plan } = parts.worlds;
   const reach = () => parts.you.reach();
 
   let target: Interactable | null = null;
@@ -122,7 +122,7 @@ export function installPointer(ctx: Ctx, core: CoreState, parts: PointerParts) {
     const { seating } = parts;
     const firstPerson = player.view === 'first';
     aimedNote = null;
-    if (modalOpen() || parts.telescope.active || ctx.activities.busy()) target = null;
+    if (modalOpen() || ctx.activities.busy()) target = null;
     else if (firstPerson) {
       const aim = aimedAt(CROSSHAIR);
       target = aim?.near ? aim.it : seating.mySeat();
@@ -141,10 +141,8 @@ export function installPointer(ctx: Ctx, core: CoreState, parts: PointerParts) {
   });
 
   player.onClick = (ndc) => {
-    const { emotes } = parts;
     // At the dart board or the axe lane, the button throws (see Thrower).
     if (modalOpen() || ctx.activities.any('takesCamera')) return;
-    if (emotes.emoteWheel.isOpen) return emotes.emoteWheel.click();
     const { hanger } = parts.hanging;
     if (hanger.active) {
       reach();
@@ -169,7 +167,7 @@ export function installPointer(ctx: Ctx, core: CoreState, parts: PointerParts) {
   return {
     /** What you're pointing at (first person) or standing at (third), if anything. */
     target: () => target,
-    /** Lets go of what you were pointing at (looking through the telescope, say). */
+
     clearTarget: () => void (target = null),
     aimedNote: () => aimedNote,
     usable,

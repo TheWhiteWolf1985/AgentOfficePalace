@@ -1,21 +1,6 @@
 import * as THREE from 'three';
 import type { Drink } from '../../../shared/rooftop';
-import { mesh, toon, toonUnique } from '../toon';
-
-// What people hold and carry (a mug of coffee, a drink, a cigarette, a box of their things), and taking
-// off what they wore.
-
-/** A full mug of coffee standing on y = 0, with its handle on the -x side. */
-export function coffeeMug(scale = 1): THREE.Group {
-  const mug = new THREE.Group();
-  const r = 0.05 * scale;
-  const height = 0.1 * scale;
-  const china = toon('#fffaf3');
-  mug.add(mesh(new THREE.CylinderGeometry(r, r * 0.88, height, 16), china, 0, height / 2, 0, false));
-  mug.add(mesh(new THREE.CylinderGeometry(r * 0.8, r * 0.8, height * 0.04, 16), toon('#6f4518'), 0, height, 0, false));
-  mug.add(mesh(new THREE.TorusGeometry(height * 0.28, r * 0.2, 6, 12), china, -r, height / 2, 0, false));
-  return mug;
-}
+import { mesh, toon} from '../toon';
 
 /** Clear glass, faintly blue; no cartoon outline, so the drink inside shows through it. */
 const GLASS = new THREE.MeshBasicMaterial({ color: '#e8f6ff', transparent: true, opacity: 0.38, depthWrite: false });
@@ -107,18 +92,6 @@ export function putDownGlass(g: THREE.Group) {
   g.traverse((o) => (o as THREE.Mesh).geometry?.dispose());
 }
 
-/** A cigarette, lit end toward +z, and the material of its glowing tip. */
-export function cigarette(): { group: THREE.Group; ember: THREE.MeshToonMaterial } {
-  const group = new THREE.Group();
-  group.add(mesh(new THREE.CylinderGeometry(0.016, 0.016, 0.12, 8).rotateX(Math.PI / 2), toon('#fffaf3'), 0, 0, 0.01, false));
-  group.add(mesh(new THREE.CylinderGeometry(0.017, 0.017, 0.045, 8).rotateX(Math.PI / 2), toon('#e9a03b'), 0, 0, -0.07, false));
-  const ember = toonUnique('#ff6a2b');
-  ember.emissive = new THREE.Color('#ff3b00');
-  ember.emissiveIntensity = 0.3;
-  group.add(mesh(new THREE.CylinderGeometry(0.017, 0.017, 0.02, 8).rotateX(Math.PI / 2), ember, 0, 0, 0.078, false));
-  return { group, ember };
-}
-
 /**
  * An open cardboard box with someone's desk things in it: a plant, a photo, a mug, a rubber duck and
  * some papers. It stands on y = 0 with its front toward +z.
@@ -177,10 +150,6 @@ export function boxOfStuff(): THREE.Group {
   photo.position.set(0.1, H + 0.04, -0.05);
   photo.rotation.set(-0.3, 0, -0.12);
   g.add(photo);
-  // A mug and the rubber duck, up front.
-  const mug = coffeeMug(0.9);
-  mug.position.set(0.0, H - 0.07, 0.07);
-  g.add(mug);
   const duck = new THREE.Group();
   const duckBody = mesh(new THREE.SphereGeometry(0.05, 10, 8), toon('#ffd166'), 0, 0, 0, false);
   duckBody.scale.y = 0.8;
@@ -191,13 +160,4 @@ export function boxOfStuff(): THREE.Group {
   duck.rotation.y = -0.4;
   g.add(duck);
   return g;
-}
-
-/** Takes a costume off whatever wore it, and frees what it was made of (its materials are shared). */
-export function undress(parts: THREE.Object3D[]) {
-  for (const o of parts) {
-    o.removeFromParent();
-    o.traverse((m) => (m as THREE.Mesh).geometry?.dispose());
-  }
-  parts.length = 0;
 }

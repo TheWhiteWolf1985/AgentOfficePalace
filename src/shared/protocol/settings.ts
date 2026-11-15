@@ -130,21 +130,6 @@ export interface SkyState {
   realTime?: boolean;
 }
 
-/** A holiday the whole building dresses up for (see shared/theme.ts). */
-export type Theme = 'halloween' | 'christmas';
-/** What someone picked in ⚙️ Settings: a holiday, none, or whichever the calendar says. */
-export type ThemePick = Theme | 'auto' | 'off';
-
-/** The building's holiday theme: the same on every floor, for everyone. */
-export interface ThemeState {
-  pick: ThemePick;
-  /** What's up right now: the pick, or for 'auto' the holiday it is at the office. Null for none. */
-  active: Theme | null;
-  /** Who picked it, and when. Unset for the default (auto). */
-  by?: string;
-  at?: number;
-}
-
 /**
  * Whether a worker whose pull request merged goes home by itself (⚙️ Settings), for every floor:
  * once it's at rest and nobody has its terminal open, it leaves and its worktree and branch are deleted.
@@ -165,8 +150,7 @@ export type SettingsClientMsg =
   | { t: 'machine.limit'; limit: number | null }
   | { t: 'upgrade.check' }
   | { t: 'upgrade.start' }
-  /** Dress the building up for a holiday, take the decorations down ('off'), or follow the calendar ('auto'). */
-  | { t: 'theme.set'; pick: ThemePick }
+
   /** The sky on the real clock (true), or a whole day and night every hour (false), for everyone. */
   | { t: 'sky.clock'; real: boolean }
   /** Workers whose pull request merged go home by themselves (true), or wait to be sent home. */
@@ -182,6 +166,5 @@ export type SettingsServerMsg =
   | { t: 'notify'; state: NotifyState }
   | { t: 'machine'; state: MachineState }
   | { t: 'sky'; state: SkyState }
-  | { t: 'theme'; state: ThemeState }
   | { t: 'prompts'; state: PromptsState }
   | { t: 'leaveOnMerge'; state: LeaveOnMergeState };

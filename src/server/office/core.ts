@@ -8,9 +8,6 @@ import { createModelCatalogues } from '../models.js';
 import { Building } from '../building.js';
 import type { Floor } from '../floor.js';
 import { ChatLog } from '../history.js';
-import { Arcade, HighScores } from '../cabinet.js';
-import { scoreText } from '../../shared/cabinet.js';
-import { cabinetChanged } from '../ws/handlers/cabinet.js';
 import type { Core, Ctx } from './context.js';
 import type { Client } from './client.js';
 
@@ -21,13 +18,6 @@ export function createCore(ctx: Ctx, cfg: Config, publicDir: string): Core {
   const clients = new Map<string, Client>();
   // Kept on disk, so a restart doesn't wipe it.
   const chat = new ChatLog(cfg.dataDir);
-  // The arcade's high scores: one table for the whole building, on every floor's cabinet. The office
-  // follows every game and puts the scores up itself (see Arcade).
-  const highScores = new HighScores(cfg.dataDir);
-  const arcade = new Arcade(highScores, (first) => {
-    for (const f of ctx.floors.values()) cabinetChanged(ctx, f);
-    if (first) ctx.toastFloor(ctx.floors.get(first.floor), `🏆 ${first.score.name} set a new arcade high score: ${scoreText(first.score.score)}`);
-  });
   /** What the office is called where it has no project of its own to go by (webhooks, invites). */
   const officeName = cfg.project ? path.basename(cfg.project) : 'the office';
   // The model lists come from the provider's own CLI: the office's --agent when it's that one.
@@ -44,5 +34,5 @@ export function createCore(ctx: Ctx, cfg: Config, publicDir: string): Core {
     if (err) console.error(`agent-office: --projects: ${err}`);
   }
   const floors = new Map<string, Floor>();
-  return { cfg, publicDir, accounts, auth, clients, chat, highScores, arcade, officeName, models, building, floors };
+  return { cfg, publicDir, accounts, auth, clients, chat, officeName, models, building, floors };
 }

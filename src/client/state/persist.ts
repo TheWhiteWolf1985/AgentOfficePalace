@@ -1,3 +1,4 @@
+import { onGrounds } from '../../shared/ground';
 // What this browser remembers between visits, in localStorage: your profile, your settings, the floor
 // you were last on and the spot you were standing in. Every read and write shrugs off blocked storage.
 
@@ -50,7 +51,7 @@ export interface Settings {
   /** Office sounds, 0–1. */
   volume: number;
   muted: boolean;
-  /** The lounge jukebox, 0–1, apart from the office sounds. */
+  /** The rooftop DJ, 0–1, apart from the office sounds. */
   music: number;
   musicMuted: boolean;
   /** The swish of a page turning as you read at the bookshelf. */
@@ -105,6 +106,7 @@ export function lastSpot(): Spot | null {
   try {
     const s = JSON.parse(localStorage.getItem(SPOT_KEY) ?? 'null');
     // Positions from retired layouts cannot be restored in the office.
+    if (s && !onGrounds(s.x, s.z)) return null;
     if (s && ((s.map !== undefined && s.map !== 'office') || s.throne === true)) return null;
     const finite = (v: unknown) => typeof v === 'number' && Number.isFinite(v);
     if (s && typeof s.floor === 'string' && s.floor && finite(s.x) && finite(s.y) && finite(s.z) && finite(s.facing)) {
@@ -128,6 +130,7 @@ export function loadSettings(): Settings {
   const s: Settings = { view: 'first', volume: 0.7, muted: false, music: 0.5, musicMuted: false, pageTurns: true, pushToTalk: false, notify: true, needsYouSound: 'once', hud: { ...HUD_DEFAULTS }, pins: [] };
   try {
     localStorage.removeItem('agent-office.golf');
+    localStorage.removeItem('agent-office.bestLap');
   } catch {
     // Legacy score cleanup must not block loading the user's settings.
   }

@@ -71,7 +71,6 @@ export function installBarGames(ctx: Ctx, deps: BarGamesDeps) {
     stop: (why) => {
       if (why !== 'taken' && why !== 'map') thrower.stop();
     },
-    // At the dart board or the axe lane, E steps back (Space throws, see Thrower); nothing else is in reach, and no emotes mid-throw.
     key: (e) => {
       if (e.code !== 'KeyF' && e.code !== 'KeyG' && !(e.code in DESK_KEYS) && !/^(?:Digit|Numpad)[1-6]$/.test(e.code)) return false;
       if (e.code === 'KeyE') thrower.stop();

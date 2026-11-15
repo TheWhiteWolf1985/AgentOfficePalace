@@ -1,17 +1,9 @@
-/**
- * The keyboard: every key press goes down the chain in ctx.keys (see Keys): the guards, what you're
- * in the middle of, the emotes, then the office's own keys, bound with what they do.
- */
 import type { Ctx } from '../core/context';
 import type { Parts } from '../core/parts';
 import { DESK_KEYS } from '../interaction';
 import { isTyping } from '../player';
 import { modalOpen } from '../ui/dom';
 
-/**
- * The office's own parts of the key chain. Install it right after the telescope's guard (looking
- * through it, no key does anything else) and before anything else's, so within a stage they come first.
- */
 export function installKeyGuards(ctx: Ctx, parts: Pick<Parts, 'focus'>) {
   const { player } = ctx;
   // A window's open or you're typing somewhere, or it's a shortcut: the key isn't the office's.
@@ -25,19 +17,11 @@ export function installKeyGuards(ctx: Ctx, parts: Pick<Parts, 'focus'>) {
   ctx.keys.add('activity', (e) => ctx.activities.key(e));
 }
 
-/**
- * Listens for keys on the window and hands each down the chain; the emote wheel's own
- * keys and mouse button; and binds the keys that use what you're facing.
- */
-export function installKeyboard(ctx: Ctx, parts: Pick<Parts, 'emotes' | 'pointer'>) {
+export function installKeyboard(ctx: Ctx, parts: Pick<Parts, 'pointer'>) {
   const { player } = ctx;
   // Every key press goes down the chain in ctx.keys: the guards, what you're in the middle of, the
-  // emotes, then the office's own keys (bound with what they do). One of those clears the walking keys.
   window.addEventListener('keydown', (e) => {
     if (ctx.keys.handle(e) === 'bound') player.clearKeys();
-  });
-  window.addEventListener('keyup', (e) => {
-    if (e.code === 'KeyG') parts.emotes.emoteWheel.release();
   });
   // Keys that use what you're facing: at a desk, each does something else (see interact).
   ctx.keys.bind({

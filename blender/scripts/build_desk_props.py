@@ -1,34 +1,5 @@
-"""The desks' knick-knacks: a mug of coffee and a few books, modelled by this script and exported
-to src/client/models/desk_props.glb for src/client/world/office/, which puts one of them in a
-back corner of most desks. The shared helpers are in aokit.py and the conventions in
-blender/README.md.
-
-Headless, from the repo root (`-- --shots` also writes a review sheet per piece and one of them all
-side by side):
-
-    blender --background --factory-startup --python blender/scripts/build_desk_props.py [-- --shots]
-
-Through the Blender MCP bridge (module globals don't survive between calls, so import it every
-time):
-
-    import sys, importlib
-    sys.path.insert(0, r"<repo>/blender/scripts")
-    import aokit, build_desk_props; importlib.reload(aokit); importlib.reload(build_desk_props)
-    build_desk_props.main()
-
-Each piece is one object and a root of its own, so the office (or anything else) can place any of
-them by itself: the `mug`, and the books in three arrangements, `books_upright` (three standing
-side by side), `books_leaning` (two standing and one leaning on them) and `books_stack` (three
-lying in a pile). Each stands on the desk at its origin and faces forward like every model: the
-books' spines face whoever sits there. A pile of books has its origin in the middle of its
-footprint; the mug has its in the middle of its body, with the handle out to +X. The object and
-material names are a contract with world/office/props.ts and tests/desk-props-model.test.ts, so rename them in
-all three places.
-
-They keep the old code-built knick-knacks' sizes: the mug is the old 0.12 m cylinder with a
-handle, and every arrangement of books fits in the old three boxes' 0.26 by 0.18 m and 0.24 m
-tall, so the laptop, the holiday present and whoever dances on the desk stay clear of them as
-before.
+"""Desktop books in three arrangements. Export desk_props.glb; preserve books_upright/books_leaning/books_stack names and dimensions used by office/props.ts and desk-props-model.test.ts.
+Run: blender --background --factory-startup --python blender/scripts/build_desk_props.py [-- --shots]
 """
 import bpy, bmesh, math, os, sys
 from mathutils import Matrix, Vector
@@ -37,25 +8,18 @@ from mathutils import Matrix, Vector
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import aokit as ao
 
-# Preview colours only: world/office/props.ts paints every material by name with the same colours (the old
-# code-built books' covers, features/bookshelf/book.ts's page edges, and the coffee in the mug a worker carries,
-# world/character/props.ts's coffeeMug()). It paints the mug's body in the colour of the desk's chair; the
-# first chair's is here.
+# Preview colours match desktop books and their page edges.
 COLORS = {
-    "Mug": "#ff8a5b",
-    "Coffee": "#6f4518",
     "CoverRed": "#e63946",
     "CoverBlue": "#457b9d",
     "CoverOrange": "#f4a261",
     "Pages": "#f3ead8",
 }
 
-PIECES = ("mug", "books_upright", "books_leaning", "books_stack")
-
+PIECES = ("books_upright", "books_leaning", "books_stack")
 
 def material(name):
     return ao.material(name, COLORS[name])
-
 
 # ---- Building an object from shapes --------------------------------------------------------------
 
@@ -112,71 +76,10 @@ class Shapes:
         bpy.context.scene.collection.objects.link(ob)
         return ob
 
-
 def faces_from(bm, start):
     """The faces added to `bm` since it had `start` of them."""
     bm.faces.ensure_lookup_table()
     return bm.faces[start:]
-
-
-# ---- The mug --------------------------------------------------------------------------------------
-#
-# A chunky diner mug: a little wider at the rim than the foot, a rolled rim, coffee a couple of
-# centimetres down, and a round handle out to +X. Its body is the old code-built mug's size (0.05 m
-# round at the foot, 0.06 at the top, 0.12 tall).
-
-MUG_H = 0.12
-# Its outside from the middle of the foot up over the rim, then down the inside to the coffee:
-# [(radius, height)], as for aokit.lathe.
-MUG = [(0.0, 0.0), (0.046, 0.0), (0.05, 0.005), (0.057, 0.106), (0.0585, 0.114), (0.0565, 0.119),
-       (0.0525, MUG_H), (0.049, 0.117), (0.0465, 0.098)]
-# How high the coffee comes. Below it the mug is shut, so the handle's ends can go into the wall
-# under this without showing inside.
-COFFEE_Z = 0.098
-# The handle's middle line, a curve out from the wall and back in (x, height), and how thick it is.
-HANDLE = [(0.05, 0.086), (0.1, 0.092), (0.1, 0.026), (0.05, 0.032)]
-HANDLE_R = 0.009
-
-
-def cubic(p, n):
-    """n + 1 points along the cubic Bezier curve through the four points `p`."""
-    a, b, c, d = (Vector(q) for q in p)
-    return [(1 - t) ** 3 * a + 3 * (1 - t) ** 2 * t * b + 3 * (1 - t) * t * t * c + t ** 3 * d
-            for t in (i / n for i in range(n + 1))]
-
-
-def tube(bm, points, r, segs=6):
-    """A round tube along `points`, capped at both ends, its rings carried round the bends without
-    twisting."""
-    pts = [Vector(p) for p in points]
-    n = len(pts)
-    tangents = [(pts[min(i + 1, n - 1)] - pts[max(i - 1, 0)]).normalized() for i in range(n)]
-    normal = tangents[0].orthogonal().normalized()
-    rings = []
-    for i, (p, t) in enumerate(zip(pts, tangents)):
-        if i:
-            normal = tangents[i - 1].rotation_difference(t) @ normal
-        side = t.cross(normal)
-        rings.append([bm.verts.new(p + r * (math.cos(a) * normal + math.sin(a) * side))
-                      for a in (ao.TAU * k / segs for k in range(segs))])
-    faces = [bm.faces.new(rings[0][::-1]), bm.faces.new(rings[-1])]
-    for lo, hi in zip(rings, rings[1:]):
-        for k in range(segs):
-            faces.append(bm.faces.new((lo[k], lo[(k + 1) % segs], hi[(k + 1) % segs], hi[k])))
-    bmesh.ops.recalc_face_normals(bm, faces=faces)
-
-
-def mug():
-    s = Shapes()
-    s.add("Mug", ao.lathe, MUG, segs=16, smooth=True)
-    # The handle stands in the mug's XZ plane, out to +X.
-    line = [Vector((x, 0.0, z)) for x, z in HANDLE]
-    s.add("Mug", tube, cubic(line, 8), HANDLE_R, segs=6, smooth=True)
-    # The coffee, a little into the wall so no gap shows round it.
-    s.add("Coffee", ao.lathe, [(0.0475, COFFEE_Z), (0.0, COFFEE_Z + 0.001)], segs=16, smooth=True)
-    # The rim rolls over smoothly; only the foot's edge and the coffee's stay crisp.
-    return s.finish("mug", sharp=math.radians(60))
-
 
 # ---- The books ------------------------------------------------------------------------------------
 #
@@ -187,7 +90,6 @@ def mug():
 BOARD = 0.008   # how thick the boards and the spine are
 INSET = 0.004   # how far the pages sit in from the boards' edges
 EDGE = 0.0025   # how far the boards' edges are rounded over
-
 
 def book(t, h, d, bands=(), label=None):
     """A hardback standing on its foot, its foot's middle at the origin: `t` thick across X, `h`
@@ -234,7 +136,6 @@ def book(t, h, d, bands=(), label=None):
         f.smooth = False
     return part
 
-
 def place(part, x=0.0, y=0.0, z=0.0, lean=0.0, yaw=0.0, lie=False):
     """Stands a book from book() in its arrangement: laid on its side first if `lie` (its top toward
     -X), tipped over toward -X by `lean` (radians) about its foot, turned `yaw` about the up axis,
@@ -247,17 +148,14 @@ def place(part, x=0.0, y=0.0, z=0.0, lean=0.0, yaw=0.0, lie=False):
     bmesh.ops.translate(part, vec=(x, y, z - low), verts=part.verts[:])
     return part
 
-
 def extent(part, axis, lo=True, above=None):
     """The least (or with `lo` False the most) of a part's vertices along `axis` (0, 1 or 2), only
     counting those higher than `above` if given."""
     vals = [v.co[axis] for v in part.verts if above is None or v.co.z > above]
     return min(vals) if lo else max(vals)
 
-
 def cover(name):
     return ("Cover" + name, "Pages")
-
 
 # Each book in an arrangement: (cover, thick, tall, deep, bands, label). The spines line up at the
 # front, give or take a few millimetres, the way books get pushed back against the wall.
@@ -266,7 +164,6 @@ UPRIGHT = [
     ("Blue", 0.066, 0.21, 0.166, [], (0.13, 0.05)),
     ("Orange", 0.078, 0.224, 0.174, [(0.19, 0.03)], None),
 ]
-
 
 def books_upright():
     """Three standing side by side, the old boxes' colours in the old order."""
@@ -277,7 +174,6 @@ def books_upright():
         x += t + 0.003
     s.centre()
     return s.finish("books_upright")
-
 
 def books_leaning():
     """Two standing, and a third tipped over against them, resting its top on the second."""
@@ -292,7 +188,6 @@ def books_leaning():
         s.add_part(cover(col), part)
     s.centre()
     return s.finish("books_leaning")
-
 
 def books_stack():
     """Three lying in a pile, biggest at the bottom, each turned a little off the one under it and
@@ -313,9 +208,7 @@ def books_stack():
     s.centre()
     return s.finish("books_stack")
 
-
-MAKERS = {"mug": mug, "books_upright": books_upright, "books_leaning": books_leaning, "books_stack": books_stack}
-
+MAKERS = {"books_upright": books_upright, "books_leaning": books_leaning, "books_stack": books_stack}
 
 def main(write=True):
     ao.clear()
@@ -327,7 +220,6 @@ def main(write=True):
     if write:
         ao.export("desk_props")
     return obs
-
 
 # ---- Review renders -------------------------------------------------------------------------------
 
@@ -343,14 +235,13 @@ def only(name, lineup=False):
             x += 0.36
     return setup
 
-
 def review():
     # three's toon materials draw front faces only; show the same, so a face turned the wrong way
     # shows here as a hole rather than first in the office.
     bpy.context.scene.display.shading.show_backface_culling = True
     views = ("tq", "front", "side", "top")
-    paths = [ao.sheet("desk_mug", [(only("mug"), v) for v in (*views, "back")], cell=(420, 420), target=(0.02, 0, 0.06), dist=0.55)]
-    for name in PIECES[1:]:
+    paths = []
+    for name in PIECES:
         paths.append(ao.sheet(f"desk_{name}", [(only(name), v) for v in (*views, "back")], cell=(420, 420), target=(0, 0, 0.1), dist=0.85))
     paths.append(ao.sheet("desk_lineup", [(only(None, lineup=True), v) for v in ("front", "tq", "back")],
                           cell=(900, 420), target=(0.54, 0, 0.1), dist=1.9))
@@ -360,7 +251,6 @@ def review():
         ob.location = (0, 0, 0)
         ob.hide_render = False
     return paths
-
 
 if __name__ == "__main__" and bpy.app.background:
     main()

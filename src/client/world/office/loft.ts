@@ -12,7 +12,7 @@ import { chair, seatable } from './seats';
  * The upstairs office: a loft on posts in the south-east corner, with glass on the two sides that
  * face the desks, reached by stairs along the south wall.
  */
-export function buildLoft(group: THREE.Group, colliders: Collider[], interactables: Interactable[], looks: Looks): THREE.Mesh {
+export function buildLoft(group: THREE.Group, colliders: Collider[], interactables: Interactable[], looks: Looks): void {
   const { minX, maxX, minZ, maxZ, y: floorY, height } = LOFT;
   const w = maxX - minX;
   const d = maxZ - minZ;
@@ -114,7 +114,6 @@ export function buildLoft(group: THREE.Group, colliders: Collider[], interactabl
   // You can't step off the side of the stairs, or climb on from it.
   colliders.push({ minX: fromX, maxX: toX, minZ: STAIRS.minZ - 0.1, maxZ: STAIRS.minZ, top: 99 });
 
-  // Inside: the big desk facing the glass, a comfy couch, a telescope aimed at the desks.
   const deskX = cx + 0.5;
   const deskZ = cz - 0.3;
   const desk = new THREE.Group();
@@ -123,7 +122,6 @@ export function buildLoft(group: THREE.Group, colliders: Collider[], interactabl
   for (const sx of [-1, 1]) desk.add(mesh(box(0.1, 0.72, 1.0), toon('#8a5a3b'), sx * 1.15, 0.37, 0));
   desk.add(mesh(roundedBox(0.9, 0.55, 0.06, 0.03), toon(PALETTE.ink), 0, 1.18, -0.2));
   desk.add(mesh(box(0.08, 0.2, 0.08), toon(PALETTE.ink), 0, 0.93, -0.2));
-  // Minesweeper plays on it (features/arcade/ui.ts).
   const screen = mesh(new THREE.PlaneGeometry(0.8, 0.45), new THREE.MeshBasicMaterial({ color: '#4cc9f0' }), 0, 1.18, -0.165, false);
   desk.add(screen);
   desk.add(mesh(new THREE.CylinderGeometry(0.06, 0.05, 0.12, 10), toon('#ffd166'), 0.9, 0.89, 0.15));
@@ -138,7 +136,6 @@ export function buildLoft(group: THREE.Group, colliders: Collider[], interactabl
   desk.add(bossChair);
   seatable(bossChair, 'boss-chair', 1.2, interactables);
   // Clicking the screen is using the chair: sit down, then play.
-  screen.userData.interact = bossChair.userData.interact;
   desk.position.set(deskX, floorY, deskZ);
   group.add(desk);
   colliders.push({ minX: deskX - 1.3, maxX: deskX + 1.3, minZ: deskZ - 0.6, maxZ: deskZ + 0.6, bottom: floorY, top: floorY + 0.8 });
@@ -156,28 +153,6 @@ export function buildLoft(group: THREE.Group, colliders: Collider[], interactabl
 
   const rug = mesh(roundedBox(4.6, 0.02, 3.2, 0.6), toon('#caffbf'), deskX - 0.3, floorY + 0.015, cz + 0.1, false);
   group.add(rug);
-
-  const scope = new THREE.Group();
-  for (let i = 0; i < 3; i++) {
-    const a = (i / 3) * Math.PI * 2;
-    const leg = mesh(new THREE.CylinderGeometry(0.025, 0.025, 1.1, 6), inkMat, Math.sin(a) * 0.2, 0.52, Math.cos(a) * 0.2);
-    leg.rotation.set(Math.cos(a) * -0.35, 0, Math.sin(a) * 0.35);
-    scope.add(leg);
-  }
-  const tube = new THREE.Group();
-  const tubeGeo = new THREE.CylinderGeometry(0.1, 0.06, 0.9, 14);
-  tubeGeo.rotateX(Math.PI / 2);
-  tube.add(mesh(tubeGeo, toon('#ffd166'), 0, 0, 0.1));
-  tube.add(mesh(new THREE.CylinderGeometry(0.11, 0.11, 0.08, 14).rotateX(Math.PI / 2), toon(PALETTE.ink), 0, 0, 0.55));
-  tube.position.y = 1.08;
-  scope.add(tube);
-  scope.position.set(minX + 0.9, floorY, minZ + 0.9);
-  group.add(scope);
-  tube.lookAt(-6, 0.8, 0);
-  const telescope: Interactable = { kind: 'telescope', x: scope.position.x, y: floorY, z: scope.position.z, radius: 1.65 };
-  scope.userData.interact = telescope;
-  interactables.push(telescope);
-  colliders.push({ minX: minX + 0.65, maxX: minX + 1.15, minZ: minZ + 0.65, maxZ: minZ + 1.15, bottom: floorY, top: floorY + 1.3 });
 
   for (const [i, [px, pz, s]] of [
     [maxX - 0.6, minZ + 0.6, 1],
@@ -207,15 +182,10 @@ export function buildLoft(group: THREE.Group, colliders: Collider[], interactabl
   outside.position.set(cx, roofY + 0.2, minZ - 0.07);
   outside.rotation.y = Math.PI;
   group.add(outside);
-  return screen;
 }
 
-declare module '../types' {
-  interface OfficeHandles {
-    /** The monitor on the boss's desk upstairs, where Minesweeper plays (features/arcade/ui.ts). */
-    bossScreen: THREE.Mesh;
-  }
-}
-
-/** The loft up the stairs, over the meeting room: the boss's office. */
-export const loft: Fixture<'bossScreen'> = (site) => ({ handle: { bossScreen: buildLoft(site.group, site.colliders, site.interactables, site.looks) } });
+/** The loft up the stairs, over the meeting room. */
+export const loft: Fixture = (site) => {
+  buildLoft(site.group, site.colliders, site.interactables, site.looks);
+  return {};
+};

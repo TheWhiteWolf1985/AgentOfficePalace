@@ -30,22 +30,16 @@ interface Puff {
 const MAX = 160;
 const tmp = new THREE.Vector3();
 
-/** Cigarette smoke: soft grey puffs that drift up on the breeze, spread out and fade. */
-export class Smoke {
+/** Landing dust: soft particles that drift, spread out and fade. */
+export class Dust {
   readonly group = new THREE.Group();
   private live: Puff[] = [];
   private free: Puff[] = [];
   private geo = new THREE.PlaneGeometry(1, 1);
   private tex = puffTexture();
 
-  /** A thin wisp curling up off a cigarette's lit end. */
-  wisp(at: THREE.Vector3) {
-    tmp.set((Math.random() - 0.5) * 0.06, 0.3 + Math.random() * 0.1, (Math.random() - 0.5) * 0.06);
-    this.emit(at, tmp, 0.06, 0.4, 2.4, 0.5);
-  }
-
-  /** A lungful blown out along `dir` (a unit vector). */
-  exhale(at: THREE.Vector3, dir: THREE.Vector3) {
+  /** Dust spreading along `dir` (a unit vector). */
+  burst(at: THREE.Vector3, dir: THREE.Vector3) {
     for (let i = 0; i < 8; i++) {
       const speed = 0.95 - i * 0.08;
       tmp.copy(dir).multiplyScalar(speed);
@@ -97,7 +91,7 @@ export class Smoke {
       }
       const k = p.age / p.life;
       p.vel.multiplyScalar(Math.exp(-dt * 1.1));
-      // Warm smoke rises; a light breeze carries it off.
+      // Dust rises; a light breeze carries it off.
       p.vel.y += dt * 0.12;
       p.vel.x += dt * 0.06;
       p.mesh.position.addScaledVector(p.vel, dt);

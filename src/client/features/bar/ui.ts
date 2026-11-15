@@ -1,3 +1,4 @@
+import './ui.css';
 import { t as uiText } from '../../../shared/i18n';
 import { DRINKS, type Drink } from '../../../shared/rooftop';
 import { h, openModal } from '../../ui/dom';
@@ -32,7 +33,7 @@ export function openBar(opts: BarOptions) {
           title: refused ? uiText("The bartender won't pour you another") : uiText`Order a ${d.name.toLowerCase()}`,
           style: refused ? 'opacity:.45;cursor:not-allowed' : '',
         },
-        h('span.jb-icon', { style: 'font-size:26px' }, d.emoji),
+        h('span.drink-icon', { style: 'font-size:26px' }, d.emoji),
         h('div.svc-main', {}, h('div.svc-title', {}, d.name), h('div.svc-meta', {}, `${d.blurb} · ${kick(d)}`)),
       );
       const pick = () => {
@@ -51,7 +52,7 @@ export function openBar(opts: BarOptions) {
     }),
   );
   const el = h(
-    'div.modal.jukebox',
+    'div.modal.bar-menu',
     { role: 'dialog', 'aria-label': uiText('Bar') },
     h('header', {}, h('h2', {}, uiText('🍸 Sky Bar')), close),
     h(

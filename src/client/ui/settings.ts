@@ -4,9 +4,7 @@ import type { Net } from '../net';
 import type { OfficeSound } from '../sound';
 import { store, type NeedsYouSound, type Settings, type ViewMode } from '../state';
 import { askNotifyPermission, notifyPermission, type DesktopNotifier } from '../notify';
-import type { ThemePick, WebhookKind } from '../../shared/protocol';
-import { THEME_PICKS } from '../../shared/theme';
-import { dogSetting } from './settings-dog';
+import type { WebhookKind } from '../../shared/protocol';
 import { h, openModal, timeAgo } from './dom';
 import { agentFields, choiceLabel, officeChoice } from './provider';
 import { openPromptEditor, rewrittenPrompts } from './prompts';
@@ -21,8 +19,6 @@ const VIEWS: [ViewMode, string, string][] = [
   ['third', uiText('🎥 Third person'), uiText('Follow your character from behind. Drag to orbit the camera, scroll to zoom, and click things to use them.')],
 ];
 
-const THEME_LABEL: Record<ThemePick, string> = { auto: uiText('📅 By the calendar'), halloween: uiText('🎃 Halloween'), christmas: uiText('🎄 Christmas'), off: uiText('Off') };
-
 const WEBHOOK_NAME: Record<WebhookKind, string> = { slack: 'Slack', discord: 'Discord', other: uiText('a webhook') };
 
 /** The categories down the side of ⚙️ Settings. */
@@ -33,7 +29,7 @@ const PANES: { id: SettingsPane; icon: string; label: string; blurb: string }[] 
   { id: 'you', icon: '🧍', label: uiText('You'), blurb: uiText('How you look, how you see the office, and how you’re signed in.') },
   { id: 'sound', icon: '🔊', label: uiText('Sound & voice'), blurb: uiText('How loud the office is for you, and how voice chat works.') },
   { id: 'notify', icon: '🔔', label: uiText('Notifications'), blurb: uiText('Hear about a worker that needs someone, or finished, while you’re somewhere else.') },
-  { id: 'building', icon: '🏢', label: uiText('Building'), blurb: uiText('The decorations, the sky, the dog, and where new floors are cloned.') },
+  { id: 'building', icon: '🏢', label: uiText('Building'), blurb: uiText('The sky and where new floors are cloned.') },
   { id: 'workers', icon: '🤖', label: uiText('Workers'), blurb: uiText('What workers start on, how many run at once, when they go home and what the office tells them.') },
   { id: 'management', icon: '👥', label: uiText('Agent management'), blurb: uiText('Individual agents, properties and repository identities across all offices.') },
   { id: 'connections', icon: '🔗', label: uiText('GitHub and Forgejo'), blurb: uiText('Servers, accounts and remote repositories.') },
@@ -123,7 +119,7 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
   };
   // Voice chat: an open mic, or muted until you hold V.
   const talkRow = choiceRow(uiText('Voice chat'), [[false, uiText('🎙️ Open mic')], [true, uiText('✋ Push to talk')]], () => settings.pushToTalk, (pushToTalk) => change({ pushToTalk }));
-  const musicRow = volumeRow(uiText('Jukebox volume'), 'music', 'musicMuted');
+  const musicRow = volumeRow(uiText('Rooftop music volume'), 'music', 'musicMuted');
 
   // The swish of the book's pages at the bookshelf, on or off.
   const pagesRow = choiceRow(uiText('Page turns at the bookshelf'), [[true, uiText('📖 On')], [false, uiText('Off')]], () => settings.pageTurns, (pageTurns) => change({ pageTurns }));
@@ -132,39 +128,6 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
     change({ needsYouSound });
     if (needsYouSound !== 'off') sound.needsYou();
   });
-
-  // The building's holiday theme, for everyone.
-  const themeRow = h('div.seg', { role: 'radiogroup', 'aria-label': uiText('Holiday theme') });
-  const themeNote = h('p.setting-note');
-  const paintTheme = () => {
-    const { pick, active, by, at } = store.theme;
-    themeRow.replaceChildren(
-      ...THEME_PICKS.map((p) =>
-        h(
-          'button.btn',
-          {
-            type: 'button',
-            role: 'radio',
-            'aria-checked': String(pick === p),
-            class: pick === p ? 'on' : '',
-            onclick: () => {
-              if (store.theme.pick !== p) net.send({ t: 'theme.set', pick: p });
-            },
-          },
-          THEME_LABEL[p],
-        ),
-      ),
-    );
-    const now =
-      active === 'halloween'
-        ? uiText('Halloween: the workers are zombies, your hands are an undead warlock’s, the dog’s in costume, the sky’s gone creepy and there are jack-o’-lanterns everywhere.')
-        : active === 'christmas'
-          ? uiText('Christmas: the workers are elves, your hands are in mittens, the dog’s Rudolph, and it’s snowing outside.')
-          : uiText('No decorations up right now.');
-    const how = pick === 'auto' ? uiText(' By the calendar it’s Halloween through October and Christmas through December.') : '';
-    themeNote.textContent = uiText`${now}${how} It’s the same for everyone in the building${by ? uiText`, set by ${by}${at ? ` ${timeAgo(at)}` : ''}` : ''}.`;
-  };
-  paintTheme();
 
   // Desktop notifications: this browser's permission, then your own on/off.
   const notifyRow = h('div.seg');
@@ -403,9 +366,6 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
   });
   dirDefault.addEventListener('click', () => net.send({ t: 'floor.projectsDir', dir: '' }));
 
-  // The dog on this floor: its name, breed and coat, for everyone here (see settings-dog.ts).
-  const { section: dogSection, paint: paintDog } = dogSetting(net, (body) => setting(uiText('Office dog'), 'floor', ...body));
-
   // What the sky's doing, and which clock it keeps (see settings-sky.ts).
   const sky = outside && outsideSetting(net, outside, (body) => setting(uiText('Outside'), 'office', ...body));
   const account = store.me.account;
@@ -426,10 +386,10 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
       setting(uiText('Signed in'), null, h('div.volume', {}, signOut), h('p.setting-note', {}, account ? uiText`As ${account.name}, with your own account (${account.role}).` : uiText('With the shared office password.'))),
     ],
     sound: [
-      setting(uiText('Office sounds'), 'you', soundRow, h('p.setting-note', {}, uiText('Workers typing, footsteps, the coffee machine, birds and rain outside, the dog, the ding when a worker is done and the alarm when one needs you. Voice chat isn’t affected.'))),
+      setting(uiText('Office sounds'), 'you', soundRow, h('p.setting-note', {}, uiText('Workers typing, footsteps, birds and rain outside, the ding when a worker is done and the alarm when one needs you. Voice chat isn’t affected.'))),
       setting(uiText('When a worker needs you'), 'you', alarmRow, h('p.setting-note', {}, uiText('An alarm the moment a worker stops to ask you something or wants a permission. Keep reminding me rings it again, softly, every 30 seconds until someone opens that worker’s terminal. It’s as loud as the office sounds are.'))),
       setting(uiText('Page turns at the bookshelf'), 'you', pagesRow, h('p.setting-note', {}, uiText('A soft swish each time the book in your hands turns a page, as you open a doc or scroll through one. The 🔈 at the top of the bookshelf turns it off too.'))),
-      setting(uiText('Jukebox'), 'you', musicRow, h('p.setting-note', {}, uiText('The jukebox in the lounge. Everyone on the floor hears the same song, louder the closer they are to it; this is how loud it is for you alone.'))),
+      setting(uiText('Rooftop music'), 'you', musicRow, h('p.setting-note', {}, uiText('The DJ on the rooftop. This sets the music volume for you alone.'))),
       setting(uiText('Voice chat'), 'you', talkRow, h('p.setting-note', {}, uiText('Either way, V joins voice, holding V talks and you’re muted once you let go, and M mutes or unmutes. With push to talk you join muted. Leave voice from the ☰ menu.'))),
     ],
     notify: [
@@ -437,9 +397,7 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
       setting(uiText('Team notifications (Slack / Discord)'), 'office', h('div.webhook', {}, hookInput, hookSave), hookActions, hookStatus),
     ],
     building: [
-      setting(uiText('Holiday theme'), 'office', themeRow, themeNote),
       ...(sky ? [sky.section] : []),
-      dogSection,
       setting(uiText('Workspace folder'), 'office', dirRow, dirActions, dirNote),
     ],
     workers: [
@@ -486,8 +444,6 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
   const close = h('button.btn.close', { 'aria-label': uiText('Close') }, '✕');
   const el = h('div.modal.settings', { role: 'dialog', 'aria-label': uiText('Settings') }, h('header', {}, h('h2', {}, uiText('⚙️ Settings')), close), h('div.settings-body', {}, nav, ...bodies.values()));
   const offNotify = store.on('notify', paintHook);
-  const offDog = store.on('dog', paintDog);
-  const offTheme = store.on('theme', paintTheme);
   const offLeave = store.on('leaveOnMerge', paintLeave);
   const offLimit = [store.on('machine', paintLimit), store.on('me', paintLimit)];
   const offDir = [store.on('projectsDir', paintDir), store.on('me', paintDir)];
@@ -497,8 +453,6 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
     onClose: () => {
       connections?.dispose(); management?.dispose();
       offNotify();
-      offDog();
-      offTheme();
       sky?.off();
       offLeave();
       offLimit.forEach((off) => off());

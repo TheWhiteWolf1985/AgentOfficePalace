@@ -1,29 +1,22 @@
 import * as THREE from 'three';
-import { HAIR_COLORS, HAIR_STYLES, SKIN_TONES, type Look } from '../../../shared/avatar';
-import { EMOTE_BY_ID, type EmoteId } from '../../../shared/emotes';
-import type { CarriedIssue, Theme } from '../../../shared/protocol';
+import { HAIR_COLORS, SKIN_TONES, type Look } from '../../../shared/avatar';
+import type { CarriedIssue } from '../../../shared/protocol';
 import type { BarGame } from '../../../shared/bargames';
 import type { Drink } from '../../../shared/rooftop';
 import { HIPS, type PersonRig } from './rig';
 import { axeModel, dartModel } from '../../features/bargames/world';
 import { OpenBook } from '../../features/bookshelf/book';
 import { HeldCard } from '../../features/carrying/card';
-import { UNDEAD_SKIN } from '../costumes';
-import { HolidayOutfit } from './person-outfit';
 import { disposeSprite, mesh, textSprite, toon, toonUnique } from '../toon';
-import { EXHALE_AT, REACH_TIME, SMOKE_CYCLE, dragCurve, reachCurve } from './curves';
-import { cigarette, coffeeMug, drinkGlass, putDownGlass } from './props';
+import { REACH_TIME, reachCurve } from './curves';
+import { drinkGlass, putDownGlass } from './props';
 import { styleHair } from './person-hair';
 import { propPosition, throwStep, type Oche } from './person-throw';
-import { poseEmote, type Emoting } from './person-emote';
 
 export type Pose = 'stand' | 'walk' | 'sit' | 'type';
 
 /** Voice loudness (RMS) above which someone counts as speaking. */
 const SPEAKING = 0.04;
-
-const v1 = new THREE.Vector3();
-const v2 = new THREE.Vector3();
 
 /** Where the line under a person's name tag sits, just over their hair, and how far it lifts the name tag. */
 const DOING_Y = 1.95;
@@ -33,7 +26,7 @@ const DOING_LIFT = 0.25;
 export class Person {
   readonly root = new THREE.Group();
   private body = new THREE.Group();
-  /** Its moving parts, for what poses them from the other files here (a throw, an emote). */
+
   readonly rig: PersonRig;
   private legL: THREE.Object3D;
   private legR: THREE.Object3D;
@@ -60,10 +53,13 @@ export class Person {
   private talkUntil = 0;
   private walkPhase = 0;
   private reachT = -1;
-  /** Held in the left hand, kept upright however the arm swings: a mug of coffee or a drink. */
+
   private mug = new THREE.Group();
-  private cup: THREE.Group;
-  private wantsMug = false;
+  /** Updates the held drink when both hands are needed for work. */
+  private showDrink() {
+    this.mug.visible = !!this.glass && !this.card.held && !this.book && this.oche?.game !== 'axe';
+  }
+
   /** A drink from the rooftop bar, in the mug's place. */
   private glass: { id: string; group: THREE.Group } | null = null;
   /** An issue card off the board, held out in front in both hands. */
@@ -73,20 +69,6 @@ export class Person {
   private book: OpenBook | null = null;
   private bookHolder = new THREE.Group();
   pose: Pose = 'stand';
-  private cig: THREE.Group;
-  private ember: THREE.MeshToonMaterial;
-  /** Seconds into a smoke break, or -1 when not on one. */
-  private smokeT = -1;
-  private wispIn = 0;
-  /** Where smoke comes off: the lit end (a wisp) or the mouth, blowing it out along `dir`. */
-  onSmoke: ((kind: 'wisp' | 'exhale', at: THREE.Vector3, dir: THREE.Vector3) => void) | null = null;
-  /** The emote being played, how far into it (seconds), and its emoji over their head. */
-  private emoting: Emoting | null = null;
-  /** A thumb up and a pointing finger on the right hand, out only for those emotes. */
-  private thumb: THREE.Mesh;
-  private finger: THREE.Mesh;
-  /** How much higher (meters) an emote's emoji pops up, to clear a chat bubble over their head. */
-  emojiLift = 0;
   /** Hips this high above the feet while sitting (on the seat), or null on their feet. */
   private hips: number | null = null;
   /** The last seat's, so getting up eases back down from it. */
@@ -101,9 +83,6 @@ export class Person {
    * `top`) or taking it back all by itself first (`autoT`), and how long until the next is in hand.
    */
   private oche: Oche | null = null;
-  /** Dressed up for a holiday (see setCostume), and what they've got on for it. */
-  private costume: Theme | null = null;
-  private outfit?: HolidayOutfit;
   /** A hand on someone's shoulder, marching them along (see holdOn). */
   private gripping = false;
   /** Something they're saying (see say), and for how many more seconds. */
@@ -160,23 +139,9 @@ export class Person {
     this.armR = limb(0.24, 0.08, this.shirt, 0.33, 0.9);
     for (const arm of [this.armL, this.armR]) arm.add(mesh(new THREE.SphereGeometry(0.085, 12, 10), skin, 0, -0.38, 0));
     // Forward is +z, so the character's left arm is the one on +x. The handle faces the hand.
-    const cup = (this.cup = coffeeMug(1.4));
-    cup.position.set(0.02, -0.08, 0.1);
-    cup.rotation.y = -Math.PI / 2;
-    this.mug.add(cup);
     this.mug.position.set(0, -0.38, 0);
     this.mug.visible = false;
     this.armR.add(this.mug);
-    // For smoke breaks: a cigarette sticking out of the right fist (the arm on -x, see reach), lit end
-    // pointing down at your side and up and away when it's at your mouth.
-    const cig = cigarette();
-    this.cig = cig.group;
-    this.ember = cig.ember;
-    const along = new THREE.Vector3(0, -0.9, -0.44).normalize();
-    this.cig.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), along);
-    this.cig.position.set(0, -0.38, 0).addScaledVector(along, 0.07);
-    this.cig.visible = false;
-    this.armL.add(this.cig);
     // Between the hands when both arms are out in front (see update), its front to whoever they walk up to.
     const holder = this.cardHolder;
     holder.position.set(0, 0.8, 0.36);
@@ -189,15 +154,6 @@ export class Person {
     this.bookHolder.rotation.set(0.85, Math.PI, 0);
     this.bookHolder.scale.setScalar(1.25);
     this.body.add(this.bookHolder);
-    // Along the arm (the fist's -y) the finger points; the thumb sticks out of the front of the fist,
-    // which is up once the arm is out in front.
-    this.thumb = mesh(new THREE.CapsuleGeometry(0.035, 0.07, 4, 8).rotateX(Math.PI / 2), skin, 0, -0.38, 0.1, false);
-    this.finger = mesh(new THREE.CapsuleGeometry(0.03, 0.09, 4, 8), skin, 0, -0.5, 0.02, false);
-    for (const m of [this.thumb, this.finger]) {
-      m.visible = false;
-      this.armL.add(m);
-    }
-
     // Little mic icon that pops up while speaking
     this.mic = mesh(new THREE.SphereGeometry(0.09, 10, 8), toon('#7cf29a', { emissive: '#2a9d4b' }), 0, 2.25, 0, false);
     this.mic.visible = false;
@@ -220,23 +176,7 @@ export class Person {
     this.look = { ...look };
     this.hairMat.color.set(HAIR_COLORS[look.hair]);
     if (restyle) this.buildHair();
-    this.dress();
-  }
-
-  /** Dresses up for a holiday, head to toe (see person-outfit.ts), with undead skin for Halloween. Null takes it off. */
-  setCostume(theme: Theme | null) {
-    if (theme === this.costume) return;
-    this.costume = theme;
-    (this.outfit ??= new HolidayOutfit(this.rig)).set(theme);
-    this.dress();
-  }
-
-  /** The skin and hair under the costume: hair that would poke through a hat's crown hides under it. */
-  private dress() {
     this.skin.color.set(SKIN_TONES[this.look.skin]);
-    if (this.costume === 'halloween') this.skin.color.lerp(UNDEAD_SKIN, 0.7);
-    const style = HAIR_STYLES[this.look.style];
-    this.hair.visible = !this.costume || !(style === 'Spiky' || style === 'Bun' || style === 'Curly');
   }
 
   /** Hair is a set of shapes on the head (see styleHair). */
@@ -331,13 +271,6 @@ export class Person {
     this.speech = null;
   }
 
-  /** A mug of coffee in the left hand, or not. */
-  holdMug(on: boolean) {
-    this.wantsMug = on;
-    this.cup.visible = !this.glass;
-    this.mug.visible = (on || !!this.glass) && !this.card.held && !this.book && this.oche?.game !== 'axe';
-  }
-
   /** A drink from the rooftop bar in the left hand (in place of a mug), or none (null). */
   holdDrink(d: Drink | null) {
     if ((d?.id ?? null) === (this.glass?.id ?? null)) return;
@@ -351,13 +284,13 @@ export class Person {
       this.mug.add(group);
       this.glass = { id: d.id, group };
     }
-    this.holdMug(this.wantsMug);
+    this.showDrink();
   }
 
   /** Carries an issue card in both hands, or puts it down (null). The mug waits while the hands are full. */
   carry(card: CarriedIssue | null | undefined) {
     this.card.set(card);
-    this.holdMug(this.wantsMug);
+    this.showDrink();
   }
 
   /** Opens a book in both hands and reads it, turning the pages (or closes it). A card they carry waits. */
@@ -372,83 +305,12 @@ export class Person {
       this.book = null;
     }
     this.cardHolder.visible = !on;
-    this.holdMug(this.wantsMug);
+    this.showDrink();
   }
 
   /** Turns a page of the book they're reading now. */
   turnPage() {
     this.book?.turn();
-  }
-
-  /** Waves, gives a thumbs up, claps…: the gesture, with its emoji popping up over their head. */
-  emote(id: EmoteId) {
-    const emote = EMOTE_BY_ID.get(id);
-    if (!emote) return;
-    this.endEmote();
-    const pop = textSprite(emote.emoji, { size: 72 });
-    const size = new THREE.Vector2(pop.scale.x, pop.scale.y);
-    pop.scale.set(0.001, 0.001, 1);
-    this.root.add(pop);
-    this.emoting = { emote, t: 0, pop, size };
-    this.thumb.visible = id === 'thumbs';
-    this.finger.visible = id === 'point';
-  }
-
-  /** The emote playing now, if any. */
-  get emoteId(): EmoteId | null {
-    return this.emoting?.emote.id ?? null;
-  }
-
-  private endEmote() {
-    const e = this.emoting;
-    if (!e) return;
-    this.root.remove(e.pop);
-    disposeSprite(e.pop);
-    this.emoting = null;
-    this.thumb.visible = this.finger.visible = false;
-  }
-
-  /** Poses the emote over whatever the arms were doing (see poseEmote), and puts it away once it's over. */
-  private emoteStep(dt: number, still: number) {
-    if (!poseEmote(this.rig, this.emoting!, dt, still, this.emojiLift)) this.endEmote();
-  }
-
-  get smoking(): boolean {
-    return this.smokeT >= 0;
-  }
-
-  /** Lights a cigarette (or puts it out): it's in their right hand, and they take a drag every few seconds. */
-  setSmoking(on: boolean) {
-    if (on === this.smoking) return;
-    this.smokeT = on ? 0 : -1;
-    this.cig.visible = on;
-  }
-
-  /** A drag: up to the mouth, hold while the tip glows, back down, then blow the smoke out. */
-  private smokeStep(dt: number, walking: boolean, airborne: boolean) {
-    const prev = this.smokeT % SMOKE_CYCLE;
-    this.smokeT += dt;
-    const c = this.smokeT % SMOKE_CYCLE;
-    const k = walking || airborne ? 0 : dragCurve(c);
-    if (!airborne) {
-      this.armL.rotation.x = THREE.MathUtils.lerp(-0.9, -2.6, k);
-      this.armL.rotation.z = THREE.MathUtils.lerp(0.15, 0.6, k);
-    }
-    const glow = k > 0.9 ? 1.4 : 0.3;
-    this.ember.emissiveIntensity += (glow - this.ember.emissiveIntensity) * Math.min(1, dt * 6);
-    if (!this.onSmoke) return;
-    this.wispIn -= dt;
-    const exhale = prev < EXHALE_AT && c >= EXHALE_AT;
-    if (this.wispIn > 0 && !exhale) return;
-    this.root.updateMatrixWorld(true);
-    if (this.wispIn <= 0) {
-      this.wispIn = 0.16 + Math.random() * 0.12;
-      this.onSmoke('wisp', this.cig.localToWorld(v1.set(0, 0, 0.09)), v2.set(0, 1, 0));
-    }
-    if (exhale) {
-      const dir = v2.set(0, 0.25, 1).applyQuaternion(this.root.quaternion).normalize();
-      this.onSmoke('exhale', this.head.localToWorld(v1.set(0, -0.1, 0.36)), dir);
-    }
   }
 
   /** Sits down with the hips `hips` above the feet, on a couch or a chair, or gets up (null). */
@@ -480,7 +342,7 @@ export class Person {
       this.body.add(prop);
       this.oche = { game, prop, back: 0, want: 0, top: 0, throwT: -1, autoT: -1, reload: 0, release: null };
     }
-    this.holdMug(this.wantsMug);
+    this.showDrink();
   }
 
   /** Drawing the dart or axe back, `k` of the way (0 aiming, 1 as far as it goes). */
@@ -541,11 +403,9 @@ export class Person {
     this.sitK += ((this.hips === null ? 0 : 1) - this.sitK) * Math.min(1, dt * 10);
     const sit = this.sitK > 0.001 ? this.sitK : 0;
     if (sit) {
-      // Legs out over the edge of the seat, hands in the lap (a cigarette still comes up for a drag).
       for (const leg of [this.legL, this.legR]) leg.rotation.x = THREE.MathUtils.lerp(leg.rotation.x, -1.35, sit);
       for (const arm of [this.armL, this.armR]) arm.rotation.x = THREE.MathUtils.lerp(arm.rotation.x, -0.55, sit);
     }
-    if (this.smokeT >= 0) this.smokeStep(dt, moving, airborne);
     if (this.book) {
       // Both arms out in front, hands under the book's bottom corners.
       this.armL.rotation.set(-1.5, 0, 0.32);
@@ -609,7 +469,6 @@ export class Person {
     this.head.rotation.x = -this.mouthOpen * 0.08 + (this.book ? 0.32 : 0);
     this.head.rotation.y = this.head.rotation.z = 0;
     this.body.rotation.y = this.body.rotation.z = 0;
-    if (this.emoting) this.emoteStep(dt, moving || airborne ? 0 : 1 - sit);
     if (this.oche && !sit) this.ocheStep(dt);
   }
 }

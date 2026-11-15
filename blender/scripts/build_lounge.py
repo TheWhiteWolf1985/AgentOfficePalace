@@ -21,7 +21,7 @@ Each piece is a root of its own, `sofa`, `pillow`, `pouf` and `coffee_table`, st
 at the origin under its middle and facing forward (the pillow's origin is under its middle too, at
 its bottom edge). world/office/ turns the sofa round to face the TV and leans a pillow on it either side
 of the middle. The pieces keep the old code-built lounge's sizes, so its colliders, seats and the
-holiday pumpkin on the table fit as before. The roots' names and the material names are a contract
+tabletop objects fit as before. The roots' names and the material names are a contract
 with world/office/props.ts and tests/lounge-model.test.ts, so rename them in all three places.
 
 The pieces are built the way build_furniture.py builds the office's desks and chairs, and use its
@@ -48,10 +48,8 @@ COLORS = {
     "Cloth": "#ffd166",
 }
 
-
 def material(name):
     return ao.material(name, COLORS[name])
-
 
 # The sizes the office's code counts on. Blender can't read TypeScript, so they're copied here, and
 # tests/lounge-model.test.ts checks the model against them.
@@ -60,7 +58,7 @@ def material(name):
 SOFA = {"length": 4.2, "depth": 1.0}
 # The seat cushions' tops. A sitter's bottom is 0.1 under their hips, so they sink a little in.
 SEAT_TOP = 0.47
-# The coffee table in world/office/: a round top 0.9 round, its surface at 0.46 (the holiday pumpkin
+# The coffee table in world/office/: a round top 0.9 round, its surface at 0.46 (tabletop objects
 # stands on it), inside a collider 0.8 either way of its middle.
 TABLE = {"radius": 0.9, "height": 0.46}
 # A floor pouf in world/office/: a collider 0.5 either way of its middle with its top on the pouf's, and
@@ -73,7 +71,6 @@ POUF = {"radius": 0.52, "height": 0.4}
 # only 0.17 m between a sitter's elbow and an arm.)
 PILLOWS = {"x": 0.6, "z": -0.08, "tilt": 0.15}
 
-
 # ---- Laying things out the office's way -----------------------------------------------------------
 #
 # Every number below is in the office's axes: (x across, y up, z forward), metres, the piece's origin
@@ -83,7 +80,6 @@ PILLOWS = {"x": 0.6, "z": -0.08, "tilt": 0.15}
 def at(x, y, z):
     return (x, -z, y)
 
-
 def rounded_rect(hx, hz, r, segs):
     """A rectangle's outline [(x, z), ...] seen from above, 2hx by 2hz, its corners rounded over `r`."""
     pts = []
@@ -92,7 +88,6 @@ def rounded_rect(hx, hz, r, segs):
             a = math.radians(a0 + 90 * i / segs)
             pts.append((cx + r * math.cos(a), cz + r * math.sin(a)))
     return pts
-
 
 def slab(bm, w, d, y0, y1, corner, edge, x=0.0, z=0.0, bottom=None, csegs=4, esegs=3, turn=None):
     """A table top, or a cushion: `w` across and `d` deep from y0 up to y1, its corners rounded over
@@ -121,18 +116,15 @@ def slab(bm, w, d, y0, y1, corner, edge, x=0.0, z=0.0, bottom=None, csegs=4, ese
         m = Matrix.Translation(at(*center)) @ Euler(rot, 'XYZ').to_matrix().to_4x4()
         bmesh.ops.transform(bm, matrix=m, verts=[v for ring in rings for v in ring])
 
-
 def turned(bm, profile, x=0.0, y=0.0, z=0.0, segs=24):
     """A lathe about the up axis, [(radius, height), ...] from the bottom, standing at (x, y, z)."""
     ao.lathe(bm, profile, center=at(x, y, z), segs=segs)
-
 
 def arc(r, cr, cy, a0, a1, n):
     """Points [(radius, height)] round a quarter (or so) of a circle centred (cr, cy), `r` round, from
     angle a0 to a1 (degrees, 0 pointing out, 90 up): a lathe profile's rounded rim."""
     return [(cr + r * math.cos(math.radians(a)), cy + r * math.sin(math.radians(a))) for a in
             (a0 + (a1 - a0) * i / n for i in range(n + 1))]
-
 
 def flat_faces(bm, start, threshold=0.999):
     """Shades the faces from `start` on flat where they face straight up or down (a top, a bottom),
@@ -142,10 +134,8 @@ def flat_faces(bm, start, threshold=0.999):
     for f in bm.faces[start:]:
         f.smooth = abs(f.normal.z) < threshold
 
-
 # Smooth shading keeps edges sharper than this crisp (a disc's rim, a foot's end).
 SHARP = math.radians(48)
-
 
 class Piece:
     """One piece's shapes, a bmesh per material, joined into one object at the end."""
@@ -182,7 +172,6 @@ class Piece:
         ob.data.name = name + "_mesh"
         return ob
 
-
 # ---- The sofa ---------------------------------------------------------------------------------------
 #
 # A plump three-seater facing forward: a cushion for each of the office's three places on a low base,
@@ -202,7 +191,6 @@ BACK_CUSHION_TOP = 0.93
 CUSHION_H = 0.19
 # Between the arms, where the cushions go.
 INNER = SOFA["length"] - 2 * ARM_W
-
 
 def sofa():
     L, D = SOFA["length"], SOFA["depth"]
@@ -245,7 +233,6 @@ def sofa():
     s.add("WoodDark", feet)
     return s.finish("sofa")
 
-
 # ---- The pillow ---------------------------------------------------------------------------------------
 #
 # A square throw pillow standing up, its face forward: plump in the middle and thin at its seam, its
@@ -253,7 +240,6 @@ def sofa():
 # edge, so even edge-on it has a rim for the outline, not a paper-thin one.
 
 PILLOW = {"w": 0.46, "h": 0.44, "t": 0.17}
-
 
 def pillow():
     W, H, T = PILLOW["w"], PILLOW["h"], PILLOW["t"]
@@ -292,7 +278,6 @@ def pillow():
     ob.data.name = "pillow_mesh"
     return ob
 
-
 # ---- The pouf -------------------------------------------------------------------------------------------
 #
 # A round floor pouf, soft as a marshmallow: a squat drum bulging round its middle, its bottom edge
@@ -330,7 +315,6 @@ def pouf():
     s.add("Cloth", button)
     return s.finish("pouf")
 
-
 # ---- The coffee table -------------------------------------------------------------------------------------
 #
 # A round wooden top on a pedestal: a thick disc with a rounded edge, its surface at TABLE's height,
@@ -362,11 +346,9 @@ def coffee_table():
     s.add("Frame", pedestal, smooth=None)
     return s.finish("coffee_table")
 
-
 # ---- Build, export, review --------------------------------------------------------------------------
 
 PIECES = [sofa, pillow, pouf, coffee_table]
-
 
 def main(write=True):
     ao.clear()
@@ -375,12 +357,10 @@ def main(write=True):
         ao.export("lounge")
     return roots
 
-
 def placed(ob, x, y, z, turn=0.0, tilt=0.0):
     """Puts `ob` at (x, y, z) in office axes, turned `turn` about the up axis (office's way round,
     counter-clockwise seen from above) and tipped back by `tilt` (its top toward -z) first."""
     ob.matrix_world = Matrix.Translation(at(x, y, z)) @ Matrix.Rotation(turn, 4, 'Z') @ Matrix.Rotation(-tilt, 4, 'X')
-
 
 def only(*names, extra=None):
     """Shows just the objects called `names` in the review renders, each at the origin unless
@@ -394,7 +374,6 @@ def only(*names, extra=None):
             if extra and ob.name in extra:
                 extra[ob.name](ob)
     return setup
-
 
 def lounge_layout():
     """The lounge the way world/office/room.ts lays it out, seen from the room: the sofa at (10.5, 0) facing the
@@ -430,7 +409,6 @@ def lounge_layout():
     return only("sofa", "pillow", "pillow_2", "coffee_table", "pouf",
                 extra={"sofa": sofa_at, "pillow": pillow_at(-1), "pillow_2": pillow_at(1), "coffee_table": table_at, "pouf": pouf_at})
 
-
 def review():
     # three's toon materials draw front faces only; show the same, so a face turned the wrong way
     # shows here as a hole rather than first in the office.
@@ -453,7 +431,6 @@ def review():
         bpy.data.objects.remove(other, do_unlink=True)
     only(*[p.__name__ for p in PIECES])()
     return paths
-
 
 if __name__ == "__main__" and bpy.app.background:
     roots = main()

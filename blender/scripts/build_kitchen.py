@@ -1,28 +1,5 @@
-"""The kitchen corner: the counter, the espresso machine and the fridge, modelled by
-this script and exported to src/client/models/kitchen.glb for
-src/client/world/kitchen.ts. The shared helpers are in aokit.py and the conventions
-in blender/README.md.
-
-Headless, from the repo root (`-- --shots` also writes review sheets):
-
-    blender --background --factory-startup --python blender/scripts/build_kitchen.py [-- --shots]
-
-Through the Blender MCP bridge (module globals don't survive between calls, so
-import it every time):
-
-    import sys, importlib
-    sys.path.insert(0, r"<repo>/blender/scripts")
-    import aokit, build_kitchen; importlib.reload(aokit); importlib.reload(build_kitchen)
-    build_kitchen.main()
-
-It is three objects, three root nodes in the file: `counter`, `coffee_machine` and
-`fridge`. kitchen.ts finds the machine by name (E at it pours a coffee, so a look at
-the counter or the fridge mustn't), and the object and material names are a contract
-with it and tests/kitchen-model.test.ts, so rename them in all three places.
-
-Like every model it faces -Y here (+z in the office). The office stands it against
-the south wall turned round to face into the room, which swaps its sides: the
-machine is at +X here so that it lands at the old machine's place, the fridge at -X.
+"""Kitchen counter and fridge. Export kitchen.glb; preserve counter/fridge root names, materials and dimensions used by kitchen.ts and kitchen-model.test.ts.
+Run: blender --background --factory-startup --python blender/scripts/build_kitchen.py [-- --shots]
 """
 import bpy, bmesh, math, os, sys
 from mathutils import Vector
@@ -39,29 +16,22 @@ COLORS = {
     "Wood": "#c98b5a",
     "Chrome": "#adb5bd",
     "Dark": "#343a40",
-    "White": "#ffffff",
-    "Glow": "#ef476f",
     "Fridge": "#f8f9fa",
     "Note": "#ffd166",
     "Memo": "#bde0fe",
     "Red": "#ef476f",
 }
 
-
 def material(name):
     return ao.material(name, COLORS[name])
 
-
 # Where things are (Blender space, metres, the counter's middle on the floor at the origin). The
-# counter is the old one's size, its top at the height the office's collider (and the holiday
-# pumpkins on it) count on; the machine and the fridge stand where the old ones did.
+# Counter dimensions match the collider in kitchen.ts.
 BODY = (5.0, 1.0, 0.95)
 TOP = (5.1, 1.1, 0.08)
 TOP_Z = 1.03
-MACHINE_AT = (1.2, 0.0, TOP_Z)
 FRIDGE_AT = (-3.2, 0.0, 0.0)
 FRIDGE = (1.1, 1.0, 2.2)
-
 
 # ---- Building an object from shapes --------------------------------------------------------------
 
@@ -99,10 +69,8 @@ class Shapes:
         ao.set_origin(ob, origin)
         return ob
 
-
 def offset(at, p):
     return tuple(a + b for a, b in zip(at, p))
-
 
 def rounded_rect(x0, x1, z0, z1, bottom, top):
     """A rectangle's outline [(x, z), ...] with its bottom corners rounded over `bottom` metres and
@@ -115,7 +83,6 @@ def rounded_rect(x0, x1, z0, z1, bottom, top):
             a = math.radians(a0 + 90 * i / n)
             pts.append((cx + r * math.cos(a), cz + r * math.sin(a)))
     return pts
-
 
 def slab(bm, points, depth, center, bevel=0.0, segments=2):
     """Like aokit.outline (a flat outline [(x, z), ...] pulled `depth` along Y), but only its sharp
@@ -134,7 +101,6 @@ def slab(bm, points, depth, center, bevel=0.0, segments=2):
         bmesh.ops.bevel(part, geom=sharp, offset=bevel, segments=segments, profile=0.5, affect='EDGES', clamp_overlap=True)
     bmesh.ops.translate(part, vec=center, verts=part.verts[:])
     ao._merge(bm, part)
-
 
 def tube(bm, points, r, segs=10):
     """A round pipe along `points`, capped at both ends: a tap's neck, a steam wand. Its rings are
@@ -156,17 +122,14 @@ def tube(bm, points, r, segs=10):
             faces.append(bm.faces.new((lo[k], lo[(k + 1) % segs], hi[(k + 1) % segs], hi[k])))
     bmesh.ops.recalc_face_normals(bm, faces=faces)
 
-
 def arc(center, r, a0, a1, n=8):
     """Points round an arc in the YZ plane (angles from +Y toward +Z), for tube()."""
     cx, cy, cz = center
     return [(cx, cy + r * math.cos(a), cz + r * math.sin(a)) for a in (a0 + (a1 - a0) * i / n for i in range(n + 1))]
 
-
 def not_facing_y(f):
     """Smooth round a slab's curved sides, flat on its big front and back."""
     return abs(f.normal.y) < 0.99
-
 
 # ---- The counter ----------------------------------------------------------------------------------
 
@@ -176,7 +139,6 @@ COLUMNS = [-2.0, -1.2, -0.4, 0.4, 1.2, 2.0]
 DRAWER_STACK = 1.2
 KNOB_SIDE = {-2.0: 1, -1.2: -1, -0.4: 1, 0.4: -1, 2.0: -1}
 FRONT = -BODY[1] / 2
-
 
 def panel(s, x, z0, z1, drawer):
     """A drawer front or a door on the counter, and its chrome pull (a bar) or knob."""
@@ -189,7 +151,6 @@ def panel(s, x, z0, z1, drawer):
             s.add("Chrome", ao.cylinder, (x + sx * 0.11, y + 0.005, z), (x + sx * 0.11, y - 0.035, z), 0.009, segs=6, smooth=True)
     else:
         s.add("Chrome", ao.ellipsoid, (x + KNOB_SIDE[x] * 0.29, y - 0.018, z1 - 0.1), (0.026, 0.02, 0.026), segs=10, rings=6, smooth=True)
-
 
 def counter():
     s = Shapes()
@@ -206,7 +167,7 @@ def counter():
             panel(s, x, 0.13, 0.7, False)
     # The wooden top, a little over the cupboards all round.
     s.add("Wood", ao.box, (0, 0, TOP_Z - TOP[2] / 2), TOP, bevel=0.018, segments=2)
-    # A sink between the pumpkins' spots (see holiday.ts), under the window: a chrome rim round a
+    # A sink under the window: a chrome rim round a
     # dark basin, and a swan-neck tap at the back.
     sink = (0.0, -0.03)
     s.add("Chrome", ao.box, (sink[0], sink[1], TOP_Z + 0.007), (0.66, 0.5, 0.014), bevel=0.02, segments=2)
@@ -222,60 +183,12 @@ def counter():
           segs=8, rings=6, smooth=True)
     return s.finish("counter", (0, 0, 0))
 
-
 # ---- The espresso machine ------------------------------------------------------------------------
 #
 # Built round the middle of its feet (x across, its front toward -y, z up from the counter top), then
 # set on the counter at MACHINE_AT. Chunky and dark like the old one, with a chrome face: a gauge
 # and the little red light on it, the group head and its portafilter over a cup on the drip tray, a
 # steam wand down one side and cups warming on the top.
-
-def machine():
-    s = Shapes()
-    at = lambda *p: offset(MACHINE_AT, p)
-    # The base with its drip tray out front, then the body on it.
-    s.add("Dark", ao.box, at(0, -0.06, 0.035), (0.56, 0.6, 0.07), bevel=0.025, segments=2)
-    s.add("Chrome", ao.box, at(0, -0.265, 0.078), (0.38, 0.17, 0.016), bevel=0.006, segments=2)
-    s.add("Dark", ao.box, at(0, 0.04, 0.34), (0.52, 0.4, 0.54), bevel=0.06)
-    s.add("Chrome", ao.box, at(0, -0.1675, 0.475), (0.44, 0.015, 0.19), bevel=0.02, segments=2)
-    # The gauge (a white face in a dark ring, and its needle), and the light.
-    gauge = (0.11, 0.475)
-    s.add("Dark", ao.cylinder, at(gauge[0], -0.17, gauge[1]), at(gauge[0], -0.195, gauge[1]), 0.064, segs=16, smooth=True)
-    s.add("White", ao.cylinder, at(gauge[0], -0.19, gauge[1]), at(gauge[0], -0.199, gauge[1]), 0.05, segs=16, smooth=True)
-    s.add("Dark", ao.box, at(gauge[0] + 0.015, -0.201, gauge[1] + 0.012), (0.01, 0.004, 0.045), rot=(0, 0.9, 0))
-    light = (-0.11, 0.475)
-    s.add("Dark", ao.cylinder, at(light[0], -0.17, light[1]), at(light[0], -0.19, light[1]), 0.045, segs=14, smooth=True)
-    s.add("Glow", ao.ellipsoid, at(light[0], -0.19, light[1]), (0.032, 0.022, 0.032), segs=12, rings=8, smooth=True)
-    # The group head, and the portafilter locked into it, its handle out front a little to one side.
-    s.add("Chrome", ao.cylinder, at(0, -0.15, 0.31), at(0, -0.25, 0.31), 0.06, segs=14, smooth=True)
-    s.add("Chrome", ao.cylinder, at(0, -0.25, 0.25), at(0, -0.25, 0.36), 0.072, segs=16, smooth=True)
-    s.add("Chrome", ao.cylinder, at(0, -0.25, 0.205), at(0, -0.25, 0.25), 0.066, rb=0.07, segs=16, smooth=True)
-    s.add("Chrome", ao.cylinder, at(0, -0.25, 0.18), at(0, -0.25, 0.205), 0.018, segs=10, smooth=True)
-    s.add("Dark", ao.limb, at(0, -0.3, 0.225), at(0.06, -0.47, 0.205), 0.024, 0.03, segs=10, rings=8, smooth=True)
-    # A cup of espresso on the drip tray, under the spout.
-    cup = at(0, -0.25, 0.086)
-    s.add("White", ao.lathe, [(0, 0), (0.034, 0), (0.044, 0.016), (0.048, 0.07), (0.041, 0.07), (0.041, 0.058), (0, 0.058)],
-          center=cup, segs=14, smooth=True)
-    s.add("Dark", ao.cylinder, offset(cup, (0, 0, 0.058)), offset(cup, (0, 0, 0.061)), 0.041, segs=14)
-    s.add("White", ao.torus, offset(cup, (0.054, 0, 0.036)), 0.02, 0.007, rot=(math.pi / 2, 0, 0), n=14, m=6, smooth=True)
-    # Knobs on both sides, and the steam wand coming down on the right (its -X side).
-    for sx in (-1, 1):
-        s.add("Dark", ao.cylinder, at(sx * 0.255, -0.06, 0.5), at(sx * 0.3, -0.06, 0.5), 0.034, segs=12, smooth=True)
-    s.add("Chrome", ao.ellipsoid, at(-0.215, -0.18, 0.4), (0.024, 0.024, 0.024), segs=10, rings=6, smooth=True)
-    s.add("Chrome", tube, [at(-0.215, -0.18, 0.4), at(-0.26, -0.2, 0.385), at(-0.285, -0.215, 0.34), at(-0.292, -0.225, 0.26),
-                           at(-0.295, -0.23, 0.17)], 0.012, segs=8, smooth=True)
-    # The cup warmer on top: a chrome rail on four posts, and two cups upside down on it.
-    top = 0.61
-    corners = [(-0.21, -0.12), (0.21, -0.12), (0.21, 0.2), (-0.21, 0.2)]
-    for (x0, y0), (x1, y1) in zip(corners, corners[1:] + corners[:1]):
-        s.add("Chrome", ao.cylinder, at(x0, y0, top + 0.055), at(x1, y1, top + 0.055), 0.01, segs=8, smooth=True)
-    for x, y in corners:
-        s.add("Chrome", ao.cylinder, at(x, y, top - 0.01), at(x, y, top + 0.055), 0.009, segs=8, smooth=True)
-        s.add("Chrome", ao.ellipsoid, at(x, y, top + 0.055), (0.014, 0.014, 0.014), segs=8, rings=4, smooth=True)
-    for x, y in ((-0.08, 0.0), (0.09, 0.07)):
-        s.add("White", ao.cylinder, at(x, y, top - 0.005), at(x, y, top + 0.07), 0.046, rb=0.038, segs=14, smooth=True)
-    return s.finish("coffee_machine", MACHINE_AT)
-
 
 # ---- The fridge -----------------------------------------------------------------------------------
 #
@@ -311,25 +224,21 @@ def fridge():
         s.add(mat, ao.ellipsoid, at(x, face - 0.008, z), (0.04, 0.018, 0.04), segs=10, rings=6, smooth=True)
     return s.finish("fridge", FRIDGE_AT)
 
-
 def main(write=True):
     ao.clear()
-    obs = [counter(), machine(), fridge()]
+    obs = [counter(), fridge()]
     for ob in obs:
         print(f"{ob.name}: {ao.tris(ob)} tris, {len(ob.data.materials)} materials")
     if write:
         ao.export("kitchen")
     return obs
 
-
 def sheet(name, shots, **kw):
     """Review renders side by side: `shots` is [view]."""
     return ao.sheet(name, [(None, view) for view in shots], **kw)
-
 
 if __name__ == "__main__" and bpy.app.background:
     main()
     if "--shots" in ao.args():
         print("sheet:", sheet("kitchen", ["tq", "front", "side", "top"], target=(-0.7, 0, 0.9), dist=11))
-        print("sheet:", sheet("kitchen_machine", ["tq", "front", "side", (-0.9, -1.0, 0.5)], target=offset(MACHINE_AT, (0, -0.1, 0.33)), dist=1.9))
         print("sheet:", sheet("kitchen_fridge", ["tq", "front", (-1.0, 0.0, 0.12), (-0.9, -1.0, 0.3)], target=offset(FRIDGE_AT, (0, 0, 1.15)), dist=4.6))

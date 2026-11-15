@@ -26,7 +26,7 @@ import type { CoreState } from './ctx';
 import { builtFloors, pastTheWing } from './floors';
 import type { Parts } from './parts';
 
-export type ArrivalParts = Pick<Parts, 'worlds' | 'place' | 'travel' | 'views' | 'cards' | 'bar' | 'bargames' | 'cars' | 'focus'>;
+export type ArrivalParts = Pick<Parts, 'worlds' | 'place' | 'travel' | 'views' | 'cards' | 'bar' | 'bargames' | 'focus'>;
 
 /**
  * Registers arriving's messages and the routers (see the order below), and what follows the upgrade,
@@ -60,7 +60,7 @@ export function installArrival(ctx: Ctx, core: CoreState, parts: ArrivalParts) {
   );
   ctx.messages.on('floor.enter', () => parts.views.seatedOnArrival(), 'before');
   ctx.messages.on('worker.remove', (msg) => parts.views.sendingHome(msg.workerId), 'before');
-  // Once the store has it (the cars have their own, registered with them, first).
+
   ctx.messages.onAny(() => parts.views.settled());
   ctx.messages.onAny(routeTerminalMessage);
   ctx.messages.onAny(routeChangesMessage);
@@ -71,7 +71,6 @@ export function installArrival(ctx: Ctx, core: CoreState, parts: ArrivalParts) {
   ctx.messages.onAny((msg) => routeWhiteboardMessage(msg, net));
   ctx.messages.on('welcome', (msg) => {
     const { travel } = parts;
-    // A few pings, to line this page's clock up with the office's for the jukebox.
     for (let i = 0; i < 5; i++) setTimeout(() => net.send({ t: 'ping', at: performance.now() }), 200 + i * 500);
     const mine = store.peers.get(store.you);
     if (firstWelcome && mine) {
@@ -103,8 +102,6 @@ export function installArrival(ctx: Ctx, core: CoreState, parts: ArrivalParts) {
     if (shownDrink) net.send({ t: 'act', drink: shownDrink });
     const { thrower } = parts.bargames;
     if (thrower.playing) net.send({ t: 'act', throwing: thrower.playing });
-    // Reconcile your seat in a car after reconnecting.
-    parts.cars.carAgain();
     // After a reconnect the server has forgotten which terminal we had open, and what we're doing.
     parts.focus.sendDoing(true);
     const openId = openTerminalFor();

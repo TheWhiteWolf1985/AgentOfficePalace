@@ -25,13 +25,9 @@ const CEILINGS: Readonly<Record<string, number>> = {
   'src/client/features/rooftop/world.ts': 989,
   'src/client/world/sky.ts': 966,
   'src/server/meetings.ts': 764,
-  'src/client/world/holiday.ts': 702,
-  'src/client/features/dog/world.ts': 702,
-  'src/client/world/character/person.ts': 694,
   'src/server/signins.ts': 660,
   'src/client/dnb.ts': 641,
   'src/client/features/bargames/world.ts': 617,
-  'src/client/world/city.ts': 613,
 };
 
 const SPLIT = 'Split it along the registries instead (see docs/code-layout.md).';

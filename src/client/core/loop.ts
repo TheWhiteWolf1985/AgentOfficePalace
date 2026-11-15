@@ -6,7 +6,6 @@
 import * as THREE from 'three';
 import { SlowFrames } from '../framerate';
 import { EYE_HEIGHT } from '../player';
-import { renderCaffeine } from '../features/coffee/meter';
 import type { Ctx } from './context';
 import type { CoreState } from './ctx';
 import type { Parts } from './parts';
@@ -23,10 +22,11 @@ export interface LoopDeps {
 }
 
 /** Registers the office's own ticks: install it before anything else registers one. */
-export function installLoop(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'stage' | 'coffee' | 'peers' | 'views' | 'worlds' | 'place'>, deps: LoopDeps) {
+export function installLoop(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'stage' | 'peers' | 'views' | 'worlds' | 'place'>, deps: LoopDeps) {
+  let landing: ReturnType<Ctx['player']['effects']['add']> | undefined;
   // Registered before anything else's, so within a phase they come first.
   ctx.ticks.add('pre', watchFrameRate);
-  ctx.ticks.add('pre', feelTheCoffee);
+  ctx.ticks.add('pre', easeShake);
   ctx.ticks.add('move', ({ dt }) => ctx.player.update(dt));
   ctx.ticks.add('me', moveMe);
   ctx.ticks.add('me', listen);
@@ -53,21 +53,10 @@ export function installLoop(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'stage
     if (slowFrames.frame(now, delta * 1000)) deps.offer2d('slow');
   }
 
-  /** Coffee, and the view's shake easing off. */
-  function feelTheCoffee({ dt, now }: Frame) {
-    const { me, hands, reduceMotion } = ctx;
-    // Coffee: quicker feet, higher jumps, a mug in hand, and maybe the jitters.
-    const { caffeine, buzz } = parts.coffee;
-    const secs = now / 1000;
-    buzz.speed = caffeine.speed(secs);
-    buzz.jump = caffeine.jump(secs);
+  /** The view's shake easing off after a pole landing or a hiccup. */
+  function easeShake({ dt }: Frame) {
     core.thud = Math.max(0, core.thud - dt * 2.5);
-    buzz.jitter = reduceMotion.matches ? 0 : Math.max(caffeine.jitter(secs), core.thud);
-    const mug = caffeine.buzzed(secs);
-    // Not while both your hands are on something else (the club, at the tee).
-    me.holdMug(mug && !ctx.activities.any('bothHands'));
-    hands.holdMug(mug);
-    renderCaffeine(caffeine, secs);
+    (landing ??= ctx.player.effects.add()).jitter = ctx.reduceMotion.matches ? 0 : core.thud;
   }
 
   /** Your body below you in first person (made on the first frame, once you are). */
@@ -95,7 +84,7 @@ export function installLoop(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'stage
     // In a car, your hands are on the wheel, out of sight.
     if (firstPerson && !ctx.activities.any('hidesHands')) hands.update(dt, t, { yaw: player.camYaw, pitch: player.lookPitch, walkPhase: player.walkPhase, walking: player.moving && player.grounded, airborne: !player.grounded, jitter: player.effects.jitter, grip });
     // What you're doing widens the view (down a pole) or narrows it (at the oche or the line), and once
-    // it's set, may take it over (the telescope) or streak its edges (down a pole): see ctx.view.
+
     const fov = ctx.view.fov(FOV);
     if (Math.abs(camera.fov - fov) > 0.05) {
       camera.fov += (fov - camera.fov) * Math.min(1, dt * 8);
@@ -145,37 +134,25 @@ export function installLoop(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'stage
     }
   }
 
-  /** The building and what's in it: its doors, its floors, the jukebox's lights, the smoke and the confetti. */
   function updateWorld({ dt, t }: Frame) {
-    const { player, office, camera, sound } = ctx;
+    const { player, office, camera } = ctx;
     const { remotes } = parts.peers;
     const { departures, arrivals } = parts.views;
     if (!core.upTop) {
       ctx.world().update(t, dt, [player.pos, ...[...remotes.values()].map((r) => r.person.root.position), ...departures.positions(), ...arrivals.positions()]);
       if (ctx.inOffice()) {
         office.stack.update(dt, [{ x: player.pos.x, y: player.pos.y, z: player.pos.z, grip: ctx.view.grip() }, ...[...remotes.values()].map((r) => ({ x: r.person.root.position.x, y: r.person.root.position.y, z: r.person.root.position.z, grip: r.grip }))], camera.position);
-        office.jukebox.update(t, dt, sound.beat());
       }
     }
-    ctx.smoke.update(dt, camera);
+    ctx.dust.update(dt, camera);
     ctx.confetti.update(dt);
   }
 
   /** The sky, the weather and the light. */
   function updateSky({ dt, t }: Frame) {
-    const { player, camera, sky, office, sound } = ctx;
-    const { sun, hemi, ambient, scene, holiday } = parts.stage;
-    // Out along the scenic loop, the haze thins (there's more out there to see), and the sun's shadows
-    // come with you: otherwise they're only cast round the office.
-    const away = !core.upTop && ctx.inOffice() ? Math.hypot(player.pos.x, player.pos.z) : 0;
-    sky.open = THREE.MathUtils.smoothstep(away, 70, 160);
-    if (away > 40) sun.target.position.set(Math.round(player.pos.x / 4) * 4, player.pos.y, Math.round(player.pos.z / 4) * 4);
-    else sun.target.position.set(0, 0, 0);
-    sun.target.updateMatrixWorld();
+    const { camera, sky, sound } = ctx;
     sky.update(dt, t, camera);
-    if (!core.upTop && ctx.inOffice()) office.scenic.cull(camera.position, office.night.street, (scene.fog as THREE.Fog).far);
 
-    if (!core.upTop && ctx.inOffice()) holiday.update(t, sky.lampsOn, camera);
     sound.setWeather(sky.rain, 1 - sky.daylight);
   }
 
@@ -192,7 +169,7 @@ export function installLoop(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'stage
     const unhide = firstBody?.hideExtras();
     effect.render(scene, camera);
     unhide?.();
-    // Not while something has the screen to itself (the telescope, the boss's monitor or the arcade up close), where they'd cover it.
+
     if (firstPerson && !ctx.view.covered() && !ctx.activities.any('hidesHands')) {
       // Hands go on top of everything, so they never clip into a desk you walk up to. They have
       // lights of their own, turned down to match wherever you're standing.

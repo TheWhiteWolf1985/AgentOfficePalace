@@ -2,14 +2,10 @@ import * as THREE from 'three';
 import type { WallRect } from '../../../shared/decor';
 import type { FloorPalette } from '../../../shared/floors';
 import { street } from '../outside';
-import { cars } from '../../features/cars/world';
-import { scenic } from '../scenic';
 import { toon, toonUnique } from '../toon';
 import { elevator, garageLift } from '../elevator';
 import { gong } from '../../features/gong/world';
-import { jukebox } from '../../features/jukebox/world';
 import { bookshelf } from '../../features/bookshelf/world';
-import { cabinet } from '../../features/cabinet/world';
 import { whiteboard } from '../../features/whiteboard/world';
 import { stack } from '../stack';
 import { tower } from '../tower';
@@ -42,19 +38,17 @@ function floorPlan() {
     nightLights,
     walls,
     balcony,
-    ...downstairs(cars, street, scenic),
+    ...downstairs(street),
     plug,
     tower,
     desks,
     beanbags,
     kiosks,
     boards,
-    // The lounge: the TV, the couch and its table and poufs, and the jukebox and the arcade in the corner.
+    // The lounge: the TV, the couch and its table and poufs, bookshelf.
     tv,
     machineMonitor,
     lounge,
-    jukebox,
-    cabinet,
     bookshelf,
     kitchen,
     plants,

@@ -13,7 +13,6 @@ import { Webhook } from '../webhook.js';
 import { Machine } from '../machine.js';
 import type { Floor } from '../floor.js';
 import { Sky } from '../sky.js';
-import { Themes } from '../theme.js';
 import { OfficePrompts } from '../prompts.js';
 import { LeaveOnMerge } from '../leave-on-merge.js';
 import type { ServiceInfo, ServicesState } from '../../shared/protocol.js';
@@ -26,10 +25,6 @@ export function createServices(ctx: Ctx): BuildingServices {
   // Day, night and the weather outside the windows, the same for everyone.
   const sky = new Sky({ city: cfg.city, weather: cfg.weather, realTime: cfg.realTimeSky, placeFile: path.join(cfg.dataDir, 'sky-place.json'), clockFile: path.join(cfg.dataDir, 'sky-clock.json') }, (state) => ctx.broadcast({ t: 'sky', state }));
   sky.start();
-  // Halloween or Christmas all over the building, the same for everyone (⚙️ Settings). On 'auto' it
-  // goes by the calendar at the office, the sky's clock.
-  const themes = new Themes(cfg.dataDir, () => sky.state.utcOffset, (state) => ctx.broadcast({ t: 'theme', state }));
-  themes.start();
   // The prompts the office writes for workers by itself, and the worker everyone starts on (⚙️ Settings).
   const configured = configuredProvider(cfg.agentCmd);
   const prompts = new OfficePrompts(cfg.dataDir, { list: agentProviders(configured), configured }, (state) => ctx.broadcast({ t: 'prompts', state }));
@@ -122,7 +117,7 @@ export function createServices(ctx: Ctx): BuildingServices {
     });
   };
 
-  return { sky, themes, prompts, leaveOnMerge, ledger, signins, limits, accountLimits, webhook, machine, limitsOf, pumpQueues };
+  return { sky, prompts, leaveOnMerge, ledger, signins, limits, accountLimits, webhook, machine, limitsOf, pumpQueues };
 }
 
 /** What's made once the floors are open: the SSH team, the tailnet, workers' web servers, pictures and upgrades. */

@@ -19,7 +19,7 @@ import type { Confetti } from '../world/confetti';
 import type { Hands } from '../world/hands';
 import type { Interactable, Office } from '../world/types';
 import type { Sky } from '../world/sky';
-import type { Smoke } from '../world/smoke';
+import type { Dust } from '../world/dust';
 import type { World } from '../world/world';
 import type { Activities, Hooks, Interactions, Keys, Messages, Ticks, Usables, View } from './registry';
 
@@ -87,7 +87,7 @@ export interface Ctx {
   readonly sound: OfficeSound;
   readonly settings: Settings;
   readonly confetti: Confetti;
-  readonly smoke: Smoke;
+  readonly dust: Dust;
   /** The system asks for less motion: no shaking the view, no swaying. */
   readonly reduceMotion: MediaQueryList;
   readonly hud: Hud;
@@ -129,11 +129,8 @@ export interface Ctx {
   readonly interactions: Interactions<OfficeInteraction>;
   /** What what you're doing makes of you and your view each frame (see ViewEffect). */
   readonly view: View<Grip>;
-  /**
-   * What else there is to use on the office's own map, and to aim at: the pictures on the walls, the
-   * dog, the ball (see usable and aimedAt in input/pointer.ts).
-   */
+
   readonly usables: Usables<Interactable, THREE.Object3D>;
-  /** What lets go when a window opens: the shot you were winding up, the emote wheel (see input/focus.ts). */
+
   readonly windowOpened: Hooks;
 }

@@ -2,8 +2,6 @@ import { t as uiText } from '../../shared/i18n';
 import { BALCONY, DANCE_FLOOR, FIRE_PIT, FLOOR, LOFT, MEETING_ROOM, ROOF_BAR, ROOF_TABLES, SEATING_BY_ID, STAGE, WING, inWing, seatAt } from '../../shared/layout';
 import type { PeerInfo } from '../../shared/protocol';
 import { ROOF } from '../../shared/rooftop';
-import { CARS, type CarSeat } from '../../shared/garage';
-import { store } from '../state';
 
 /**
  * What a teammate is up to, for the line under their name tag and in the sidebar: whatever they have
@@ -11,21 +9,17 @@ import { store } from '../state';
  * the balcony", "🛋️ on the couch", "🏎️ driving the Orange Lambo"). Nothing while they're just walking around
  * the office.
  */
-export function whereabouts(p: PeerInfo, car?: { car: number; seat: CarSeat }): string | undefined {
+export function whereabouts(p: PeerInfo): string | undefined {
   if (p.doing) return p.doing;
   // Not standing anywhere: in on the 2D view, from a phone, say.
   if (p.lite) return uiText('📱 on the 2D view');
-  // In one of the garage's cars (see Store.carOf).
-  const def = car && CARS[car.car];
-  if (def) return car.seat === 'driver' ? uiText`🏎️ Driving ${def.name}` : uiText`🏎️ Riding in ${def.name}`;
-  if (p.smoking) return uiText('🚬 on a smoke break');
   if (p.throwing) return p.throwing === 'darts' ? uiText('🎯 playing darts') : uiText('🪓 throwing axes');
   const place = p.seat ? seatAt(p.seat) : undefined;
   const seat = place && SEATING_BY_ID.get(place.seatId);
   if (seat) {
     // "🛋️ Couch" -> "🛋️ on the couch".
     const [icon, ...name] = seat.label.split(' ');
-    return uiText`${icon} ${seat.game ? 'in' : 'on'} the ${name.join(' ').toLowerCase()}`;
+    return uiText`${icon} on the ${name.join(' ').toLowerCase()}`;
   }
   // The roof is the office's size, but none of its rooms are up there.
   if (p.floor === ROOF) return onTheRoof(p);

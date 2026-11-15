@@ -19,11 +19,9 @@ import type { Machine } from '../machine.js';
 import type { Building, FloorDef } from '../building.js';
 import type { Floor } from '../floor.js';
 import type { Sky } from '../sky.js';
-import type { Themes } from '../theme.js';
 import type { OfficePrompts } from '../prompts.js';
 import type { LeaveOnMerge } from '../leave-on-merge.js';
 import type { ChatLog } from '../history.js';
-import type { Arcade, HighScores } from '../cabinet.js';
 import type { AgentProvider, FloorInfo, Me, ServerMsg, ServiceInfo, ServicesState, SignInKind } from '../../shared/protocol.js';
 import type { Client } from './client.js';
 import type { Spot } from './input.js';
@@ -41,9 +39,6 @@ export interface Core {
   clients: Map<string, Client>;
   /** Kept on disk, so a restart doesn't wipe it. */
   chat: ChatLog;
-  /** The arcade's high scores: one table for the whole building, on every floor's cabinet. */
-  highScores: HighScores;
-  arcade: Arcade;
   /** What the office is called where it has no project of its own to go by (webhooks, invites). */
   officeName: string;
   /** The models each provider's own CLI lists, for the ones that list them (see models.ts). */
@@ -56,7 +51,6 @@ export interface Core {
 /** Made once the hook server listens, before any floor opens (office/services.ts). */
 export interface BuildingServices {
   sky: Sky;
-  themes: Themes;
   prompts: OfficePrompts;
   leaveOnMerge: LeaveOnMerge;
   ledger: Ledger;

@@ -262,10 +262,6 @@ export const TV = { x: FLOOR.maxX - 0.1, y: 2.2, z: 0, width: 6.4, height: 3.6 }
  * workers it runs of the most it takes.
  */
 export const MACHINE_MONITOR = { x: FLOOR.minX, y: 2.2, z: -6, width: 2.3, height: 1.3 } as const;
-/** The lounge jukebox, against the east wall south of the TV, facing into the room. `y` is its speaker. */
-export const JUKEBOX = { x: FLOOR.maxX - 0.42, y: 0.75, z: 5.4, width: 1.3, depth: 0.72, height: 1.85 } as const;
-/** The arcade cabinet, against the east wall between the jukebox and the loft, facing into the room. `width` runs along the wall. */
-export const CABINET = { x: FLOOR.maxX - 0.42, z: 7.05, width: 0.8, depth: 0.8, height: 1.9 } as const;
 
 /**
  * The bookshelf of the project's docs (every Markdown file in it, see shared/docs.ts): against the
@@ -368,10 +364,8 @@ export const EXIT_STAIRS = {
 
 /** Glass doors out to the balcony, on the south wall. They slide apart into the wall on either side. */
 export const BALCONY_DOOR: Opening = { wall: 'south', u: -4, width: 3, y0: 0, y1: 2.5 };
-/** The smoking balcony, hanging over the garage entrance. */
+
 export const BALCONY = { minX: -10.5, maxX: 2.5, minZ: FLOOR.maxZ + WALL_T, maxZ: FLOOR.maxZ + WALL_T + 3.4 } as const;
-/** The ashtray on the balcony, where a smoke break starts. */
-export const ASHTRAY = { x: -8.2, z: BALCONY.maxZ - 0.55 } as const;
 /**
  * Leaving a floor above the bottom one, with no exit door: out through the balcony doors to the
  * railing straight ahead (`jump`), up onto its top (`railTop` high), and over it by parachute. The
@@ -433,8 +427,6 @@ export interface SeatDef {
   out: number;
   /** It faces the lounge TV: sitting down there puts whatever's being shared up on your screen. */
   tv?: boolean;
-  /** It faces the boss's monitor: E there, sitting down, plays Minesweeper on it. */
-  game?: boolean;
   /** Up on the rooftop bar, not in the office. */
   roof?: boolean;
   /** At the bar: E there, sitting down, orders a drink. */
@@ -453,7 +445,7 @@ export const SEATING: SeatDef[] = [
   { id: 'lounge-beanbag-2', label: uiText('🫘 Beanbag'), x: 14.5, y: 0, z: -3.4, rotY: Math.atan2(TV.x - 14.5, TV.z + 3.4), places: [0], hips: 0.42, depth: -0.1, out: 1.2 },
   // Up in the boss office: the couch against the east wall, and the chair at the big desk, facing the glass.
   { id: 'loft-couch', label: uiText('🛋️ Couch'), x: LOFT.maxX - 0.65, y: LOFT.y, z: (LOFT.minZ + LOFT.maxZ) / 2, rotY: -Math.PI / 2, places: [-0.5, 0.5], hips: 0.5, depth: -0.05, out: 0.9 },
-  { id: 'boss-chair', label: uiText("🪑 Boss's chair"), x: (LOFT.minX + LOFT.maxX) / 2 + 0.5, y: LOFT.y, z: (LOFT.minZ + LOFT.maxZ) / 2 + 0.7, rotY: Math.PI, places: [0], hips: 0.62, depth: -0.05, out: -0.8, game: true },
+  { id: 'boss-chair', label: uiText("🪑 Boss's chair"), x: (LOFT.minX + LOFT.maxX) / 2 + 0.5, y: LOFT.y, z: (LOFT.minZ + LOFT.maxZ) / 2 + 0.7, rotY: Math.PI, places: [0], hips: 0.62, depth: -0.05, out: -0.8 },
   // Out on the balcony: the bench under the window, looking out over the street, and a stool either side of the bistro table.
   { id: 'bench', label: uiText('🪑 Bench'), x: -9, y: 0, z: BALCONY.minZ + 0.3, rotY: 0, places: [-0.5, 0.5], hips: 0.47, depth: 0, out: 0.8 },
   { id: 'stool-1', label: uiText('🪑 Stool'), x: -0.6, y: 0, z: (BALCONY.minZ + BALCONY.maxZ) / 2 + 0.2, rotY: Math.PI / 2, places: [0], hips: 0.5, depth: 0, out: -0.7 },

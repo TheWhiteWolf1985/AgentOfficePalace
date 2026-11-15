@@ -4,8 +4,6 @@ import { readdirSync } from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { EMPTY_PLAN } from '../src/shared/floorplan.js';
-import { parked } from '../src/shared/garage.js';
-import { JUKEBOX_TUNES } from '../src/shared/jukebox.js';
 import type { ServerMsg } from '../src/shared/protocol.js';
 
 // The store keeps the floor you're on in localStorage and times things by performance.now(): stand both
@@ -38,12 +36,8 @@ function floorView(floor: string) {
     decor: [],
     plan: { labels: {}, wing: 1 },
     services: { items: [], port: 4600 },
-    dog: { name: 'Rex', coat: 0, breed: 'lab', path: [[0, 0]], speed: 1, elapsed: 100 },
-    jukebox: { on: true, track: 'lofi', startedAt: 5000, elapsed: 300 },
-    cabinet: { player: null, scores: [], frame: null },
     whiteboard: { elements: [el('e1', 1)], people: [] },
     meeting: { current: null, past: [] },
-    cars: [{ x: 0, z: 0, rotY: 0, speed: 0, steer: 0, driver: 'p-b' }],
   };
 }
 
@@ -64,22 +58,21 @@ const welcome = () =>
     notify: {},
     machine: { cpu: 0, cores: 1, memUsed: 0, memTotal: 1, history: [], workers: 1 },
     sky: { hour: 1 },
-    theme: { pick: 'auto', active: null },
     prompts: { custom: {} },
     leaveOnMerge: { on: false },
     ...floorView('f1'),
   });
 
 /** What a floor you arrive on fires, in order. */
-const FLOOR_TOPICS = ['floor', 'project', 'workers', 'issues', 'pulls', 'queue', 'meeting', 'decor', 'floorPlan', 'services', 'dog', 'jukebox', 'whiteboard', 'drawing', 'cabinet', 'cabinetFrame', 'cars'];
+const FLOOR_TOPICS = ['floor', 'project', 'workers', 'issues', 'pulls', 'queue', 'meeting', 'decor', 'floorPlan', 'services', 'whiteboard', 'drawing'];
 
 /** Every topic, to listen for them all. */
-const TOPICS = ['peers', 'workers', 'issues', 'pulls', 'chat', 'project', 'screens', 'team', 'upgrade', 'services', 'decor', 'floorPlan', 'usage', 'limits', 'queue', 'me', 'accounts', 'signins', 'notify', 'machine', 'floors', 'floor', 'projectsDir', 'repos', 'dog', 'jukebox', 'sky', 'theme', 'leaveOnMerge', 'whiteboard', 'drawing', 'cabinet', 'cabinetFrame', 'meeting', 'prompts', 'cars'] as const;
+const TOPICS = ['peers', 'workers', 'issues', 'pulls', 'chat', 'project', 'screens', 'team', 'upgrade', 'services', 'decor', 'floorPlan', 'usage', 'limits', 'queue', 'me', 'accounts', 'signins', 'notify', 'machine', 'floors', 'floor', 'projectsDir', 'repos', 'sky', 'leaveOnMerge', 'whiteboard', 'drawing', 'meeting', 'prompts'] as const;
 
 /** Every message the store takes in (and one it doesn't), and the topics it fires, in the order it has always fired them. */
 const RUN: [ServerMsg, string[]][] = [
-  [welcome(), [...FLOOR_TOPICS, 'peers', 'chat', 'upgrade', 'usage', 'limits', 'me', 'notify', 'machine', 'floors', 'projectsDir', 'sky', 'theme', 'prompts', 'leaveOnMerge']],
-  [msg({ t: 'pong', at: 0, now: 1_000_000 }), ['jukebox']],
+  [welcome(), [...FLOOR_TOPICS, 'peers', 'chat', 'upgrade', 'usage', 'limits', 'me', 'notify', 'machine', 'floors', 'projectsDir', 'sky', 'prompts', 'leaveOnMerge']],
+  [msg({ t: 'pong', at: 0, now: 1_000_000 }), []],
   [msg({ t: 'pong', at: -1e6, now: 1_000_000 }), []],
   [msg({ t: 'floors', floors: [{ id: 'f1', name: 'f1' }] }), ['floors']],
   [msg({ t: 'projectsDir', state: { dir: '~/q', custom: true } }), ['projectsDir']],
@@ -101,9 +94,6 @@ const RUN: [ServerMsg, string[]][] = [
   [msg({ t: 'services', state: { items: [], port: 1 } }), ['services']],
   [msg({ t: 'decor', items: [] }), ['decor']],
   [msg({ t: 'plan', plan: { labels: {}, wing: 2 } }), ['floorPlan']],
-  [msg({ t: 'jukebox', state: { on: false, track: 'lofi', startedAt: 0, elapsed: 0 } }), ['jukebox']],
-  [msg({ t: 'cabinet', state: { player: { id: 'p-b' }, scores: [] } }), ['cabinet']],
-  [msg({ t: 'cabinet.frame', frame: { board: [] } }), ['cabinetFrame']],
   [msg({ t: 'wb.update', elements: [el('e2', 1)] }), ['whiteboard']],
   [msg({ t: 'wb.update', elements: [el('e2', 0)] }), []],
   [msg({ t: 'wb.people', people: ['p-a'] }), ['drawing']],
@@ -113,11 +103,7 @@ const RUN: [ServerMsg, string[]][] = [
   [msg({ t: 'meeting', state: { current: null, past: [] } }), ['meeting']],
   [msg({ t: 'notify', state: {} }), ['notify']],
   [msg({ t: 'machine', state: {} }), ['machine']],
-  [msg({ t: 'dog', dog: null }), ['dog']],
-  [msg({ t: 'cars', cars: [{ x: 0, z: 0, rotY: 0, speed: 0, steer: 0 }] }), ['cars']],
-  [msg({ t: 'car.move', car: 0, x: 1, z: 1, rotY: 0, speed: 1, steer: 0 }), []],
   [msg({ t: 'sky', state: { hour: 2 } }), ['sky']],
-  [msg({ t: 'theme', state: { pick: 'none', active: null } }), ['theme']],
   [msg({ t: 'prompts', state: { custom: {} } }), ['prompts']],
   [msg({ t: 'leaveOnMerge', state: { on: true } }), ['leaveOnMerge']],
   [msg({ t: 'chat', name: 'A', color: '#fff', text: 'hi', at: 1 }), ['chat']],
@@ -141,7 +127,6 @@ test('each message leaves the fields it always has', () => {
   assert.equal(store.you, 'p-a');
   assert.equal(store.floor, 'f1');
   assert.deepEqual([...store.workers.keys()], ['f1-w1']);
-  assert.equal(store.carOf('p-b')?.seat, 'driver');
   assert.equal(storage.get('agent-office.floor'), 'f1');
   // A screen that changes size starts over.
   store.apply(msg({ t: 'screen', workerId: 'f1-w1', cols: 80, rows: 24, lines: { 1: [['a', 1, -1, 0]] }, full: true, cursor: [1, 1] }));
@@ -150,13 +135,6 @@ test('each message leaves the fields it always has', () => {
   store.apply(msg({ t: 'screen', workerId: 'f1-w1', cols: 90, rows: 24, lines: {}, full: false, cursor: [0, 0] }));
   assert.equal(store.screens.get('f1-w1')!.version, 5);
   assert.equal(store.screens.get('f1-w1')!.lines.length, 0);
-  // Somebody else at the cabinet: the last game's screen goes.
-  store.apply(msg({ t: 'cabinet', state: { player: { id: 'p-a' }, scores: [] } }));
-  store.apply(msg({ t: 'cabinet.frame', frame: { board: [1] } }));
-  store.apply(msg({ t: 'cabinet', state: { player: { id: 'p-a' }, scores: [1] } }));
-  assert.deepEqual(store.cabinetFrame, { board: [1] });
-  store.apply(msg({ t: 'cabinet', state: { player: { id: 'p-b' }, scores: [] } }));
-  assert.equal(store.cabinetFrame, null);
   // An old browser's map notification cannot change the office or unset seats.
   store.apply(msg({ t: 'map', state: { pick: 'castle', custom: [] } }));
   assert.equal(store.peers.get('p-a')!.seat, 's1');
@@ -169,20 +147,17 @@ test('each message leaves the fields it always has', () => {
   store.apply(msg({ t: 'pong', at: clock, now: 5_000_000 }));
   const now = store.officeNow();
   assert.ok(now > 5_000_000 && now < 5_001_000, String(now));
-  // A car that isn't there doesn't move.
-  store.apply(msg({ t: 'car.move', car: 5, x: 1, z: 1, rotY: 0, speed: 1, steer: 0 }));
-  assert.equal(store.cars.length, 1);
 });
 
 test('floor listeners see the complete new floor and worker removal is atomic', () => {
   store.apply(welcome());
   const seen: Record<string, unknown> = {};
   const offs = [
-    store.on('floor', () => (seen.floor = { peers: [...store.peers.keys()], cars: store.cars.length, workers: [...store.workers.keys()] })),
+    store.on('floor', () => (seen.floor = { peers: [...store.peers.keys()], workers: [...store.workers.keys()] })),
     store.on('workers', () => (seen.workers = [...store.workers.keys()])),
   ];
   store.apply(msg({ t: 'floor.enter', peers: [peer('p-z', { floor: 'f2' })], ...floorView('f2') }));
-  assert.deepEqual(seen.floor, { peers: ['p-z'], cars: 1, workers: ['f2-w1'] });
+  assert.deepEqual(seen.floor, { peers: ['p-z'], workers: ['f2-w1'] });
   store.apply(msg({ t: 'worker.remove', workerId: 'f2-w1' }));
   assert.deepEqual(seen.workers, []);
   for (const off of offs) off();
@@ -210,7 +185,7 @@ test('what the browser remembers keeps its keys and shapes', () => {
 
 test("the store's keys are its state, as window.__office shows them", () => {
   // As the office had them before its store was split into slices: methods and the slices aren't among them.
-  assert.deepEqual(Object.keys(store).sort(), ['accounts', 'cabinet', 'cabinetFrame', 'cars', 'carsAt', 'chat', 'clock', 'decor', 'dog', 'dogStart', 'drawing', 'floor', 'floorPlan', 'floors', 'ice', 'invites', 'issues', 'jukebox', 'leaveOnMerge', 'limits', 'machine', 'me', 'meeting', 'notify', 'peers', 'profile', 'project', 'projectsDir', 'prompts', 'pulls', 'queue', 'repos', 'screens', 'services', 'signins', 'sky', 'subs', 'team', 'theme', 'upgrade', 'usage', 'whiteboard', 'workers', 'you']);
+  assert.deepEqual(Object.keys(store).sort(), ['accounts', 'chat', 'clock', 'decor', 'drawing', 'floor', 'floorPlan', 'floors', 'ice', 'invites', 'issues', 'leaveOnMerge', 'limits', 'machine', 'me', 'meeting', 'notify', 'peers', 'profile', 'project', 'projectsDir', 'prompts', 'pulls', 'queue', 'repos', 'screens', 'services', 'signins', 'sky', 'subs', 'team', 'upgrade', 'usage', 'whiteboard', 'workers', 'you']);
 });
 
 test('a new store starts every field where it always has', async () => {
@@ -229,11 +204,10 @@ test('a new store starts every field where it always has', async () => {
       upgrade: { available: false, phase: 'idle' },
       usage: { total: { input: 0, output: 0, cacheWrite: 0, cacheRead: 0, cost: 0, calls: 0 }, today: { input: 0, output: 0, cacheWrite: 0, cacheRead: 0, cost: 0, calls: 0 }, day: '', pauseHiring: false },
       limits: { windows: [], at: 0 }, notify: {}, machine: { cpu: 0, cores: 0, memUsed: 0, memTotal: 0, history: [], workers: 0 },
-      sky: null, theme: { pick: 'auto', active: null }, prompts: { custom: {} }, leaveOnMerge: { on: false },
+      sky: null, prompts: { custom: {} }, leaveOnMerge: { on: false },
       meeting: { current: null, past: [] }, decor: [], floorPlan: EMPTY_PLAN, services: { items: [], port: 4600 },
-      dog: null, dogStart: 0, jukebox: { on: false, track: JUKEBOX_TUNES[0].id, startedAt: 0, elapsed: 0, since: 0 }, clock: '<undefined>',
-      whiteboard: [], drawing: [], cabinet: { player: null, scores: [] }, cabinetFrame: null,
-      cars: parked(), carsAt: [],
+      clock: '<undefined>',
+      whiteboard: [], drawing: [],
       team: null, accounts: null, signins: null,
     },
   );
@@ -279,7 +253,7 @@ test('retired layouts reset only the position, preserving profile and settings',
   const spot = { floor: 'f1', name: 'Project', x: 1, y: 0, z: 3, facing: 0 };
   state.saveProfile({ name: 'Kept', color: '#123456' });
   state.saveSettings({ ...state.loadSettings(), view: 'third', volume: 0.3 });
-  for (const legacy of [{ map: 'castle' }, { map: 'station' }, { map: 'custom-hall' }, { throne: true }]) {
+  for (const legacy of [{ map: 'castle' }, { map: 'station' }, { map: 'custom-hall' }, { throne: true }, { x: 196, z: 372 }, { x: -222, z: 224 }]) {
     storage.set('agent-office.spot', JSON.stringify({ ...spot, ...legacy }));
     assert.equal(state.lastSpot(), null);
   }
@@ -288,8 +262,10 @@ test('retired layouts reset only the position, preserving profile and settings',
     assert.deepEqual(state.lastSpot(), spot);
   }
   storage.set('agent-office.golf', 'obsolete score');
+  storage.set('agent-office.bestLap', 'obsolete lap');
   assert.equal(state.loadSettings().view, 'third');
   assert.equal(state.loadSettings().volume, 0.3);
   assert.equal(storage.has('agent-office.golf'), false);
+  assert.equal(storage.has('agent-office.bestLap'), false);
   assert.equal(state.loadProfile()?.name, 'Kept');
 });

@@ -1,5 +1,5 @@
 import { t as uiText } from '../../../shared/i18n';
-/** Workers, their laptops, seats and normal arrivals/departures, plus holiday decorations and spending. */
+
 import * as THREE from 'three';
 import { FLOOR, WING, beanbagsOut, deskBuilt, vacantSeats, wingMinZ, wingRowZ } from '../../../shared/layout';
 import { MEETING_PATTERNS } from '../../../shared/meetings';
@@ -11,7 +11,6 @@ import { pastTheWing, seatBuilt } from '../../core/floors';
 import { aside, hintTitle, key, onE } from '../../core/hint';
 import { noOutline } from '../../core/outline';
 import type { Parts } from '../../core/parts';
-import { waitingInOrder } from '../../nextup';
 import { waitingOnSomeone } from '../../notify';
 import { renderTitle } from '../../shared/title';
 import { store } from '../../state';
@@ -44,15 +43,14 @@ export interface WorkerView {
 const HOLD_NEAR = 4;
 const HOLD_LEAVE = 5;
 
-export type WorkerViewsParts = Pick<Parts, 'stage' | 'worlds' | 'travel' | 'rooftop' | 'cabinet' | 'notifier' | 'waiting' | 'dog' | 'peers'>;
+export type WorkerViewsParts = Pick<Parts, 'stage' | 'worlds' | 'travel' | 'rooftop' | 'notifier' | 'waiting' | 'peers'>;
 
 /**
  * Registers what follows the workers, the jail, the floor plan, the meeting, the pull requests and
  * the queue, the theme, and what's been spent (see the order below), and the workers' own tick.
  */
 export function installWorkerViews(ctx: Ctx, core: CoreState, parts: WorkerViewsParts) {
-  const { scene, sound, player, camera, office, sky, confetti, hands, me, net } = ctx;
-  const { holiday } = parts.stage;
+  const { scene, sound, player, camera, office, sky, confetti, net } = ctx;
   const { plan, groundHere, officeWing, inOffice } = parts.worlds;
 
   const workerViews = new Map<string, WorkerView>();
@@ -91,7 +89,6 @@ export function installWorkerViews(ctx: Ctx, core: CoreState, parts: WorkerViews
       if (!v) {
         departures.vacate(w.deskId);
         const model = new Worker(w.name, w.color);
-        model.setCostume(store.theme.active);
         desk.seatAnchor.add(model.root);
         // Its globe floats beside the laptop (or the kiosk's counter), out from behind the card over
         // its head and the back of its chair, so it shows from across the room.
@@ -113,7 +110,6 @@ export function installWorkerViews(ctx: Ctx, core: CoreState, parts: WorkerViews
           if (w.status === 'done') sound.ding('done');
           parts.notifier.alert(w);
           // Playing at the arcade: one of yours stops the game.
-          if (w.status === 'needs_input' && yours(w)) parts.cabinet.needsYou(w);
         }
         // Finished what it was on: a little spin and a puff of confetti.
         if (w.status === 'done' && (v.status === 'working' || v.status === 'needs_input')) {
@@ -156,12 +152,6 @@ export function installWorkerViews(ctx: Ctx, core: CoreState, parts: WorkerViews
     parts.waiting.renderWaiting();
     parts.notifier.sync(store.workers);
     renderTitle();
-  }
-
-  /** Hired by you (at a desk, or through the queue), or last given something to do by you. */
-  function yours(w: WorkerInfo): boolean {
-    const name = store.peers.get(store.you)?.name ?? store.profile.name;
-    return w.createdBy === name || w.createdBy === `${name} (queue)` || w.lastInput?.by === name;
   }
 
   /**
@@ -267,22 +257,6 @@ export function installWorkerViews(ctx: Ctx, core: CoreState, parts: WorkerViews
   store.on('queue', paintPrs);
   store.on('workers', renderUsage);
 
-  /**
-   * Dresses the building up for the holiday it's set to (⚙️ Settings), or takes it all down: the sky and
-   * the decorations, the dog, your hands and your character, everyone else, and every worker.
-   */
-  function dressUp() {
-    const theme = store.theme.active;
-    holiday.set(theme);
-    sky.setTheme(theme);
-    parts.dog.setCostume(theme);
-    hands.setCostume(theme);
-    me.setCostume(theme);
-    for (const r of parts.peers.remotes.values()) r.person.setCostume(theme);
-    for (const v of workerViews.values()) v.model.setCostume(theme);
-    for (const a of parts.worlds.idleAgents()) a.model.setCostume(theme);
-  }
-  store.on('theme', dressUp);
   store.on('usage', renderUsage);
   store.on('limits', renderLimits);
   // The reset countdowns tick down between reads.
@@ -310,7 +284,6 @@ export function installWorkerViews(ctx: Ctx, core: CoreState, parts: WorkerViews
     },
     syncWorkers,
     syncPlan,
-    dressUp,
     burstOver,
   };
 }

@@ -12,13 +12,13 @@ import type { Parts } from './parts';
 import { Activities, Hooks, Interactions, Keys, Messages, Ticks, Usables, View } from './registry';
 
 /** What you can be in the middle of, in the order it gets keys, has the hint bar and stops in (see Activities). */
-const ACTIVITY_ORDER = ['hanger', 'climber', 'thrower', 'driver'];
+const ACTIVITY_ORDER = ['hanger', 'climber', 'thrower'];
 
 /** The office's own state: what the ctx hands out about where you are and what you hold, and what its own parts keep between frames. */
 export interface CoreState {
   /** What the hint bar last drew (see renderHint in core/hintbar.ts): anything else has it draw again. */
   hintKey: string;
-  /** How hard the view shakes (a landing off a pole, a bump in a car, a hiccup), easing off to 0. */
+  /** How hard the view shakes (a landing off a pole, a hiccup), easing off to 0. */
   thud: number;
   /** The issue card in your hands, taken off this floor's issues board (see features/carrying), or null. */
   carrying: CarriedIssue | null;
@@ -77,8 +77,8 @@ export function createCtx(parts: Parts): { ctx: Ctx; core: CoreState } {
     get confetti() {
       return parts.confetti;
     },
-    get smoke() {
-      return parts.smoke;
+    get dust() {
+      return parts.dust;
     },
     get reduceMotion() {
       return parts.reduceMotion;

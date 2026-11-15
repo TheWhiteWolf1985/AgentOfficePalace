@@ -10,12 +10,9 @@
 import type { Slice } from '../store';
 import { building, floor, me, presence } from '../core';
 import { accounts } from './accounts';
-import { cabinet } from './cabinet';
-import { cars } from './cars';
+import { clock } from './clock';
 import { decor } from './decor';
-import { dog } from './dog';
 import { floorPlan } from './floor-plan';
-import { jukebox } from './jukebox';
 import { leaveOnMerge } from './leave-on-merge';
 import { machine } from './machine';
 import { meeting } from './meeting';
@@ -25,7 +22,6 @@ import { services } from './services';
 import { signins } from './signins';
 import { sky } from './sky';
 import { team } from './team';
-import { theme } from './theme';
 import { upgrade } from './upgrade';
 import { usage } from './usage';
 import { whiteboard } from './whiteboard';
@@ -39,7 +35,7 @@ export const SLICES: readonly Slice[] = [
   machine,
   building,
   sky,
-  theme,
+  clock,
   prompts,
   leaveOnMerge,
   floor,
@@ -47,11 +43,7 @@ export const SLICES: readonly Slice[] = [
   decor,
   floorPlan,
   services,
-  dog,
-  jukebox,
   whiteboard,
-  cabinet,
-  cars,
   team,
   accounts,
   signins,

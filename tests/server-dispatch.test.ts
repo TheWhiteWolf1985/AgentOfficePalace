@@ -98,7 +98,7 @@ class Browser {
   async next(n: number, ms = 5000): Promise<string[]> {
     const until = Date.now() + ms;
     for (;;) {
-      const got = this.inbox.filter((m) => m.t !== 'floors' && m.t !== 'dog');
+      const got = this.inbox.filter((m) => m.t !== 'floors');
       if (got.length >= n) {
         this.inbox = [];
         return got.slice(0, n).map((m) => m.t);
@@ -273,7 +273,7 @@ test('welcomes a browser and dispatches what it sends', async () => {
   assert.equal(ada?.name, 'Ada');
   assert.equal(ada?.color, '#ff8a5b');
   assert.equal(ada?.floor, floor.id);
-  assert.deepEqual(Object.keys(welcome).slice(-15), ['floor', 'project', 'workers', 'issues', 'pulls', 'queue', 'decor', 'plan', 'services', 'dog', 'cars', 'jukebox', 'whiteboard', 'meeting', 'cabinet']);
+  assert.deepEqual(Object.keys(welcome).slice(-11), ['floor', 'project', 'workers', 'issues', 'pulls', 'queue', 'decor', 'plan', 'services', 'whiteboard', 'meeting']);
 
   a.send({ t: 'ping', at: 42 });
   const pong = await a.take('pong');
@@ -339,15 +339,6 @@ test('the toys on a floor, and letting go of them on leaving the floor or the of
   await b.take('welcome');
   await a.take('peer.join');
 
-  a.send({ t: 'jukebox.skip' });
-  assert.equal((await b.take('jukebox')).state.on, true);
-  assert.match((await b.take('toast', (m) => m.text.startsWith('⏭️'))).text, /^⏭️ Cy skipped to “.+”$/);
-  a.send({ t: 'jukebox.stop' });
-  assert.equal((await b.take('jukebox')).state.on, false);
-  assert.equal((await b.take('toast', (m) => m.text.startsWith('🔇'))).text, '🔇 Cy turned the jukebox off');
-  a.send({ t: 'dog.name', name: 'Rex' });
-  assert.equal((await b.take('toast', (m) => m.text.startsWith('🐶'))).text, '🐶 Cy named the dog Rex');
-
   // The gong once, not twice in a row; no air horn off the roof.
   a.send({ t: 'gong' });
   a.send({ t: 'gong' });
@@ -363,25 +354,20 @@ test('the toys on a floor, and letting go of them on leaving the floor or the of
 
   const holdEverything = async () => {
     a.send({ t: 'wb.open' });
-    a.send({ t: 'car.enter', car: 0, seat: 'driver' });
-    await a.take('cars', (m) => m.answer === true);
-    await b.take('cars');
-    a.send({ t: 'cabinet.play' });
-    assert.equal((await b.take('cabinet')).state.player?.id, cy);
     await b.drain();
   };
   await holdEverything();
-  // Up to the roof: the floor sees the arcade free up, Cy go, and then the whiteboard and the car.
+  // Up to the roof: the floor sees Cy go, then the whiteboard is released.
   a.send({ t: 'floor.go', floor: '@roof' });
   assert.equal((await a.take('floor.enter')).floor, '@roof');
-  assert.deepEqual(await b.next(4), ['cabinet', 'peer.update', 'wb.people', 'cars']);
+  assert.deepEqual(await b.next(2), ['peer.update', 'wb.people']);
 
   a.send({ t: 'floor.go', floor: floor.id });
   assert.equal((await a.take('floor.enter')).floor, floor.id);
   await holdEverything();
-  // Out of the office: the whiteboard, the arcade and the car, then Cy's gone.
+  // Out of the office: release the whiteboard, then remove Cy's presence.
   await a.close();
-  assert.deepEqual(await b.next(4), ['wb.people', 'cabinet', 'cars', 'peer.leave']);
+  assert.deepEqual(await b.next(2), ['wb.people', 'peer.leave']);
   await b.close();
 });
 
@@ -391,15 +377,11 @@ test('settings, accounts, sign-ins and the boards answer as before', async () =>
   const warned = async (text: string) => assert.equal((await a.take('toast', (m) => m.level === 'warn')).text, text);
   const told = async (start: string) => (await a.take('toast', (m) => m.level === 'info' && m.text.startsWith(start))).text;
 
-  a.send({ t: 'theme.set', pick: 'nope' });
-  a.send({ t: 'theme.set', pick: 'off' });
-  assert.equal((await a.take('theme')).state.pick, 'off');
-  assert.equal(await told('Eve took'), 'Eve took the holiday decorations down');
   // Stale clients cannot re-enable removed features; the next valid request still answers.
-  for (const legacy of [{ t: 'map.set', map: 'castle' }, { t: 'ball.take' }, { t: 'golf', power: 1 }]) a.send(legacy as never);
+  for (const legacy of [{ t: 'map.set', map: 'castle' }, { t: 'ball.take' }, { t: 'golf', power: 1 }, { t: 'theme.set', pick: 'halloween' }, { t: 'dog.name', name: 'Rex' }, { t: 'jukebox.play' }, { t: 'cabinet.play' }, { t: 'car.enter', car: 0 }, { t: 'emote', emote: 'wave' }]) a.send(legacy as never);
   a.send({ t: 'ping', at: 123 });
   assert.equal((await a.take('pong')).at, 123);
-  assert.equal((await a.drain()).some((m) => ['map', 'ball', 'golf'].includes(m.t)), false);
+  assert.equal((await a.drain()).some((m) => ['map', 'ball', 'golf', 'theme', 'dog', 'jukebox', 'cabinet', 'cars', 'peer.emote'].includes(m.t)), false);
   a.send({ t: 'machine.limit', limit: 0 });
   await warned('The worker limit is a whole number from 1 to 500');
   a.send({ t: 'machine.limit', limit: 3 });

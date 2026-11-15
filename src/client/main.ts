@@ -21,7 +21,7 @@ import { createScene, fitWindow, installSky, makeRenderer, noWebGL } from './cor
 import { createWorlds } from './core/worlds';
 import { frameLoop, installLoop } from './core/loop';
 import { installPlace } from './core/place';
-import { installYou, makeMe, makeSmoke, makeSound } from './core/you';
+import { installYou, makeMe, makeDust, makeSound } from './core/you';
 import { installTravel } from './core/travel';
 import { installArrival } from './core/arrival';
 import { installFloorStatus } from './core/floor-status';
@@ -29,33 +29,24 @@ import { installHintBar } from './core/hintbar';
 import { installKeyboard, installKeyGuards } from './input/keyboard';
 import { installFocus } from './input/focus';
 import { installPointer } from './input/pointer';
-import { installArcade } from './features/arcade';
 import { installBar } from './features/bar';
 import { installBarGames } from './features/bargames';
 import { installBoards } from './features/boards';
 import { installBookshelf } from './features/bookshelf';
-import { installCabinet } from './features/cabinet';
 import { installCarrying } from './features/carrying';
-import { installCars } from './features/cars';
 import { installChat } from './features/chat';
 import { installClimbing } from './features/climbing';
-import { installCoffee } from './features/coffee';
 import { installDictation } from './features/dictation';
-import { installDog } from './features/dog';
-import { installEmotes } from './features/emotes';
 import { installGong } from './features/gong';
 import { installGallery, installHanging } from './features/hanging';
 import { installHud } from './features/hud';
-import { installJukebox } from './features/jukebox';
 import { installMeeting } from './features/meeting';
 import { installNeedsYou } from './features/needsyou';
 import { installPalette } from './features/palette';
 import { installPeers } from './features/peers';
 import { installRooftop } from './features/rooftop';
 import { installSeating } from './features/seating';
-import { installSmoke } from './features/smoke';
 import { installLamplight } from './features/lamplight';
-import { installTelescope } from './features/telescope';
 import { installTv } from './features/tv';
 import { installVoice } from './features/voice';
 import { installWaiting } from './features/waiting';
@@ -100,7 +91,6 @@ installWhiteboard(ctx);
 parts.confetti = new Confetti((x, z, y) => groundAt(ctx.player.colliders, x, z, y, false));
 ctx.scene.add(parts.confetti.mesh);
 parts.tv = installTv(ctx, { shares: () => parts.talk.currentShares(), watch: () => parts.talk.watchShare() });
-parts.arcade = installArcade(ctx);
 parts.rooftop = installRooftop(ctx, { ambient: parts.stage.ambient, hemi: parts.stage.hemi });
 
 // You, and how you talk to the office.
@@ -109,7 +99,6 @@ parts.voice = new Voice(parts.net);
 parts.me = makeMe(ctx);
 parts.settings = loadSettings();
 parts.player = new PlayerController(ctx.camera, canvas, ctx.office.colliders);
-parts.telescope = installTelescope(ctx, { clearTarget: () => parts.pointer.clearTarget(), backToGame: () => parts.focus.backToGame() });
 installKeyGuards(ctx, parts);
 parts.place = installPlace(ctx, core, parts);
 // Everyone arrives by elevator (the welcome says exactly where).
@@ -118,12 +107,9 @@ parts.player.view = parts.settings.view;
 parts.hands = new Hands(store.profile.color, parts.me.skinColor);
 parts.you = installYou(ctx);
 parts.reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-({ smoke: parts.smoke, puff: parts.puff } = makeSmoke(ctx));
+parts.dust = makeDust(ctx);
 parts.sound = makeSound(parts.settings);
 
-parts.dog = installDog(ctx);
-parts.jukebox = installJukebox(ctx, { showSettings: (pane) => parts.hud.showSettings(pane) });
-parts.cabinet = installCabinet(ctx, { openTerminal: (id) => parts.waiting.openWorkerTerminal(id) });
 parts.notifier = new DesktopNotifier(() => parts.settings.notify, (id) => parts.waiting.answerWorker(id));
 const standUp = () => parts.seating.standUp();
 const stopWalking = () => parts.walking.stopWalkingTo();
@@ -132,7 +118,6 @@ const reach = () => parts.you.reach();
 parts.bargames = installBarGames(ctx, { roof: parts.rooftop.roof, standUp, stopWalking, personOf });
 parts.hanging = installHanging(ctx, { gallery: parts.gallery, reach });
 parts.climbing = installClimbing(ctx, { travel: (floorId, how, at) => parts.travel.travel(floorId, how, at), standUp, stopWalking });
-parts.cars = installCars(ctx, { standUp, stopWalking });
 
 parts.travel = installTravel(ctx, core, parts);
 parts.arrival = installArrival(ctx, core, parts);
@@ -148,8 +133,6 @@ parts.meeting = installMeeting(ctx, parts);
 parts.bookshelf = installBookshelf(ctx);
 
 parts.bar = installBar(ctx, { roof: parts.rooftop.roof, djAt: parts.rooftop.djAt, reach });
-parts.coffee = installCoffee(ctx);
-parts.smoking = installSmoke(ctx);
 installLamplight(ctx, parts);
 parts.cards = installCarrying(ctx, {
   hold: (card) => void (core.carrying = card),
@@ -160,11 +143,10 @@ parts.cards = installCarrying(ctx, {
   officeIsFull: parts.actions.officeIsFull,
   showMeeting: parts.meeting.showMeeting,
 });
-parts.seating = installSeating(ctx, { shares: () => parts.talk.currentShares(), watchShare: () => parts.talk.watchShare(), arcade: parts.arcade, showBar: parts.bar.showBar, usable: () => parts.pointer.usable() });
+parts.seating = installSeating(ctx, { shares: () => parts.talk.currentShares(), watchShare: () => parts.talk.watchShare(), showBar: parts.bar.showBar, usable: () => parts.pointer.usable() });
 installGong(ctx, { burstOver: parts.views.burstOver, workerViews: parts.views.workerViews, idleAgents: () => parts.worlds.idleAgents() });
 
 parts.hintbar = installHintBar(ctx, core, parts);
-parts.emotes = installEmotes(ctx, { personOf });
 installKeyboard(ctx, parts);
 parts.focus = installFocus(ctx, core, parts);
 parts.pointer = installPointer(ctx, core, parts);
@@ -204,7 +186,7 @@ void whoami().then(() => {
     store.profile = { ...saved, look: saved.look };
     parts.you.showMyProfile(store.profile);
     boot();
-    // In as soon as the floor you're on is here with its dog, so the dog doesn't pop in after.
+    // In as soon as the floor you're on is here is ready.
     const welcomed = new Promise<void>((resolve) => {
       const off = store.on('floor', () => {
         off();
@@ -213,7 +195,6 @@ void whoami().then(() => {
     });
     loading.until([
       { say: uiText('Knocking on the door'), done: welcomed },
-      { say: uiText('Fetching the dog'), done: parts.dog.firstReady },
     ]);
   } else {
     // Pick a character first (people from before there was a choice keep their name and color).
@@ -230,8 +211,8 @@ void whoami().then(() => {
 });
 
 // Debug handle for quick checks from the console / headless screenshots.
-const { worlds, views, rooftop, bar, coffee, bargames, hanging, climbing, cars, emotes } = parts;
-(window as any).__office = { world: () => worlds.world(), plan: worlds.plan, roof: rooftop.roof, booze: bar.booze, dj: () => djFrame(rooftop.djAt()), store, player: parts.player, caffeine: coffee.caffeine, camera: ctx.camera, arcade: parts.arcade, cabinet: parts.cabinet, workerViews: views.workerViews, departures: views.departures, arrivals: views.arrivals, scene: ctx.scene, net: parts.net, renderer: ctx.renderer, hands: parts.hands, me: parts.me, remotes: parts.peers.remotes, settings: parts.settings, gallery: parts.gallery, hanger: hanging.hanger, office: ctx.office, ride: parts.travel.ride, switchFloor: parts.travel.switchFloor, climber: climbing.climber, driver: cars.driver, getIn: cars.getIn, getOut: cars.getOut, thrower: bargames.thrower, elevatorPanelOpen, confetti: parts.confetti, dog: parts.dog, sky: ctx.sky, holiday: parts.stage.holiday, carried: () => core.carrying, emoteWheel: emotes.emoteWheel, emote: emotes.emote };
+const { worlds, views, rooftop, bar, bargames, hanging, climbing } = parts;
+(window as any).__office = { world: () => worlds.world(), plan: worlds.plan, roof: rooftop.roof, booze: bar.booze, dj: () => djFrame(rooftop.djAt()), store, player: parts.player, camera: ctx.camera, workerViews: views.workerViews, departures: views.departures, arrivals: views.arrivals, scene: ctx.scene, net: parts.net, renderer: ctx.renderer, hands: parts.hands, me: parts.me, remotes: parts.peers.remotes, settings: parts.settings, gallery: parts.gallery, hanger: hanging.hanger, office: ctx.office, ride: parts.travel.ride, switchFloor: parts.travel.switchFloor, climber: climbing.climber, thrower: bargames.thrower, elevatorPanelOpen, confetti: parts.confetti, sky: ctx.sky, carried: () => core.carrying };
 (window as any).__voice = parts.voice;
 (window as any).__sound = parts.sound;
 (window as any).__notify = parts.notifier;

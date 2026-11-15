@@ -1,3 +1,4 @@
+import { onGrounds } from '../../shared/ground.js';
 // Coercing what a browser sends into what the office works with: a message's fields are whatever
 // the page (or anyone else) put there, so every one is checked before it's used.
 import { MAX_FLOORS } from '../../shared/floors.js';
@@ -21,6 +22,7 @@ export function arrivalSpot(at: unknown): Spot | undefined {
   if (!at || typeof at !== 'object') return undefined;
   const a = at as Record<string, unknown>;
   const clamp = (v: unknown, lo: number, hi: number) => Math.min(hi, Math.max(lo, num(v)));
+  if (!onGrounds(num(a.x), num(a.z))) return undefined;
   // Down on the street from a floor high up, the street is a long way down.
   return { x: clamp(a.x, -60, 60), y: clamp(a.y, streetBelow(MAX_FLOORS - 1), 10), z: clamp(a.z, -60, 60), rotY: num(a.rotY) };
 }
