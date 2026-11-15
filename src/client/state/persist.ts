@@ -94,10 +94,6 @@ export interface Spot {
   floor: string;
   /** What that floor was called, to say so if it's gone by then. */
   name: string;
-  /** The building's map then (see shared/maps): a spot on another map is nowhere on this one. */
-  map?: string;
-  /** Sitting on its throne. */
-  throne?: boolean;
   x: number;
   y: number;
   z: number;
@@ -108,9 +104,11 @@ export interface Spot {
 export function lastSpot(): Spot | null {
   try {
     const s = JSON.parse(localStorage.getItem(SPOT_KEY) ?? 'null');
+    // Positions from retired layouts cannot be restored in the office.
+    if (s && ((s.map !== undefined && s.map !== 'office') || s.throne === true)) return null;
     const finite = (v: unknown) => typeof v === 'number' && Number.isFinite(v);
     if (s && typeof s.floor === 'string' && s.floor && finite(s.x) && finite(s.y) && finite(s.z) && finite(s.facing)) {
-      return { floor: s.floor, name: typeof s.name === 'string' ? s.name : '', ...(typeof s.map === 'string' ? { map: s.map } : {}), ...(s.throne === true ? { throne: true } : {}), x: s.x, y: s.y, z: s.z, facing: s.facing };
+      return { floor: s.floor, name: typeof s.name === 'string' ? s.name : '', x: s.x, y: s.y, z: s.z, facing: s.facing };
     }
   } catch {
     // storage blocked
@@ -128,6 +126,11 @@ export function rememberSpot(s: Spot) {
 
 export function loadSettings(): Settings {
   const s: Settings = { view: 'first', volume: 0.7, muted: false, music: 0.5, musicMuted: false, pageTurns: true, pushToTalk: false, notify: true, needsYouSound: 'once', hud: { ...HUD_DEFAULTS }, pins: [] };
+  try {
+    localStorage.removeItem('agent-office.golf');
+  } catch {
+    // Legacy score cleanup must not block loading the user's settings.
+  }
   try {
     const saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) ?? 'null');
     if (saved?.view === 'first' || saved?.view === 'third') s.view = saved.view;

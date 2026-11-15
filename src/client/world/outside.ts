@@ -279,8 +279,7 @@ export function roadTexture(): THREE.CanvasTexture {
 
 /**
  * The neighbours' buildings: [x, z, width, height, depth, paint], across the street and further out
- * behind and beside the office. The gap across the street from the balcony is the golf hole's
- * (GOLF_HOLE in layout).
+ * behind and beside the office.
  */
 const NEIGHBOURS: [number, number, number, number, number, string][] = [
   [-38, 45, 12, 10, 9, '#8ecae6'],

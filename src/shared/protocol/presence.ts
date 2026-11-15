@@ -6,7 +6,7 @@ import type { EmoteId } from '../emotes.js';
 import type { DrinkId } from '../rooftop.js';
 import type { Me } from './accounts.js';
 import type { FloorInfo, FloorView, ProjectsDirState } from './floors.js';
-import type { LeaveOnMergeState, MachineState, MapState, NotifyState, PromptsState, SkyState, ThemeState, UpgradeState } from './settings.js';
+import type { LeaveOnMergeState, MachineState, NotifyState, PromptsState, SkyState, ThemeState, UpgradeState } from './settings.js';
 import type { PlanLimits, UsageState } from './usage.js';
 
 /** The issue on a card someone carries around the floor (see PeerInfo.carrying). */
@@ -31,8 +31,6 @@ export interface PeerInfo {
   sharing: boolean;
   /** On a smoke break, cigarette in hand. */
   smoking?: boolean;
-  /** At the golf tee on the balcony, club in hand. */
-  golfing?: boolean;
   /** At the rooftop bar's dart board or axe lane, a dart or an axe in hand. */
   throwing?: BarGame;
   /** Sitting down: the place they're in (see seatAt in layout), like "couch:1". */
@@ -86,11 +84,11 @@ export type PresenceClientMsg =
   | { t: 'move'; x: number; y: number; z: number; rotY: number; moving: boolean }
   /**
    * You reached out to use something; everyone else sees your character's arm do it. With `smoke`,
-   * you lit a cigarette (or put it out) on the balcony instead; with `golf`, you took a club out at
-   * the tee (or put it back); with `drink`, you took a drink from the rooftop bar (or finished it,
+   * you lit a cigarette (or put it out) on the balcony instead; with `drink`, you took a drink from
+   * the rooftop bar (or finished it,
    * null); with `throwing`, you stepped up to the dart board or the axe lane up there (or back, null).
    */
-  | { t: 'act'; smoke?: boolean; golf?: boolean; drink?: DrinkId | null; throwing?: BarGame | null }
+  | { t: 'act'; smoke?: boolean; drink?: DrinkId | null; throwing?: BarGame | null }
   /** You sat down in a place on a couch, a beanbag, a chair or the bench (see seatAt in layout), or got up again (no seat). */
   | { t: 'sit'; seat?: string }
   /** You picked an issue card up off the board (or put it down again, no issue): everyone sees it in your hands. */
@@ -130,8 +128,6 @@ export type PresenceServerMsg =
       sky: SkyState;
       /** Halloween or Christmas decorations, all over the building, or none. */
       theme: ThemeState;
-      /** What the building looks like inside. */
-      map: MapState;
       /** The office's prompts and the worker everyone starts on. */
       prompts: PromptsState;
       leaveOnMerge: LeaveOnMergeState;
@@ -140,7 +136,7 @@ export type PresenceServerMsg =
   | { t: 'peer.update'; peer: PeerInfo }
   | { t: 'peer.move'; id: string; x: number; y: number; z: number; rotY: number; moving: boolean }
   | { t: 'peer.leave'; id: string }
-  | { t: 'peer.act'; id: string; smoke?: boolean; golf?: boolean; drink?: DrinkId | null; throwing?: BarGame | null }
+  | { t: 'peer.act'; id: string; smoke?: boolean; drink?: DrinkId | null; throwing?: BarGame | null }
   | { t: 'peer.emote'; id: string; emote: EmoteId }
   | { t: 'rtc'; from: string; data: unknown }
   | ({ t: 'chat' } & ChatLine)

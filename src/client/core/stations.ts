@@ -27,7 +27,6 @@ export function idleAgentsIn(w: World): IdleAgent[] {
     const model = new Worker(agent.name, agent.color);
     model.setStatus('idle', false);
     model.setTask({ name: STATION_INFO[kind].offer, summary: STATION_INFO[kind].does });
-    model.setOutfit(w.plan.agents.outfit === 'peasant' ? 'peasant' : null);
     const view = w.desks.get(def.id)!;
     view.vacancy.children[0].add(model.root);
     noOutline(model.root);

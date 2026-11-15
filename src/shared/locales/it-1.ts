@@ -1,5 +1,8 @@
 /** Italian UI catalogue, part 1. */
 export default {
+  "Use what you look at: hire a worker, open its terminal, read a board, call a meeting in the meeting room, watch the TV, put a song on the jukebox, sit on a couch, a beanbag, a chair or the balcony bench (walk off to get up)": "Usa ciò che guardi: assumi un agente, apri il suo terminale, leggi una lavagna, convoca una riunione, guarda la TV, metti una canzone nel jukebox o siediti su un divano, un pouf, una sedia o la panca del balcone (muoviti per alzarti)",
+  "Put back the issue card in your hands (E at a note on the issues board, or ✋ Pick it up in an issue; then E at an empty desk, a worker or the queue board)": "Riponi la scheda della segnalazione che hai in mano (E su una nota nella lavagna Segnalazioni, oppure ✋ Raccoglila nella segnalazione; poi E su una scrivania vuota, un agente o la lavagna della coda)",
+
   "expires in {0} day{1}": "Scadenza fra giorni: {0}",
   "expires today": "scade oggi",
   "🔑 Accounts": "🔑 Account",

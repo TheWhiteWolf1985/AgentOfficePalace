@@ -6,7 +6,6 @@ import { store, type NeedsYouSound, type Settings, type ViewMode } from '../stat
 import { askNotifyPermission, notifyPermission, type DesktopNotifier } from '../notify';
 import type { ThemePick, WebhookKind } from '../../shared/protocol';
 import { THEME_PICKS } from '../../shared/theme';
-import { mapChoices } from '../../shared/maps';
 import { dogSetting } from './settings-dog';
 import { h, openModal, timeAgo } from './dom';
 import { agentFields, choiceLabel, officeChoice } from './provider';
@@ -34,7 +33,7 @@ const PANES: { id: SettingsPane; icon: string; label: string; blurb: string }[] 
   { id: 'you', icon: '🧍', label: uiText('You'), blurb: uiText('How you look, how you see the office, and how you’re signed in.') },
   { id: 'sound', icon: '🔊', label: uiText('Sound & voice'), blurb: uiText('How loud the office is for you, and how voice chat works.') },
   { id: 'notify', icon: '🔔', label: uiText('Notifications'), blurb: uiText('Hear about a worker that needs someone, or finished, while you’re somewhere else.') },
-  { id: 'building', icon: '🏢', label: uiText('Building'), blurb: uiText('The map, the decorations, the sky, the dog, and where new floors are cloned.') },
+  { id: 'building', icon: '🏢', label: uiText('Building'), blurb: uiText('The decorations, the sky, the dog, and where new floors are cloned.') },
   { id: 'workers', icon: '🤖', label: uiText('Workers'), blurb: uiText('What workers start on, how many run at once, when they go home and what the office tells them.') },
   { id: 'management', icon: '👥', label: uiText('Agent management'), blurb: uiText('Individual agents, properties and repository identities across all offices.') },
   { id: 'connections', icon: '🔗', label: uiText('GitHub and Forgejo'), blurb: uiText('Servers, accounts and remote repositories.') },
@@ -166,42 +165,6 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
     themeNote.textContent = uiText`${now}${how} It’s the same for everyone in the building${by ? uiText`, set by ${by}${at ? ` ${timeAgo(at)}` : ''}` : ''}.`;
   };
   paintTheme();
-
-  // The building's map, for everyone: the office, the castle, the space station, or one of your own. Opening Settings
-  // has the office read its folder of maps again, so one you just added or fixed shows up.
-  net.send({ t: 'map.set' });
-  const mapRow = h('div.seg', { role: 'radiogroup', 'aria-label': uiText('Map') });
-  const mapNote = h('p.setting-note');
-  const mapBad = h('p.setting-note.bad', { style: 'white-space: pre-line' });
-  const paintMap = () => {
-    const { pick, by, at, custom } = store.map;
-    const choices = mapChoices(custom);
-    mapRow.replaceChildren(
-      ...choices.map((m) =>
-        h(
-          'button.btn',
-          {
-            type: 'button',
-            role: 'radio',
-            'aria-checked': String(pick === m.id),
-            class: pick === m.id ? 'on' : '',
-            disabled: !!m.error,
-            title: m.error ? uiText`${m.id} won't load: ${m.error}` : m.description,
-            onclick: () => {
-              if (!m.error && store.map.pick !== m.id) net.send({ t: 'map.set', map: m.id });
-            },
-          },
-          `${m.icon} ${m.name}`,
-        ),
-      ),
-    );
-    const now = choices.find((m) => m.id === pick) ?? choices[0];
-    mapNote.textContent = uiText`${now.description} It’s the same on every floor, for everyone in the building${by ? uiText`, picked by ${by}${at ? ` ${timeAgo(at)}` : ''}` : ''}. Maps of your own go in the office’s .agent-office/maps/ folder as JSON (see docs/maps.md).`;
-    const broken = choices.filter((m) => m.error);
-    mapBad.textContent = broken.map((m) => uiText`⚠️ ${m.id} won't load: ${m.error}`).join('\n');
-    mapBad.hidden = !broken.length;
-  };
-  paintMap();
 
   // Desktop notifications: this browser's permission, then your own on/off.
   const notifyRow = h('div.seg');
@@ -474,7 +437,6 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
       setting(uiText('Team notifications (Slack / Discord)'), 'office', h('div.webhook', {}, hookInput, hookSave), hookActions, hookStatus),
     ],
     building: [
-      setting(uiText('Map'), 'office', mapRow, mapNote, mapBad),
       setting(uiText('Holiday theme'), 'office', themeRow, themeNote),
       ...(sky ? [sky.section] : []),
       dogSection,
@@ -526,7 +488,6 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
   const offNotify = store.on('notify', paintHook);
   const offDog = store.on('dog', paintDog);
   const offTheme = store.on('theme', paintTheme);
-  const offMap = store.on('map', paintMap);
   const offLeave = store.on('leaveOnMerge', paintLeave);
   const offLimit = [store.on('machine', paintLimit), store.on('me', paintLimit)];
   const offDir = [store.on('projectsDir', paintDir), store.on('me', paintDir)];
@@ -539,7 +500,6 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
       offDog();
       offTheme();
       sky?.off();
-      offMap();
       offLeave();
       offLimit.forEach((off) => off());
       offDir.forEach((off) => off());

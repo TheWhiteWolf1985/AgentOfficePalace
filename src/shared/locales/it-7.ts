@@ -1,17 +1,5 @@
 /** Italian UI catalogue, part 7. */
 export default {
-  "🫨 WHOAAAA!": "🫨 UOOOAAAH!",
-  "😭 I regret nothiiing!": "😭 Non rimpiango nienteee!",
-  "🚀 Wheeeee!": "🚀 Evvivaaa!",
-  "🫠 Tell my PR I loved it!": "🫠 Dite alla mia PR che l'amavo!",
-  "🍞 …bread?": "🍞 …pane?",
-  "💧 water…": "💧 acqua…",
-  "🙏 let me out": "🙏 fatemi uscire",
-  "🐀 hello, rat": "🐀 ciao, topo",
-  "🎵 99 bugs in the code…": "🎵 99 bug nel codice…",
-  "🕯️ is it day?": "🕯️ è giorno?",
-  "😢 I miss my desk": "😢 Mi manca la scrivania",
-  "🔑 psst… the key?": "🔑 psst… la chiave?",
   "😢 bye, everyone": "😢 ciao a tutti",
   "🥲 it was fun": "🥲 è stato bello",
   "📦 welp": "📦 pazienza",

@@ -67,7 +67,6 @@ export function installHud(ctx: Ctx, core: CoreState, parts: HudParts) {
         run: () => parts.meeting.showMeeting(),
       },
       { id: 'search', icon: '🔎', label: uiText('Search'), section: 'Open', key: '/', title: () => uiText('Search the chat and every terminal'), run: waiting.showSearch },
-      // The office has its bookshelf for them; a map of its own may not.
       { id: 'docs', icon: '📚', label: uiText('Docs'), section: 'Open', shown: () => !inOffice(), title: () => uiText('Read the project’s docs'), run: parts.bookshelf.showBookshelf },
       { id: 'elevator', icon: '🛗', label: () => (inOffice() ? uiText('Elevator') : uiText('Floors')), section: 'Open', count: () => store.floors.reduce((n, f) => n + (f.id === store.floor ? 0 : f.waiting), 0), title: () => (inOffice() ? uiText('Ride to another project') : uiText('Go to another project, or add one')), run: travel.showElevator },
       { id: 'roof', icon: '🍸', label: uiText('Rooftop bar'), section: 'Open', shown: () => !core.upTop && inOffice() && builtFloors().length > 0, title: () => uiText('Ride the elevator up to the roof: a DJ, drinks and the city'), run: () => travel.ride(ROOF) },

@@ -14,7 +14,6 @@ import { disposeSprite, mesh, textSprite, toon, toonUnique } from '../toon';
 import { EXHALE_AT, REACH_TIME, SMOKE_CYCLE, dragCurve, reachCurve } from './curves';
 import { cigarette, coffeeMug, drinkGlass, putDownGlass } from './props';
 import { styleHair } from './person-hair';
-import { clubSwing, strike, swingStep, type Golf } from './person-golf';
 import { propPosition, throwStep, type Oche } from './person-throw';
 import { poseEmote, type Emoting } from './person-emote';
 
@@ -34,7 +33,7 @@ const DOING_LIFT = 0.25;
 export class Person {
   readonly root = new THREE.Group();
   private body = new THREE.Group();
-  /** Its moving parts, for what poses them from the other files here (a golf swing, a throw, an emote). */
+  /** Its moving parts, for what poses them from the other files here (a throw, an emote). */
   readonly rig: PersonRig;
   private legL: THREE.Object3D;
   private legR: THREE.Object3D;
@@ -73,9 +72,6 @@ export class Person {
   /** A book off the bookshelf, open in both hands while they read (see read). */
   private book: OpenBook | null = null;
   private bookHolder = new THREE.Group();
-  /** The basketball in both hands (the ball itself is the floor's, see features/basketball/world.ts), and seconds into a shot, or -1. */
-  private ball = false;
-  private shootT = -1;
   pose: Pose = 'stand';
   private cig: THREE.Group;
   private ember: THREE.MeshToonMaterial;
@@ -99,12 +95,6 @@ export class Person {
   private sitK = 0;
   /** Holding on to the ladder or a fire pole (see setGrip). */
   private grip: 'ladder' | 'pole' | null = null;
-  /**
-   * At the golf tee with a club (see setGolf): the club's swing, how far back it's been taken (and
-   * `want`, where it's going), and a swing under way (`swingT` seconds in, from `top`), or -1.
-   * `autoT` is a whole swing playing by itself (golfSwing), taken back to `power`.
-   */
-  private golf: Golf | null = null;
   /**
    * At the dart board's oche or the axe lane's line (see setThrowing): the dart or axe in hand, how
    * far it's been drawn back (`back`, easing to `want`), a throw under way (`throwT` seconds in, from
@@ -345,7 +335,7 @@ export class Person {
   holdMug(on: boolean) {
     this.wantsMug = on;
     this.cup.visible = !this.glass;
-    this.mug.visible = (on || !!this.glass) && !this.card.held && !this.book && !this.ball && this.oche?.game !== 'axe';
+    this.mug.visible = (on || !!this.glass) && !this.card.held && !this.book && this.oche?.game !== 'axe';
   }
 
   /** A drink from the rooftop bar in the left hand (in place of a mug), or none (null). */
@@ -388,18 +378,6 @@ export class Person {
   /** Turns a page of the book they're reading now. */
   turnPage() {
     this.book?.turn();
-  }
-
-  /** Holds the basketball out in front in both hands, or not. */
-  holdBall(on: boolean) {
-    if (on === this.ball) return;
-    this.ball = on;
-    this.holdMug(this.wantsMug);
-  }
-
-  /** Shoots: both arms up over the head and after the ball. */
-  shoot() {
-    this.shootT = 0;
   }
 
   /** Waves, gives a thumbs up, claps…: the gesture, with its emoji popping up over their head. */
@@ -488,50 +466,6 @@ export class Person {
     this.grip = grip;
   }
 
-  /** At the golf tee with a club in both hands, over the ball (the ball in front of their feet, the hole off to their left), or not. */
-  setGolf(on: boolean) {
-    if (on === !!this.golf) return;
-    if (!on) {
-      const { swing } = this.golf!;
-      this.body.remove(swing);
-      swing.traverse((o) => (o as THREE.Mesh).geometry?.dispose());
-      this.golf = null;
-      // The swing turned the arms and legs every which way; standing, they only swing back and forth.
-      for (const limb of [this.armL, this.armR, this.legL, this.legR]) limb.rotation.set(0, 0, 0);
-      return;
-    }
-    const swing = clubSwing();
-    this.body.add(swing);
-    this.golf = { swing, back: 0, want: 0, top: 0, swingT: -1, autoT: -1, power: 0 };
-  }
-
-  /** Taking the club back, `k` of the way (0 at the ball, 1 as far as it goes), the harder to hit it. */
-  golfBack(k: number) {
-    const g = this.golf;
-    if (g && g.swingT < 0) g.want = THREE.MathUtils.clamp(k, 0, 1);
-  }
-
-  /** Down through the ball from wherever it was taken back to, up into the finish, and back to the ball. */
-  golfHit() {
-    const g = this.golf;
-    if (!g) return;
-    strike(g);
-  }
-
-  /** A whole swing, all by itself: back `power` of the way over BACKSWING_TIME, then through (someone else's shot). */
-  golfSwing(power: number) {
-    const g = this.golf;
-    if (!g) return;
-    g.swingT = -1;
-    g.autoT = 0;
-    g.power = THREE.MathUtils.clamp(power, 0, 1);
-  }
-
-  /** The golf swing, over whatever the arms and legs were doing (see swingStep). */
-  private golfStep(dt: number) {
-    swingStep(this.rig, this.golf!, dt);
-  }
-
   /** At the oche with a dart in the right hand, or the axe lane's line with an axe in both, or neither (null). */
   setThrowing(game: BarGame | null) {
     if (game === (this.oche?.game ?? null)) return;
@@ -617,22 +551,10 @@ export class Person {
       this.armL.rotation.set(-1.5, 0, 0.32);
       this.armR.rotation.set(-1.5, 0, -0.32);
       this.book.update(dt);
-    } else if (this.card.held || this.ball) {
-      // Both arms out in front, hands on the card's edges (or either side of the ball): they don't swing while they walk.
+    } else if (this.card.held) {
+      // Both arms out in front, hands on the card's edges : they don't swing while they walk.
       this.armL.rotation.set(-1.25, 0, 0.3);
       this.armR.rotation.set(-1.25, 0, -0.3);
-    }
-    if (this.shootT >= 0) {
-      this.shootT += dt;
-      const k = reachCurve(this.shootT / 0.5);
-      for (const [arm, side] of [
-        [this.armL, 1],
-        [this.armR, -1],
-      ] as const) {
-        arm.rotation.x = THREE.MathUtils.lerp(arm.rotation.x, -2.75, k);
-        arm.rotation.z = THREE.MathUtils.lerp(arm.rotation.z, side * 0.12, k);
-      }
-      if (this.shootT >= 0.5) this.shootT = -1;
     }
     let reach = 0;
     if (this.reachT >= 0) {
@@ -643,7 +565,7 @@ export class Person {
       this.armL.rotation.z = THREE.MathUtils.lerp(this.armL.rotation.z, 0.22, reach);
       if (this.reachT >= REACH_TIME) this.reachT = -1;
     }
-    if (this.gripping && !this.book && !this.card.held && !this.ball) {
+    if (this.gripping && !this.book && !this.card.held) {
       // The right arm out and a little down, onto the shoulder of whoever's in front.
       this.armL.rotation.x = THREE.MathUtils.lerp(this.armL.rotation.x, -1.15, Math.min(1, dt * 10));
       this.armL.rotation.z = THREE.MathUtils.lerp(this.armL.rotation.z, 0.3, Math.min(1, dt * 10));
@@ -688,7 +610,6 @@ export class Person {
     this.head.rotation.y = this.head.rotation.z = 0;
     this.body.rotation.y = this.body.rotation.z = 0;
     if (this.emoting) this.emoteStep(dt, moving || airborne ? 0 : 1 - sit);
-    if (this.golf && !sit && !airborne) this.golfStep(dt);
     if (this.oche && !sit) this.ocheStep(dt);
   }
 }

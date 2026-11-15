@@ -3,7 +3,6 @@ import { BALCONY, DANCE_FLOOR, FIRE_PIT, FLOOR, LOFT, MEETING_ROOM, ROOF_BAR, RO
 import type { PeerInfo } from '../../shared/protocol';
 import { ROOF } from '../../shared/rooftop';
 import { CARS, type CarSeat } from '../../shared/garage';
-import { seatOn, type MapPlan } from '../../shared/maps';
 import { store } from '../state';
 
 /**
@@ -12,7 +11,7 @@ import { store } from '../state';
  * the balcony", "🛋️ on the couch", "🏎️ driving the Orange Lambo"). Nothing while they're just walking around
  * the office.
  */
-export function whereabouts(p: PeerInfo, car?: { car: number; seat: CarSeat }, plan: MapPlan = store.plan()): string | undefined {
+export function whereabouts(p: PeerInfo, car?: { car: number; seat: CarSeat }): string | undefined {
   if (p.doing) return p.doing;
   // Not standing anywhere: in on the 2D view, from a phone, say.
   if (p.lite) return uiText('📱 on the 2D view');
@@ -20,11 +19,9 @@ export function whereabouts(p: PeerInfo, car?: { car: number; seat: CarSeat }, p
   const def = car && CARS[car.car];
   if (def) return car.seat === 'driver' ? uiText`🏎️ Driving ${def.name}` : uiText`🏎️ Riding in ${def.name}`;
   if (p.smoking) return uiText('🚬 on a smoke break');
-  if (p.golfing) return uiText('🏌️ teeing off');
   if (p.throwing) return p.throwing === 'darts' ? uiText('🎯 playing darts') : uiText('🪓 throwing axes');
-  const office = plan.style === 'office' || p.floor === ROOF;
-  const place = p.seat ? (office ? seatAt(p.seat) : seatOn(plan, p.seat)) : undefined;
-  const seat = place && (office ? SEATING_BY_ID : plan.seatingById).get(place.seatId);
+  const place = p.seat ? seatAt(p.seat) : undefined;
+  const seat = place && SEATING_BY_ID.get(place.seatId);
   if (seat) {
     // "🛋️ Couch" -> "🛋️ on the couch".
     const [icon, ...name] = seat.label.split(' ');
@@ -32,8 +29,6 @@ export function whereabouts(p: PeerInfo, car?: { car: number; seat: CarSeat }, p
   }
   // The roof is the office's size, but none of its rooms are up there.
   if (p.floor === ROOF) return onTheRoof(p);
-  // On a map of its own, the office's rooms aren't where they'd be.
-  if (!office) return undefined;
   // Through the north wall in the back office: nobody gets there unless the floor's built out.
   if (p.y > -1 && inWing(p.x, p.z, WING.rows)) return uiText('🏗️ in the back office');
   // Down on the street, or out the back door on the stairs down to it.

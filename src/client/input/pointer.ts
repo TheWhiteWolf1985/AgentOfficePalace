@@ -16,7 +16,7 @@ import { store } from '../state';
 import { modalOpen, toast } from '../ui/dom';
 import type { Interactable } from '../world/types';
 
-export type PointerParts = Pick<Parts, 'worlds' | 'rooftop' | 'place' | 'you' | 'boards' | 'cards' | 'seating' | 'hoops' | 'emotes' | 'hanging' | 'telescope' | 'hintbar'>;
+export type PointerParts = Pick<Parts, 'worlds' | 'rooftop' | 'place' | 'you' | 'boards' | 'cards' | 'seating' | 'emotes' | 'hanging' | 'telescope' | 'hintbar'>;
 
 /** Listens for the mouse over the canvas, registers the aim tick ('aim'), and takes the player's clicks. */
 export function installPointer(ctx: Ctx, core: CoreState, parts: PointerParts) {
@@ -56,7 +56,7 @@ export function installPointer(ctx: Ctx, core: CoreState, parts: PointerParts) {
   function usable(): (readonly Interactable[])[] {
     const roof = parts.rooftop.roof();
     if (core.upTop && roof) return [roof.interactables];
-    return inOffice() ? [office.interactables, ...ctx.usables.lists()] : [ctx.world().interactables, parts.worlds.court()?.interactables ?? []];
+    return [office.interactables, ...ctx.usables.lists()];
   }
 
   /** `note` is the issue note you're pointing at on the issues board, if any (see aimedNote). */
@@ -88,9 +88,9 @@ export function installPointer(ctx: Ctx, core: CoreState, parts: PointerParts) {
   function aimedAt(ndc: THREE.Vector2, slack = 0): { it: Interactable; near: boolean; hit: THREE.Intersection } | null {
     raycaster.setFromCamera(ndc, camera);
     eye.set(player.pos.x, player.pos.y + EYE_HEIGHT, player.pos.z);
-    // (Workers standing in line in the castle carry their spot's interactable: see Court.)
+
     const roof = parts.rooftop.roof();
-    for (const hit of raycaster.intersectObjects(core.upTop && roof ? roof.pickables : inOffice() ? [office.group, ...ctx.usables.pickables()] : ctx.world().pickables, true)) {
+    for (const hit of raycaster.intersectObjects(core.upTop && roof ? roof.pickables : [office.group, ...ctx.usables.pickables()], true)) {
       let it: Interactable | undefined;
       let shown = true;
       for (let o: THREE.Object3D | null = hit.object; o; o = o.parent) {
@@ -103,17 +103,6 @@ export function installPointer(ctx: Ctx, core: CoreState, parts: PointerParts) {
       return { it, near: hit.point.distanceTo(eye) <= ctx.interactions.reach(it.kind) + slack, hit };
     }
     return null;
-  }
-
-  /**
-   * On the throne, E is for whoever's first in line (or, with nobody waiting, the herald beside you):
-   * what you'd be facing, sat there. Null when you're not on the throne.
-   */
-  function throneTarget(): Interactable | null {
-    const id = plan().throne?.id;
-    if (!id || player.seat?.seatId !== id) return null;
-    const first = parts.worlds.court()?.interactables.find((it) => !it.off);
-    return first ?? ctx.world().herald?.interactable ?? null;
   }
 
   /** The issue whose note on the issues board an aim lands on, or null (bare cork, the frame, anything else). */
@@ -130,16 +119,16 @@ export function installPointer(ctx: Ctx, core: CoreState, parts: PointerParts) {
   canvas.addEventListener('pointerleave', () => (pointer = null));
   // What you're pointing at (first person) or standing at (third), and what the hint bar says about it.
   ctx.ticks.add('aim', () => {
-    const { seating, hoops } = parts;
+    const { seating } = parts;
     const firstPerson = player.view === 'first';
     aimedNote = null;
     if (modalOpen() || parts.telescope.active || ctx.activities.busy()) target = null;
     else if (firstPerson) {
       const aim = aimedAt(CROSSHAIR);
-      target = aim?.near ? aim.it : (throneTarget() ?? seating.mySeat() ?? (inOffice() ? hoops.ballAtFeet() : null));
+      target = aim?.near ? aim.it : seating.mySeat();
       if (aim?.near) aimedNote = noteUnder(aim);
     } else {
-      target = throneTarget() ?? seating.mySeat() ?? pickTarget();
+      target = seating.mySeat() ?? pickTarget();
       // By the issues board, the mouse points at the note you'd take.
       if (target?.kind === 'issues' && pointer) {
         const aim = aimedAt(pointer, 2.5);
@@ -152,17 +141,10 @@ export function installPointer(ctx: Ctx, core: CoreState, parts: PointerParts) {
   });
 
   player.onClick = (ndc) => {
-    const { emotes, hoops } = parts;
-    // At the tee, a click is you steadying the mouse to aim: nothing else is in reach.
+    const { emotes } = parts;
     // At the dart board or the axe lane, the button throws (see Thrower).
     if (modalOpen() || ctx.activities.any('takesCamera')) return;
     if (emotes.emoteWheel.isOpen) return emotes.emoteWheel.click();
-    // The ball in your hands: press to wind up, let go (or click again, with no mouse captured) to shoot.
-    if (hoops.holding()) {
-      if (hoops.winding() && !player.locked) hoops.letFly();
-      else hoops.windUp();
-      return;
-    }
     const { hanger } = parts.hanging;
     if (hanger.active) {
       reach();

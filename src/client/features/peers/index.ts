@@ -77,13 +77,12 @@ export function installPeers(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'puff
         noOutline(r.person.root);
       }
       r.person.setSmoking(!!peer.smoking);
-      r.person.setGolf(!!peer.golfing);
       r.person.setThrowing(peer.throwing ?? null);
       r.person.holdDrink(peer.drink ? (DRINK_BY_ID.get(peer.drink) ?? null) : null);
       r.person.carry(peer.carrying);
       r.person.read(!!peer.reading);
       r.person.sit(store.carOf(id) ? SEAT_HIPS : peer.seat ? (seatOn(plan(), peer.seat)?.hips ?? null) : null);
-      r.person.setDoing(whereabouts(peer, store.carOf(id), plan()));
+      r.person.setDoing(whereabouts(peer, store.carOf(id)));
     }
     for (const [id, r] of remotes) {
       const peer = store.peers.get(id);
@@ -157,7 +156,7 @@ export function installPeers(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'puff
       // What people are up to changes as they walk about, not only when they open something.
       for (const [id, r] of remotes) {
         const p = store.peers.get(id);
-        if (p) r.person.setDoing(whereabouts(p, store.carOf(id), plan()));
+        if (p) r.person.setDoing(whereabouts(p, store.carOf(id)));
       }
       renderPeople(voice, editProfile, walkTo, false);
       updateSpeaking(voice);
@@ -187,16 +186,6 @@ export function installPeers(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'puff
         else delete p.throwing;
       }
       r?.person.setThrowing(msg.throwing);
-      return;
-    }
-    if (msg.golf !== undefined) {
-      // A club out at the tee, or back in the bag.
-      const p = store.peers.get(msg.id);
-      if (p) {
-        if (msg.golf) p.golfing = true;
-        else delete p.golfing;
-      }
-      r?.person.setGolf(msg.golf);
       return;
     }
     if (msg.smoke === undefined) {

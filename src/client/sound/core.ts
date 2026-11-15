@@ -9,18 +9,6 @@ export interface Listener extends Pos {
   fz: number;
 }
 
-/**
- * On a map of its own (the castle): the room it is, where its gong hangs and where its windows are,
- * with nothing of the office's in it (no fridge). `vacuum`: there's nothing outside it to hear at
- * all (the space station): no rain, no thunder, no birds.
- */
-export interface Hall {
-  bounds: { minX: number; maxX: number; minZ: number; maxZ: number };
-  gong: Pos | null;
-  windows: Pos[];
-  vacuum?: boolean;
-}
-
 /** What AudioCore asks of the rest of the sound: see unlock. */
 export interface AudioHooks {
   /** Audio just started: the rest of the graph goes up, and whatever plays all the time starts. */
@@ -32,7 +20,7 @@ export interface AudioHooks {
 /**
  * The audio every sound shares: the context (started on the first click or key, as browsers want),
  * the buses a sound goes out on, your volume, the tab hiding, where your ears are and what's round
- * them, the samples, and what runs every frame. The recipes (weather.ts, features/golf/sound.ts and the rest) are
+ * them, the samples, and what runs every frame. The recipes (weather.ts, features/dog/sound.ts and the rest) are
  * functions of one of these; OfficeSound (index.ts) puts them together.
  */
 export class AudioCore {
@@ -47,8 +35,6 @@ export class AudioCore {
   /** …where there's wind, and the city far below. */
   outside!: GainNode;
   outdoors = false;
-  /** On a map of its own (the castle), the room it is (see Hall). Null in the office. */
-  hall: Hall | null = null;
   /** How many rows the floor's back office is built out: in there you're indoors too. */
   wing = 0;
   private analyser!: AnalyserNode;
@@ -80,7 +66,7 @@ export class AudioCore {
 
   /** The weather outside (see world/sky.ts), every frame. */
   setWeather(rain: number, night: number) {
-    this.weather.rain = this.hall?.vacuum ? 0 : rain;
+    this.weather.rain = rain;
     this.weather.night = night;
   }
 
@@ -186,18 +172,14 @@ export class AudioCore {
   /** Where your ears are: in the office, where rain is muffled by the glass, in the garage, or out in it. */
   where(): 'office' | 'garage' | 'out' {
     const { x, y, z } = this.listener;
-    if (this.hall) {
-      const b = this.hall.bounds;
-      return x > b.minX && x < b.maxX && z > b.minZ && z < b.maxZ ? 'office' : 'out';
-    }
     const under = (m: number) => x > FLOOR.minX - m && x < FLOOR.maxX + m && z > FLOOR.minZ - m && z < FLOOR.maxZ + m;
     if ((under(0) || inWing(x, z, this.wing)) && y > -0.5) return 'office';
     return under(0.3) ? 'garage' : 'out';
   }
 
-  /** Where the sounds from outside come in: the hall's windows, or the office's. */
+  /** Where the sounds from outside come in: the office's windows. */
   windows(): Pos[] {
-    return this.hall?.windows.length ? this.hall.windows : WINDOWS;
+    return WINDOWS;
   }
 
   /** Up on the roof (true), or inside on a floor: the office's hum gives way to the wind and the city. */

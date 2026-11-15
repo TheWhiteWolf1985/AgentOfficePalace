@@ -155,49 +155,49 @@ function activity(id: string, log: string[], opts: { on?: boolean; stopsFor?: Wh
 
 test('activities keep their declared order whatever order they were added in', () => {
   const log: string[] = [];
-  const acts = new Activities<Why, string>(['hanger', 'climber', 'golf']);
-  const golf = activity('golf', log, { on: true, key: 'KeyE', camera: true });
+  const acts = new Activities<Why, string>(['hanger', 'climber', 'reader']);
+  const reader = activity('reader', log, { on: true, key: 'KeyE', camera: true });
   const extra = activity('extra', log, { on: true });
   const hanger = activity('hanger', log, { on: true, key: 'Escape' });
-  acts.add(golf);
+  acts.add(reader);
   acts.add(extra);
   acts.add(hanger);
   acts.add(activity('climber', log));
   assert.deepEqual(
     acts.all().map((a) => a.id),
-    ['hanger', 'climber', 'golf', 'extra'],
+    ['hanger', 'climber', 'reader', 'extra'],
   );
   assert.equal(acts.current()?.id, 'hanger');
   assert.equal(acts.busy(), true);
-  assert.equal(acts.running('golf'), true);
+  assert.equal(acts.running('reader'), true);
   assert.equal(acts.running('climber'), false);
   assert.equal(acts.any('takesCamera'), true);
   assert.equal(acts.any('hidesHands'), false);
   // Keys go to what's going on, in order, until one takes it.
   assert.equal(acts.key('KeyE'), true);
-  assert.deepEqual(log, ['hanger key KeyE', 'golf key KeyE']);
-  assert.throws(() => acts.add(activity('golf', log)));
+  assert.deepEqual(log, ['hanger key KeyE', 'reader key KeyE']);
+  assert.throws(() => acts.add(activity('reader', log)));
 });
 
 test('stopAll stops what is going on in order, but what is excepted or does not stop for that', () => {
   const log: string[] = [];
-  const acts = new Activities<Why>(['hanger', 'climber', 'driver', 'golf']);
+  const acts = new Activities<Why>(['hanger', 'climber', 'driver', 'reader']);
   const hanger = activity('hanger', log, { on: true, stopsFor: ['trip'] });
   const climber = activity('climber', log);
   const driver = activity('driver', log, { on: true });
-  const golf = activity('golf', log, { on: true });
-  for (const a of [golf, driver, climber, hanger]) acts.add(a);
+  const reader = activity('reader', log, { on: true });
+  for (const a of [reader, driver, climber, hanger]) acts.add(a);
   acts.stopAll('walk');
-  assert.deepEqual(log, ['driver stops for walk', 'golf stops for walk']);
+  assert.deepEqual(log, ['driver stops for walk', 'reader stops for walk']);
   assert.equal(hanger.on, true);
   log.length = 0;
-  driver.on = golf.on = true;
-  acts.stopAll('trip', ['golf']);
+  driver.on = reader.on = true;
+  acts.stopAll('trip', ['reader']);
   assert.deepEqual(log, ['hanger stops for trip', 'driver stops for trip']);
-  assert.equal(golf.on, true);
+  assert.equal(reader.on, true);
   log.length = 0;
   acts.stopAll('trip');
-  assert.deepEqual(log, ['golf stops for trip']);
+  assert.deepEqual(log, ['reader stops for trip']);
   assert.equal(acts.busy(), false);
   assert.equal(acts.current(), undefined);
 });
@@ -218,18 +218,18 @@ test('stop stops one activity alone, only while it is going on, and it decides w
   assert.deepEqual(log, ['driver stops for trip']);
   assert.equal(hanger.on, true);
   // Nothing registered by that id: nothing happens.
-  acts.stop('golf', 'trip');
+  acts.stop('reader', 'trip');
   assert.deepEqual(log, ['driver stops for trip']);
 });
 
 test('an activity with both hands busy says so, only while it is going on', () => {
-  const acts = new Activities(['golf', 'driver']);
-  let golfing = false;
-  acts.add({ id: 'golf', active: () => golfing, stop: () => {}, bothHands: true, hidesHands: true });
+  const acts = new Activities(['reader', 'driver']);
+  let reading = false;
+  acts.add({ id: 'reader', active: () => reading, stop: () => {}, bothHands: true, hidesHands: true });
   acts.add({ id: 'driver', active: () => true, stop: () => {}, hidesHands: true });
   assert.equal(acts.any('hidesHands'), true);
   assert.equal(acts.any('bothHands'), false);
-  golfing = true;
+  reading = true;
   assert.equal(acts.any('bothHands'), true);
 });
 
@@ -358,7 +358,7 @@ test('interactions: one definition per kind, with its reach, hint and use', () =
 function clientSources(): { file: string; src: string }[] {
   const root = path.join(import.meta.dirname, '../src/client');
   const code = (src: string) => src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
-  return (readdirSync(root, { recursive: true }) as string[]).filter((rel) => rel.endsWith('.ts')).map((file) => ({ file, src: code(readFileSync(path.join(root, file), 'utf8')) }));
+  return (readdirSync(root, { recursive: true }) as string[]).filter((rel) => rel.endsWith('.ts')).map((file) => ({ file: file.split(path.sep).join('/'), src: code(readFileSync(path.join(root, file), 'utf8')) }));
 }
 
 /**
@@ -401,7 +401,7 @@ test('InteractKind is the kinds added to InteractKinds, and world/types.ts adds 
 test('every kind of thing you can use has exactly one definition, in the file that adds the kind, and nothing else is defined', () => {
   const added = interactKinds();
   const kinds = added.map((k) => k.kind);
-  assert.ok(kinds.length >= 31, `found ${kinds.length} kinds`);
+  assert.ok(kinds.length >= 28, `found ${kinds.length} kinds`);
   assert.deepEqual(
     kinds.filter((k, i) => kinds.indexOf(k) !== i),
     [],

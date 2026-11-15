@@ -18,8 +18,7 @@ export function floorWings(floors: FloorInfo[]): number[] {
 
 /**
  * Whether seat `id` is there to sit at on this floor: a back office desk only once the floor's built
- * out that far, on whichever map (the castle names seats for them too, so a worker hired there has
- * one on every map).
+ * out that far.
  */
 export function seatBuilt(id: string): boolean {
   const d = DESK_BY_ID.get(id);

@@ -1,6 +1,6 @@
 import { t as uiText } from '../../../shared/i18n';
 /**
- * Sitting down: on a chair, a stool, the couch, the throne. Sitting there already, E gets you up, or
+ * Sitting down: on a chair, a stool, the couch. Sitting there already, E gets you up, or
  * does what the seat's for (the TV from the couch, Minesweeper from the boss's chair, the bar's menu).
  */
 import { seatPlace, type SeatDef, type SeatPlace } from '../../../shared/layout';

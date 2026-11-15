@@ -1,11 +1,10 @@
 // Getting around a floor on a coarse grid, round the furniture: the dog's walks (server/dog.ts), a
-// worker's way out when it's sent home, and on a map of its own (see shared/maps), a worker's walks
+// worker's way out when it's sent home, and a worker's walks
 // about the hall. The office's grid is below; a map builds one from its plan (NavGrid).
 // An office floor built out into the back office (see WING) has more of it to get round: the office's
 // helpers take how many rows it's built out (`wing`), and each level gets a grid of its own.
 
 import { BALCONY, BALCONY_DOOR, BEANBAGS, BOOKSHELF, CABINET, DESK_SIZE, ELEVATOR, ELEVATOR_FRONT, EXIT_DOOR, EXIT_STAIRS, FLOOR, GONG, JUKEBOX, KIOSK, LADDER, LOFT, MEETING_ROOM, MEETING_SEATS, MEETING_TABLE, PARACHUTE, POLE, POLES, ROAD, STAIRS, STATIONS, WHITEBOARD, WING, builtDesks, plantsAt, wingLevel, wingMinZ, type DeskDef } from './layout.js';
-
 
 export type Pt = [number, number];
 
@@ -14,6 +13,15 @@ const CELL = 0.5;
 const R = 0.3;
 
 export type Rect = [number, number, number, number]; // minX, maxX, minZ, maxZ
+/** The floor a `w` by `d` box takes, centered on (x, z) and turned `rotY` (its `d` along rotY). */
+export function boxFootprint(x: number, z: number, w: number, d: number, rotY = 0): Rect {
+  const c = Math.abs(Math.cos(rotY));
+  const s = Math.abs(Math.sin(rotY));
+  const hx = (w * c + d * s) / 2;
+  const hz = (w * s + d * c) / 2;
+  return [x - hx, x + hx, z - hz, z + hz];
+}
+
 export type Circle = [number, number, number]; // x, z, radius
 /** What's in the way on a floor. */
 export interface Obstacles {
@@ -378,7 +386,6 @@ class Heap {
     return top;
   }
 }
-
 
 // ---- Sent home ----------------------------------------------------------------------------------
 

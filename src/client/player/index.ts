@@ -44,8 +44,7 @@ export class PlayerController extends PlayerInput {
   street = STREET_Y;
   /**
    * The room the camera stays in while you're in it, and how thick its outside walls are: the
-   * office's, unless the building's on a map of its own. `enclosed`: walled and roofed all round,
-   * with no street or garage under it to see from.
+   * office's. The garage and street remain visible while outside.
    */
   room: Room = { ...FLOOR, wall: WALL_T, enclosed: false };
   /** How many rows the floor's back office is built out (see WING): the camera keeps inside it too. */

@@ -22,11 +22,9 @@ export function installDog(ctx: Ctx): Dog {
   ctx.usables.add({ usable: () => dog.interactables, pickable: () => dog.root });
   store.on('dog', () => {
     dog.sync(store.dog, store.dogStart);
-    // The dog lives in the office: on a map of its own it stays home.
     if (!ctx.inOffice()) dog.root.visible = false;
   });
   ctx.ticks.add('others', ({ dt }) => {
-    // The dog is the office's: on a map of its own it stays at home, quiet.
     if (ctx.inOffice()) dog.update(dt);
   });
   ctx.interactions.define('dog', {

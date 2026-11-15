@@ -2,7 +2,6 @@
 // floor. A new feature adds its handler file and a line here.
 import type { ClientMsg } from '../../../shared/protocol.js';
 import { accountsHandlers } from './accounts.js';
-import { ballHandlers, ballHooks, ballView } from './ball.js';
 import { cabinetHandlers, cabinetHooks, cabinetView } from './cabinet.js';
 import { carHandlers, carHooks, carsView } from './car.js';
 import { changesHandlers, changesHooks } from './changes.js';
@@ -21,13 +20,12 @@ import { signinsHandlers } from './signins.js';
 import { teamHandlers } from './team.js';
 import { usageHandlers } from './usage.js';
 import { whiteboardHandlers, whiteboardHooks, whiteboardView } from './whiteboard.js';
-import { jailView, workerHandlers, workerHooks, workersView } from './workers.js';
+import { workerHandlers, workerHooks, workersView } from './workers.js';
 import type { FeatureHooks, HandlerMap, ViewPieces } from './types.js';
 
 /** Each domain's handlers put together, in alphabetical order. */
 export const handlers: HandlerMap<ClientMsg> = {
   ...accountsHandlers,
-  ...ballHandlers,
   ...cabinetHandlers,
   ...carHandlers,
   ...changesHandlers,
@@ -53,7 +51,7 @@ export const handlers: HandlerMap<ClientMsg> = {
  * The features that keep something per person on a floor, in the order they let go of it when
  * someone leaves the floor or the office (see FeatureHooks): the order the office has always done it in.
  */
-export const features: readonly FeatureHooks[] = [workerHooks, changesHooks, whiteboardHooks, ballHooks, carHooks, cabinetHooks];
+export const features: readonly FeatureHooks[] = [workerHooks, changesHooks, whiteboardHooks, carHooks, cabinetHooks];
 
 /** What someone arriving on a floor is sent (see office/views.ts): a piece from each feature, in the order it has always gone out. */
 export const views: ViewPieces = {
@@ -66,9 +64,7 @@ export const views: ViewPieces = {
   plan: planView,
   services: servicesView,
   dog: dogView,
-  ball: ballView,
   cars: carsView,
-  jail: jailView,
   jukebox: jukeboxView,
   whiteboard: whiteboardView,
   meeting: meetingView,

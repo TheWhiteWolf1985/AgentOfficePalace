@@ -11,10 +11,8 @@ import { jukebox } from '../../features/jukebox/world';
 import { bookshelf } from '../../features/bookshelf/world';
 import { cabinet } from '../../features/cabinet/world';
 import { whiteboard } from '../../features/whiteboard/world';
-import { green, tee } from '../../features/golf/world';
 import { stack } from '../stack';
 import { tower } from '../tower';
-import { hoop } from '../../features/basketball/world';
 import { kitchen } from '../kitchen';
 import { signs } from '../desksigns';
 import type { Collider, DeskView, Interactable, Office, OfficeHandles } from '../types';
@@ -44,8 +42,7 @@ function floorPlan() {
     nightLights,
     walls,
     balcony,
-    tee,
-    ...downstairs(cars, street, green, scenic),
+    ...downstairs(cars, street, scenic),
     plug,
     tower,
     desks,
@@ -69,7 +66,6 @@ function floorPlan() {
     elevator,
     garageLift,
     gong,
-    hoop,
     whiteboard,
     clearOfStairs,
   ] as const;

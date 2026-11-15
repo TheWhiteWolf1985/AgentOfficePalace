@@ -163,7 +163,7 @@ export class Departures {
 
   /**
    * Takes over a worker's model and laptop the moment it's sent home from `desk`. `from` is where it
-   * stands if it's up out of its seat (in line for the throne, say): it sets off from there.
+   * stands if it's up out of its seat: it sets off from there.
    */
   add(model: Worker, laptop: Laptop, desk: DeskView, from?: Pt) {
     // Off the desk first if it was up there dancing: it packs up in its seat.

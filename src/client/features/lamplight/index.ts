@@ -16,7 +16,7 @@ export function installLamplight(ctx: Ctx, parts: Pick<Parts, 'stage' | 'place'>
   let indoorness = 0;
   /**
    * The office's outside walls, the back office's too (tagged `userData.wall` in world/office/shell.ts):
-   * indoors they take no shadows, or the light from overhead would streak them down from the hoop, the TV
+   * indoors they take no shadows, or the light from overhead would streak them down from the TV
    * and the boards hanging on them, and speckle the wall itself, nearly side-on to it.
    */
   let wallsShaded = true;
@@ -27,7 +27,7 @@ export function installLamplight(ctx: Ctx, parts: Pick<Parts, 'stage' | 'place'>
   ctx.ticks.add('env', ({ dt }) => {
     const { sun } = parts.stage;
     const { sky } = ctx;
-    // A map of its own (the castle) lights itself (see World.mood), and the roof's out under the sky.
+
     const inside = ctx.inOffice() && !ctx.upTop() && parts.place.indoors();
     indoorness += ((inside ? 1 : 0) - indoorness) * (1 - Math.exp(-dt * 3));
     if (indoorness > 0.001) {

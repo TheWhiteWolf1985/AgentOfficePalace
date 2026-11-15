@@ -149,10 +149,9 @@ export function installLoop(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'stage
   function updateWorld({ dt, t }: Frame) {
     const { player, office, camera, sound } = ctx;
     const { remotes } = parts.peers;
-    const { departures, sendoffs, arrivals } = parts.views;
-    const court = parts.worlds.court();
+    const { departures, arrivals } = parts.views;
     if (!core.upTop) {
-      ctx.world().update(t, dt, [player.pos, ...[...remotes.values()].map((r) => r.person.root.position), ...departures.positions(), ...sendoffs.positions(), ...arrivals.positions(), ...(court?.positions() ?? [])]);
+      ctx.world().update(t, dt, [player.pos, ...[...remotes.values()].map((r) => r.person.root.position), ...departures.positions(), ...arrivals.positions()]);
       if (ctx.inOffice()) {
         office.stack.update(dt, [{ x: player.pos.x, y: player.pos.y, z: player.pos.z, grip: ctx.view.grip() }, ...[...remotes.values()].map((r) => ({ x: r.person.root.position.x, y: r.person.root.position.y, z: r.person.root.position.z, grip: r.grip }))], camera.position);
         office.jukebox.update(t, dt, sound.beat());
@@ -175,8 +174,7 @@ export function installLoop(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'stage
     sun.target.updateMatrixWorld();
     sky.update(dt, t, camera);
     if (!core.upTop && ctx.inOffice()) office.scenic.cull(camera.position, office.night.street, (scene.fog as THREE.Fog).far);
-    // A map of its own lights itself its own way (the castle's torchlit hall), after the sky's had its say.
-    if (!core.upTop) ctx.world().mood?.({ sun, hemi, ambient, scene }, sky.daylight, t, camera.position);
+
     if (!core.upTop && ctx.inOffice()) holiday.update(t, sky.lampsOn, camera);
     sound.setWeather(sky.rain, 1 - sky.daylight);
   }

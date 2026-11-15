@@ -1,5 +1,5 @@
 /* The HUD over the 3D office (index.html's #hud, filled by the features: features/hud and the rest): the floor's name and
-   the dock, the side panels, the chat, hints and meters, the telescope, coffee, golf and darts. Only the
+   the dock, the side panels, the chat, hints and meters, the telescope, coffee and darts. Only the
    office loads it, through style.css. */
 
 #app { position: fixed; inset: 0; }
@@ -123,21 +123,6 @@
 }
 .hint .title { color: #ffd166; }
 .hint .cost { color: #a5ecfb; font-weight: 700; }
-/* Winding up a shot with the basketball: the marker runs up and down; let go in the green. */
-.shot-meter {
-  position: absolute; left: 50%; bottom: 92px; width: 240px; height: 18px; transform: translateX(-50%);
-  background: var(--ink); border: 3px solid var(--paper); border-radius: 10px; box-shadow: 0 4px 0 rgba(0,0,0,.35);
-  overflow: hidden; pointer-events: none !important;
-}
-.shot-meter .sweet {
-  display: none; position: absolute; top: 0; bottom: 0; left: calc((var(--sweet) - var(--width) / 2) * 100%); width: calc(var(--width) * 100%);
-  background: var(--good);
-}
-.shot-meter.aimed .sweet { display: block; }
-.shot-meter .mark {
-  position: absolute; top: 0; bottom: 0; left: 0; width: calc(var(--at) * 100%);
-  background: linear-gradient(90deg, rgba(255,209,102,.25), rgba(255,138,91,.75)); border-right: 4px solid var(--paper);
-}
 
 .crosshair {
   position: absolute; left: 50%; top: 50%; width: 10px; height: 10px; margin: -5px 0 0 -5px;
@@ -190,13 +175,6 @@ body.telescope-active #hud { visibility: hidden; }
 .caffeine .bar span { display: block; width: 0; height: 100%; background: #9c6644; transition: width 1s linear; }
 .caffeine .left { min-width: 24px; font-variant-numeric: tabular-nums; }
 .caffeine.jittery { animation: jitters .1s steps(2) infinite; }
-.golf { position: absolute; left: 50%; top: 14px; transform: translateX(-50%); width: min(300px, calc(100vw - 32px)); padding: 8px 12px 9px; display: grid; gap: 6px; font-size: 13px; font-weight: 900; text-align: center; pointer-events: none !important; }
-.golf-meter { position: relative; height: 16px; border: 3px solid var(--ink); border-radius: 999px; background: linear-gradient(90deg, #caffbf, #ffd166 70%, #ef476f); overflow: hidden; }
-/* Covers the part of the meter's colors that isn't filled, from the right. */
-.golf-rest { position: absolute; inset: 0 0 0 auto; width: 100%; background: #f1e4d3; }
-.golf-last { position: absolute; top: -2px; bottom: -2px; width: 3px; margin-left: -1px; background: var(--ink); }
-.golf-info { font-weight: 800; font-variant-numeric: tabular-nums; }
-#hud:has(.golf:not(.hidden)) #toasts { translate: 0 48px; }
 /* At the rooftop bar's dart board or axe lane (see features/bargames/controller.ts): the meter with its green, and the round so far. */
 .throw { position: absolute; left: 50%; top: 14px; transform: translateX(-50%); width: min(320px, calc(100vw - 32px)); padding: 8px 12px 9px; display: grid; gap: 6px; font-size: 13px; font-weight: 900; text-align: center; pointer-events: none !important; }
 .throw-meter { position: relative; height: 16px; border: 3px solid var(--ink); border-radius: 999px; background: #f1e4d3; overflow: hidden; }
@@ -223,7 +201,6 @@ body.telescope-active #hud { visibility: hidden; }
   .side { width: min(250px, calc(100vw - 24px)); max-height: calc(100vh - 290px); }
   .dock-btn .lbl { display: none; }
   .hint { max-width: calc(100vw - 24px); bottom: 190px; }
-  .shot-meter { bottom: 254px; }
   .chat { width: calc(100vw - 24px); }
 }
 

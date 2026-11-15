@@ -163,7 +163,7 @@ export class Keys<E extends KeyPress = KeyPress> {
  * - moved: what where you've got to does to you (a lap timed, a car shoving you, a pole's hole)
  * - play: games and what they hold you in (the arcade, the tee, the dart board)
  * - me: your character, your hands and the camera, what you hear, and telling the office where you are
- * - others: everyone and everything else that moves (people, cars' engines, workers, the dog, the ball)
+ * - others: everyone and everything else that moves (people, cars' engines, workers and the dog)
  * - world: the building and what's in it (its doors and floors, smoke breaks, particles, a picture being hung)
  * - env: the sky, the weather and the light, then what's lit by it (the roof's strobes)
  * - aim: what you're pointing at, and the hint bar
@@ -207,7 +207,7 @@ export class Ticks {
 
 /**
  * Something you can be in the middle of that takes over the controls (hanging a picture, the ladder,
- * the golf tee…). `Why` names what's making you stop (see Activities.stopAll), `E` is a key press and
+ * a car…). `Why` names what's making you stop (see Activities.stopAll), `E` is a key press and
  * `El` is where the hint bar draws.
  */
 export interface Activity<Why extends string = string, E = unknown, El = unknown> {

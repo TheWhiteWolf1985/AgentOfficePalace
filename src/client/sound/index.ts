@@ -11,21 +11,18 @@
  * OfficeSound is all the rest of the office sees. What every sound shares (the context, the buses,
  * where your ears are, what runs every frame) is AudioCore in core.ts; each sound is a recipe in a
  * file of its own, beside this one (weather.ts, steps.ts and so on) or in its feature's folder
- * (features/golf/sound.ts, features/dog/sound.ts and so on), and this class only hands them the core.
+ * (features/dog/sound.ts and so on), and this class only hands them the core.
  */
 import type { GongWhy } from '../../shared/protocol';
 import { birdsong, Fridge, nightCrickets, startRoomTone, startWind } from './ambience';
 import { ding } from './alerts';
 import { arcade } from '../features/cabinet/sound';
-import { ball, type BallSound } from '../features/basketball/sound';
 import { Dj, hiccup, pour } from '../features/bar/sound';
 import { carDoor, crash, honk, Motors, type Engine } from '../features/cars/sound';
 import { bonk, hatch, poleLanding, rung, slide, twirl } from '../features/climbing/sound';
 import { coffee } from '../features/coffee/sound';
-import { AudioCore, type Hall, type Listener } from './core';
+import { AudioCore, type Listener } from './core';
 import { bark, yip } from '../features/dog/sound';
-import { airlock, cellDoor, thud } from '../features/workers/sound';
-import { golf, type GolfSound } from '../features/golf/sound';
 import { gong } from '../features/gong/sound';
 import { Jukebox, type JukeboxPlay } from '../features/jukebox/sound';
 import { needsYou } from '../features/needsyou/sound';
@@ -122,11 +119,6 @@ export class OfficeSound {
     this.a.update(l);
   }
 
-  /** On a map of its own, `hall` (see Hall); null back in the office. */
-  setHall(hall: Hall | null) {
-    this.a.hall = hall;
-  }
-
   /** Up on the roof (true), or inside on a floor: the office's hum gives way to the wind and the city. */
   setOutdoors(on: boolean) {
     this.a.setOutdoors(on);
@@ -166,7 +158,7 @@ export class OfficeSound {
     this.feet.stepAt({ x, y, z }, pace);
   }
 
-  // ---- The ladder, the fire poles and the dungeon (features/climbing, features/workers) ------------
+  // ---- The ladder, the fire poles (features/climbing, features/workers) ------------
 
   rung(soft = false) {
     rung(this.a, soft);
@@ -174,18 +166,6 @@ export class OfficeSound {
 
   hatch(at: Pos, open: boolean) {
     hatch(this.a, at, open);
-  }
-
-  cellDoor(at: Pos, open: boolean) {
-    cellDoor(this.a, at, open);
-  }
-
-  thud(at: Pos) {
-    thud(this.a, at);
-  }
-
-  airlock(at: Pos, what: 'door' | 'alarm' | 'blow') {
-    airlock(this.a, at, what);
   }
 
   bonk() {
@@ -204,18 +184,8 @@ export class OfficeSound {
     poleLanding(this.a, speed, at);
   }
 
-  // ---- Games (features/golf, bargames, basketball and cabinet) -------------------------------------
-
-  golf(kind: GolfSound, at?: Pos, speed = 5) {
-    golf(this.a, kind, at, speed);
-  }
-
   toss(kind: TossSound, at: Pos) {
     toss(this.a, kind, at);
-  }
-
-  ball(kind: BallSound, at: Pos, speed: number) {
-    ball(this.a, kind, at, speed);
   }
 
   arcade(kind: 'land' | 'clear' | 'over', lines = 1) {
@@ -255,8 +225,6 @@ export class OfficeSound {
   }
 
   thunder(delay: number, loud: number) {
-    // Nothing carries it, out in space.
-    if (this.a.hall?.vacuum) return;
     thunder(this.a, delay, loud);
   }
 

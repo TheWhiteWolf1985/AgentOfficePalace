@@ -10,17 +10,14 @@
 import type { Slice } from '../store';
 import { building, floor, me, presence } from '../core';
 import { accounts } from './accounts';
-import { ball } from './ball';
 import { cabinet } from './cabinet';
 import { cars } from './cars';
 import { decor } from './decor';
 import { dog } from './dog';
 import { floorPlan } from './floor-plan';
-import { jail } from './jail';
 import { jukebox } from './jukebox';
 import { leaveOnMerge } from './leave-on-merge';
 import { machine } from './machine';
-import { map } from './map';
 import { meeting } from './meeting';
 import { notify } from './notify';
 import { prompts } from './prompts';
@@ -45,7 +42,6 @@ export const SLICES: readonly Slice[] = [
   theme,
   prompts,
   leaveOnMerge,
-  map,
   floor,
   meeting,
   decor,
@@ -55,9 +51,7 @@ export const SLICES: readonly Slice[] = [
   jukebox,
   whiteboard,
   cabinet,
-  ball,
   cars,
-  jail,
   team,
   accounts,
   signins,

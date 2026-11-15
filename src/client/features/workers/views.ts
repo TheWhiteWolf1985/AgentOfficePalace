@@ -1,13 +1,7 @@
 import { t as uiText } from '../../../shared/i18n';
-/**
- * The workers as you see them: at their desks with their laptops (or up and about in the castle),
- * walking in to a meeting, packing up when they're sent home (or marched down to the dungeon), how
- * worn out they look, and the seats: which are free, the bean bags, the back office built out. Also
- * the building dressed up for a holiday, and what the workers have spent.
- */
+/** Workers, their laptops, seats and normal arrivals/departures, plus holiday decorations and spending. */
 import * as THREE from 'three';
 import { FLOOR, WING, beanbagsOut, deskBuilt, vacantSeats, wingMinZ, wingRowZ } from '../../../shared/layout';
-import { OFFICE_PLAN } from '../../../shared/maps';
 import { MEETING_PATTERNS } from '../../../shared/meetings';
 import type { WorkerInfo, WorkerTask } from '../../../shared/protocol';
 import { workerPr } from '../../../shared/status';
@@ -28,11 +22,8 @@ import { renderLimits } from '../../ui/limits';
 import { modelBadge, providerLabel } from '../../ui/provider';
 import { renderUsage } from '../../ui/usage';
 import { Worker } from '../../world/character';
-import { Drifters } from './adrift';
-import { Jail } from './jail';
 import { Laptop } from './laptop';
 import { Arrivals, Departures } from './leaving';
-import { Sendoffs } from './sendhome';
 
 // The kinds of thing you can use that this defines (see InteractKinds in world/types.ts).
 declare module '../../world/types' {
@@ -52,8 +43,6 @@ export interface WorkerView {
 /** How close (meters) you stop a worker jumping, and how far you go before it starts again. */
 const HOLD_NEAR = 4;
 const HOLD_LEAVE = 5;
-/** How long a worker sent out from the herald has to turn up before its seat's forgotten. */
-const HERALD_WAIT = 30_000;
 
 export type WorkerViewsParts = Pick<Parts, 'stage' | 'worlds' | 'travel' | 'rooftop' | 'cabinet' | 'notifier' | 'waiting' | 'dog' | 'peers'>;
 
@@ -77,25 +66,6 @@ export function installWorkerViews(ctx: Ctx, core: CoreState, parts: WorkerViews
     () => arrangeSeats(),
     () => ctx.world().ways,
   );
-  /** How someone the office has kept is dressed: the map's outfit, and as worn out as it had got working. */
-  const dressKept = (model: Worker, p: { workedMs?: number }) => {
-    model.setOutfit(plan().agents.outfit === 'peasant' ? 'peasant' : null);
-    model.setAge(agedBy(p.workedMs ?? 0));
-  };
-  // Workers locked up in the dungeon, on a map that has one, wasting away in their cells.
-  const jail = new Jail(() => store.jail, () => store.officeNow(), dressKept);
-  // Or, on a station, the same ones adrift outside its airlock.
-  const adrift = new Drifters(() => store.jail, () => store.officeNow(), dressKept);
-  // Workers sent home on a map with a script for it (the castle's Kingsguard marching them down to the dungeon, the station's Security to the airlock).
-  const sendoffs = new Sendoffs(
-    scene,
-    groundHere,
-    { step: (x, y, z) => sound.stepAt(x, z, y), door: (at, open) => sound.cellDoor(at, open), thud: (at) => sound.thud(at), airlock: (at, what) => sound.airlock(at, what) },
-    () => arrangeSeats(),
-    () => ctx.world(),
-    jail,
-    adrift,
-  );
   // Workers called to a meeting, walking in from the elevator (or the doors) to the meeting table.
   const arrivals = new Arrivals(
     scene,
@@ -108,25 +78,20 @@ export function installWorkerViews(ctx: Ctx, core: CoreState, parts: WorkerViews
   /** A floor arriving (a welcome, a floor.enter): nobody's still leaving or coming in, and its workers are seated already. */
   function seatedOnArrival() {
     departures.clear();
-    sendoffs.clear();
     arrivals.clear();
     seatedAlready = true;
   }
 
   function syncWorkers() {
     const world = ctx.world();
-    const court = parts.worlds.court();
     for (const w of store.workers.values()) {
       let v = workerViews.get(w.id);
       const desk = world.desks.get(w.deskId);
       if (!desk) continue;
       if (!v) {
         departures.vacate(w.deskId);
-        sendoffs.vacate(w.deskId);
         const model = new Worker(w.name, w.color);
         model.setCostume(store.theme.active);
-        model.setOutfit(plan().agents.outfit === 'peasant' ? 'peasant' : null);
-        model.setAge(ageOf(w));
         desk.seatAnchor.add(model.root);
         // Its globe floats beside the laptop (or the kiosk's counter), out from behind the card over
         // its head and the back of its chair, so it shows from across the room.
@@ -134,9 +99,8 @@ export function installWorkerViews(ctx: Ctx, core: CoreState, parts: WorkerViews
         model.setPropSpot(model.root.worldToLocal(desk.laptopAnchor.localToWorld(beside)));
         // Called to a meeting just now: out of the elevator and over to the table, one after another.
         if (desk.def.room && !seatedAlready) arrivals.add(model, desk);
-        // In the castle, a worker at the tables gets up and walks about (see Court): a new one runs in to its seat.
-        else if (court && inCourt(w)) court.add(w.id, model, desk, seatedAlready ? undefined : cameFrom(w));
-        const laptop = new Laptop(world.device);
+
+        const laptop = new Laptop();
         desk.laptopAnchor.add(laptop.root);
         noOutline(desk.group);
         desk.chair.rotation.y = 0;
@@ -176,13 +140,8 @@ export function installWorkerViews(ctx: Ctx, core: CoreState, parts: WorkerViews
       if (store.workers.has(id)) continue;
       arrivals.forget(v.model);
       const desk = world.desks.get(v.deskId);
-      // Up and about in the castle: it sets off from where it's standing.
-      const up = court?.release(id);
-      // Sent home: it packs up and walks out, and the seat shows as free once it's up (see departures), or
-      // on a map with its own way of seeing workers off, that (the castle's dungeon, for one it locks up).
-      const send = plan().sendHome;
-      if (desk && sentHome.has(id) && send && (!send.keeps || store.jail.prisoners.some((p) => p.id === id))) sendoffs.add(id, v.model, v.laptop, desk, up);
-      else if (desk && sentHome.has(id)) departures.add(v.model, v.laptop, desk, up);
+      // Sent home: pack up and walk out; the seat becomes free once the worker stands up.
+      if (desk && sentHome.has(id)) departures.add(v.model, v.laptop, desk);
       else {
         v.model.root.removeFromParent();
         v.laptop.root.removeFromParent();
@@ -193,60 +152,11 @@ export function installWorkerViews(ctx: Ctx, core: CoreState, parts: WorkerViews
       workerViews.delete(id);
     }
     arrangeSeats();
-    // Whoever's waiting on someone lines up for the throne, the one who's waited longest first.
-    court?.line(waitingInOrder(store.workers.values()).filter(inCourt).map((w) => w.id));
     renderWorkers((id) => parts.waiting.openWorkerTerminal(id));
     parts.waiting.renderWaiting();
     parts.notifier.sync(store.workers);
     renderTitle();
   }
-
-  /** A worker that sits at the tables (not a board agent or at the meeting table): it gets up and lines up for the throne. */
-  function inCourt(w: WorkerInfo): boolean {
-    const d = plan().byId.get(w.deskId);
-    return w.kind === 'agent' && !!d && !d.station && !d.room && !w.meeting;
-  }
-
-  /**
-   * The seat a worker sent out from the herald goes to: the first free one, not counting one you've
-   * just sent someone else to (it isn't taken until the office says so).
-   */
-  function heraldSeat(): string | undefined {
-    const now = performance.now();
-    for (const [id, s] of heraldHires) if (now - s.at > HERALD_WAIT) heraldHires.delete(id);
-    return [...plan().desks, ...plan().overflow].find((d) => !store.workerAtDesk(d.id) && !heraldHires.has(d.id))?.id;
-  }
-
-  /** Seats you've just sent a worker out to from the herald (see hireFromHerald), so a second goes elsewhere. */
-  const heraldHires = new Map<string, { floor: string | null; at: number }>();
-
-  /** Where a worker just hired comes in from, running to its seat: the herald, the doors (off the queue), or nowhere (it's just there). */
-  function cameFrom(w: WorkerInfo): [number, number] | undefined {
-    heraldHires.delete(w.deskId);
-    // Sent out by the herald (by anyone: the office says so): from beside him.
-    const h = plan().herald;
-    if (w.via === 'herald' && h) return [h.x + Math.sin(h.rotY) * 1.1, h.z + Math.cos(h.rotY) * 1.1];
-    if (w.createdBy.endsWith('(queue)')) return [plan().door.x, plan().door.z];
-    return undefined;
-  }
-
-  /** How worn out a worker looks on this map, 0–1: how long it has worked, of the map's ageMinutes. */
-  function ageOf(w: WorkerInfo): number {
-    return agedBy((w.workedMs ?? 0) + (w.workingSince !== undefined && w.status === 'working' ? Math.max(0, store.officeNow() - w.workingSince) : 0));
-  }
-
-  /** How worn out `worked` ms of work makes a worker look on this map, 0–1. */
-  function agedBy(worked: number): number {
-    const full = plan().agents.ageMinutes;
-    return full ? Math.min(1, worked / (full * 60_000)) : 0;
-  }
-
-  /** Whoever the floor has kept: locked up in its dungeon, in their cells, or adrift outside its airlock. */
-  function syncJail() {
-    jail.sync(ctx.world().dungeon, plan().sendHome);
-    adrift.sync(ctx.world().airlock, plan().sendHome);
-  }
-  store.on('jail', syncJail);
 
   /** Hired by you (at a desk, or through the queue), or last given something to do by you. */
   function yours(w: WorkerInfo): boolean {
@@ -278,7 +188,7 @@ export function installWorkerViews(ctx: Ctx, core: CoreState, parts: WorkerViews
   function arrangeSeats() {
     const world = ctx.world();
     // Someone sent home still counts until they get up, so a bean bag stays out under them.
-    const free = vacantSeats(store.workers.values(), (id) => departures.seated(id) || sendoffs.seated(id));
+    const free = vacantSeats(store.workers.values(), (id) => departures.seated(id));
     for (const [id, desk] of world.desks) desk.vacancy.visible = free.has(id) && seatBuilt(id);
     const appeared = world.setBeanbags(beanbagsOut((id) => !free.has(id), store.floorPlan.wing));
     // One came out right where you're standing (on the office floor, not down in the garage): you end up on top of it.
@@ -287,19 +197,10 @@ export function installWorkerViews(ctx: Ctx, core: CoreState, parts: WorkerViews
   }
   store.on('workers', syncWorkers);
   const workerPos = new THREE.Vector3();
-  /** When (performance.now()) the workers' looks were last brought up to how long they've worked. */
-  let agedAt = 0;
-  ctx.ticks.add('others', ({ dt, t, now }) => {
+  ctx.ticks.add('others', ({ dt, t }) => {
     const camPos = camera.position;
-    // How worn out each looks, as they work on (every second or so is plenty).
-    const aging = !!plan().agents.ageMinutes && now - agedAt > 1000;
-    if (aging) agedAt = now;
     for (const [id, v] of workerViews) {
       const desk = plan().byId.get(v.deskId)!;
-      if (aging) {
-        const w = store.workers.get(id);
-        if (w) v.model.setAge(ageOf(w));
-      }
       // A jumping worker holds still while you're near enough to read its card, and jumps again once you walk away.
       const d = v.model.root.getWorldPosition(workerPos).distanceTo(player.pos);
       v.model.held = d < (v.model.held ? HOLD_LEAVE : HOLD_NEAR);
@@ -309,17 +210,11 @@ export function installWorkerViews(ctx: Ctx, core: CoreState, parts: WorkerViews
     }
     for (const a of parts.worlds.idleAgents()) if (a.view.vacancy.visible) a.model.update(dt, t);
     departures.update(dt, t);
-    if (!core.upTop) {
-      sendoffs.update(dt, t);
-      jail.update(dt, t, camera.position);
-      adrift.update(dt, t, camera.position);
-    }
     arrivals.update(dt);
-    parts.worlds.court()?.update(dt);
   });
 
-  /** The floor plan last shown, to tell someone knocking through from arriving on a floor already built out (or back on the office's map). */
-  let shownPlan: { floor: string | null; map: string; wing: number } = { floor: null, map: OFFICE_PLAN.id, wing: 0 };
+  /** The floor plan last shown, to tell someone knocking through from arriving on a floor already built out. */
+  let shownPlan: { floor: string | null; wing: number } = { floor: null, wing: 0 };
   /**
    * The floor's back office, as far as it's built out, and the signs over its desks. Everything that
    * finds its way round the floor learns how far it goes; a row knocked through goes up in a puff of
@@ -329,7 +224,7 @@ export function installWorkerViews(ctx: Ctx, core: CoreState, parts: WorkerViews
     const fp = store.floorPlan;
     const level = officeWing();
     const was = shownPlan;
-    shownPlan = { floor: store.floor, map: plan().id, wing: level };
+    shownPlan = { floor: store.floor, wing: level };
     const p = player.pos;
     if (inOffice() && pastTheWing(p, level)) {
       // Out to the side aisle of what's left, or back into the room.
@@ -343,7 +238,7 @@ export function installWorkerViews(ctx: Ctx, core: CoreState, parts: WorkerViews
     parts.travel.syncStack();
     parts.rooftop.syncRoof();
     arrangeSeats();
-    if (was.floor === store.floor && was.map === shownPlan.map && level > was.wing) {
+    if (was.floor === store.floor && level > was.wing) {
       const at = { x: (WING.minX + WING.maxX) / 2, y: 1.2, z: wingRowZ(level) };
       confetti.burst(at.x, 2.4, at.z, 140, 0.8);
       sound.toss('thunk', at);
@@ -386,7 +281,6 @@ export function installWorkerViews(ctx: Ctx, core: CoreState, parts: WorkerViews
     for (const r of parts.peers.remotes.values()) r.person.setCostume(theme);
     for (const v of workerViews.values()) v.model.setCostume(theme);
     for (const a of parts.worlds.idleAgents()) a.model.setCostume(theme);
-    ctx.world().herald?.person.setCostume(theme);
   }
   store.on('theme', dressUp);
   store.on('usage', renderUsage);
@@ -397,32 +291,14 @@ export function installWorkerViews(ctx: Ctx, core: CoreState, parts: WorkerViews
 
   /** Where confetti comes from over a desk: above the worker's head. */
   function burstOver(deskId: string, n: number) {
-    // Up and about in the castle: over wherever it is.
-    const w = store.workerAtDesk(deskId);
-    const v = w && parts.worlds.court()?.away(w.id) ? workerViews.get(w.id) : undefined;
-    if (v) {
-      const at = v.model.root.position;
-      return confetti.burst(at.x, at.y + 2.1, at.z, n);
-    }
     const d = plan().byId.get(deskId);
     if (d) confetti.burst(d.x, 2.3, d.z, n);
-  }
-
-  /** Syncs the workers as if they were in their seats already: nobody walks in (see applyMap in core/maps.ts). */
-  function syncWorkersSeated() {
-    const already = seatedAlready;
-    seatedAlready = true;
-    syncWorkers();
-    seatedAlready = already;
   }
 
   return {
     /** The workers on this floor, as they're drawn at their desks. */
     workerViews,
     departures,
-    jail,
-    adrift,
-    sendoffs,
     arrivals,
     seatedOnArrival,
     /** A `worker.remove` is taking `id` out of the store: it walks out of the building. */
@@ -433,12 +309,8 @@ export function installWorkerViews(ctx: Ctx, core: CoreState, parts: WorkerViews
       sentHome.clear();
     },
     syncWorkers,
-    syncWorkersSeated,
-    syncJail,
     syncPlan,
     dressUp,
-    heraldSeat,
-    heraldHires,
     burstOver,
   };
 }

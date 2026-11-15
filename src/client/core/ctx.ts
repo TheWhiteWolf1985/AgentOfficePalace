@@ -12,7 +12,7 @@ import type { Parts } from './parts';
 import { Activities, Hooks, Interactions, Keys, Messages, Ticks, Usables, View } from './registry';
 
 /** What you can be in the middle of, in the order it gets keys, has the hint bar and stops in (see Activities). */
-const ACTIVITY_ORDER = ['hanger', 'climber', 'golf', 'thrower', 'driver'];
+const ACTIVITY_ORDER = ['hanger', 'climber', 'thrower', 'driver'];
 
 /** The office's own state: what the ctx hands out about where you are and what you hold, and what its own parts keep between frames. */
 export interface CoreState {
@@ -92,9 +92,8 @@ export function createCtx(parts: Parts): { ctx: Ctx; core: CoreState } {
     upTop: () => core.upTop,
     trip: () => core.trip,
     carrying: () => core.carrying,
-    holdingBall: () => parts.hoops.holding(),
     hint: {
-      // Not '': that reads as "no hint shown", and a hint still up (the golf one, say) would stay up.
+      // Not '': that reads as "no hint shown", and a hint still up (an activity hint, for example) would stay up.
       invalidate: () => void (core.hintKey = 'stale'),
       draw: (el, k, drawn) => {
         if (k === core.hintKey) return;

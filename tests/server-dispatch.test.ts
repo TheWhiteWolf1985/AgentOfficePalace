@@ -89,7 +89,9 @@ class Browser {
   /** Waits for what's still on its way (the elevator's list goes out a moment later), then forgets all of it. */
   async drain(ms = 400) {
     await new Promise((resolve) => setTimeout(resolve, ms));
+    const messages = this.inbox;
     this.inbox = [];
+    return messages;
   }
 
   /** The types of the next `n` messages, in the order they came, leaving out the elevator's list and the dog, who goes about its day. */
@@ -149,6 +151,9 @@ before(async () => {
 
   for (const k of Object.keys(process.env)) if (k.startsWith('AGENT_OFFICE_')) delete process.env[k];
   const port = await freePort();
+  mkdirSync(path.join(home, '.agent-office', 'maps'), { recursive: true });
+  writeFileSync(path.join(home, '.agent-office', 'map.json'), JSON.stringify({ pick: 'castle' }));
+  writeFileSync(path.join(home, '.agent-office', 'maps', 'legacy.json'), '{invalid retired map');
   const cfg = loadConfig([project, '--home', home, '--projects', path.join(tmp, 'projects'), '--port', String(port), '--password', PASSWORD, '--no-open', '--weather', 'clear', '--agent', claude]);
   office = await startServer(cfg, { publicDir });
   base = `http://127.0.0.1:${port}`;
@@ -261,13 +266,14 @@ test('welcomes a browser and dispatches what it sends', async () => {
   assert.equal(welcome.project?.name, floor.project.name);
   assert.deepEqual(welcome.me, { admin: true });
   assert.deepEqual(welcome.workers, []);
+  for (const removed of ['map', 'ball', 'jail']) assert.equal(removed in welcome, false);
   assert.equal(welcome.floors.length, 1);
   assert.equal(welcome.floors[0].id, floor.id);
   const ada = welcome.peers.find((p) => p.id === welcome.you);
   assert.equal(ada?.name, 'Ada');
   assert.equal(ada?.color, '#ff8a5b');
   assert.equal(ada?.floor, floor.id);
-  assert.deepEqual(Object.keys(welcome).slice(-17), ['floor', 'project', 'workers', 'issues', 'pulls', 'queue', 'decor', 'plan', 'services', 'dog', 'ball', 'cars', 'jail', 'jukebox', 'whiteboard', 'meeting', 'cabinet']);
+  assert.deepEqual(Object.keys(welcome).slice(-15), ['floor', 'project', 'workers', 'issues', 'pulls', 'queue', 'decor', 'plan', 'services', 'dog', 'cars', 'jukebox', 'whiteboard', 'meeting', 'cabinet']);
 
   a.send({ t: 'ping', at: 42 });
   const pong = await a.take('pong');
@@ -342,14 +348,11 @@ test('the toys on a floor, and letting go of them on leaving the floor or the of
   a.send({ t: 'dog.name', name: 'Rex' });
   assert.equal((await b.take('toast', (m) => m.text.startsWith('🐶'))).text, '🐶 Cy named the dog Rex');
 
-  // The gong once, not twice in a row; no air horn off the roof, and no golf without a club.
+  // The gong once, not twice in a row; no air horn off the roof.
   a.send({ t: 'gong' });
   a.send({ t: 'gong' });
   a.send({ t: 'horn' });
-  a.send({ t: 'golf', yaw: 0, loft: 0.5, power: 0.5 });
-  a.send({ t: 'act', golf: true });
-  a.send({ t: 'golf', yaw: 0.25, loft: 0.5, power: 0.5 });
-  assert.deepEqual(await b.next(3), ['gong', 'peer.act', 'golf']);
+  assert.deepEqual(await b.next(1), ['gong']);
 
   a.send({ t: 'wb.open' });
   assert.deepEqual((await b.take('wb.people')).people, [cy]);
@@ -360,8 +363,6 @@ test('the toys on a floor, and letting go of them on leaving the floor or the of
 
   const holdEverything = async () => {
     a.send({ t: 'wb.open' });
-    a.send({ t: 'ball.take' });
-    assert.equal((await b.take('ball')).ball.holder, cy);
     a.send({ t: 'car.enter', car: 0, seat: 'driver' });
     await a.take('cars', (m) => m.answer === true);
     await b.take('cars');
@@ -370,17 +371,17 @@ test('the toys on a floor, and letting go of them on leaving the floor or the of
     await b.drain();
   };
   await holdEverything();
-  // Up to the roof: the floor sees the arcade free up, Cy go, and then the whiteboard, the ball and the car.
+  // Up to the roof: the floor sees the arcade free up, Cy go, and then the whiteboard and the car.
   a.send({ t: 'floor.go', floor: '@roof' });
   assert.equal((await a.take('floor.enter')).floor, '@roof');
-  assert.deepEqual(await b.next(5), ['cabinet', 'peer.update', 'wb.people', 'ball', 'cars']);
+  assert.deepEqual(await b.next(4), ['cabinet', 'peer.update', 'wb.people', 'cars']);
 
   a.send({ t: 'floor.go', floor: floor.id });
   assert.equal((await a.take('floor.enter')).floor, floor.id);
   await holdEverything();
-  // Out of the office: the whiteboard, the arcade, the ball and the car, then Cy's gone.
+  // Out of the office: the whiteboard, the arcade and the car, then Cy's gone.
   await a.close();
-  assert.deepEqual(await b.next(5), ['wb.people', 'cabinet', 'ball', 'cars', 'peer.leave']);
+  assert.deepEqual(await b.next(4), ['wb.people', 'cabinet', 'cars', 'peer.leave']);
   await b.close();
 });
 
@@ -394,8 +395,11 @@ test('settings, accounts, sign-ins and the boards answer as before', async () =>
   a.send({ t: 'theme.set', pick: 'off' });
   assert.equal((await a.take('theme')).state.pick, 'off');
   assert.equal(await told('Eve took'), 'Eve took the holiday decorations down');
-  a.send({ t: 'map.set', map: 'nowhere' });
-  await warned('There’s no map by that name, or it won’t load: see ⚙️ Settings');
+  // Stale clients cannot re-enable removed features; the next valid request still answers.
+  for (const legacy of [{ t: 'map.set', map: 'castle' }, { t: 'ball.take' }, { t: 'golf', power: 1 }]) a.send(legacy as never);
+  a.send({ t: 'ping', at: 123 });
+  assert.equal((await a.take('pong')).at, 123);
+  assert.equal((await a.drain()).some((m) => ['map', 'ball', 'golf'].includes(m.t)), false);
   a.send({ t: 'machine.limit', limit: 0 });
   await warned('The worker limit is a whole number from 1 to 500');
   a.send({ t: 'machine.limit', limit: 3 });

@@ -54,7 +54,6 @@ export function installCars(ctx: Ctx, deps: CarsDeps) {
     const def = CARS[i];
     if (ctx.trip() || ctx.activities.running('climber') || driver.active || !c || !def) return;
     if (ctx.carrying()) return toast(uiText('🗂️ Your hands are full: put the card back first (Q)'), 'warn');
-    if (ctx.holdingBall()) return toast(uiText('🏀 Put the ball down first (Q)'), 'warn');
     const seat: CarSeat | null = !c.driver ? 'driver' : !c.passenger ? 'passenger' : null;
     if (!seat) return toast(uiText`🏎️ The ${def.name} is full`, 'warn');
     if (ctx.player.seat) deps.standUp();
@@ -167,8 +166,7 @@ export function installCars(ctx: Ctx, deps: CarsDeps) {
         // private window: it's only for this visit then
       }
     }
-    if (done?.best) ctx.sound.golf('cheer');
-    else ctx.sound.arcade('clear');
+    ctx.sound.arcade('clear');
     toast(done?.best ? uiText`🏁 Lap of the scenic loop: ${lapTime(time)}, your best yet!` : uiText`🏁 Lap of the scenic loop: ${lapTime(time)} (best ${lapTime(laps.best ?? time)})`, 'info');
   }
 

@@ -92,7 +92,7 @@ export interface Ctx {
   readonly reduceMotion: MediaQueryList;
   readonly hud: Hud;
 
-  /** The world the building's map is built as: the office, or a map of its own (the castle). */
+  /** The fixed office world. */
   world(): World;
   /** Where everything is on the building's map. */
   plan(): MapPlan;
@@ -105,8 +105,6 @@ export interface Ctx {
 
   /** The issue card in your hands, if any. */
   carrying(): CarriedIssue | null;
-  /** Whether the basketball's in your hands. */
-  holdingBall(): boolean;
 
   readonly hint: {
     /** Asks the hint bar to draw itself again, next frame. */

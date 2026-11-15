@@ -1,3 +1,4 @@
+import { OFFICE_PLAN } from '../../shared/maps';
 import { t as uiText } from '../../shared/i18n';
 // The page's store: what it knows about the office, kept up to date from the server's messages, and the
 // topics it fires as that changes (store.on / store.emit).
@@ -91,6 +92,8 @@ export function workerForPull(workers: Iterable<WorkerInfo>, pr: { number: numbe
 }
 
 export class Store {
+  /** The office is the building's only layout. */
+  plan() { return OFFICE_PLAN; }
   you = '';
   profile: Profile = { name: uiText('Guest'), color: AVATAR_COLORS[1], look: randomLook() };
   peers = new Map<string, PeerInfo>();

@@ -1,10 +1,9 @@
-// The toys on every floor: pictures, the jukebox, the arcade, the whiteboard, the ball, the cars and the dog.
+// The toys on every floor: pictures, the jukebox, the arcade, the whiteboard, the cars and the dog.
 
 import type { CabinetFrame, CabinetState } from '../cabinet.js';
 import type { DecorPlacement, Decoration } from '../decor.js';
 import type { DogState } from '../dog.js';
 import type { CarSeat, CarState } from '../garage.js';
-import type { BallState } from '../hoop.js';
 import type { JukeboxState } from '../jukebox.js';
 import type { WbElement, WbPointer } from '../whiteboard.js';
 
@@ -45,12 +44,6 @@ export type WhiteboardClientMsg =
   /** Where your mouse is on the whiteboard, and what you have selected there. */
   | ({ t: 'wb.pointer'; selected?: string[] } & WbPointer);
 
-export type BallClientMsg =
-  /** Pick up the floor's basketball (or catch it): yours if nobody else has it. */
-  | { t: 'ball.take' }
-  /** Throw the basketball in your hands from (x, y, z) at (vx, vy, vz) m/s, or drop it; everyone on the floor sees it fly. */
-  | { t: 'ball.throw'; x: number; y: number; z: number; vx: number; vy: number; vz: number };
-
 export type CarClientMsg =
   /** Get into a seat of one of the floor's cars (by its place in CARS): yours if nobody's in it. */
   | { t: 'car.enter'; car: number; seat: CarSeat }
@@ -75,8 +68,6 @@ export type ToysServerMsg =
   | { t: 'decor'; items: Decoration[] }
   /** What the dog on your floor is up to now: sent at the start of each leg of its day. */
   | { t: 'dog'; dog: DogState }
-  /** The basketball on your floor was picked up, thrown, or put back under the hoop. */
-  | { t: 'ball'; ball: BallState }
   /** Someone got into one of your floor's cars, or out of one; `answer` to each car.enter and car.leave of yours, whether you got in or not. */
   | { t: 'cars'; cars: CarState[]; answer?: boolean }
   /** A car on your floor is being driven (see car.drive). */
