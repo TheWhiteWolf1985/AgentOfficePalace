@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { model } from './models';
 import { prepareAtrium } from './atrium-materials';
+import { buildReceptionStaff } from './character/reception-staff';
 import { roofDrop } from '../../shared/layout';
 import { exteriorGroundGeometry } from './city-ground';
 import { mulberry32 } from '../../shared/rng';
@@ -347,7 +348,11 @@ export function buildCity(night: NightParts): City {
   const building = buildTower([], night);
   group.add(building.group);
   const atrium = model('atrium');
-  if (atrium) { prepareAtrium(atrium.scene); street.add(atrium.scene); }
+  if (atrium) {
+    prepareAtrium(atrium.scene);
+    atrium.scene.add(buildReceptionStaff(name => model(name)?.scene ?? null));
+    street.add(atrium.scene);
+  }
   // Its plaza surrounds the atrium: even two centimetres would bury the parquet and rugs.
   const plaza = blockAt(0, 0);
   parks.add(mesh(exteriorGroundGeometry({ minX: plaza.x-inner/2, maxX: plaza.x+inner/2, minZ: plaza.z-inner/2, maxZ: plaza.z+inner/2 }), toon('#cfc8b8'), 0, 0.02, 0, false));

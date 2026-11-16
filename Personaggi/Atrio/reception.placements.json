@@ -1,0 +1,71 @@
+{
+  "contract": "AOP_CHAR_RIGID_1",
+  "source_atrium_sha256": "5655594f52a4be97977d7cc98f00f1e514d73de5276de31d095a771fb7da774c",
+  "role": "decorative_reception_npc",
+  "count": 2,
+  "pose": "standing_idle",
+  "movement": false,
+  "tasks": null,
+  "agent_provider": null,
+  "floor": "@lobby",
+  "placements": [
+    {
+      "id": "reception_npc_a",
+      "asset": "reception_a.glb",
+      "profile": "human",
+      "runtime_position": [
+        -1.1,
+        0,
+        -10.8
+      ],
+      "runtime_rotY": 0,
+      "blender_position": [
+        -1.1,
+        10.8,
+        0
+      ],
+      "runtime_facing": [
+        0,
+        0,
+        1
+      ],
+      "runtime_instance_scale": [
+        1.15,
+        1.15,
+        1.15
+      ]
+    },
+    {
+      "id": "reception_npc_b",
+      "asset": "reception_b.glb",
+      "profile": "human",
+      "runtime_position": [
+        1.1,
+        0,
+        -10.8
+      ],
+      "runtime_rotY": 0,
+      "blender_position": [
+        1.1,
+        10.8,
+        0
+      ],
+      "runtime_facing": [
+        0,
+        0,
+        1
+      ],
+      "runtime_instance_scale": [
+        1.15,
+        1.15,
+        1.15
+      ]
+    }
+  ],
+  "placement_status": "proposed and checked against current reference boxes; final fit requires exported character + runtime QA",
+  "countertop_height_m": 1.31,
+  "clearance_note": "Keep root local at origin in each exported character. Placements are applied by app, never baked into asset. Do not delete/move counter, chairs, monitors or logo panel.",
+  "instance_scale": 1.15,
+  "scale_status": "explicitly confirmed by Juri on 2026-11-16; only the two reception NPC instances; asset root remains scale 1",
+  "comparison_reference": "reception_scale_100.png shows original scale; reception_reference.png shows confirmed 1.15"
+}

@@ -1,0 +1,37 @@
+{
+  "status": "PASS",
+  "profile": "human",
+  "errors": [],
+  "metrics": {
+    "triangles": 762,
+    "mesh_instances": 12,
+    "primitives": 23,
+    "materials": 8,
+    "bytes": 53488,
+    "bounds_min": [
+      -0.45500001311302185,
+      0.0,
+      -0.32899999618530273
+    ],
+    "bounds_max": [
+      0.45500001311302185,
+      1.7654999494552612,
+      0.335999995470047
+    ]
+  },
+  "mesh_nodes": [
+    "char_arm_negx_visual",
+    "char_hand_negx_visual",
+    "char_arm_posx_visual",
+    "char_hand_posx_visual",
+    "char_eye_negx_visual",
+    "char_eye_posx_visual",
+    "char_hair_visual",
+    "char_head_visual",
+    "char_mouth_visual",
+    "char_leg_negx_visual",
+    "char_leg_posx_visual",
+    "char_torso_visual"
+  ],
+  "scope": "static contract; no manual/Blender/runtime certification"
+}

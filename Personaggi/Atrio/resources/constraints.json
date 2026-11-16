@@ -1,0 +1,825 @@
+{
+  "contract": "AOP_CHAR_RIGID_1",
+  "version": "1.0.0",
+  "source_commit": "18eabedb9656f0d29393514f1168bcd602d85434",
+  "units": "meters",
+  "runtime_axes": {
+    "up": "+Y",
+    "forward": "+Z",
+    "first_person_forward": "-Z"
+  },
+  "blender_axes": {
+    "up": "+Z",
+    "character_front": "-Y",
+    "first_person_front": "+Y"
+  },
+  "blender_to_runtime": [
+    "x",
+    "z",
+    "-y"
+  ],
+  "tolerance_m": 0.005,
+  "rotation_tolerance": 0.001,
+  "scale_tolerance": 0.001,
+  "profile_type": "rigid named transform hierarchy; no armature, skins, clips or morph targets in v1",
+  "profiles": {
+    "human": {
+      "nodes": {
+        "char_root": {
+          "parent": null,
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        },
+        "char_body": {
+          "parent": "char_root",
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        },
+        "char_torso": {
+          "parent": "char_body",
+          "translation": [
+            0,
+            0.72,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        },
+        "char_head": {
+          "parent": "char_body",
+          "translation": [
+            0,
+            1.32,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        },
+        "char_hair": {
+          "parent": "char_head",
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        },
+        "char_eye_negx": {
+          "parent": "char_head",
+          "translation": [
+            -0.12,
+            0.02,
+            0.3
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        },
+        "char_eye_posx": {
+          "parent": "char_head",
+          "translation": [
+            0.12,
+            0.02,
+            0.3
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        },
+        "char_mouth": {
+          "parent": "char_head",
+          "translation": [
+            0,
+            -0.1,
+            0.32
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        },
+        "char_arm_negx": {
+          "parent": "char_body",
+          "translation": [
+            -0.33,
+            0.9,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        },
+        "char_arm_posx": {
+          "parent": "char_body",
+          "translation": [
+            0.33,
+            0.9,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        },
+        "char_leg_negx": {
+          "parent": "char_body",
+          "translation": [
+            -0.12,
+            0.42,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        },
+        "char_leg_posx": {
+          "parent": "char_body",
+          "translation": [
+            0.12,
+            0.42,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        },
+        "char_hand_negx": {
+          "parent": "char_arm_negx",
+          "translation": [
+            0,
+            -0.38,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        },
+        "char_hand_posx": {
+          "parent": "char_arm_posx",
+          "translation": [
+            0,
+            -0.38,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        },
+        "char_socket_label": {
+          "parent": "char_root",
+          "translation": [
+            0,
+            2,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        },
+        "char_socket_voice": {
+          "parent": "char_root",
+          "translation": [
+            0,
+            2.25,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        },
+        "char_socket_bubble": {
+          "parent": "char_root",
+          "translation": [
+            0,
+            2.45,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        },
+        "char_socket_card": {
+          "parent": "char_body",
+          "translation": [
+            0,
+            0.8,
+            0.36
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        }
+      },
+      "bounds_min": [
+        -0.5,
+        -0.005,
+        -0.5
+      ],
+      "bounds_max": [
+        0.5,
+        1.85,
+        0.4
+      ],
+      "required_material_roles": [
+        "skin",
+        "clothing"
+      ],
+      "limits": {
+        "triangles": 12000,
+        "mesh_instances": 24,
+        "primitives": 24,
+        "materials": 8,
+        "bytes": 4194304
+      },
+      "optional_material_roles": [
+        "hair"
+      ]
+    },
+    "agent": {
+      "nodes": {
+        "char_root": {
+          "parent": null,
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        },
+        "char_body": {
+          "parent": "char_root",
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        },
+        "char_arm_negx": {
+          "parent": "char_body",
+          "translation": [
+            -0.3,
+            0.55,
+            0.05
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        },
+        "char_arm_posx": {
+          "parent": "char_body",
+          "translation": [
+            0.3,
+            0.55,
+            0.05
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        },
+        "char_foot_negx": {
+          "parent": "char_body",
+          "translation": [
+            -0.12,
+            0.2,
+            0.05
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        },
+        "char_foot_posx": {
+          "parent": "char_body",
+          "translation": [
+            0.12,
+            0.2,
+            0.05
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        },
+        "char_eye_negx": {
+          "parent": "char_body",
+          "translation": [
+            -0.11,
+            0.7,
+            0.23
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        },
+        "char_eye_posx": {
+          "parent": "char_body",
+          "translation": [
+            0.11,
+            0.7,
+            0.23
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        },
+        "char_pupil_negx": {
+          "parent": "char_body",
+          "translation": [
+            -0.11,
+            0.7,
+            0.29
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        },
+        "char_pupil_posx": {
+          "parent": "char_body",
+          "translation": [
+            0.11,
+            0.7,
+            0.29
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        },
+        "char_status": {
+          "parent": "char_body",
+          "translation": [
+            0,
+            1.2,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        },
+        "char_hand_negx": {
+          "parent": "char_arm_negx",
+          "translation": [
+            0,
+            -0.23,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        },
+        "char_hand_posx": {
+          "parent": "char_arm_posx",
+          "translation": [
+            0,
+            -0.23,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        },
+        "char_socket_label": {
+          "parent": "char_root",
+          "translation": [
+            0,
+            1.55,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        },
+        "char_socket_bubble": {
+          "parent": "char_root",
+          "translation": [
+            0,
+            1.95,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        },
+        "char_socket_task": {
+          "parent": "char_root",
+          "translation": [
+            0,
+            1.74,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        }
+      },
+      "bounds_min": [
+        -0.45,
+        -0.005,
+        -0.4
+      ],
+      "bounds_max": [
+        0.45,
+        1.35,
+        0.4
+      ],
+      "required_material_roles": [
+        "body",
+        "status"
+      ],
+      "limits": {
+        "triangles": 12000,
+        "mesh_instances": 24,
+        "primitives": 24,
+        "materials": 8,
+        "bytes": 4194304
+      }
+    },
+    "first_person": {
+      "nodes": {
+        "fp_root": {
+          "parent": null,
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        },
+        "fp_arm_negx": {
+          "parent": "fp_root",
+          "translation": [
+            -0.18,
+            -0.17,
+            -0.5
+          ],
+          "rotation": [
+            0.18722432273715855,
+            -0.2848164938852224,
+            0.03337917585305431,
+            0.9395277794753663
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        },
+        "fp_arm_posx": {
+          "parent": "fp_root",
+          "translation": [
+            0.18,
+            -0.17,
+            -0.5
+          ],
+          "rotation": [
+            0.18722432273715855,
+            0.2848164938852224,
+            -0.03337917585305431,
+            0.9395277794753663
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ]
+        }
+      },
+      "bounds_min": [
+        -0.65,
+        -0.65,
+        -0.9
+      ],
+      "bounds_max": [
+        0.65,
+        0.4,
+        0.6
+      ],
+      "required_material_roles": [
+        "skin",
+        "clothing"
+      ],
+      "limits": {
+        "triangles": 6000,
+        "mesh_instances": 8,
+        "primitives": 8,
+        "materials": 3,
+        "bytes": 2097152
+      }
+    }
+  },
+  "common": {
+    "allowed_geometry": "TRIANGLES",
+    "embedded_resources_only": true,
+    "textures_max_px": 2048,
+    "allowed_image_mimes": [
+      "image/png",
+      "image/jpeg"
+    ],
+    "no_required_extensions": true,
+    "no_cameras_lights_physics_colliders": true,
+    "node_names": "unique ASCII letters/digits/underscore; no dots/spaces/Blender .001",
+    "material_names_prefix": "char_mat_ or fp_mat_",
+    "dynamic_materials": "solid baseColorFactor, no texture on skin/clothing/hair/body/status",
+    "rest_pose": "upright, arms down, facing +Z; first-person profile is camera-local",
+    "controls": "all required nodes survive export, exact parent/rest TRS; vertices may change within bounds",
+    "prohibited": "root motion; baked names/labels/tasks/logos; room geometry in character GLB; external downloads; baked outlines/shadows; unlicensed assets"
+  }
+}

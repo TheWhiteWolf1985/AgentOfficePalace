@@ -3,6 +3,7 @@ import { ATRIUM_COLLIDERS, ATRIUM_DATA, ATRIUM_SEATING } from '../../../shared/a
 import { ELEVATOR, FLOOR } from '../../../shared/layout';
 import { LOBBY_NAME } from '../../../shared/rooftop';
 import { prepareAtrium } from '../../world/atrium-materials';
+import { buildReceptionStaff } from '../../world/character/reception-staff';
 import { buildCity } from '../../world/city';
 import { buildElevator } from '../../world/elevator';
 import { model } from '../../world/models';
@@ -16,6 +17,7 @@ export function buildAtrium(night: NightParts) {
   group.name = 'atrium';
   prepareAtrium(asset.scene);
   group.add(asset.scene);
+  group.add(buildReceptionStaff(name => model(name)?.scene ?? null));
   const colliders: Collider[] = ATRIUM_COLLIDERS.map((c) => ({ ...c }));
   colliders.push({ minX: ELEVATOR.x-ELEVATOR.width/2, maxX: ELEVATOR.x+ELEVATOR.width/2, minZ: FLOOR.minZ, maxZ: FLOOR.minZ+ELEVATOR.depth, bottom: -0.3, top: 0 });
   const elevator = buildElevator(ATRIUM_DATA.height);

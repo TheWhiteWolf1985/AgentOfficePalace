@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { EXIT_DOOR, STOREY, STREET_Y, streetBelow } from '../../../shared/layout';
 import { model } from '../models';
 import { prepareAtrium } from '../atrium-materials';
+import { buildReceptionStaff } from '../character/reception-staff';
 import { mergeByMaterial } from '../toon';
 import type { Collider } from '../types';
 import { buildBalconyPosts, buildExitStairs } from './balcony';
@@ -36,6 +37,7 @@ export function downstairs<P extends Fixture<never, StreetSite>[]>(...parts: P):
     const atrium = model('atrium');
     if (atrium) {
       prepareAtrium(atrium.scene);
+      atrium.scene.add(buildReceptionStaff(name => model(name)?.scene ?? null));
       atrium.scene.position.y = STREET_Y;
       ground.add(atrium.scene);
     }

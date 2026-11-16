@@ -1,0 +1,33 @@
+{
+  "status": "PASS",
+  "collisions": [],
+  "envelopes": [
+    {
+      "asset": "reception_a",
+      "min": [
+        -1.6232500150799751,
+        0.0,
+        -11.178349995613098
+      ],
+      "max": [
+        -0.576749984920025,
+        2.03032494187355,
+        -10.413600005209446
+      ]
+    },
+    {
+      "asset": "reception_b",
+      "min": [
+        0.576749984920025,
+        0.0,
+        -11.175474998354913
+      ],
+      "max": [
+        1.6232500150799751,
+        2.03032494187355,
+        -10.413600005209446
+      ]
+    }
+  ],
+  "scope": "Static AABB versus kit-measured reception furniture; no navigation/application test."
+}

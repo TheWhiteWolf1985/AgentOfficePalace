@@ -12,6 +12,21 @@ utilizzabili, consolle, quattordici piante e pannello aziendale dietro la recept
 Il pannello dietro la reception può mostrare testo centrato o un logo aziendale. WASD permette di girare; E usa l'ascensore o una
 seduta. Posizione e spazio vengono ripristinati dopo la riconnessione.
 
+Dietro il banco sono presenti i due personaggi consegnati in `Personaggi/Atrio/`:
+capelli biondi a sinistra e castani a destra guardando la reception. Sono presenze
+decorative fisse, in piedi, senza compiti o interazioni; non sono utenti connessi
+o processi agente e non occupano posti nei salottini. Sono visibili anche senza
+uffici configurati e nelle rappresentazioni esterne dell'Atrio.
+
+Le istanze sono a x ±1,10 m, y 0, z −10,80 m, rivolte verso +Z; solo le istanze
+sono scalate a 1,15, mentre i GLB e i rig rimangono a scala 1. Le tinte originali
+e i materiali multipli dei volti vengono adattati al toon con materiali separati
+per istanza. I loro ingombri statici partecipano alle collisioni e ai percorsi
+dell'Atrio. L'import riproducibile `python -B scripts/import-reception-staff.py`
+verifica l'inventario SHA-256 della consegna, preserva gli originali e genera
+soltanto i due asset runtime e `src/shared/reception-staff.ts`. Le verifiche del
+produttore restano distinte dai successivi controlli nell'applicazione.
+
 La cabina applicativa riempie il volume riservato dal modello. Le collisioni
 comprendono i box del manifest e i limiti trasformati delle geometrie di
 architettura, reception e arredi originali. Il GLB è già Y-up: la conversione

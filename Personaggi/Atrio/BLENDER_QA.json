@@ -1,0 +1,114 @@
+{
+  "reception_a": {
+    "walk_a": {
+      "status": "PASS",
+      "rotated": true,
+      "finite": true
+    },
+    "walk_b": {
+      "status": "PASS",
+      "rotated": true,
+      "finite": true
+    },
+    "sit": {
+      "status": "PASS",
+      "rotated": true,
+      "finite": true
+    },
+    "hold": {
+      "status": "PASS",
+      "rotated": true,
+      "finite": true
+    },
+    "paper_book": {
+      "status": "PASS",
+      "rotated": true,
+      "finite": true
+    },
+    "ladder": {
+      "status": "PASS",
+      "rotated": true,
+      "finite": true,
+      "head_clearance_negx": "PASS",
+      "head_clearance_posx": "PASS"
+    },
+    "pole": {
+      "status": "PASS",
+      "rotated": true,
+      "finite": true,
+      "head_clearance_negx": "PASS",
+      "head_clearance_posx": "PASS"
+    },
+    "hide_head_and_arms": {
+      "status": "PASS",
+      "remaining": [
+        "char_leg_negx_visual",
+        "char_leg_posx_visual",
+        "char_torso_visual"
+      ]
+    },
+    "pbr_materials": {
+      "status": "PASS",
+      "count": 8
+    }
+  },
+  "reception_b": {
+    "walk_a": {
+      "status": "PASS",
+      "rotated": true,
+      "finite": true
+    },
+    "walk_b": {
+      "status": "PASS",
+      "rotated": true,
+      "finite": true
+    },
+    "sit": {
+      "status": "PASS",
+      "rotated": true,
+      "finite": true
+    },
+    "hold": {
+      "status": "PASS",
+      "rotated": true,
+      "finite": true
+    },
+    "paper_book": {
+      "status": "PASS",
+      "rotated": true,
+      "finite": true
+    },
+    "ladder": {
+      "status": "PASS",
+      "rotated": true,
+      "finite": true,
+      "head_clearance_negx": "PASS",
+      "head_clearance_posx": "PASS"
+    },
+    "pole": {
+      "status": "PASS",
+      "rotated": true,
+      "finite": true,
+      "head_clearance_negx": "PASS",
+      "head_clearance_posx": "PASS"
+    },
+    "hide_head_and_arms": {
+      "status": "PASS",
+      "remaining": [
+        "char_leg_negx_visual",
+        "char_leg_posx_visual",
+        "char_torso_visual"
+      ]
+    },
+    "pbr_materials": {
+      "status": "PASS",
+      "count": 8
+    }
+  },
+  "two_instances": {
+    "status": "PASS",
+    "distinct_material_datablocks": true,
+    "independent_control_rotation": true,
+    "scope": "Blender two-import check only; runtime materials still require per-instance cloning."
+  }
+}
