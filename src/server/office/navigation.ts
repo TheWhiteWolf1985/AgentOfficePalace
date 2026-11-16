@@ -1,11 +1,11 @@
 import type { Floor } from '../floor.js';
 import { elevatorSpot } from '../../shared/layout.js';
-import { ROOF } from '../../shared/rooftop.js';
+import { LOBBY, ROOF } from '../../shared/rooftop.js';
 import { features } from '../ws/handlers/index.js';
 import type { Ctx, Navigation } from './context.js';
 import type { Client } from './client.js';
 import type { Spot } from './input.js';
-import { floorView, roofView, screensOf } from './views.js';
+import { floorView, lobbyView, roofView, screensOf } from './views.js';
 
 /** Taking people between the floors, the roof and the lobby. */
 export function navigation(ctx: Ctx): Navigation {
@@ -37,9 +37,10 @@ export function navigation(ctx: Ctx): Navigation {
 
   /** Out to the lobby, where the elevator has nowhere to go: the building's last floor was taken off. */
   const toLobby = (c: Client) => {
+    if (c.peer.floor === LOBBY) return;
     const left = leave(c);
-    delete c.peer.floor;
-    ctx.sendTo(c, { t: 'floor.enter', peers: [...ctx.clients.values()].map((o) => o.peer), ...floorView(ctx, undefined) });
+    c.peer.floor = LOBBY;
+    ctx.sendTo(c, { t: 'floor.enter', peers: [...ctx.clients.values()].map((o) => o.peer), ...lobbyView(ctx) });
     arrived(c, left);
   };
 

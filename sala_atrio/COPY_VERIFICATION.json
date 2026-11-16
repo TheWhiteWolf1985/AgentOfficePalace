@@ -1,0 +1,148 @@
+{
+  "status": "PASS",
+  "verified_at_utc": "2026-11-16T11:00:33.520775+00:00",
+  "files_verified": 23,
+  "total_bytes": 9470929,
+  "asset_glb_sha256": "5655594f52a4be97977d7cc98f00f1e514d73de5276de31d095a771fb7da774c",
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "e643543f39f12d680bdac3f9b8e4672d8275766f5f31efd07eb24d7b3c189391",
+      "copied_sha256": "e643543f39f12d680bdac3f9b8e4672d8275766f5f31efd07eb24d7b3c189391",
+      "match": true
+    },
+    {
+      "path": "delivery/atrium.blend",
+      "sha256": "5e1c76ac5720ea5d5dd75baaab82fcae23f1a3df43680f93c2a6f41a09b4ed3f",
+      "copied_sha256": "5e1c76ac5720ea5d5dd75baaab82fcae23f1a3df43680f93c2a6f41a09b4ed3f",
+      "match": true
+    },
+    {
+      "path": "delivery/atrium.glb",
+      "sha256": "5655594f52a4be97977d7cc98f00f1e514d73de5276de31d095a771fb7da774c",
+      "copied_sha256": "5655594f52a4be97977d7cc98f00f1e514d73de5276de31d095a771fb7da774c",
+      "match": true
+    },
+    {
+      "path": "delivery/atrium.manifest.json",
+      "sha256": "3b89c15e927d4eb899416c0be5bdfa548b61a0506aaa1d1888acd18820f8ba1b",
+      "copied_sha256": "3b89c15e927d4eb899416c0be5bdfa548b61a0506aaa1d1888acd18820f8ba1b",
+      "match": true
+    },
+    {
+      "path": "delivery/build_scene.py",
+      "sha256": "8a6312c09b282f6bbe306353305aa27ce745df57f85b819eb90ba7a097a0d9ad",
+      "copied_sha256": "8a6312c09b282f6bbe306353305aa27ce745df57f85b819eb90ba7a097a0d9ad",
+      "match": true
+    },
+    {
+      "path": "delivery/DRAFT_CHECKS.json",
+      "sha256": "017ac911f35a75fd3c7094bc7c8cd3f145059363ea64c939e407bd2c7f63a008",
+      "copied_sha256": "017ac911f35a75fd3c7094bc7c8cd3f145059363ea64c939e407bd2c7f63a008",
+      "match": true
+    },
+    {
+      "path": "delivery/DRAFT_CHECKS_AUTO.json",
+      "sha256": "7bd7524b26f7fa279bc448c0305c441d34a005e67a27b7f33ee4eab16d6d71c7",
+      "copied_sha256": "7bd7524b26f7fa279bc448c0305c441d34a005e67a27b7f33ee4eab16d6d71c7",
+      "match": true
+    },
+    {
+      "path": "delivery/enrich_lobby.py",
+      "sha256": "a039bd57d72b1a2cbe75340b69a16ef1bebc6222d47b8896eca695e4dedde538",
+      "copied_sha256": "a039bd57d72b1a2cbe75340b69a16ef1bebc6222d47b8896eca695e4dedde538",
+      "match": true
+    },
+    {
+      "path": "delivery/geometry_fingerprint.py",
+      "sha256": "acd726b0d99f6e76c002287a9c3acb02e11570b07532439a91e6aeaa675bc6e6",
+      "copied_sha256": "acd726b0d99f6e76c002287a9c3acb02e11570b07532439a91e6aeaa675bc6e6",
+      "match": true
+    },
+    {
+      "path": "delivery/NOTES.md",
+      "sha256": "66c8ee87008ceee3a69c62db8b5f9b0a17b68beedb4d26a9f54d4c4d026ce603",
+      "copied_sha256": "66c8ee87008ceee3a69c62db8b5f9b0a17b68beedb4d26a9f54d4c4d026ce603",
+      "match": true
+    },
+    {
+      "path": "delivery/preview_and_export.py",
+      "sha256": "2ec87e6a8ee180614331f6878cc686d560aa923441942627b7b10d321fd8df5e",
+      "copied_sha256": "2ec87e6a8ee180614331f6878cc686d560aa923441942627b7b10d321fd8df5e",
+      "match": true
+    },
+    {
+      "path": "delivery/reimport_check.blend",
+      "sha256": "4d192427cba03ab9b1b01871512a79949426c90fe020ca1157de8b5cd36642b8",
+      "copied_sha256": "4d192427cba03ab9b1b01871512a79949426c90fe020ca1157de8b5cd36642b8",
+      "match": true
+    },
+    {
+      "path": "delivery/render_views.py",
+      "sha256": "845603f75f2bc8662464c1d21b1f0d25dbf85c09a9f03c565136578a61975e00",
+      "copied_sha256": "845603f75f2bc8662464c1d21b1f0d25dbf85c09a9f03c565136578a61975e00",
+      "match": true
+    },
+    {
+      "path": "delivery/VALIDATION.json",
+      "sha256": "017ac911f35a75fd3c7094bc7c8cd3f145059363ea64c939e407bd2c7f63a008",
+      "copied_sha256": "017ac911f35a75fd3c7094bc7c8cd3f145059363ea64c939e407bd2c7f63a008",
+      "match": true
+    },
+    {
+      "path": "delivery/views/entrance.png",
+      "sha256": "dbb0d38cd9d9627a8a33553211b45eee20abccc84664eaa1514cef041f4454bd",
+      "copied_sha256": "dbb0d38cd9d9627a8a33553211b45eee20abccc84664eaa1514cef041f4454bd",
+      "match": true
+    },
+    {
+      "path": "delivery/views/reception.png",
+      "sha256": "79087023e517543d0b0d0785a9c7217e0eee1e702b855b724aeb42a17ba272d4",
+      "copied_sha256": "79087023e517543d0b0d0785a9c7217e0eee1e702b855b724aeb42a17ba272d4",
+      "match": true
+    },
+    {
+      "path": "delivery/views/top.png",
+      "sha256": "a5f3ddedd0523b31a11b05b7c0a10d18a149adaed081fa38482409f152b64bd8",
+      "copied_sha256": "a5f3ddedd0523b31a11b05b7c0a10d18a149adaed081fa38482409f152b64bd8",
+      "match": true
+    },
+    {
+      "path": "PACKAGE_MANIFEST.json",
+      "sha256": "3a785a2d228a939e78ca1a6dafaf89c71973c5e8985fb9b3f55ffab2cd206dda",
+      "copied_sha256": "3a785a2d228a939e78ca1a6dafaf89c71973c5e8985fb9b3f55ffab2cd206dda",
+      "match": true
+    },
+    {
+      "path": "README_CONSEGNA.md",
+      "sha256": "66c8ee87008ceee3a69c62db8b5f9b0a17b68beedb4d26a9f54d4c4d026ce603",
+      "copied_sha256": "66c8ee87008ceee3a69c62db8b5f9b0a17b68beedb4d26a9f54d4c4d026ce603",
+      "match": true
+    },
+    {
+      "path": "scripts/verify_package.py",
+      "sha256": "664c8e08677765cfe7706dc39638ba822b3a5784b93d99c3ac2b0e9cebcd2600",
+      "copied_sha256": "664c8e08677765cfe7706dc39638ba822b3a5784b93d99c3ac2b0e9cebcd2600",
+      "match": true
+    },
+    {
+      "path": "verification/rebuild_comparison.json",
+      "sha256": "10d6b66657e4ab6938302af18f5596cf56c0812a9b1e993f549479f2328b53ad",
+      "copied_sha256": "10d6b66657e4ab6938302af18f5596cf56c0812a9b1e993f549479f2328b53ad",
+      "match": true
+    },
+    {
+      "path": "verification/rebuilt_geometry_fingerprint.json",
+      "sha256": "f9d5bfe13ae437cbe8fc30395e187ecd505eef0b1c509dea8bd5c05c709b3f2b",
+      "copied_sha256": "f9d5bfe13ae437cbe8fc30395e187ecd505eef0b1c509dea8bd5c05c709b3f2b",
+      "match": true
+    },
+    {
+      "path": "verification/source_geometry_fingerprint.json",
+      "sha256": "f9d5bfe13ae437cbe8fc30395e187ecd505eef0b1c509dea8bd5c05c709b3f2b",
+      "copied_sha256": "f9d5bfe13ae437cbe8fc30395e187ecd505eef0b1c509dea8bd5c05c709b3f2b",
+      "match": true
+    }
+  ],
+  "report_note": "Il rapporto COPY_VERIFICATION.json \u00e8 escluso dalla propria lista di hash."
+}

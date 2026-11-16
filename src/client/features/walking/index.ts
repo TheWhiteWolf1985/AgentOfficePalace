@@ -1,3 +1,5 @@
+import { atriumRoute } from '../../../shared/atrium-nav';
+import { LOBBY } from '../../../shared/rooftop';
 import { t as uiText } from '../../../shared/i18n';
 /**
  * Walking over to someone (clicked in the sidebar, or in the palette), riding the elevator first if
@@ -79,7 +81,7 @@ export function installWalking(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'wo
     if (now < walkingTo.replanAt) return;
     walkingTo.replanAt = now + 800;
     // Navigate the office rooms, stairs and back office.
-    player.walkPath(ctx.upTop() ? conferenceRoute(player.pos, at) : wayTo(player.pos, at, officeWing()));
+    player.walkPath(store.floor === LOBBY ? atriumRoute(player.pos, at) : ctx.upTop() ? conferenceRoute(player.pos, at) : wayTo(player.pos, at, officeWing()));
   }
 
   ctx.ticks.add('steer', ({ now }) => walkTick(now));
@@ -109,7 +111,7 @@ export function installWalking(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'wo
    * ladder, driving a car) it just does it. A key of yours takes over, and then it doesn't happen.
    */
   function walkThen(at: { x: number; y?: number; z: number }, what: string, then: () => void, face?: { x: number; z: number }) {
-    if (core.upTop || core.trip || ctx.activities.running('climber') || ctx.activities.running('driver')) return then();
+    if (core.upTop || core.atLobby || core.trip || ctx.activities.running('climber') || ctx.activities.running('driver')) return then();
     closeAllModals();
     if (player.seat) parts.seating.standUp();
     ctx.activities.stopAll('errand');

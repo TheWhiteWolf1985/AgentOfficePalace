@@ -1,5 +1,5 @@
 import type { Floor } from '../floor.js';
-import { ROOF } from '../../shared/rooftop.js';
+import { LOBBY, ROOF } from '../../shared/rooftop.js';
 import type { FloorView } from '../../shared/protocol.js';
 import { views } from '../ws/handlers/index.js';
 import type { Ctx } from './context.js';
@@ -13,6 +13,7 @@ export const floorView = (ctx: Ctx, floor: Floor | undefined): FloorView => {
 };
 /** The shared meeting room: nobody works up there, so it has none of a floor's things. */
 export const roofView = (ctx: Ctx): FloorView => ({ ...floorView(ctx, undefined), floor: ROOF });
+export const lobbyView = (ctx: Ctx): FloorView => ({ ...floorView(ctx, undefined), floor: LOBBY });
 export const screensOf = (ctx: Ctx, c: Client, floor: Floor | undefined) => {
   for (const { workerId, frame } of floor?.workers.fullScreens() ?? []) ctx.sendTo(c, { t: 'screen', workerId, ...frame, full: true });
 };

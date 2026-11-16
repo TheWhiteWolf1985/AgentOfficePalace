@@ -2,7 +2,7 @@ import { t as uiText } from '../../shared/i18n';
 import './elevator.css';
 import type { CloneProgress, FloorInfo, RepoChoice, ServerMsg } from '../../shared/protocol';
 import { cloneLabel, cloneStep, floorPalette, normalizeRepo, sameRepo } from '../../shared/floors';
-import { LOBBY, ROOF, ROOF_NAME } from '../../shared/rooftop';
+import { LOBBY, LOBBY_NAME, ROOF, ROOF_NAME } from '../../shared/rooftop';
 import type { Net } from '../net';
 import { store } from '../state';
 import { h, openModal, timeAgo, toast, type Modal } from './dom';
@@ -195,36 +195,22 @@ export function openElevator(opts: ElevatorOptions): void {
     return btn;
   };
 
-  /** Under floor 1: the garage, level with the street. */
-  const garageButton = () => {
-    const here = opts.downstairs();
-    const bottom = store.floors.find((f) => !f.cloning);
-    const under = store.floor === ROOF ? uiText`Under ${bottom?.name ?? uiText('the building')}, level with the street` : uiText('Under the building, level with the street: the garage and the way out');
-    const btn = h(
-      'button.floor-btn',
-      { type: 'button', class: here ? 'here' : '', disabled: here, title: here ? uiText("You're down at the street") : uiText('Ride down to the garage') },
-      h('span.floor-no', { style: 'background:#2b2d42' }, '🏎️'),
-      h('span.floor-text', {}, h('span.floor-name', {}, uiText('Garage'), here ? h('span.here-tag', {}, uiText('you are here')) : null), h('span.floor-sub', {}, under)),
-      h('span.floor-stats', {}),
-    );
-    btn.addEventListener('click', () => {
-      if (here) return;
-      modal.close();
-      opts.ride(GARAGE);
-    });
+  /** Permanent floor zero, below every project and always available. */
+  const lobbyButton = () => {
+    const here = store.floor === LOBBY;
+    const people = [...store.peers.values()].filter((p) => p.floor === LOBBY).length;
+    const btn = h('button.floor-btn', { type: 'button', class: here ? 'here' : '', disabled: here },
+      h('span.floor-no', { style: 'background:#2b2d42' }, '0'),
+      h('span.floor-text', {}, h('span.floor-name', {}, LOBBY_NAME, here ? h('span.here-tag', {}, uiText('you are here')) : null),
+        h('span.floor-sub', {}, uiText('Ground floor · reception and lounge'))),
+      h('span.floor-stats', {}, people ? `🧑 ${people}` : ''));
+    btn.addEventListener('click', () => { if (!here) { modal.close(); opts.ride(LOBBY); } });
     return btn;
   };
 
   const renderFloors = () => {
     const floors = store.floors;
-    const built = floors.some((f) => !f.cloning);
-    // Top floor first, the way an elevator's buttons stack, with the roof over them, floor 1 and then the garage at the bottom.
-    floorsEl.replaceChildren(
-      roofButton(),
-      ...(floors.length ? floors.map(floorRow).reverse() : [h('p.empty', {}, uiText('No floors yet.'))]),
-      ...(built ? [garageButton()] : []),
-      ...(store.floor === ROOF ? [h('button.floor-btn', { type: 'button', onclick: () => { modal.close(); opts.ride(LOBBY); } }, uiText('🏢 Lobby'))] : []),
-    );
+    floorsEl.replaceChildren(roofButton(), ...floors.map(floorRow).reverse(), lobbyButton());
   };
 
   const repoRow = (r: RepoChoice) => {

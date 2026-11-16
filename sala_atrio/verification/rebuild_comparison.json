@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "nodes_compared": 532,
+  "source_sha256": "f9d5bfe13ae437cbe8fc30395e187ecd505eef0b1c509dea8bd5c05c709b3f2b",
+  "rebuilt_sha256": "f9d5bfe13ae437cbe8fc30395e187ecd505eef0b1c509dea8bd5c05c709b3f2b",
+  "scope": [
+    "evaluated_mesh_geometry",
+    "world_transforms",
+    "hierarchy",
+    "material_assignments"
+  ],
+  "blender_version": "5.3.0"
+}

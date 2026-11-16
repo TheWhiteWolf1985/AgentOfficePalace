@@ -1,0 +1,68 @@
+{
+  "stage": "visual_draft",
+  "blender_version": "5.3.0",
+  "checks": {
+    "root_identity": true,
+    "metric_scale": true,
+    "external_xy_bounds": true,
+    "floor_above_minimum": true,
+    "reception_centered": true,
+    "stairs_left": true,
+    "stairs_30_treads": true,
+    "elevator_reserved_bbox_clear": true,
+    "no_elevator_construction": true,
+    "old_brand_text_removed": true,
+    "blank_logo_quad_uv": true,
+    "logo_has_no_image": true,
+    "central_entrance_aisle_clear": true,
+    "glb2_header": true,
+    "embedded_buffers": true,
+    "embedded_images": true,
+    "no_required_extensions": true,
+    "nodes_present": true,
+    "no_preview_or_guides": true,
+    "no_exported_cameras_or_lights": true,
+    "reimport_bounds_match": true,
+    "reimport_mesh_count": true,
+    "reimport_materials_match": true
+  },
+  "automatic_checks_pass": true,
+  "bounds_blender_m": {
+    "min": [
+      -18.299999237060547,
+      -13.300000190734863,
+      -0.2199999988079071
+    ],
+    "max": [
+      18.299999237060547,
+      13.300000190734863,
+      6.242390155792236
+    ]
+  },
+  "reserved_bbox_overlaps": [],
+  "glb_bytes": 2940904,
+  "glb_sha256": "5655594f52a4be97977d7cc98f00f1e514d73de5276de31d095a771fb7da774c",
+  "nodes": 532,
+  "source_meshes": 480,
+  "reimport_meshes": 480,
+  "reimport_bounds_blender_m": {
+    "min": [
+      -18.299999237060547,
+      -13.300000190734863,
+      -0.2199999988079071
+    ],
+    "max": [
+      18.299999237060547,
+      13.300000190734863,
+      6.242390155792236
+    ]
+  },
+  "manual_review": "Viste da osservare dopo il render; approvazione del design in corso con Juri.",
+  "not_tested": [
+    "navigazione runtime",
+    "interazioni",
+    "integrazione applicativa",
+    "normativa scale"
+  ],
+  "ready_for_final_delivery": false
+}

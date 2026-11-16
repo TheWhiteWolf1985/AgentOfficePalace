@@ -11,7 +11,7 @@ import { Net } from './net';
 import { AVATAR_COLORS, loadProfile, loadSettings, saveProfile, store } from './state';
 import { randomLook } from '../shared/avatar';
 import { cloneLabel } from '../shared/floors';
-import { ROOF } from '../shared/rooftop';
+import { LOBBY, LOBBY_NAME, ROOF, ROOF_NAME } from '../shared/rooftop';
 import { DESK_BY_ID, nextFreeSeat } from '../shared/layout';
 import { isAsleep } from '../shared/status';
 import type { AgentEffort, AgentProvider, FloorInfo, WorkerInfo } from '../shared/protocol';
@@ -62,7 +62,6 @@ net.onMessage((msg) => {
       // Back from a restart on another version: this page's code is stale, so load the new one.
       if (!bootVersion) bootVersion = msg.version;
       else if (msg.version !== bootVersion) return location.reload();
-      offTheRoof();
       // After a reconnect the server has forgotten which terminal we had open, and what we're doing.
       sendDoing(true);
       const openId = openTerminalFor();
@@ -72,7 +71,6 @@ net.onMessage((msg) => {
       break;
     }
     case 'floor.enter':
-      offTheRoof();
       break;
     case 'toast':
       toast(msg.text, msg.level);
@@ -89,23 +87,17 @@ net.onMessage((msg) => {
   }
 });
 
-/** Nothing to see up on the roof from here: down to the first floor instead (the 3D office left you up there, say). */
-function offTheRoof() {
-  if (store.floor !== ROOF) return;
-  const to = store.floors.find((f) => !f.cloning);
-  if (to) net.send({ t: 'floor.go', floor: to.id });
-}
-
 // ---- The floor you're on ------------------------------------------------------------------------
 const floorSelect = $('floor') as HTMLSelectElement;
 const floorLabel = (f: FloorInfo) => `${f.name}${f.cloning ? ` (${cloneLabel(f.clone)})` : f.waiting ? ` · 🙋 ${f.waiting}` : ''}`;
 
 function renderFloors() {
   const options = store.floors.map((f) => h('option', { value: f.id, disabled: !!f.cloning }, floorLabel(f)));
-  if (!store.floors.length) options.push(h('option', { value: '' }, uiText('No floors yet')));
+  options.unshift(h('option', { value: ROOF }, ROOF_NAME));
+  options.push(h('option', { value: LOBBY }, LOBBY_NAME));
   floorSelect.replaceChildren(...options);
   floorSelect.value = store.floor ?? '';
-  floorSelect.disabled = store.floors.length < 2;
+  floorSelect.disabled = false;
   const p = store.project;
   const f = store.currentFloor();
   $('floor-meta').textContent = p ? [p.branch && `⎇ ${p.branch}`, f?.repo ?? p.dir, f && uiText`👥 ${f.people} here`].filter(Boolean).join(' · ') : store.floors.length ? '' : uiText('Add a project from the elevator in the 3D office.');

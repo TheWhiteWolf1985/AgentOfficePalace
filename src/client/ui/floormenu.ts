@@ -1,7 +1,7 @@
 import { t as uiText } from '../../shared/i18n';
 import './floormenu.css';
 import { cloneLabel, floorPalette } from '../../shared/floors';
-import { ROOF, ROOF_NAME } from '../../shared/rooftop';
+import { LOBBY, LOBBY_NAME, ROOF, ROOF_NAME } from '../../shared/rooftop';
 import type { FloorInfo } from '../../shared/protocol';
 import { store } from '../state';
 import { h } from './dom';
@@ -88,7 +88,13 @@ export function toggleFloorMenu(anchor: HTMLElement, opts: FloorMenuOptions): vo
       close();
       opts.roof?.();
     });
-    el.replaceChildren(h('div.floor-menu-head', {}, uiText`🏢 ${floors.length} floor${floors.length === 1 ? '' : 's'}`), ...(opts.roof ? [roof] : []), ...items, add);
+    const inLobby = store.floor === LOBBY;
+    const lobby = h('button.floor-item', { type: 'button', role: 'menuitem', class: inLobby ? 'here' : '', disabled: inLobby },
+      h('span.floor-no', { style: 'background:#2b2d42' }, '0'),
+      h('span.floor-text', {}, h('span.floor-name', {}, LOBBY_NAME), h('span.floor-sub', {}, inLobby ? uiText('you are here') : uiText('Ground floor · reception and lounge'))));
+    lobby.addEventListener('click', () => { if (!inLobby) { close(); opts.go(LOBBY); } });
+    const count = floors.length + 2;
+    el.replaceChildren(h('div.floor-menu-head', {}, uiText`🏢 ${count} floor${count === 1 ? '' : 's'}`), ...(opts.roof ? [roof] : []), ...items, lobby, add);
   };
 
   const place = () => {

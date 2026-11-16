@@ -103,7 +103,7 @@ export function installPeers(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'worl
       const ground = groundAt(player.colliders, p.x, p.z, p.y);
       const airborne = !sat && p.y > ground + 0.05;
       // Or holding on to the ladder or a pole; off a pole onto the mat, the firehouse bell rings.
-      const holding = sat || core.upTop || !inOffice() ? null : gripOf(p, office.stack.poles(), ground);
+      const holding = sat || core.upTop || core.atLobby || !inOffice() ? null : gripOf(p, office.stack.poles(), ground);
       if (r.grip === 'pole' && !holding && Math.abs(p.y) < 0.2) sound.poleLanding(6, { x: pos.x, y: 0.5, z: pos.z });
       r.grip = holding;
       r.person.setGrip(holding);

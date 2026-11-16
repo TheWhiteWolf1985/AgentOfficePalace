@@ -18,7 +18,7 @@ export function installRooftop(ctx: Ctx) {
     }
     return roof;
   }
-  const roofFloors = () => Math.max(1, builtFloors().length);
+  const roofFloors = () => builtFloors().length;
   function syncRoof() {
     if (!roof) return;
     roof.setFloors(roofFloors(), floorWings(builtFloors()));

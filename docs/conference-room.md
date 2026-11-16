@@ -3,7 +3,7 @@
 Il piano condiviso è raggiungibile dall'ascensore e dal menu dell'edificio anche
 senza progetti configurati. Non crea un ufficio, un repository o un agente.
 Il codice conserva la destinazione `@roof` per le posizioni già salvate;
-`@lobby` riporta all'ingresso. Chi visita la sala vi rimane anche quando viene
+`@lobby` riporta all'[Atrio al piano terra](atrium.md). Chi visita la sala vi rimane anche quando viene
 rimosso l'ultimo piano ufficio.
 
 La stanza usa il GLB consegnato in `sala_riunioni/delivery/`: 13 sedute al tavolo,

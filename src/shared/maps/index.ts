@@ -46,6 +46,6 @@ export function seatOn(plan: MapPlan, key: string): SeatPlace | undefined {
 }
 
 /** Validates a floor or rooftop seat against the office's fixed layout. */
-export function seatHereOn(_plan: MapPlan, key: string, onRoof: boolean): SeatPlace | undefined {
+export function seatHereOn(_plan: MapPlan, key: string, onRoof: boolean | string): SeatPlace | undefined {
   return seatHere(key, onRoof);
 }

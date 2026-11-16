@@ -1,6 +1,7 @@
 import * as THREE from 'three';
-import { EXIT_DOOR, STOREY, streetBelow } from '../../../shared/layout';
-import { buildGarage } from '../outside';
+import { EXIT_DOOR, STOREY, STREET_Y, streetBelow } from '../../../shared/layout';
+import { model } from '../models';
+import { prepareAtrium } from '../atrium-materials';
 import { mergeByMaterial } from '../toon';
 import type { Collider } from '../types';
 import { buildBalconyPosts, buildExitStairs } from './balcony';
@@ -32,7 +33,12 @@ export function downstairs<P extends Fixture<never, StreetSite>[]>(...parts: P):
     ground.add(mergeByMaterial(stairs));
     // The door, its frame and the EXIT sign over it.
     site.wall(EXIT_DOOR.wall, EXIT_DOOR.u, (EXIT_DOOR.y1 + 0.7) / 2, EXIT_DOOR.width + 0.3, EXIT_DOOR.y1 + 0.7);
-    buildGarage(ground, groundColliders);
+    const atrium = model('atrium');
+    if (atrium) {
+      prepareAtrium(atrium.scene);
+      atrium.scene.position.y = STREET_Y;
+      ground.add(atrium.scene);
+    }
     return {};
   };
   /** The street, with everything down there, in under the floor: that many storeys further down on a floor above the bottom one. */

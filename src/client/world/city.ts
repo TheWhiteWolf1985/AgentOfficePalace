@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import { model } from './models';
+import { prepareAtrium } from './atrium-materials';
 import { FLOOR, SLAB, STREET_Y, WALL_T, roofDrop } from '../../shared/layout';
 import { mulberry32 } from '../../shared/rng';
 import type { NightParts } from './outside';
@@ -39,7 +41,7 @@ export interface City {
    * The building has `floors` floors under the roof: the street goes as far down as that is tall,
    * and the buildings nearby come down to stay under the roof.
    */
-  setFloors(floors: number, wings?: readonly number[]): void;
+  setFloors(floors: number, wings?: readonly number[], atrium?: boolean): void;
 
   update(t: number, dt: number, night: number): void;
 }
@@ -346,16 +348,8 @@ export function buildCity(night: NightParts): City {
   // garage at the bottom: walled at the back and on the west side, columns along the other two.
   const building = buildTower([], night);
   group.add(building.group);
-  const garage = new THREE.Group();
-  const garageH = -STREET_Y - SLAB;
-  const concrete = toon('#d3d6dd');
-  garage.add(mesh(new THREE.BoxGeometry(B.maxX - B.minX, garageH, WALL_T), concrete, (B.minX + B.maxX) / 2, garageH / 2, B.minZ + WALL_T / 2, false));
-  garage.add(mesh(new THREE.BoxGeometry(WALL_T, garageH, B.maxZ - B.minZ), concrete, B.minX + WALL_T / 2, garageH / 2, (B.minZ + B.maxZ) / 2, false));
-  const column = new THREE.BoxGeometry(0.5, garageH, 0.5);
-  for (const x of [B.maxX - 0.25, -9.6, 0, 9.6]) garage.add(mesh(column, toon('#e6e8ee'), x, garageH / 2, B.maxZ - 0.25, false));
-  for (const z of [-6.5, 6.5, B.minZ + 0.25]) garage.add(mesh(column, toon('#e6e8ee'), B.maxX - 0.25, garageH / 2, z, false));
-  garage.add(mesh(new THREE.PlaneGeometry(B.maxX - B.minX, B.maxZ - B.minZ).rotateX(-Math.PI / 2), toon('#9a9ea8'), (B.minX + B.maxX) / 2, 0.03, (B.minZ + B.maxZ) / 2, false));
-  street.add(mergeByMaterial(garage));
+  const atrium = model('atrium');
+  if (atrium) { prepareAtrium(atrium.scene); street.add(atrium.scene); }
   // Its plaza, with a few trees in front.
   parks.add(mesh(new THREE.PlaneGeometry(inner, inner).rotateX(-Math.PI / 2), toon('#cfc8b8'), blockAt(0, 0).x, 0.02, blockAt(0, 0).z, false));
   for (const [x, z] of [
@@ -502,19 +496,22 @@ export function buildCity(night: NightParts): City {
   }
   group.add(mergeByMaterial(sky));
 
-  let floorsNow = 0;
+  let floorsNow = -1;
   let wingsNow = '';
   let riseNow = -1;
+  let inAtrium = false;
   return {
     group,
-    setFloors(floors, wings = []) {
-      floors = Math.max(1, floors);
-      if (floors === floorsNow && wings.join() === wingsNow) return;
+    setFloors(floors, wings = [], ground = false) {
+      floors = Math.max(0, floors);
+      if (floors === floorsNow && wings.join() === wingsNow && ground === inAtrium) return;
+      inAtrium = ground;
+      if (atrium) atrium.scene.visible = !ground;
       floorsNow = floors;
       wingsNow = wings.join();
-      const drop = roofDrop(floors);
+      const drop = ground ? 0 : roofDrop(floors);
       street.position.y = -drop;
-      building.set(floors, floors, wings);
+      building.set(ground ? -1 : floors, floors, wings);
       // The buildings only change height up to six floors (see rise).
       const k = Math.min(1, drop / LAID_OUT);
       if (k !== riseNow) {

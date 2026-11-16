@@ -481,7 +481,7 @@ test('the shared meeting room survives the last project removal and accepts visi
     await b.take('welcome');
     const floor = office.floors()[0];
     b.send({ t: 'floor.remove', floor: floor.id });
-    assert.equal((await b.take('floor.enter')).floor, null);
+    assert.equal((await b.take('floor.enter')).floor, '@lobby');
     a.send({ t: 'ping', at: 711 });
     await a.take('pong');
     assert.deepEqual(a.pending('floor.enter'), [], 'removing an office must not evacuate the shared room');
@@ -497,7 +497,24 @@ test('the shared meeting room survives the last project removal and accepts visi
     c.send({ t: 'sit', seat: 'seat_001:0' });
     assert.equal((await c.take('sit.refused')).seat, 'seat_001:0');
     a.send({ t: 'floor.go', floor: '@lobby' });
-    assert.equal((await a.take('floor.enter')).floor, null);
+    assert.equal((await a.take('floor.enter')).floor, '@lobby');
+    a.send({ t: 'sit', seat: 'atrio_lounge_seat_sofa_left0:0' });
+    a.send({ t: 'ping', at: 713 });
+    await a.take('pong');
+    c.send({ t: 'floor.go', floor: '@lobby' });
+    const atrium = await c.take('floor.enter');
+    assert.equal(atrium.floor, '@lobby');
+    assert.equal(atrium.project, null);
+    assert.deepEqual(atrium.workers, []);
+    assert.equal(atrium.peers.find((p) => p.id === welcome.you)?.seat, 'atrio_lounge_seat_sofa_left0:0');
+    c.send({ t: 'sit', seat: 'atrio_lounge_seat_sofa_left0:0' });
+    assert.equal((await c.take('sit.refused')).seat, 'atrio_lounge_seat_sofa_left0:0');
+    const restored = await Browser.open('?name=AtriumRestore&floor=%40lobby&x=0&y=0&z=8&rotY=0');
+    try {
+      const state = await restored.take('welcome');
+      assert.equal(state.floor, '@lobby');
+      assert.equal(state.peers.find((p) => p.id === state.you)?.z, 8);
+    } finally { await restored.close(); }
     a.send({ t: 'floor.go', floor: '@roof' });
     assert.equal((await a.take('floor.enter')).floor, '@roof');
   } finally {

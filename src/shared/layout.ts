@@ -1,8 +1,10 @@
+import { ATRIUM_SEATING } from './atrium.js';
+import { LOBBY, ROOF } from './rooftop.js';
 import { CONFERENCE_SEATING } from './conference-room.js';
 import { t as uiText } from './i18n.js';
 // Static office layout shared by the server (validation) and client (rendering).
 // Units are meters; +y is up. The office floor spans FLOOR.minX..maxX / minZ..maxZ at y = 0,
-// upstairs over a garage whose floor is level with the street (STREET_Y).
+// above the permanent atrium, whose floor is level with the street (STREET_Y).
 
 export const FLOOR = { minX: -18, maxX: 18, minZ: -13, maxZ: 13 } as const;
 /** How high the ceiling is: a meter over the loft's roof (LOFT.y + LOFT.height), all the way across the room. */
@@ -310,7 +312,7 @@ export const WHITEBOARD = { x: 5.4, z: -5.4, width: 4, height: 2.2, bottom: 0.5 
  * office, are this far below its floor. Each floor stands one STOREY higher than the one below it,
  * so from floor `i` the street is `streetBelow(i)` down.
  */
-export const STREET_Y = -3.6;
+export const STREET_Y = -(WALL_HEIGHT + 0.3); // Permanent atrium below the first project office.
 /** The street runs east–west in front of the building (south, +z), with a sidewalk along either side. */
 export const ROAD = { minZ: 23, maxZ: 31 } as const;
 /** The office's floor slab, which is the garage's ceiling: it runs from -SLAB up to 0. */
@@ -322,7 +324,7 @@ export const WALL_T = 0.3;
 
 /** How far below floor `index` of the building (0 is the bottom one) the street is. */
 export function streetBelow(index: number): number {
-  return STREET_Y - Math.max(0, index) * STOREY;
+  return STREET_Y - Math.max(-1, index) * STOREY;
 }
 
 export type Side = 'north' | 'south' | 'east' | 'west';
@@ -359,7 +361,7 @@ export const EXIT_STAIRS = {
   landingZ0: 5.6,
   landingZ1: 7.5,
   /** The steps run south from the landing down to the street. */
-  steps: 15,
+  steps: 30,
   run: 0.34,
 } as const;
 
@@ -381,11 +383,11 @@ export const PARACHUTE = { jump: { x: BALCONY_DOOR.u, z: BALCONY.maxZ - 0.45 }, 
 // comes up in its usual spot. A glass railing runs round the edge, and the city is far below.
 
 /**
- * How far below the roof the street is, with `floors` floors under it: the building is this tall.
+ * How far below the roof the street is, with `floors` project offices and the permanent atrium under it.
  * The roof stands a STOREY over the top floor, where a floor above it would be.
  */
 export function roofDrop(floors: number): number {
-  return -streetBelow(Math.max(1, floors));
+  return -streetBelow(Math.max(0, floors));
 }
 /**
  * Something to sit on, standing at x, z on the floor at `y` (the loft's, for what's up there). You
@@ -411,6 +413,8 @@ export interface SeatDef {
   tv?: boolean;
   /** In the shared meeting room, rather than a project office. */
   roof?: boolean;
+  /** In the permanent ground-floor atrium. */
+  lobby?: boolean;
   /** Explicit free standing anchor, supplied by a modeled room. */
   stand?: { x: number; y: number; z: number };
 }
@@ -433,6 +437,7 @@ export const SEATING: SeatDef[] = [
   { id: 'stool-1', label: uiText('🪑 Stool'), x: -0.6, y: 0, z: (BALCONY.minZ + BALCONY.maxZ) / 2 + 0.2, rotY: Math.PI / 2, places: [0], hips: 0.5, depth: 0, out: -0.7 },
   { id: 'stool-2', label: uiText('🪑 Stool'), x: 1, y: 0, z: (BALCONY.minZ + BALCONY.maxZ) / 2 + 0.2, rotY: -Math.PI / 2, places: [0], hips: 0.5, depth: 0, out: -0.7 },
   ...CONFERENCE_SEATING,
+  ...ATRIUM_SEATING,
 ];
 export const SEATING_BY_ID = new Map(SEATING.map((s) => [s.id, s]));
 
@@ -476,9 +481,12 @@ export function seatAt(key: string): SeatPlace | undefined {
 }
 
 /** The place `key` names, if it's somewhere you can sit from where you are: up on the roof, or down on a floor. */
-export function seatHere(key: string, onRoof: boolean): SeatPlace | undefined {
+export function seatHere(key: string, space: boolean | string): SeatPlace | undefined {
   const place = seatAt(key);
-  return place && !!SEATING_BY_ID.get(place.seatId)!.roof === onRoof ? place : undefined;
+  if (!place) return;
+  const seat = SEATING_BY_ID.get(place.seatId)!;
+  const here = seat.lobby ? space === LOBBY : seat.roof ? (space === true || space === ROOF) : (space !== true && space !== ROOF && space !== LOBBY);
+  return here ? place : undefined;
 }
 
 /**

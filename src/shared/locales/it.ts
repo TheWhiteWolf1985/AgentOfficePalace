@@ -8,4 +8,4 @@ import part5 from './it-6.js';
 import part6 from './it-7.js';
 import { italianConnections } from './it-connections.js';
 /** Italian UI catalogue; English source text is the fallback. */
-export const italian: Readonly<Record<string, string>> = { ...part0, ...part1, ...part2, ...part3, ...part4, ...part5, ...part6, ...italianConnections, ...italianConferenceRoom };
+export const italian: Readonly<Record<string, string>> = { 'Atrium': 'Atrio', 'Ground floor · reception and lounge': 'Piano terra · reception e salottini', ...part0, ...part1, ...part2, ...part3, ...part4, ...part5, ...part6, ...italianConnections, ...italianConferenceRoom };

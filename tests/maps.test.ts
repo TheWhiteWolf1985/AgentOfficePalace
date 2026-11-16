@@ -11,7 +11,7 @@ test('the fixed office preserves all desks, kiosks, meeting chairs and expansion
 });
 
 test('office and rooftop seats stay valid only on their own floor', () => {
-  for (const seat of SEATING.filter((s) => !s.roof)) {
+  for (const seat of SEATING.filter((s) => !s.roof && !s.lobby)) {
     const key = `${seat.id}:0`;
     assert.ok(seatOn(OFFICE_PLAN, key));
     assert.ok(seatHereOn(OFFICE_PLAN, key, false));

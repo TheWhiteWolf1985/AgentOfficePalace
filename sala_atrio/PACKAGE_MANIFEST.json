@@ -1,0 +1,119 @@
+{
+  "asset": "sala_atrio",
+  "version": "v03",
+  "date": "2026-11-16",
+  "blender_version": "5.3.0",
+  "asset_glb_sha256": "5655594f52a4be97977d7cc98f00f1e514d73de5276de31d095a771fb7da774c",
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "bytes": 541,
+      "sha256": "e643543f39f12d680bdac3f9b8e4672d8275766f5f31efd07eb24d7b3c189391"
+    },
+    {
+      "path": "delivery/atrium.blend",
+      "bytes": 631728,
+      "sha256": "5e1c76ac5720ea5d5dd75baaab82fcae23f1a3df43680f93c2a6f41a09b4ed3f"
+    },
+    {
+      "path": "delivery/atrium.glb",
+      "bytes": 2940904,
+      "sha256": "5655594f52a4be97977d7cc98f00f1e514d73de5276de31d095a771fb7da774c"
+    },
+    {
+      "path": "delivery/atrium.manifest.json",
+      "bytes": 32792,
+      "sha256": "3b89c15e927d4eb899416c0be5bdfa548b61a0506aaa1d1888acd18820f8ba1b"
+    },
+    {
+      "path": "delivery/build_scene.py",
+      "bytes": 23053,
+      "sha256": "8a6312c09b282f6bbe306353305aa27ce745df57f85b819eb90ba7a097a0d9ad"
+    },
+    {
+      "path": "delivery/DRAFT_CHECKS.json",
+      "bytes": 2307,
+      "sha256": "017ac911f35a75fd3c7094bc7c8cd3f145059363ea64c939e407bd2c7f63a008"
+    },
+    {
+      "path": "delivery/DRAFT_CHECKS_AUTO.json",
+      "bytes": 1856,
+      "sha256": "7bd7524b26f7fa279bc448c0305c441d34a005e67a27b7f33ee4eab16d6d71c7"
+    },
+    {
+      "path": "delivery/enrich_lobby.py",
+      "bytes": 10386,
+      "sha256": "a039bd57d72b1a2cbe75340b69a16ef1bebc6222d47b8896eca695e4dedde538"
+    },
+    {
+      "path": "delivery/geometry_fingerprint.py",
+      "bytes": 1495,
+      "sha256": "acd726b0d99f6e76c002287a9c3acb02e11570b07532439a91e6aeaa675bc6e6"
+    },
+    {
+      "path": "delivery/NOTES.md",
+      "bytes": 4686,
+      "sha256": "66c8ee87008ceee3a69c62db8b5f9b0a17b68beedb4d26a9f54d4c4d026ce603"
+    },
+    {
+      "path": "delivery/preview_and_export.py",
+      "bytes": 6385,
+      "sha256": "2ec87e6a8ee180614331f6878cc686d560aa923441942627b7b10d321fd8df5e"
+    },
+    {
+      "path": "delivery/reimport_check.blend",
+      "bytes": 1317708,
+      "sha256": "4d192427cba03ab9b1b01871512a79949426c90fe020ca1157de8b5cd36642b8"
+    },
+    {
+      "path": "delivery/render_views.py",
+      "bytes": 1683,
+      "sha256": "845603f75f2bc8662464c1d21b1f0d25dbf85c09a9f03c565136578a61975e00"
+    },
+    {
+      "path": "delivery/VALIDATION.json",
+      "bytes": 2307,
+      "sha256": "017ac911f35a75fd3c7094bc7c8cd3f145059363ea64c939e407bd2c7f63a008"
+    },
+    {
+      "path": "delivery/views/entrance.png",
+      "bytes": 1241733,
+      "sha256": "dbb0d38cd9d9627a8a33553211b45eee20abccc84664eaa1514cef041f4454bd"
+    },
+    {
+      "path": "delivery/views/reception.png",
+      "bytes": 1205018,
+      "sha256": "79087023e517543d0b0d0785a9c7217e0eee1e702b855b724aeb42a17ba272d4"
+    },
+    {
+      "path": "delivery/views/top.png",
+      "bytes": 1428142,
+      "sha256": "a5f3ddedd0523b31a11b05b7c0a10d18a149adaed081fa38482409f152b64bd8"
+    },
+    {
+      "path": "README_CONSEGNA.md",
+      "bytes": 4686,
+      "sha256": "66c8ee87008ceee3a69c62db8b5f9b0a17b68beedb4d26a9f54d4c4d026ce603"
+    },
+    {
+      "path": "scripts/verify_package.py",
+      "bytes": 610,
+      "sha256": "664c8e08677765cfe7706dc39638ba822b3a5784b93d99c3ac2b0e9cebcd2600"
+    },
+    {
+      "path": "verification/rebuild_comparison.json",
+      "bytes": 381,
+      "sha256": "10d6b66657e4ab6938302af18f5596cf56c0812a9b1e993f549479f2328b53ad"
+    },
+    {
+      "path": "verification/rebuilt_geometry_fingerprint.json",
+      "bytes": 304313,
+      "sha256": "f9d5bfe13ae437cbe8fc30395e187ecd505eef0b1c509dea8bd5c05c709b3f2b"
+    },
+    {
+      "path": "verification/source_geometry_fingerprint.json",
+      "bytes": 304313,
+      "sha256": "f9d5bfe13ae437cbe8fc30395e187ecd505eef0b1c509dea8bd5c05c709b3f2b"
+    }
+  ]
+}

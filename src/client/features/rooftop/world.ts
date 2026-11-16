@@ -99,5 +99,5 @@ export function buildRooftop(night: NightParts): Rooftop {
     // Keep the passage solid until the leaf clears it; hold it open while anyone crosses.
     doorCollider.top = open > 0.8 ? -10 : closedTop;
   };
-  return { group, colliders, interactables, elevator, city, pickables: [room.scene, elevator.group, seatTargets], setFloors: (n, wings) => city.setFloors(Math.max(1, n), wings), update };
+  return { group, colliders, interactables, elevator, city, pickables: [room.scene, elevator.group, seatTargets], setFloors: (n, wings) => city.setFloors(Math.max(0, n), wings), update };
 }

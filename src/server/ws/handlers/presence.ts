@@ -2,7 +2,7 @@
 import type { ChatLine, PresenceClientMsg } from '../../../shared/protocol.js';
 import { OFFICE_PLAN, seatHereOn } from '../../../shared/maps/index.js';
 import { sanitizeLook } from '../../../shared/avatar.js';
-import { ROOF } from '../../../shared/rooftop.js';
+import { LOBBY } from '../../../shared/rooftop.js';
 import { throttle } from '../../office/client.js';
 import { COLOR_RE, issueNumber, num, str } from '../../office/input.js';
 import type { HandlerMap } from './types.js';
@@ -26,7 +26,7 @@ export const presenceHandlers = {
     // Everyone sees them sit down (or get up), and anyone who comes in later finds them sitting.
     // Only on a seat where they are: the roof's up on the roof, the office's on a floor.
     const key = str(msg.seat, 40);
-    const seat = seatHereOn(OFFICE_PLAN, key, c.peer.floor === ROOF) ? key : undefined;
+    const seat = seatHereOn(OFFICE_PLAN, key, c.peer.floor ?? LOBBY) ? key : undefined;
     if (seat === c.peer.seat) return;
 
     // (Not yourself, on a connection that hasn't timed out yet after a reconnect.)

@@ -19,6 +19,6 @@ export function createWorlds(ctx: Ctx) {
     inOffice: () => true,
     plan: () => world.plan,
     officeWing,
-    groundHere: (x: number, z: number, y: number) => Math.max(groundAt(world.colliders, x, z, y), ctx.player.street),
+    groundHere: (x: number, z: number, y: number) => Math.max(groundAt(ctx.player.colliders, x, z, y), ctx.player.street),
   };
 }

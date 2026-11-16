@@ -16,7 +16,7 @@ import { store } from '../state';
 import { modalOpen, toast } from '../ui/dom';
 import type { Interactable } from '../world/types';
 
-export type PointerParts = Pick<Parts, 'worlds' | 'rooftop' | 'place' | 'you' | 'boards' | 'cards' | 'seating' | 'hanging' | 'hintbar'>;
+export type PointerParts = Pick<Parts, 'worlds' | 'rooftop' | 'atrium' | 'place' | 'you' | 'boards' | 'cards' | 'seating' | 'hanging' | 'hintbar'>;
 
 /** Listens for the mouse over the canvas, registers the aim tick ('aim'), and takes the player's clicks. */
 export function installPointer(ctx: Ctx, core: CoreState, parts: PointerParts) {
@@ -55,6 +55,7 @@ export function installPointer(ctx: Ctx, core: CoreState, parts: PointerParts) {
   /** What you can use where you are, and what's in the way of looking at it. */
   function usable(): (readonly Interactable[])[] {
     const roof = parts.rooftop.roof();
+    if (core.atLobby) return [parts.atrium.atrium()?.interactables ?? []];
     if (core.upTop && roof) return [roof.interactables];
     return [office.interactables, ...ctx.usables.lists()];
   }
@@ -90,7 +91,7 @@ export function installPointer(ctx: Ctx, core: CoreState, parts: PointerParts) {
     eye.set(player.pos.x, player.pos.y + EYE_HEIGHT, player.pos.z);
 
     const roof = parts.rooftop.roof();
-    for (const hit of raycaster.intersectObjects(core.upTop && roof ? roof.pickables : [office.group, ...ctx.usables.pickables()], true)) {
+    for (const hit of raycaster.intersectObjects(core.atLobby ? (parts.atrium.atrium()?.pickables ?? []) : core.upTop && roof ? roof.pickables : [office.group, ...ctx.usables.pickables()], true)) {
       let it: Interactable | undefined;
       let shown = true;
       for (let o: THREE.Object3D | null = hit.object; o; o = o.parent) {
