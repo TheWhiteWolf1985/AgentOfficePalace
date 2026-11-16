@@ -41,6 +41,7 @@ import { installMeeting } from './features/meeting';
 import { installNeedsYou } from './features/needsyou';
 import { installPalette } from './features/palette';
 import { installPeers } from './features/peers';
+import { installReceptionSign } from './features/reception-sign';
 import { installAtrium } from './features/atrium';
 import { installRooftop } from './features/rooftop';
 import { installSeating } from './features/seating';
@@ -91,6 +92,7 @@ ctx.scene.add(parts.confetti.mesh);
 parts.tv = installTv(ctx, { shares: () => parts.talk.currentShares(), watch: () => parts.talk.watchShare() });
 parts.rooftop = installRooftop(ctx);
 parts.atrium = installAtrium(ctx);
+installReceptionSign(ctx);
 
 // You, and how you talk to the office.
 parts.net = new Net(() => store.profile, () => parts.arrival.whereNow());

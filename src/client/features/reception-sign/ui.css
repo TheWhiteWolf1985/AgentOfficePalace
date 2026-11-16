@@ -1,0 +1,5 @@
+.reception-sign { width: min(760px, calc(100vw - 24px)); }
+.reception-sign .body { display: grid; gap: 14px; }
+.sign-preview { display: block; width: 100%; height: auto; border: 2px solid var(--ink); border-radius: 8px; }
+.reception-sign textarea { display: block; box-sizing: border-box; width: 100%; resize: vertical; margin-top: 6px; }
+.reception-sign input[type=file] { display: block; max-width: 100%; margin-bottom: 10px; }

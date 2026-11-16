@@ -12,6 +12,7 @@ import { outsideSetting } from './settings-sky';
 import { choiceRow } from './settings-rows';
 import { languageSelect } from './language';
 import { connectionsPanel } from './connections';
+import { openReceptionSign } from '../features/reception-sign/ui';
 import { agentManagementPanel } from './agent-management';
 
 const VIEWS: [ViewMode, string, string][] = [
@@ -29,7 +30,7 @@ const PANES: { id: SettingsPane; icon: string; label: string; blurb: string }[] 
   { id: 'you', icon: '🧍', label: uiText('You'), blurb: uiText('How you look, how you see the office, and how you’re signed in.') },
   { id: 'sound', icon: '🔊', label: uiText('Sound & voice'), blurb: uiText('How loud the office is for you, and how voice chat works.') },
   { id: 'notify', icon: '🔔', label: uiText('Notifications'), blurb: uiText('Hear about a worker that needs someone, or finished, while you’re somewhere else.') },
-  { id: 'building', icon: '🏢', label: uiText('Building'), blurb: uiText('The sky and where new floors are cloned.') },
+  { id: 'building', icon: '🏢', label: uiText('Building'), blurb: uiText('Reception sign, sky and project folders.') },
   { id: 'workers', icon: '🤖', label: uiText('Workers'), blurb: uiText('What workers start on, how many run at once, when they go home and what the office tells them.') },
   { id: 'management', icon: '👥', label: uiText('Agent management'), blurb: uiText('Individual agents, properties and repository identities across all offices.') },
   { id: 'connections', icon: '🔗', label: uiText('GitHub and Forgejo'), blurb: uiText('Servers, accounts and remote repositories.') },
@@ -395,6 +396,7 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
       setting(uiText('Team notifications (Slack / Discord)'), 'office', h('div.webhook', {}, hookInput, hookSave), hookActions, hookStatus),
     ],
     building: [
+      setting(uiText('Reception sign'), 'office', h('button.btn', {type:'button',disabled:!store.me.admin,onclick:()=>{modal.close();void openReceptionSign();}}, uiText('Customize')), h('p.setting-note',{},uiText('Centered text or your company logo, visible to everyone in the building.'))),
       ...(sky ? [sky.section] : []),
       setting(uiText('Workspace folder'), 'office', dirRow, dirActions, dirNote),
     ],

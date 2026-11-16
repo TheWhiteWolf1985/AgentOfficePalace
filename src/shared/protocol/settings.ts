@@ -1,5 +1,6 @@
 // ⚙️ Settings and the building's services: notifications, the machine, upgrades, the sky, holidays, prompts.
 
+import type { ReceptionSignState } from '../reception-sign.js';
 import type { PromptId } from '../prompts.js';
 import type { AgentChoice } from './agents.js';
 
@@ -161,6 +162,7 @@ export type SettingsClientMsg =
   | { t: 'prompts.agent'; choice: AgentChoice | null };
 
 export type SettingsServerMsg =
+  | { t: 'reception.sign'; state: ReceptionSignState }
   | { t: 'upgrade'; state: UpgradeState }
   | { t: 'services'; state: ServicesState }
   | { t: 'notify'; state: NotifyState }

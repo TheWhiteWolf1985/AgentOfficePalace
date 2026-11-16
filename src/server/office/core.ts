@@ -7,6 +7,7 @@ import type { AgentProvider } from '../../shared/providers.js';
 import { createModelCatalogues } from '../models.js';
 import { Building } from '../building.js';
 import type { Floor } from '../floor.js';
+import { ReceptionSign } from '../reception-sign.js';
 import { ChatLog } from '../history.js';
 import type { Core, Ctx } from './context.js';
 import type { Client } from './client.js';
@@ -34,5 +35,5 @@ export function createCore(ctx: Ctx, cfg: Config, publicDir: string): Core {
     if (err) console.error(`agent-office: --projects: ${err}`);
   }
   const floors = new Map<string, Floor>();
-  return { cfg, publicDir, accounts, auth, clients, chat, officeName, models, building, floors };
+  return { cfg, publicDir, accounts, auth, clients, chat, receptionSign: new ReceptionSign(cfg.dataDir), officeName, models, building, floors };
 }

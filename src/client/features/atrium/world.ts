@@ -23,6 +23,10 @@ export function buildAtrium(night: NightParts) {
   group.add(elevator.group);
   colliders.push(...elevator.colliders);
   const interactables: Interactable[] = [elevator.interactable];
+  const sign = asset.scene.getObjectByName(ATRIUM_DATA.logo.surface);
+  const counter = ATRIUM_COLLIDERS.find(c=>c.id==='atrio_reception_body');
+  const signInteraction: Interactable = {kind:'reception',x:0,y:0,z:(counter?.maxZ ?? -7.3)+1.6,radius:2.6};
+  if(sign){sign.userData.interact=signInteraction;interactables.push(signInteraction);}
   const targets = new THREE.Group();
   for (const seat of ATRIUM_SEATING) {
     const it: Interactable = { kind: 'seat', seatId: seat.id, x: seat.x, y: 0, z: seat.z, radius: 1.7 };

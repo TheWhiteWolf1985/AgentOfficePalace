@@ -471,6 +471,43 @@ test('the hook server answers only workers, with their own token', async () => {
   }
 });
 
+test('the reception sign is shared across spaces, keeps image bytes out of sockets and restricts changes to admins', async () => {
+  assert.equal((await get('/api/reception-sign')).status,401);
+  assert.equal((await get('/api/reception-sign/logo?id=nope')).status,401);
+  const a=await Browser.open('?name=BrandA&floor=%40lobby'),b=await Browser.open('?name=BrandB&floor=%40roof');
+  let memberId:string|undefined;
+  try {
+    await a.take('welcome');await b.take('welcome');
+    const headers={cookie,origin:base};
+    const text=await post('/api/reception-sign',{mode:'text',text:'ACME\nStudio'},headers);
+    assert.equal(text.status,200);const state=await text.json();
+    assert.equal((await a.take('reception.sign')).state.text,state.text);
+    assert.equal((await b.take('reception.sign')).state.text,state.text);
+    const png='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jL1kAAAAASUVORK5CYII=';
+    const uploaded=await post('/api/reception-sign',{mode:'logo',text:state.text,image:png},headers);assert.equal(uploaded.status,200);
+    const logo=await uploaded.json();assert.equal(logo.logo.mime,'image/png');
+    assert.ok(!JSON.stringify((await b.take('reception.sign')).state).includes('base64'));
+    const file=await get('/api/reception-sign/logo?id='+logo.logo.id,{cookie});
+    assert.equal(file.status,200);assert.equal(file.headers.get('content-type'),'image/png');
+    assert.deepEqual(Buffer.from(await file.arrayBuffer()),Buffer.from(png.split(',')[1],'base64'));
+    assert.equal((await get('/api/reception-sign/logo?id=../../secret',{cookie})).status,404);
+    assert.equal((await post('/api/reception-sign',{mode:'text',text:'Wrong origin'},{cookie,origin:'http://elsewhere.invalid'})).status,403);
+    const invite=office.accounts.invite('test','member','Reception Member');assert.notEqual(typeof invite,'string');
+    const member=await office.accounts.join((invite as {token:string}).token,'Reception Member','member-test-password');assert.notEqual(typeof member,'string');
+    memberId=(member as {id:string}).id;
+    const login=await post('/api/login',{name:'Reception Member',password:'member-test-password'},{origin:base});assert.equal(login.status,200);
+    const memberCookie=(login.headers.get('set-cookie') ?? '').split(';')[0];
+    assert.equal((await get('/api/reception-sign',{cookie:memberCookie})).status,200);
+    assert.equal((await get('/api/reception-sign/logo?id='+logo.logo.id,{cookie:memberCookie})).status,200);
+    assert.equal((await post('/api/reception-sign',{mode:'blank',text:''},{cookie:memberCookie,origin:base})).status,403);
+    assert.equal((await get('/api/reception-sign',{cookie})).status,200);
+    assert.equal((await (await get('/api/reception-sign',{cookie})).json()).mode,'logo');
+  } finally {
+    await a.close();await b.close();if(memberId)office.accounts.revoke(memberId);
+    assert.equal((await post('/api/reception-sign',{mode:'blank',text:'',image:null},{cookie,origin:base})).status,200);
+  }
+});
+
 test('the shared meeting room survives the last project removal and accepts visits with no offices', async () => {
   const a = await Browser.open('?name=RoomA&floor=%40roof');
   const b = await Browser.open('?name=RoomB');

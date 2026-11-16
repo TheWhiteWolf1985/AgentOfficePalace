@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { attachReceptionSign } from './reception-sign';
 import { GLASS } from './office/materials';
 import { toonUnique } from './toon';
 
@@ -30,4 +31,5 @@ export function prepareAtrium(root: THREE.Object3D) {
     node.castShadow = !mats.some((m) => m.transparent);
     node.receiveShadow = true;
   });
+  attachReceptionSign(root);
 }

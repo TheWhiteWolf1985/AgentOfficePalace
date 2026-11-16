@@ -9,6 +9,7 @@ import { githubRoutes } from './github.js';
 import { pageRoutes } from './pages.js';
 import { searchRoutes } from './search.js';
 import { serviceRoutes } from './services.js';
+import { receptionSignRoute } from './reception-sign.js';
 import { connectionsRoute } from './connections.js';
 
 export const routes: readonly Route[] = [
@@ -29,6 +30,7 @@ export const routes: readonly Route[] = [
   // Signed in.
   authRoutes.whoami,
   connectionsRoute,
+  receptionSignRoute,
   agentRoutes.models,
   fileRoutes.image,
   fileRoutes.whiteboardFile,

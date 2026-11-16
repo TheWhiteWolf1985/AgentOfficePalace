@@ -8,8 +8,8 @@ essere rimosso come un progetto.
 
 La destinazione d'ingresso già esistente ora apre il modello in
 `sala_atrio/delivery/atrium.glb`: reception, due salottini con dieci posti
-utilizzabili, consolle, quattordici piante e superficie per il futuro logo.
-Il pannello logo resta vuoto. WASD permette di girare; E usa l'ascensore o una
+utilizzabili, consolle, quattordici piante e pannello aziendale dietro la reception.
+Il pannello dietro la reception può mostrare testo centrato o un logo aziendale. WASD permette di girare; E usa l'ascensore o una
 seduta. Posizione e spazio vengono ripristinati dopo la riconnessione.
 
 La cabina applicativa riempie il volume riservato dal modello. Le collisioni
@@ -26,7 +26,7 @@ Un piano esterno sovrapposto coprirebbe questi dettagli; la geometria del GLB
 rimane alla quota consegnata, senza compensazioni o spostamenti degli arredi.
 
 Le scale del modello sono geometria collidibile; per passare ad altri piani
-si usa l'ascensore. Il loro collegamento tra ambienti, il logo e le altre
+si usa l'ascensore. Il loro collegamento tra ambienti e le altre
 rifiniture saranno interventi successivi. Questa integrazione non abilita
 agenti, postazioni reception operative o la lavagna della Sala riunioni.
 
@@ -43,3 +43,22 @@ L'import verifica i 22 elementi elencati dal manifest del pacchetto (24 file
 complessivi, inclusi i rapporti di copia), conserva GLB/Blender originali e
 genera `src/shared/atrium-data.ts`. I rapporti del produttore non vengono
 riscritti: i limiti delle sue verifiche restano distinti dai test applicativi.
+
+## Pannello reception
+
+Da **Impostazioni → Edificio → Pannello reception → Personalizza**, oppure con
+**E** guardando il pannello dal fronte della reception, un amministratore può
+scegliere Vuoto, Testo oppure Logo. Il testo è centrato sui due assi e si adatta
+automaticamente alle dimensioni, anche su più righe (massimo 400 caratteri e 6 righe).
+Il logo viene caricato dal computer in PNG/JPEG/WebP, fino a2MiB e4096×4096pixel,
+centrato senza deformazioni o ritagli. L'anteprima consente di verificare il risultato
+prima di salvare. Rimuovi logo elimina anche l'immagine salvata; cambiare modalità
+conserva il testo e il logo per riutilizzarli.
+
+La configurazione è unica per l'edificio, funziona anche senza uffici e si aggiorna
+per tutti i visitatori. Viene salvata atomicamente in `<dataDir>/reception-sign.json`
+con l'immagine; i WebSocket trasmettono soltanto i metadati. Il file immagine viene
+servito dalla sessione autenticata tramite `/api/reception-sign/logo?id=<hash>`.
+Il GLB e la sua superficie7,44×1,70m restano invariati; una sola texture condivisa
+aggiorna anche le rappresentazioni esterne dell'Atrio. La lavagna della Sala riunioni
+è un intervento separato.
