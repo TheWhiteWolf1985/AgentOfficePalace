@@ -61,11 +61,12 @@ riscritti: i limiti delle sue verifiche restano distinti dai test applicativi.
 
 ## Pannello reception
 
-Da **Impostazioni → Edificio → Pannello reception → Personalizza**, oppure con
-**E** guardando il pannello dal fronte della reception, un amministratore può
-scegliere Vuoto, Testo oppure Logo. Il testo è centrato sui due assi e si adatta
+Da **Impostazioni → Logo atrio**, un amministratore può scegliere Vuoto, Testo
+oppure Logo direttamente nella scheda. Il pannello 3D non espone scorciatoie o
+suggerimenti di interazione alla reception, lasciando libero questo spazio per i
+futuri compiti degli NPC. Il testo è centrato sui due assi e si adatta
 automaticamente alle dimensioni, anche su più righe (massimo 400 caratteri e 6 righe).
-Il logo viene caricato dal computer in PNG/JPEG/WebP, fino a2MiB e4096×4096pixel,
+Il logo viene caricato dal computer in PNG/JPEG/WebP, fino a 2 MiB e 4096 × 4096 pixel,
 centrato senza deformazioni o ritagli. L'anteprima consente di verificare il risultato
 prima di salvare. Rimuovi logo elimina anche l'immagine salvata; cambiare modalità
 conserva il testo e il logo per riutilizzarli.
@@ -74,6 +75,6 @@ La configurazione è unica per l'edificio, funziona anche senza uffici e si aggi
 per tutti i visitatori. Viene salvata atomicamente in `<dataDir>/reception-sign.json`
 con l'immagine; i WebSocket trasmettono soltanto i metadati. Il file immagine viene
 servito dalla sessione autenticata tramite `/api/reception-sign/logo?id=<hash>`.
-Il GLB e la sua superficie7,44×1,70m restano invariati; una sola texture condivisa
+Il GLB e la sua superficie da 7,44 × 1,70 m restano invariati; una sola texture condivisa
 aggiorna anche le rappresentazioni esterne dell'Atrio. La lavagna della Sala riunioni
 è un intervento separato.

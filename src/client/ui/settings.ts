@@ -12,7 +12,7 @@ import { outsideSetting } from './settings-sky';
 import { choiceRow } from './settings-rows';
 import { languageSelect } from './language';
 import { connectionsPanel } from './connections';
-import { openReceptionSign } from '../features/reception-sign/ui';
+import { receptionSignPanel } from '../features/reception-sign/ui';
 import { agentManagementPanel } from './agent-management';
 
 const VIEWS: [ViewMode, string, string][] = [
@@ -23,14 +23,15 @@ const VIEWS: [ViewMode, string, string][] = [
 const WEBHOOK_NAME: Record<WebhookKind, string> = { slack: 'Slack', discord: 'Discord', other: uiText('a webhook') };
 
 /** The categories down the side of ⚙️ Settings. */
-export type SettingsPane = 'you' | 'language' | 'sound' | 'notify' | 'building' | 'workers' | 'connections' | 'management';
+export type SettingsPane = 'you' | 'language' | 'sound' | 'notify' | 'building' | 'atrium-logo' | 'workers' | 'connections' | 'management';
 
 const PANES: { id: SettingsPane; icon: string; label: string; blurb: string }[] = [
   { id: 'language', icon: '🌐', label: uiText('Language'), blurb: uiText('Choose the language of this interface.') },
   { id: 'you', icon: '🧍', label: uiText('You'), blurb: uiText('How you look, how you see the office, and how you’re signed in.') },
   { id: 'sound', icon: '🔊', label: uiText('Sound & voice'), blurb: uiText('How loud the office is for you, and how voice chat works.') },
   { id: 'notify', icon: '🔔', label: uiText('Notifications'), blurb: uiText('Hear about a worker that needs someone, or finished, while you’re somewhere else.') },
-  { id: 'building', icon: '🏢', label: uiText('Building'), blurb: uiText('Reception sign, sky and project folders.') },
+  { id: 'building', icon: '🏢', label: uiText('Building'), blurb: uiText('The sky and where new floors are cloned.') },
+  { id: 'atrium-logo', icon: '🖼️', label: uiText('Atrium logo'), blurb: uiText('Centered text or your company logo, visible to everyone in the building.') },
   { id: 'workers', icon: '🤖', label: uiText('Workers'), blurb: uiText('What workers start on, how many run at once, when they go home and what the office tells them.') },
   { id: 'management', icon: '👥', label: uiText('Agent management'), blurb: uiText('Individual agents, properties and repository identities across all offices.') },
   { id: 'connections', icon: '🔗', label: uiText('GitHub and Forgejo'), blurb: uiText('Servers, accounts and remote repositories.') },
@@ -374,9 +375,11 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
   const character = h('button.btn', { type: 'button' }, account ? uiText('🧍 Change your look') : uiText('🧍 Change your look & name'));
   const connections = store.me.admin ? connectionsPanel() : undefined;
   const management = store.me.admin ? agentManagementPanel() : undefined;
+  const receptionSign = receptionSignPanel();
   const panes: Record<SettingsPane, Node[]> = {
     connections: [connections?.element ?? h('p', {}, uiText('Administrator access required'))],
     management: [management?.element ?? h('p', {}, uiText('Administrator access required'))],
+    'atrium-logo': [receptionSign.element],
     language: [setting(uiText('Language'), 'you',
       languageSelect(),
       h('p.setting-note', {}, uiText('Changing language reloads this page. Your agents keep working.')))],
@@ -396,7 +399,6 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
       setting(uiText('Team notifications (Slack / Discord)'), 'office', h('div.webhook', {}, hookInput, hookSave), hookActions, hookStatus),
     ],
     building: [
-      setting(uiText('Reception sign'), 'office', h('button.btn', {type:'button',disabled:!store.me.admin,onclick:()=>{modal.close();void openReceptionSign();}}, uiText('Customize')), h('p.setting-note',{},uiText('Centered text or your company logo, visible to everyone in the building.'))),
       ...(sky ? [sky.section] : []),
       setting(uiText('Workspace folder'), 'office', dirRow, dirActions, dirNote),
     ],
@@ -420,6 +422,7 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
   }
   const show = (id: SettingsPane) => {
     lastPane = id;
+    if (id === 'atrium-logo') receptionSign.load();
     el.classList.toggle('settings-wide', id === 'connections' || id === 'management');
     for (const [t, tab] of tabs) {
       tab.classList.toggle('on', t === id);
@@ -452,6 +455,7 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
     doing: uiText('⚙️ in settings'),
     onClose: () => {
       connections?.dispose(); management?.dispose();
+      receptionSign.dispose();
       offNotify();
       sky?.off();
       offLeave();
