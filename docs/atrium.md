@@ -20,6 +20,11 @@ lo stesso vetro trasparente degli uffici; meteo e ciclo giorno/notte proseguono
 all'esterno. La rappresentazione esterna dell'edificio include l'Atrio alla
 quota della strada, con gli uffici e la Sala riunioni sopra.
 
+Terreno e piazzale esterni lasciano libera l'impronta dell'edificio: il parquet
+originale è a quota zero e i tre tappeti sono rialzati di pochi millimetri.
+Un piano esterno sovrapposto coprirebbe questi dettagli; la geometria del GLB
+rimane alla quota consegnata, senza compensazioni o spostamenti degli arredi.
+
 Le scale del modello sono geometria collidibile; per passare ad altri piani
 si usa l'ascensore. Il loro collegamento tra ambienti, il logo e le altre
 rifiniture saranno interventi successivi. Questa integrazione non abilita

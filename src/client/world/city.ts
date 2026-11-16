@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import { model } from './models';
 import { prepareAtrium } from './atrium-materials';
-import { FLOOR, SLAB, STREET_Y, WALL_T, roofDrop } from '../../shared/layout';
+import { roofDrop } from '../../shared/layout';
+import { exteriorGroundGeometry } from './city-ground';
 import { mulberry32 } from '../../shared/rng';
 import type { NightParts } from './outside';
 import { tilingCanvasTexture } from './texture';
@@ -18,8 +19,6 @@ import { buildTower } from './tower';
 // Everything is built from a handful of shared materials (a window texture per paint, repeated a
 // window at a time), merged into a few meshes, so the whole city is a few dozen draw calls.
 
-/** The building, walls included. */
-const B = { minX: FLOOR.minX - WALL_T, maxX: FLOOR.maxX + WALL_T, minZ: FLOOR.minZ - WALL_T, maxZ: FLOOR.maxZ + WALL_T } as const;
 /** A block and the street beside it; streets run down x = 28 + 56k and z = 27 + 56k. */
 const PERIOD = 56;
 const STREET_X = 28;
@@ -256,8 +255,7 @@ export function buildCity(night: NightParts): City {
 
   // The ground: every block and street, repeated out to the haze.
   const size = PERIOD * 24;
-  const groundGeo = new THREE.PlaneGeometry(size, size);
-  groundGeo.rotateX(-Math.PI / 2);
+  const groundGeo = exteriorGroundGeometry({ minX: -size/2, maxX: size/2, minZ: -size/2, maxZ: size/2 });
   const uv = groundGeo.getAttribute('uv') as THREE.BufferAttribute;
   const gp = groundGeo.getAttribute('position') as THREE.BufferAttribute;
   // Line the texture up with the streets: a road down its middle falls on x = STREET_X, z = STREET_Z.
@@ -350,8 +348,9 @@ export function buildCity(night: NightParts): City {
   group.add(building.group);
   const atrium = model('atrium');
   if (atrium) { prepareAtrium(atrium.scene); street.add(atrium.scene); }
-  // Its plaza, with a few trees in front.
-  parks.add(mesh(new THREE.PlaneGeometry(inner, inner).rotateX(-Math.PI / 2), toon('#cfc8b8'), blockAt(0, 0).x, 0.02, blockAt(0, 0).z, false));
+  // Its plaza surrounds the atrium: even two centimetres would bury the parquet and rugs.
+  const plaza = blockAt(0, 0);
+  parks.add(mesh(exteriorGroundGeometry({ minX: plaza.x-inner/2, maxX: plaza.x+inner/2, minZ: plaza.z-inner/2, maxZ: plaza.z+inner/2 }), toon('#cfc8b8'), 0, 0.02, 0, false));
   for (const [x, z] of [
     [-16, 18],
     [-6, 18],
