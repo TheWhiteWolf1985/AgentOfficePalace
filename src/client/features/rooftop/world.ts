@@ -6,6 +6,7 @@ import { ROOF_NAME } from '../../../shared/rooftop';
 import { buildCity, type City } from '../../world/city';
 import { buildElevator, type Elevator } from '../../world/elevator';
 import { model } from '../../world/models';
+import { applyConferenceGlazing } from '../../world/conference-glazing';
 import type { NightParts } from '../../world/outside';
 import { toonUnique } from '../../world/toon';
 import type { Collider, Interactable } from '../../world/types';
@@ -50,6 +51,7 @@ export function buildRooftop(night: NightParts): Rooftop {
     node.castShadow = !(node.material as THREE.Material).transparent;
     node.receiveShadow = true;
   });
+  applyConferenceGlazing(room.scene);
 
   const colliders: Collider[] = CONFERENCE_COLLIDERS.map((c) => ({ ...c }));
   // The asset deliberately reserves this volume for the application's own elevator.

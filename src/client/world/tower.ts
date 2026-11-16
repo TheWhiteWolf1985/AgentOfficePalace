@@ -3,6 +3,7 @@ import { BALCONY, BALCONY_DOOR, ELEVATOR, ELEVATOR_FRONT, EXIT_DOOR, FLOOR, SLAB
 import type { Collider } from './types';
 import type { Fixture } from './office/fixture';
 import { model } from './models';
+import { applyConferenceGlazing } from './conference-glazing';
 import { bulb, type NightParts } from './outside';
 import { mergeByMaterial, mesh, toon, toonUnique } from './toon';
 
@@ -184,6 +185,7 @@ export function buildTower(colliders: Collider[], night: NightParts): Tower {
   const roofTop = (parts: THREE.Group, y: number) => {
     const room = model('conference_room');
     if (!room) return;
+    applyConferenceGlazing(room.scene);
     room.scene.position.y = y;
     parts.add(room.scene);
   };

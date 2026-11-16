@@ -20,6 +20,10 @@ il tavolo o altre sedie. Il percorso verso i colleghi usa gli arredi della sala.
 
 Il modello conserva nomi, materiali, colori e UV della consegna. I materiali
 vengono adattati al rendering toon, mantenendo la trasparenza della vetrata.
+I pannelli blu delle finestre esterne del modello vengono convertiti nel vetro
+trasparente usato dagli uffici, con riflessi leggeri e senza ombre opache.
+L'adattamento vale anche per la sala vista dai piani inferiori; il pacchetto
+Blender originale e le collisioni delle finestre rimangono invariati.
 La lavagna è una superficie dedicata predisposta per il prossimo collegamento:
 questa integrazione dello spazio non aggiunge ancora editor condiviso, sessioni
 di riunione o postazioni operative per agenti nella nuova sala.
