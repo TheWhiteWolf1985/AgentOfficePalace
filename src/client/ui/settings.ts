@@ -372,7 +372,7 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
   const account = store.me.account;
   const signOut = h('button.btn', { type: 'button' }, uiText('🚪 Sign out'));
   signOut.addEventListener('click', onSignOut);
-  const character = h('button.btn', { type: 'button' }, account ? uiText('🧍 Change your look') : uiText('🧍 Change your look & name'));
+  const character = h('button.btn', { type: 'button' }, uiText('🧍 Your character'));
   const connections = store.me.admin ? connectionsPanel() : undefined;
   const management = store.me.admin ? agentManagementPanel() : undefined;
   const receptionSign = receptionSignPanel();

@@ -1,0 +1,6 @@
+{
+  "status": "PASS",
+  "scope": "Rebuilt with distributed scripts/resources from the delivery directory; GLB byte-identical. Geometry-only rebuild, render QA separately recorded.",
+  "original_sha256": "fbe41af193d44b1069a8221136d35000cb849390a0a2acf43829552a04c9fde6",
+  "rebuilt_sha256": "fbe41af193d44b1069a8221136d35000cb849390a0a2acf43829552a04c9fde6"
+}

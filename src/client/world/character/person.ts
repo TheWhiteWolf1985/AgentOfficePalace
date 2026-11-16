@@ -7,6 +7,7 @@ import { HeldCard } from '../../features/carrying/card';
 import { disposeSprite, mesh, textSprite, toon, toonUnique } from '../toon';
 import { REACH_TIME, reachCurve } from './curves';
 import { styleHair } from './person-hair';
+import { humanBase } from './human-base';
 
 export type Pose = 'stand' | 'walk' | 'sit' | 'type';
 
@@ -17,12 +18,14 @@ const SPEAKING = 0.04;
 const DOING_Y = 1.95;
 const DOING_LIFT = 0.25;
 
-/** A chibi cartoon person — used for every human in the office. Forward is +z. */
+/** A user avatar with the delivered base, or the procedural fallback. Forward is +z. */
 export class Person {
   readonly root = new THREE.Group();
   private body = new THREE.Group();
 
   readonly rig: PersonRig;
+  private baseVisual?: ReturnType<typeof humanBase>;
+  get usesBaseModel() { return !!this.baseVisual; }
   private legL: THREE.Object3D;
   private legR: THREE.Object3D;
   private armL: THREE.Object3D;
@@ -39,8 +42,8 @@ export class Person {
   private speaking = false;
   private mic: THREE.Mesh;
   private head: THREE.Group;
-  private smile: THREE.Mesh;
-  private mouth: THREE.Mesh;
+  private smile?: THREE.Mesh;
+  private mouth?: THREE.Mesh;
   private voiceLevel = 0;
   /** 0 = lips together, 1 = wide open. Follows the voice's loudness. */
   private mouthOpen = 0;
@@ -74,52 +77,69 @@ export class Person {
     private name: string,
     color: string,
     look: Look,
+    asset?: THREE.Object3D,
   ) {
     this.look = { ...look };
-    this.shirt = toonUnique(color);
-    const skin = (this.skin = toonUnique(SKIN_TONES[look.skin]));
-    this.hairMat = toonUnique(HAIR_COLORS[look.hair]);
-    this.hairMat.side = THREE.DoubleSide;
-    const pants = toon('#3d405b');
-    const ink = toon('#1d1d1d');
+    let torso: THREE.Object3D;
+    if (asset) {
+      const base = this.baseVisual = humanBase(asset);
+      this.root = base.rig.root;
+      this.body = base.rig.body;
+      this.head = base.rig.head;
+      torso = base.rig.torso;
+      this.armL = base.rig.armL;
+      this.armR = base.rig.armR;
+      this.legL = base.rig.legL;
+      this.legR = base.rig.legR;
+      this.shirt = base.clothing;
+      this.skin = base.skin;
+      this.hairMat = base.hair;
+    } else {
+      this.shirt = toonUnique(color);
+      const skin = (this.skin = toonUnique(SKIN_TONES[look.skin]));
+      this.hairMat = toonUnique(HAIR_COLORS[look.hair]);
+      this.hairMat.side = THREE.DoubleSide;
+      const pants = toon('#3d405b');
+      const ink = toon('#1d1d1d');
 
-    this.root.add(this.body);
-    const torso = mesh(new THREE.CapsuleGeometry(0.26, 0.28, 6, 12), this.shirt, 0, 0.72, 0);
-    this.body.add(torso);
-    // Head
-    const head = (this.head = new THREE.Group());
-    head.position.y = 1.32;
-    head.add(mesh(new THREE.SphereGeometry(0.34, 20, 16), skin));
-    head.add(this.hair);
-    this.buildHair();
-    for (const sx of [-1, 1]) {
-      head.add(mesh(new THREE.SphereGeometry(0.055, 10, 8), ink, sx * 0.12, 0.02, 0.3, false));
-      head.add(mesh(new THREE.SphereGeometry(0.05, 10, 8), toon('#ff9f9f'), sx * 0.2, -0.08, 0.27, false));
+      this.root.add(this.body);
+      torso = mesh(new THREE.CapsuleGeometry(0.26, 0.28, 6, 12), this.shirt, 0, 0.72, 0);
+      this.body.add(torso);
+      // Head
+      const head = (this.head = new THREE.Group());
+      head.position.y = 1.32;
+      head.add(mesh(new THREE.SphereGeometry(0.34, 20, 16), skin));
+      head.add(this.hair);
+      this.buildHair();
+      for (const sx of [-1, 1]) {
+        head.add(mesh(new THREE.SphereGeometry(0.055, 10, 8), ink, sx * 0.12, 0.02, 0.3, false));
+        head.add(mesh(new THREE.SphereGeometry(0.05, 10, 8), toon('#ff9f9f'), sx * 0.2, -0.08, 0.27, false));
+      }
+      const smile = (this.smile = mesh(new THREE.TorusGeometry(0.06, 0.015, 6, 12, Math.PI), ink, 0, -0.08, 0.32, false));
+      smile.rotation.z = Math.PI;
+      head.add(smile);
+      // Talking mouth: a flattened ball pressed into the face, scaled open and shut with the voice.
+      this.mouth = mesh(new THREE.SphereGeometry(1, 16, 12), toon('#7a2635'), 0, -0.1, 0.295, false);
+      const tongue = mesh(new THREE.SphereGeometry(1, 12, 10), toon('#ff8fa3'), 0, -0.5, 0, false);
+      tongue.scale.set(0.6, 0.45, 1.15);
+      this.mouth.add(tongue);
+      this.mouth.visible = false;
+      head.add(this.mouth);
+      this.body.add(head);
+
+      const limb = (len: number, r: number, mat: THREE.Material, x: number, y: number) => {
+        const pivot = new THREE.Group();
+        pivot.position.set(x, y, 0);
+        pivot.add(mesh(new THREE.CapsuleGeometry(r, len, 4, 8), mat, 0, -len / 2 - r / 2, 0));
+        this.body.add(pivot);
+        return pivot;
+      };
+      this.legL = limb(0.22, 0.1, pants, -0.12, HIPS);
+      this.legR = limb(0.22, 0.1, pants, 0.12, HIPS);
+      this.armL = limb(0.24, 0.08, this.shirt, -0.33, 0.9);
+      this.armR = limb(0.24, 0.08, this.shirt, 0.33, 0.9);
+      for (const arm of [this.armL, this.armR]) arm.add(mesh(new THREE.SphereGeometry(0.085, 12, 10), skin, 0, -0.38, 0));
     }
-    const smile = (this.smile = mesh(new THREE.TorusGeometry(0.06, 0.015, 6, 12, Math.PI), ink, 0, -0.08, 0.32, false));
-    smile.rotation.z = Math.PI;
-    head.add(smile);
-    // Talking mouth: a flattened ball pressed into the face, scaled open and shut with the voice.
-    this.mouth = mesh(new THREE.SphereGeometry(1, 16, 12), toon('#7a2635'), 0, -0.1, 0.295, false);
-    const tongue = mesh(new THREE.SphereGeometry(1, 12, 10), toon('#ff8fa3'), 0, -0.5, 0, false);
-    tongue.scale.set(0.6, 0.45, 1.15);
-    this.mouth.add(tongue);
-    this.mouth.visible = false;
-    head.add(this.mouth);
-    this.body.add(head);
-
-    const limb = (len: number, r: number, mat: THREE.Material, x: number, y: number) => {
-      const pivot = new THREE.Group();
-      pivot.position.set(x, y, 0);
-      pivot.add(mesh(new THREE.CapsuleGeometry(r, len, 4, 8), mat, 0, -len / 2 - r / 2, 0));
-      this.body.add(pivot);
-      return pivot;
-    };
-    this.legL = limb(0.22, 0.1, pants, -0.12, HIPS);
-    this.legR = limb(0.22, 0.1, pants, 0.12, HIPS);
-    this.armL = limb(0.24, 0.08, this.shirt, -0.33, 0.9);
-    this.armR = limb(0.24, 0.08, this.shirt, 0.33, 0.9);
-    for (const arm of [this.armL, this.armR]) arm.add(mesh(new THREE.SphereGeometry(0.085, 12, 10), skin, 0, -0.38, 0));
     // Forward is +z, so the character's left arm is the one on +x. The handle faces the hand.
     // Between the hands when both arms are out in front (see update), its front to whoever they walk up to.
     const holder = this.cardHolder;
@@ -143,16 +163,19 @@ export class Person {
   }
 
   setColor(color: string) {
-    this.shirt.color.set(color);
+    if (!this.baseVisual) this.shirt.color.set(color);
   }
 
   get skinColor(): string {
-    return SKIN_TONES[this.look.skin];
+    return this.baseVisual ? `#${this.skin.color.getHexString()}` : SKIN_TONES[this.look.skin];
   }
+
+  get shirtColor(): string { return `#${this.shirt.color.getHexString()}`; }
 
   setLook(look: Look) {
     const restyle = look.style !== this.look.style;
     this.look = { ...look };
+    if (this.baseVisual) return; // Preserve profile data; the new appearance is fixed in this first stage.
     this.hairMat.color.set(HAIR_COLORS[look.hair]);
     if (restyle) this.buildHair();
     this.skin.color.set(SKIN_TONES[this.look.skin]);
@@ -371,12 +394,29 @@ export class Person {
     this.mouthOpen += (want - this.mouthOpen) * Math.min(1, dt * (want > this.mouthOpen ? 35 : 15));
     if (this.voiceLevel > SPEAKING * 0.75) this.talkUntil = t + 0.4;
     const talking = t < this.talkUntil;
-    this.smile.visible = !talking;
-    this.mouth.visible = talking;
-    if (talking) this.mouth.scale.set(0.07 * (1 - this.mouthOpen * 0.2), 0.01 + this.mouthOpen * 0.045, 0.05);
+    if (this.smile && this.mouth) {
+      this.smile.visible = !talking;
+      this.mouth.visible = talking;
+      if (talking) this.mouth.scale.set(0.07 * (1 - this.mouthOpen * 0.2), 0.01 + this.mouthOpen * 0.045, 0.05);
+    }
     // Reading, they look down into the book.
     this.head.rotation.x = -this.mouthOpen * 0.08 + (this.book ? 0.32 : 0);
     this.head.rotation.y = this.head.rotation.z = 0;
     this.body.rotation.y = this.body.rotation.z = 0;
   }
+
+  /** Release instance resources, leaving cached GLB buffers and shared palette materials intact. */
+  dispose() {
+    if (this.label) disposeSprite(this.label);
+    if (this.doing) disposeSprite(this.doing);
+    this.hush();
+    this.card.set(null);
+    this.read(false);
+    this.root.traverse(node => {
+      if (node instanceof THREE.Mesh && !node.userData.sharedHumanGeometry) node.geometry.dispose();
+    });
+    if (this.baseVisual) this.baseVisual.dispose();
+    else { this.shirt.dispose(); this.skin.dispose(); this.hairMat.dispose(); }
+  }
+
 }

@@ -6,3 +6,4 @@
 sala_riunioni/** -text -whitespace
 sala_atrio/** -text -whitespace
 Personaggi/Atrio/** -text -whitespace
+Personaggi/Utenti/** -text -whitespace

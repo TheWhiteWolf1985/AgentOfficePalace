@@ -5,6 +5,7 @@ import { OutlineEffect } from 'three/examples/jsm/effects/OutlineEffect.js';
 import { HAIR_COLOR_NAMES, HAIR_COLORS, HAIR_STYLES, SKIN_TONES, randomLook, randomName, type Look } from '../../shared/avatar';
 import { AVATAR_COLORS, saveProfile, store, type Profile } from '../state';
 import { Person } from '../world/character';
+import { model } from '../world/models';
 import { toonUnique } from '../world/toon';
 import { h, openModal } from './dom';
 
@@ -48,7 +49,7 @@ class Preview {
     rug.material.userData.outlineParameters = { visible: false };
     this.scene.add(rug);
 
-    this.person = new Person(p.name, p.color, p.look);
+    this.person = new Person(p.name, p.color, p.look, model('human_base')?.scene);
     this.person.showLabel(false);
     this.scene.add(this.person.root);
     this.camera.position.set(0, 1.35, 4.6);
@@ -120,6 +121,8 @@ class Preview {
   dispose() {
     cancelAnimationFrame(this.raf);
     this.resize.disconnect();
+    this.scene.remove(this.person.root);
+    this.person.dispose();
     this.scene.traverse((o) => {
       if ((o as THREE.Mesh).isMesh) (o as THREE.Mesh).geometry.dispose();
     });
@@ -205,17 +208,19 @@ export function openCharacter(first: boolean, onSave: (p: Profile) => void) {
         h('label', {}, uiText('Your name')),
         account ? input : h('div.webhook', {}, input, reroll),
         account ? h('p.setting-note', {}, uiText`🔑 Signed in as ${account.name}, so that's your name here.`) : null,
-        h('label', {}, uiText('Skin tone')),
-        skinRow,
-        h('label', {}, uiText('Hair')),
-        styleRow,
-        h('label', {}, uiText('Hair color')),
-        hairRow,
-        h('label', {}, uiText('Shirt')),
-        shirtRow,
+        ...(preview.person.usesBaseModel ? [h('p.setting-note', {}, uiText('Base model. Appearance customization will be available later.'))] : [
+          h('label', {}, uiText('Skin tone')),
+          skinRow,
+          h('label', {}, uiText('Hair')),
+          styleRow,
+          h('label', {}, uiText('Hair color')),
+          hairRow,
+          h('label', {}, uiText('Shirt')),
+          shirtRow,
+        ]),
       ),
     ),
-    h('footer', {}, surprise, h('span.grow'), save),
+    h('footer', {}, preview.person.usesBaseModel ? null : surprise, h('span.grow'), save),
   ) as HTMLFormElement;
 
   let done = false;
