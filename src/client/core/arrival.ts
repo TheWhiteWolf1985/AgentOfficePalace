@@ -20,7 +20,7 @@ import { needsSigningIn, openSignIns } from '../ui/signins';
 import { routeTeamMessage } from '../ui/team';
 import { openTerminalFor, routeTerminalMessage } from '../ui/terminal';
 import { restarting, showRestarting, showUpgraded } from '../ui/upgrade';
-import { routeWhiteboardMessage } from '../features/whiteboard/ui';
+import { leaveWhiteboard, routeWhiteboardMessage } from '../features/whiteboard/ui';
 import type { Ctx } from './context';
 import type { CoreState } from './ctx';
 import { pastTheWing } from './floors';
@@ -59,6 +59,7 @@ export function installArrival(ctx: Ctx, core: CoreState, parts: ArrivalParts) {
     'before',
   );
   ctx.messages.on('floor.enter', () => parts.views.seatedOnArrival(), 'before');
+  ctx.messages.on('floor.enter', leaveWhiteboard, 'before');
   ctx.messages.on('worker.remove', (msg) => parts.views.sendingHome(msg.workerId), 'before');
 
   ctx.messages.onAny(() => parts.views.settled());

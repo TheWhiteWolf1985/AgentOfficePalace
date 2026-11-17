@@ -7,6 +7,8 @@ import { buildCity, type City } from '../../world/city';
 import { buildElevator, type Elevator } from '../../world/elevator';
 import { model } from '../../world/models';
 import { applyConferenceGlazing } from '../../world/conference-glazing';
+import { bindConferenceWhiteboard } from '../../world/conference-whiteboard';
+import { createWhiteboardSurface } from '../whiteboard/surface';
 import type { NightParts } from '../../world/outside';
 import { toonUnique } from '../../world/toon';
 import type { Collider, Interactable } from '../../world/types';
@@ -18,6 +20,7 @@ export interface Rooftop {
   elevator: Elevator;
   city: City;
   pickables: THREE.Object3D[];
+  whiteboard: ReturnType<typeof bindConferenceWhiteboard>;
   setFloors(floors: number, wings?: readonly number[]): void;
   update(t: number, dt: number, dark: number, people: Iterable<{ x: number; y: number; z: number }>): void;
 }
@@ -52,6 +55,7 @@ export function buildRooftop(night: NightParts): Rooftop {
     node.receiveShadow = true;
   });
   applyConferenceGlazing(room.scene);
+  const whiteboard = bindConferenceWhiteboard(room.scene, createWhiteboardSurface(CONFERENCE_DATA.whiteboard.width_m, CONFERENCE_DATA.whiteboard.height_m, 2048, true));
 
   const colliders: Collider[] = CONFERENCE_COLLIDERS.map((c) => ({ ...c }));
   // The asset deliberately reserves this volume for the application's own elevator.
@@ -60,7 +64,7 @@ export function buildRooftop(night: NightParts): Rooftop {
   elevator.setSign(ROOF_NAME);
   group.add(elevator.group);
   colliders.push(...elevator.colliders);
-  const interactables: Interactable[] = [elevator.interactable];
+  const interactables: Interactable[] = [elevator.interactable, whiteboard.interactable];
   const seatTargets = new THREE.Group();
   group.add(seatTargets);
   for (const seat of CONFERENCE_SEATING) {
@@ -99,5 +103,5 @@ export function buildRooftop(night: NightParts): Rooftop {
     // Keep the passage solid until the leaf clears it; hold it open while anyone crosses.
     doorCollider.top = open > 0.8 ? -10 : closedTop;
   };
-  return { group, colliders, interactables, elevator, city, pickables: [room.scene, elevator.group, seatTargets], setFloors: (n, wings) => city.setFloors(Math.max(0, n), wings), update };
+  return { group, colliders, interactables, elevator, city, whiteboard, pickables: [room.scene, elevator.group, seatTargets], setFloors: (n, wings) => city.setFloors(Math.max(0, n), wings), update };
 }

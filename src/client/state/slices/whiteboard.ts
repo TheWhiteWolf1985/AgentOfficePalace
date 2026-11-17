@@ -34,9 +34,11 @@ export const whiteboard: Slice = {
   },
   on: {
     'wb.update'(s, m) {
+      if (m.board !== undefined && m.board !== s.floor) return;
       s.drew(m.elements);
     },
     'wb.people'(s, m) {
+      if (m.board !== undefined && m.board !== s.floor) return;
       s.drawing = m.people;
       return ['drawing'];
     },

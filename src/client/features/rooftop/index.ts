@@ -5,6 +5,7 @@ import { builtFloors, floorWings } from '../../core/floors';
 import { noOutline } from '../../core/outline';
 import { store } from '../../state';
 import { buildRooftop, type Rooftop } from './world';
+import { refreshWhiteboard } from '../whiteboard/ui';
 
 export function installRooftop(ctx: Ctx) {
   let roof: Rooftop | null = null;
@@ -15,6 +16,7 @@ export function installRooftop(ctx: Ctx) {
       roof.group.visible = false;
       ctx.scene.add(roof.group);
       noOutline(roof.group);
+      refreshWhiteboard();
     }
     return roof;
   }

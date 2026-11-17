@@ -1,6 +1,8 @@
 import { t as uiText } from '../../../shared/i18n';
 /** The whiteboard: it shows what everyone's drawn on it, and E draws on it with them. */
 import type { Ctx } from '../../core/context';
+import type { Parts } from '../../core/parts';
+import { ROOF } from '../../../shared/rooftop';
 import { aside, hintTitle, key, onE } from '../../core/hint';
 import { store } from '../../state';
 import { clip } from '../../ui/dom';
@@ -13,10 +15,10 @@ declare module '../../world/types' {
   }
 }
 
-export function installWhiteboard(ctx: Ctx) {
+export function installWhiteboard(ctx: Ctx, parts: Pick<Parts, 'rooftop'>) {
   const { office } = ctx;
   // The whiteboard shows what everyone's drawn on it.
-  mirrorWhiteboard(office.whiteboard.show, office.whiteboard.fit.width, office.whiteboard.fit.height);
+  mirrorWhiteboard(() => store.floor === ROOF ? parts.rooftop.roof()?.whiteboard : store.project ? office.whiteboard : undefined);
   ctx.interactions.define('whiteboard', {
     reach: 7,
     hint: () => {

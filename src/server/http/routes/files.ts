@@ -7,6 +7,7 @@ import type { Ctx } from '../../office/context.js';
 import { repoOf, str } from '../../office/input.js';
 import { readBody, readBytes, sameOrigin, send } from '../util.js';
 import type { Route } from '../router.js';
+import { whiteboardAt } from '../../office/whiteboards.js';
 
 // Which floor a request is about: its boards and its workers.
 export const floorParam = (ctx: Ctx, url: URL): Floor | undefined => ctx.floors.get(url.searchParams.get('floor') ?? '');
@@ -36,11 +37,11 @@ export const fileRoutes = {
     path: '/api/whiteboard/file',
     auth: 'session',
     async handle(ctx, { req, res, url }) {
-      const floor = floorParam(ctx, url);
+      const board = whiteboardAt(ctx, url.searchParams.get('floor'));
       // Pictures on the whiteboard. Their ids are hashes of what's in them, so they never change.
-      if (!floor) return send(res, 404, { error: 'No such floor' });
+      if (!board) return send(res, 404, { error: 'No such floor' });
       if (req.method === 'GET') {
-        const f = floor.whiteboard.file(url.searchParams.get('id') ?? '');
+        const f = board.file(url.searchParams.get('id') ?? '');
         if (!f) return send(res, 404, { error: 'No such picture' });
         return send(res, 200, f, { 'cache-control': 'private, max-age=31536000, immutable' });
       }
@@ -53,7 +54,7 @@ export const fileRoutes = {
         if ((err as Error).message === 'too large') return send(res, 413, { error: 'That picture is too big for the whiteboard' });
         return send(res, 400, { error: 'Bad request' });
       }
-      const error = floor.whiteboard.addFile(body);
+      const error = board.addFile(body);
       return error ? send(res, 400, { error }) : send(res, 200, { ok: true });
     },
   },

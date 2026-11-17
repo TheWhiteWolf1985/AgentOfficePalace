@@ -11,13 +11,15 @@ import { createElement as e } from 'react';
 import { createRoot } from 'react-dom/client';
 import { CaptureUpdateAction, Excalidraw, MainMenu, WelcomeScreen, exportToCanvas, reconcileElements, restoreElements } from '@excalidraw/excalidraw';
 import '@excalidraw/excalidraw/index.css';
-import type { BinaryFileData, Collaborator, ExcalidrawImperativeAPI, SocketId } from '@excalidraw/excalidraw/types';
+import type { Collaborator, ExcalidrawImperativeAPI, SocketId } from '@excalidraw/excalidraw/types';
 import type { ExcalidrawElement } from '@excalidraw/excalidraw/element/types';
 import type { RemoteExcalidrawElement } from '@excalidraw/excalidraw/data/reconcile';
 import type { ClientMsg, ServerMsg } from '../../../shared/protocol';
 import { WB_MAX_ELEMENT_BYTES, byIndex, newer, type WbElement, type WbPointer } from '../../../shared/whiteboard';
 import { store } from '../../state';
 import { toast } from '../../ui/dom';
+import type { WhiteboardScope } from './files';
+import { freshPending, readyToPublish } from './sync';
 
 /** How often your changes, and your mouse, go out while you draw. */
 const SEND_MS = 50;
@@ -31,79 +33,20 @@ const asExcalidraw = (els: readonly WbElement[]) => restoreElements(els as unkno
 // Kept apart from the elements, as Excalidraw does: an image element names its picture by id (a hash
 // of the picture), and the picture itself goes up and down over HTTP.
 
-const files = new Map<string, BinaryFileData>();
-/** Pictures the office has, so they needn't go up again. */
-const stored = new Set<string>();
-const uploads = new Map<string, Promise<boolean>>();
-/** Pictures the office didn't have when asked, and when; asked again after a while. */
-const missing = new Map<string, number>();
-
-const fileUrl = (id?: string) => `/api/whiteboard/file?floor=${encodeURIComponent(store.floor ?? '')}${id ? `&id=${encodeURIComponent(id)}` : ''}`;
-
-/** Fetches the pictures these elements show that this browser doesn't have yet. */
-async function loadFiles(els: readonly ExcalidrawElement[]): Promise<BinaryFileData[]> {
-  const now = Date.now();
-  const want = new Set<string>();
-  for (const el of els) {
-    const id = el.type === 'image' && !el.isDeleted ? el.fileId : null;
-    if (id && !files.has(id) && now - (missing.get(id) ?? 0) > 10_000) want.add(id);
-  }
-  const got: BinaryFileData[] = [];
-  await Promise.all(
-    [...want].map(async (id) => {
-      try {
-        const res = await fetch(fileUrl(id));
-        if (!res.ok) throw new Error(String(res.status));
-        const f = (await res.json()) as BinaryFileData;
-        files.set(id, f);
-        stored.add(id);
-        missing.delete(id);
-        got.push(f);
-      } catch {
-        missing.set(id, Date.now());
-      }
-    }),
-  );
-  return got;
-}
-
-/** Puts a picture on the office's board; resolves to whether it's there now. */
-function upload(f: BinaryFileData): Promise<boolean> {
-  let p = uploads.get(f.id);
-  if (p) return p;
-  p = fetch(fileUrl(), { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id: f.id, mimeType: f.mimeType, dataURL: f.dataURL, created: f.created }) })
-    .then(async (res) => {
-      if (res.ok) {
-        stored.add(f.id);
-        files.set(f.id, f);
-        return true;
-      }
-      const { error } = (await res.json().catch(() => ({}))) as { error?: string };
-      toast(error ?? uiText("Couldn't put that picture on the whiteboard"), 'warn');
-      return false;
-    })
-    .catch(() => {
-      // Offline: try again with the next change.
-      uploads.delete(f.id);
-      return false;
-    });
-  uploads.set(f.id, p);
-  return p;
-}
-
 // ---- The board in the office ------------------------------------------------------------------------
 
 /**
  * The drawing as a picture for the board in the office, as big as fits in `maxW` × `maxH` pixels
  * (small drawings are scaled up, but not blown up past 3×). Null when nothing is drawn.
  */
-export async function renderPreview(elements: readonly WbElement[], maxW: number, maxH: number): Promise<HTMLCanvasElement | null> {
+export async function renderPreview(elements: readonly WbElement[], maxW: number, maxH: number, scope: WhiteboardScope): Promise<HTMLCanvasElement | null> {
   const live = asExcalidraw(elements.filter((el) => !el.isDeleted));
   if (!live.length) return null;
-  await loadFiles(live);
+  await scope.files.load(live);
+  if (!scope.active()) return null;
   return exportToCanvas({
     elements: live,
-    files: Object.fromEntries(files),
+    files: scope.files.snapshot(),
     appState: { exportBackground: false, exportWithDarkMode: false },
     exportPadding: 12,
     getDimensions: (w: number, h: number) => {
@@ -168,7 +111,9 @@ export interface WhiteboardApp {
   unmount(): void;
 }
 
-export function mountWhiteboard(host: HTMLElement, send: (msg: ClientMsg) => void, name: string): WhiteboardApp {
+export function mountWhiteboard(host: HTMLElement, send: (msg: ClientMsg) => void, name: string, scope: WhiteboardScope): WhiteboardApp {
+  let mounted = true;
+  const active = () => mounted && scope.active();
   let api: ExcalidrawImperativeAPI | null = null;
   /** Your changes on their way out: the live elements, sent as they are when the timer fires. */
   const pending = new Map<string, ExcalidrawElement>();
@@ -180,11 +125,12 @@ export function mountWhiteboard(host: HTMLElement, send: (msg: ClientMsg) => voi
   let collabFrame = 0;
 
   const schedule = () => {
-    if (pending.size && !sendTimer) sendTimer = window.setTimeout(flush, SEND_MS);
+    if (active() && pending.size && !sendTimer) sendTimer = window.setTimeout(flush, SEND_MS);
   };
 
   /** Notes every element that's newer here than what the office last had of it. */
   const noteChanges = (els: readonly ExcalidrawElement[]) => {
+    if (!active()) return;
     for (const el of els) if (newer(el, store.whiteboard.get(el.id))) pending.set(el.id, el);
     schedule();
   };
@@ -192,17 +138,28 @@ export function mountWhiteboard(host: HTMLElement, send: (msg: ClientMsg) => voi
   function flush() {
     window.clearTimeout(sendTimer);
     sendTimer = 0;
+    if (!active()) { pending.clear(); return; }
     const out: WbElement[] = [];
-    for (const [id, el] of pending) {
+    const live = [...pending.values()].some(el => el.type === 'image') ? new Map(api?.getSceneElementsIncludingDeleted().map(el => [el.id, el])) : undefined;
+    let initializing = false;
+    for (const [id, queued] of pending) {
+      const el = freshPending(queued, live?.get(id));
+      // A peer restoring an empty text can delete it before typing begins. An image can fill
+      // its fileId at the same version: publishing its placeholder would suppress that copy.
+      if (!readyToPublish(el)) { initializing ||= el.type === 'image'; continue; }
       // A picture goes up before the element that shows it, so nobody gets an image they can't load.
-      if (el.type === 'image' && el.fileId && !el.isDeleted && !stored.has(el.fileId)) {
+      if (el.type === 'image' && el.fileId && !el.isDeleted && !scope.files.has(el.fileId)) {
         const f = api?.getFiles()[el.fileId];
-        if (f) void upload(f).then((ok) => ok && schedule());
+        if (f) void scope.files.upload(f).then((ok) => ok && active() && schedule());
+        else initializing = true;
         continue;
       }
       pending.delete(id);
       out.push({ ...(el as unknown as WbElement) });
     }
+    // Excalidraw can finish an image without another onChange callback. Recheck only while
+    // an image is initializing, and stop with this editor/scope; never poll a completed board.
+    if (initializing && active() && !sendTimer) sendTimer = window.setTimeout(flush, 200);
     if (!out.length) return;
     store.drew(out);
     let batch: WbElement[] = [];
@@ -216,29 +173,29 @@ export function mountWhiteboard(host: HTMLElement, send: (msg: ClientMsg) => voi
         continue;
       }
       if (batch.length && size + n > BATCH_BYTES) {
-        send({ t: 'wb.update', elements: batch });
+        send({ t: 'wb.update', board: scope.board, elements: batch });
         batch = [];
         size = 0;
       }
       batch.push(el);
       size += n;
     }
-    if (batch.length) send({ t: 'wb.update', elements: batch });
+    if (batch.length) send({ t: 'wb.update', board: scope.board, elements: batch });
   }
 
   /** Merges elements from the office into the drawing; whatever you're in the middle of stays yours. */
   const merge = (remote: readonly WbElement[]) => {
-    if (!api || !remote.length) return;
+    if (!active() || !api || !remote.length) return;
     const restored = asExcalidraw(remote) as RemoteExcalidrawElement[];
     const elements = reconcileElements(api.getSceneElementsIncludingDeleted(), restored, api.getAppState());
     api.updateScene({ elements, captureUpdate: CaptureUpdateAction.NEVER });
-    void loadFiles(restored).then((got) => got.length && api?.addFiles(got));
+    void scope.files.load(restored).then((got) => active() && got.length && api?.addFiles(got));
   };
 
   /** Everyone else with the whiteboard open, with their cursors and selections. */
   const showCollaborators = () => {
     collabFrame = 0;
-    if (!api) return;
+    if (!active() || !api) return;
     const collaborators = new Map<SocketId, Collaborator>();
     for (const id of store.drawing) {
       const peer = store.peers.get(id);
@@ -267,18 +224,20 @@ export function mountWhiteboard(host: HTMLElement, send: (msg: ClientMsg) => voi
       Excalidraw,
       {
         excalidrawAPI: (a: ExcalidrawImperativeAPI) => {
+          if (!active()) return;
           api = a;
-          void loadFiles(initial).then((got) => got.length && api?.addFiles(got));
+          void scope.files.load(initial).then((got) => active() && got.length && api?.addFiles(got));
           collaboratorsSoon();
         },
         initialData: { elements: initial, appState: { viewBackgroundColor: '#ffffff' }, scrollToContent: true },
         onChange: (els) => noteChanges(els),
         onPointerUpdate: ({ pointer, button }) => {
+          if (!active()) return;
           const now = performance.now();
           if (now - lastPointer < POINTER_MS) return;
           lastPointer = now;
           const selected = api ? Object.keys(api.getAppState().selectedElementIds).slice(0, 200) : undefined;
-          send({ t: 'wb.pointer', x: pointer.x, y: pointer.y, tool: pointer.tool, button, selected });
+          send({ t: 'wb.pointer', board: scope.board, x: pointer.x, y: pointer.y, tool: pointer.tool, button, selected });
         },
         isCollaborating: true,
         name,
@@ -306,7 +265,7 @@ export function mountWhiteboard(host: HTMLElement, send: (msg: ClientMsg) => voi
         e(WelcomeScreen.Hints.MenuHint),
         e(WelcomeScreen.Hints.ToolbarHint),
         e(WelcomeScreen.Hints.HelpHint),
-        e(WelcomeScreen.Center, null, e(WelcomeScreen.Center.Heading, null, uiText('Draw together: everyone on this floor sees it live, and it stays up on the board'))),
+        e(WelcomeScreen.Center, null, e(WelcomeScreen.Center.Heading, null, uiText('Draw together: everyone in this space sees it live, and it stays up on the board'))),
       ),
     ),
   );
@@ -336,6 +295,7 @@ export function mountWhiteboard(host: HTMLElement, send: (msg: ClientMsg) => voi
       return true;
     },
     receive(msg) {
+      if (!active() || ('board' in msg && msg.board !== undefined && msg.board !== scope.board)) return;
       switch (msg.t) {
         case 'wb.update':
           merge(msg.elements);
@@ -355,12 +315,15 @@ export function mountWhiteboard(host: HTMLElement, send: (msg: ClientMsg) => voi
       }
     },
     resync() {
-      if (!api) return;
+      if (!active() || !api) return;
       merge([...store.whiteboard.values()]);
       noteChanges(api.getSceneElementsIncludingDeleted());
     },
     unmount() {
       flush();
+      mounted = false;
+      pending.clear();
+      window.clearTimeout(sendTimer);
       cancelAnimationFrame(collabFrame);
       api = null;
       root.unmount();

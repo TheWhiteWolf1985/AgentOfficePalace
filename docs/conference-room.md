@@ -24,9 +24,30 @@ I pannelli blu delle finestre esterne del modello vengono convertiti nel vetro
 trasparente usato dagli uffici, con riflessi leggeri e senza ombre opache.
 L'adattamento vale anche per la sala vista dai piani inferiori; il pacchetto
 Blender originale e le collisioni delle finestre rimangono invariati.
-La lavagna è una superficie dedicata predisposta per il prossimo collegamento:
-questa integrazione dello spazio non aggiunge ancora editor condiviso, sessioni
-di riunione o postazioni operative per agenti nella nuova sala.
+La lavagna è condivisa fra i visitatori della Sala riunioni anche con zero uffici.
+Avvicinati al pannello e premi E, oppure apri “Lavagna Sala riunioni” dalla palette
+Ctrl+K. L'editor Excalidraw permette testo, disegno, forme, cancellazione, annulla e
+immagini, con cursori e partecipanti in diretta. Chi ha l'editor chiuso vede il
+contenuto sul pannello 3D. La lavagna degli uffici rimane separata.
+
+Scena e immagini sono conservate in `<dataDir>/shared/conference-room/whiteboard/`;
+il riavvio ordinato svuota il salvataggio differito. La rimozione dell'ultimo
+ufficio non elimina la lavagna comune. Sulla VM112 il dataDir è
+`/var/lib/agent-office-palace/office/.agent-office`. Il salvataggio della scena
+è differito di circa due secondi; l'ultimo tratto può andare perso con un arresto
+brutale. Restano i limiti esistenti delle lavagne: 20.000 elementi,16 MB di scena,
+6 MB per immagine come data URL,64 MB complessivi di immagini.
+
+Il pannello usa una sola texture canvas,2048×691 pixel, adattata alle UV glTF
+con flipY=false e materiale leggibile anche di notte. Cornice, geometria,
+sedute, vetri e collider non cambiano. Ogni visita all'editor cattura il proprio
+spazio: cache immagini, upload e messaggi wb.* sono contestualizzati, e invii o
+anteprime obsoleti vengono scartati durante il cambio piano. I messaggi legacy
+senza scope restano compatibili; il nuovo client invia sempre il board esplicito.
+
+Le modifiche contemporanee sono riconciliate per elemento/versione/nonce come
+negli uffici. Non è un editor dei singoli caratteri in tempo reale. Non vengono
+aggiunte sessioni automatiche di riunione o postazioni operative per agenti.
 
 La scena del vecchio locale, bar, bevande, effetti di ubriachezza, DJ, musica,
 freccette e lancio dell'ascia sono rimossi, insieme ai rispettivi comandi e dati

@@ -4,18 +4,13 @@ import { WHITEBOARD } from '../../../shared/layout';
 import { mesh, roundedBox, textPlane, toon } from '../../world/toon';
 import type { Collider, Interactable } from '../../world/types';
 import type { Fixture } from '../../world/office/fixture';
+import { createWhiteboardSurface } from './surface';
 
 // The whiteboard: a rolling whiteboard on casters out on the open floor, with a marker tray. Its
 // face shows whatever everyone has drawn on it (see ui.ts), live.
 
 const ALU = '#aab4be';
 const INK = '#2b2d42';
-/** The face's canvas, in pixels per meter. */
-const PX = 512;
-/** Clear space around a drawing on the face, in pixels. */
-const PAD = 40;
-const FONT = 'Nunito, ui-rounded, system-ui, sans-serif';
-
 export interface WhiteboardStand {
   group: THREE.Group;
   colliders: Collider[];
@@ -40,14 +35,8 @@ export function buildWhiteboard(): WhiteboardStand {
   const frame = mesh(roundedBox(width + 0.14, 0.07, height + 0.14, 0.04), alu, 0, mid, 0);
   frame.rotation.x = Math.PI / 2;
   group.add(frame);
-  const canvas = document.createElement('canvas');
-  canvas.width = Math.round(width * PX);
-  canvas.height = Math.round(height * PX);
-  const g = canvas.getContext('2d')!;
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.colorSpace = THREE.SRGBColorSpace;
-  texture.anisotropy = 4;
-  const face = new THREE.Mesh(new THREE.PlaneGeometry(width, height), new THREE.MeshBasicMaterial({ map: texture, toneMapped: false }));
+  const display = createWhiteboardSurface(width, height);
+  const face = new THREE.Mesh(new THREE.PlaneGeometry(width, height), display.material);
   face.position.set(0, mid, 0.04);
   group.add(face);
 
@@ -89,36 +78,7 @@ export function buildWhiteboard(): WhiteboardStand {
   const interactable: Interactable = { kind: 'whiteboard', x, z: z + 1.7, radius: 2.3 };
   group.userData.interact = interactable;
 
-  const show = (drawing: HTMLCanvasElement | null) => {
-    const W = canvas.width;
-    const H = canvas.height;
-    g.fillStyle = '#ffffff';
-    g.fillRect(0, 0, W, H);
-    // A faint shine across the top corner, so it reads as a glossy board from across the room.
-    const shine = g.createLinearGradient(0, 0, W * 0.5, H * 0.6);
-    shine.addColorStop(0, 'rgba(210, 225, 240, 0.55)');
-    shine.addColorStop(1, 'rgba(210, 225, 240, 0)');
-    g.fillStyle = shine;
-    g.fillRect(0, 0, W, H);
-    if (drawing) {
-      const s = Math.min((W - PAD * 2) / drawing.width, (H - PAD * 2) / drawing.height);
-      const w = drawing.width * s;
-      const h = drawing.height * s;
-      g.drawImage(drawing, (W - w) / 2, (H - h) / 2, w, h);
-    } else {
-      g.fillStyle = '#b8c0c8';
-      g.textAlign = 'center';
-      g.textBaseline = 'middle';
-      g.font = `900 120px ${FONT}`;
-      g.fillText(uiText('Draw together ✏️'), W / 2, H / 2 - 70);
-      g.font = `700 64px ${FONT}`;
-      g.fillText(uiText('Walk up and press E — everyone on this floor sees it live'), W / 2, H / 2 + 70);
-    }
-    texture.needsUpdate = true;
-  };
-  show(null);
-
-  return { group, colliders, interactable, show, fit: { width: canvas.width - PAD * 2, height: canvas.height - PAD * 2 } };
+  return { group, colliders, interactable, show: display.show, fit: display.fit };
 }
 
 declare module '../../world/types' {

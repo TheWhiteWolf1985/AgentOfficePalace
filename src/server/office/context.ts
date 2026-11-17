@@ -22,6 +22,7 @@ import type { Sky } from '../sky.js';
 import type { OfficePrompts } from '../prompts.js';
 import type { LeaveOnMerge } from '../leave-on-merge.js';
 import type { ReceptionSign } from '../reception-sign.js';
+import type { Whiteboard } from '../whiteboard.js';
 import type { ChatLog } from '../history.js';
 import type { AgentProvider, FloorInfo, Me, ServerMsg, ServiceInfo, ServicesState, SignInKind } from '../../shared/protocol.js';
 import type { Client } from './client.js';
@@ -41,6 +42,8 @@ export interface Core {
   /** Kept on disk, so a restart doesn't wipe it. */
   chat: ChatLog;
   receptionSign: ReceptionSign;
+  /** Shared meeting-room drawing, independent of configured project floors. */
+  conferenceWhiteboard: Whiteboard;
   /** What the office is called where it has no project of its own to go by (webhooks, invites). */
   officeName: string;
   /** The models each provider's own CLI lists, for the ones that list them (see models.ts). */

@@ -4,6 +4,7 @@
 import { after, before, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
+import { once } from 'node:events';
 import { chmodSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import net from 'node:net';
 import { tmpdir } from 'node:os';
@@ -13,6 +14,7 @@ import { loadConfig } from '../src/server/config.js';
 import { startServer } from '../src/server/server.js';
 import type { ServerMsg } from '../src/shared/protocol.js';
 import { DEFAULT_AVATAR_COLORS } from '../src/shared/avatar-colors.js';
+import { WB_MAX_FILE_BYTES } from '../src/shared/whiteboard.js';
 
 type Office = Awaited<ReturnType<typeof startServer>>;
 type Msg<T extends ServerMsg['t']> = Extract<ServerMsg, { t: T }>;
@@ -332,6 +334,64 @@ test('welcomes a browser and dispatches what it sends', async () => {
   await a.close();
 });
 
+test('meeting room collaboration, pictures and delayed scoped messages stay separate from the project floor', async () => {
+  const floor = office.floors()[0].id;
+  const a = await Browser.open('?name=Writer&floor=%40roof'), b = await Browser.open('?name=Reader&floor=%40roof'), c = await Browser.open('?name=Office&floor=' + floor);
+  const file = { id: 'shared-test-picture', mimeType: 'image/png', dataURL: 'data:image/png;base64,AAAA', created: 1 };
+  const url = (space: string) => '/api/whiteboard/file?floor=' + encodeURIComponent(space);
+  const headers = { cookie, origin: base };
+  const element = { id: 'room-note', type: 'text', text: 'Sala riunioni', version: 1, versionNonce: 30 };
+  try {
+    const writer = (await a.take('welcome')).you, reader = (await b.take('welcome')).you;
+    await c.take('welcome');
+    a.send({ t: 'wb.open', board: '@roof' });
+    assert.deepEqual((await b.take('wb.people')).people, [writer]);
+    b.send({ t: 'wb.open', board: '@roof' });
+    assert.deepEqual(new Set((await a.take('wb.people', m => m.people.length === 2)).people), new Set([writer, reader]));
+    a.send({ t: 'wb.pointer', board: '@roof', x: 12, y: 34, tool: 'laser', button: 'down', selected: ['room-note'] });
+    assert.deepEqual(await b.take('wb.pointer'), { t: 'wb.pointer', board: '@roof', id: writer, x: 12, y: 34, tool: 'laser', button: 'down', selected: ['room-note'] });
+    a.send({ t: 'wb.update', board: '@roof', elements: [element] });
+    assert.deepEqual((await b.take('wb.update')).elements, [element]);
+    assert.equal(c.pending('wb.update').length, 0);
+    // Both users edit the same element: lower nonce wins the tie, and a later snapshot converges.
+    b.send({ t: 'wb.update', board: '@roof', elements: [{ ...element, version: 2, versionNonce: 20 }] });
+    await a.take('wb.update');
+    a.send({ t: 'wb.update', board: '@roof', elements: [{ ...element, version: 2, versionNonce: 10, text: 'Condivisa' }] });
+    assert.equal((await b.take('wb.update')).elements[0].versionNonce, 10);
+    assert.equal((await get(url('@roof') + '&id=' + file.id)).status, 401);
+    assert.equal((await post(url('@roof'), file, { cookie, origin: 'http://elsewhere.invalid' })).status, 403);
+    // The common HTTP reader closes an oversized stream; depending on transport timing the
+    // caller receives its 413 or a reset. Neither path may save the picture or stop the server.
+    await post(url('@roof'), 'x'.repeat(WB_MAX_FILE_BYTES + 4097), headers).then(
+      res => assert.equal(res.status, 413),
+      err => assert.match(String(err.cause?.code), /UND_ERR_SOCKET|ECONNRESET/),
+    );
+    assert.equal((await post(url('@roof'), file, headers)).status, 200);
+    assert.deepEqual(await (await get(url('@roof') + '&id=' + file.id, { cookie })).json(), file);
+    assert.equal((await get(url(floor) + '&id=' + file.id, { cookie })).status, 404);
+    assert.equal((await post(url(floor), file, headers)).status, 200, 'same image must also be stored in the project');
+    assert.equal((await get(url('../shared/conference-room') + '&id=' + file.id, { cookie })).status, 404);
+    a.send({ t: 'floor.go', floor }); await a.take('floor.enter');
+    assert.deepEqual((await b.take('wb.people', m => m.people.length === 1)).people, [reader]);
+    a.send({ t: 'wb.update', board: '@roof', elements: [{ ...element, id: 'late-wrong-board' }] });
+    a.send({ t: 'wb.open', board: '@roof' });
+    a.send({ t: 'ping', at: 909 }); await a.take('pong');
+    a.send({ t: 'floor.go', floor: '@roof' });
+    const back = await a.take('floor.enter');
+    assert.equal(back.whiteboard.elements.find(e => e.id === 'room-note')?.versionNonce, 10);
+    assert.equal(back.whiteboard.elements.some(e => e.id === 'late-wrong-board'), false);
+    a.send({ t: 'wb.open', board: '@roof' }); await b.take('wb.people', m => m.people.length === 2);
+    a.send({ t: 'wb.close', board: floor }); // a late close from the other board cannot close this editor
+    a.send({ t: 'ping', at: 910 }); await a.take('pong');
+    await a.close();
+    assert.deepEqual((await b.take('wb.people', m => m.people.length === 1)).people, [reader]);
+    c.send({ t: 'floor.go', floor: '@roof' });
+    assert.equal((await c.take('floor.enter')).whiteboard.elements.some(e => e.id === 'late-wrong-board'), false);
+    c.send({ t: 'floor.go', floor });
+    assert.deepEqual((await c.take('floor.enter')).whiteboard.elements, [], 'late room update never reached the project');
+  } finally { await a.close(); await b.close(); await c.close(); }
+});
+
 test('the toys on a floor, and letting go of them on leaving the floor or the office', async () => {
   const floor = office.floors()[0];
   const a = await Browser.open('?name=Cy');
@@ -351,7 +411,7 @@ test('the toys on a floor, and letting go of them on leaving the floor or the of
   b.send({ t: 'wb.open' });
   assert.equal((await a.take('wb.people', (m) => m.people.length === 2)).people.length, 2);
   a.send({ t: 'wb.pointer', x: 1, y: 2, tool: 'laser', button: 'down' });
-  assert.deepEqual(await b.take('wb.pointer'), { t: 'wb.pointer', id: cy, x: 1, y: 2, tool: 'laser', button: 'down' });
+  assert.deepEqual(await b.take('wb.pointer'), { t: 'wb.pointer', board: floor.id, id: cy, x: 1, y: 2, tool: 'laser', button: 'down' });
 
   const holdEverything = async () => {
     a.send({ t: 'wb.open' });
@@ -604,4 +664,36 @@ test('female body, stable hairstyle and bow survive WebSocket join, model change
     update = await b.take('peer.update', msg => msg.peer.id === joined.you);
     assert.equal(update.peer.look.hairstyle, 'bald'); assert.equal(update.peer.look.colors!.bow, '#123456');
   } finally { await a.close(); await b.close(); }
+});
+
+
+test('with zero project floors the meeting board survives reconnect and a graceful server restart', async () => {
+  assert.equal(office.floors().length, 0);
+  const a = await Browser.open('?name=Persist&floor=%40roof'), b = await Browser.open('?name=Watch&floor=%40roof');
+  const note = { id: 'room-restart-note', type: 'text', text: 'Persistente', version: 1, versionNonce: 1 };
+  const file = { id: 'room-restart-file', mimeType: 'image/png', dataURL: 'data:image/png;base64,AAAA', created: 1 };
+  try {
+    await a.take('welcome'); const welcome = await b.take('welcome'); assert.equal(welcome.floor, '@roof');
+    assert.equal((await post('/api/whiteboard/file?floor=%40roof', file, { cookie, origin: base })).status, 200);
+    a.send({ t: 'wb.open', board: '@roof' }); await b.take('wb.people');
+    a.send({ t: 'wb.update', board: '@roof', elements: [note, { ...note, id: 'room-restart-image', type: 'image', fileId: file.id }] });
+    assert.equal((await b.take('wb.update')).elements.length, 2);
+  } finally { await a.close(); await b.close(); }
+  // Shutdown must flush the two-second pending scene, before a replacement server reads it.
+  const publicDir = office.publicDir;
+  const stopped = once(office.server, 'close'); office.shutdown(); office.server.closeAllConnections(); await stopped;
+  const port = await freePort();
+  const cfg = loadConfig([path.join(tmp, 'project'), '--home', path.join(tmp, 'home'), '--projects', path.join(tmp, 'projects'), '--port', String(port), '--password', PASSWORD, '--no-open', '--weather', 'clear', '--agent', path.join(tmp, 'bin/claude')]);
+  office = await startServer(cfg, { publicDir }); base = `http://127.0.0.1:${port}`;
+  const login = await post('/api/login', { password: PASSWORD }, { origin: base });
+  assert.equal(login.status, 200); cookie = login.headers.get('set-cookie')!.split(';')[0];
+  const again = await Browser.open('?name=Restored&floor=%40roof');
+  try {
+    const state = await again.take('welcome'); assert.equal(state.floor, '@roof'); assert.equal(state.floors.length, 0);
+    assert.ok(state.whiteboard.elements.some(e => e.id === note.id && e.text === note.text));
+    assert.deepEqual(state.whiteboard.people, []);
+    assert.deepEqual(await (await get('/api/whiteboard/file?floor=%40roof&id=' + file.id, { cookie })).json(), file);
+    again.send({ t: 'floor.go', floor: '@lobby' }); assert.deepEqual((await again.take('floor.enter')).whiteboard.elements, []);
+    again.send({ t: 'floor.go', floor: '@roof' }); assert.ok((await again.take('floor.enter')).whiteboard.elements.some(e => e.id === note.id));
+  } finally { await again.close(); }
 });

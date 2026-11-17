@@ -8,4 +8,10 @@ export const italianConferenceRoom: Record<string, string> = {
   '🛗 Visit the meeting room or add a project in the elevator': '🛗 Visita la Sala riunioni o aggiungi un progetto nell’ascensore',
   'The meeting room is ready to visit. You can add a project whenever you need an office floor.': 'La Sala riunioni è già visitabile. Puoi aggiungere un progetto quando ti serve un piano ufficio.',
   'Take the elevator to the shared meeting room, even without a project. Walk with WASD and press E at a chair to sit down or get up.': 'Raggiungi la Sala riunioni dall’ascensore anche senza progetti. Muoviti con WASD e premi E vicino a una sedia per sederti o alzarti.',
+  'Meeting room whiteboard': 'Lavagna Sala riunioni',
+  'Just you for now. Anyone in the meeting room can join in.': 'Per ora ci sei solo tu. Chiunque nella Sala riunioni può unirsi.',
+  'Walk up and press E — everyone in this room sees it live': 'Avvicinati e premi E — chi è nella sala vede tutto in diretta',
+  'Take the elevator to an office or the meeting room first': 'Raggiungi un ufficio o la Sala riunioni con l’ascensore',
+  'Draw together in the offices or the shared meeting room: press E at the whiteboard. Text, drawings and pictures stay on that board and everyone in the same space sees them live.': 'Disegnate insieme negli uffici o nella Sala riunioni: premi E vicino alla lavagna. Testo, disegni e immagini restano su quella lavagna e chi si trova nello stesso spazio li vede in diretta.',
+  'Draw together: everyone in this space sees it live, and it stays up on the board': 'Disegnate insieme: chi si trova in questo spazio vede tutto in diretta e il contenuto resta sulla lavagna',
 };

@@ -20,10 +20,10 @@ import { openIssue, openPull } from '../../ui/pull';
 import { openServices, serviceUrl } from '../../ui/services';
 import { openTeam } from '../../ui/team';
 import { IS_MAC } from '../../ui/termkeys';
-import { openWhiteboard } from '../whiteboard/ui';
+import { hasWhiteboard, openWhiteboard } from '../whiteboard/ui';
 import type { InteractKind, Interactable } from '../../world/types';
 
-export type PaletteParts = Pick<Parts, 'walking' | 'waiting' | 'actions' | 'hud' | 'hanging' | 'meeting'>;
+export type PaletteParts = Pick<Parts, 'walking' | 'waiting' | 'actions' | 'hud' | 'hanging' | 'meeting' | 'rooftop'>;
 
 /** Listens for Ctrl+K (⌘K) on the window. */
 export function installPalette(ctx: Ctx, parts: PaletteParts) {
@@ -34,6 +34,7 @@ export function installPalette(ctx: Ctx, parts: PaletteParts) {
 
   /** Where you stand to use something of this kind on this floor, like the Issues board. */
   function spotOf(kind: InteractKind): Interactable | undefined {
+    if (ctx.upTop()) return parts.rooftop.roof()?.interactables.find((it) => it.kind === kind && !it.off);
     return office.interactables.find((it) => it.kind === kind && !it.off);
   }
 
@@ -104,7 +105,7 @@ export function installPalette(ctx: Ctx, parts: PaletteParts) {
     out.push(at('issues', uiText('the Issues board'), { icon: '📌', kind: uiText('Board'), title: uiText('Issues board'), open: () => openBoard('issues', net, actions.boardActions()) }));
     out.push(at('pulls', uiText('the PR board'), { icon: '🔀', kind: uiText('Board'), title: uiText('PR board'), keywords: [uiText('pull requests')], open: () => openBoard('pulls', net, actions.boardActions()) }));
     out.push(at('services', uiText('the Services board'), { icon: '🌐', kind: uiText('Board'), title: uiText('Services board'), detail: uiText('Web servers the workers are running'), open: () => openServices() }));
-    out.push(at('whiteboard', uiText('the whiteboard'), { icon: '📝', kind: uiText('Board'), title: uiText('Whiteboard'), open: () => openWhiteboard(net) }));
+    if (hasWhiteboard()) out.push(at('whiteboard', uiText('the whiteboard'), { icon: '📝', kind: uiText('Board'), title: ctx.upTop() ? uiText('Meeting room whiteboard') : uiText('Whiteboard'), open: () => openWhiteboard(net) }));
     out.push(at('meeting', uiText('the meeting room'), { icon: '🤝', kind: uiText('Board'), title: uiText('Meeting room'), keywords: [uiText('call a meeting')], open: () => meeting.showMeeting() }));
 
     for (const pr of store.pulls.items) {
