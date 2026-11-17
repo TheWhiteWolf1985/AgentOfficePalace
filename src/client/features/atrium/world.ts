@@ -7,6 +7,7 @@ import { buildReceptionStaff } from '../../world/character/reception-staff';
 import { buildCompanyExterior } from '../../world/company-exterior';
 import { buildElevator } from '../../world/elevator';
 import { model } from '../../world/models';
+import { batchStaticMeshes } from '../../world/static-batches';
 import type { NightParts } from '../../world/outside';
 import type { Collider, Interactable } from '../../world/types';
 
@@ -16,6 +17,7 @@ export function buildAtrium(night: NightParts) {
   const group = new THREE.Group();
   group.name = 'atrium';
   prepareAtrium(asset.scene);
+  batchStaticMeshes(asset.scene, new Set([ATRIUM_DATA.logo.surface]));
   group.add(asset.scene);
   group.add(buildReceptionStaff(name => model(name)?.scene ?? null));
   const colliders: Collider[] = ATRIUM_COLLIDERS.map((c) => ({ ...c }));

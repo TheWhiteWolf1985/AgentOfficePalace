@@ -14,6 +14,7 @@ import { languageSelect } from './language';
 import { connectionsPanel } from './connections';
 import { receptionSignPanel } from '../features/reception-sign/ui';
 import { agentManagementPanel } from './agent-management';
+import { loadGraphics, saveGraphics, type GraphicsQuality, type RenderRate } from '../graphics-settings';
 
 const VIEWS: [ViewMode, string, string][] = [
   ['first', uiText('👀 First person'), uiText('See through your own eyes. Click the office to look around with the mouse and click things to use them. Esc frees the mouse.')],
@@ -23,11 +24,12 @@ const VIEWS: [ViewMode, string, string][] = [
 const WEBHOOK_NAME: Record<WebhookKind, string> = { slack: 'Slack', discord: 'Discord', other: uiText('a webhook') };
 
 /** The categories down the side of ⚙️ Settings. */
-export type SettingsPane = 'you' | 'language' | 'sound' | 'notify' | 'building' | 'atrium-logo' | 'workers' | 'connections' | 'management';
+export type SettingsPane = 'you' | 'language' | 'graphics' | 'sound' | 'notify' | 'building' | 'atrium-logo' | 'workers' | 'connections' | 'management';
 
 const PANES: { id: SettingsPane; icon: string; label: string; blurb: string }[] = [
   { id: 'language', icon: '🌐', label: uiText('Language'), blurb: uiText('Choose the language of this interface.') },
   { id: 'you', icon: '🧍', label: uiText('You'), blurb: uiText('How you look, how you see the office, and how you’re signed in.') },
+  { id: 'graphics', icon: '🖥️', label: uiText('Graphics'), blurb: uiText('Balance visual detail and rendering load on this device.') },
   { id: 'sound', icon: '🔊', label: uiText('Sound & voice'), blurb: uiText('How loud the office is for you, and how voice chat works.') },
   { id: 'notify', icon: '🔔', label: uiText('Notifications'), blurb: uiText('Hear about a worker that needs someone, or finished, while you’re somewhere else.') },
   { id: 'building', icon: '🏢', label: uiText('Building'), blurb: uiText('The sky and where new floors are cloned.') },
@@ -38,11 +40,12 @@ const PANES: { id: SettingsPane; icon: string; label: string; blurb: string }[] 
 ];
 
 /** Who a setting is for, shown by its name: some are yours alone, some the whole office's. */
-type Scope = 'you' | 'floor' | 'office';
+type Scope = 'you' | 'floor' | 'office' | 'device';
 const SCOPE: Record<Scope, [label: string, title: string]> = {
   you: [uiText('Just you'), uiText('Only for you, kept in this browser')],
   floor: [uiText('This floor'), uiText('The same for everyone on this floor')],
   office: [uiText('Everyone'), uiText('The same for everyone in the building')],
+  device: [uiText('This device'), uiText('Kept in this browser, independently of your account')],
 };
 
 /** One setting: its name and who it's for, then whatever sets it. */
@@ -119,6 +122,9 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
     settings = { ...settings, ...some };
     onChange(settings);
   };
+  let graphics = loadGraphics();
+  const qualityRow = choiceRow<GraphicsQuality>(uiText('Visual quality'), [['high', uiText('High (default)')], ['balanced', uiText('Balanced')], ['economy', uiText('Economy')]], () => graphics.quality, quality => { graphics = { ...graphics, quality }; saveGraphics(graphics); });
+  const rateRow = choiceRow<RenderRate>(uiText('Rendering frequency'), [[30, '30 FPS'], [60, uiText('60 FPS (default)')], [0, uiText('Display refresh rate')]], () => graphics.fps, fps => { graphics = { ...graphics, fps }; saveGraphics(graphics); });
   // Voice chat: an open mic, or muted until you hold V.
   const talkRow = choiceRow(uiText('Voice chat'), [[false, uiText('🎙️ Open mic')], [true, uiText('✋ Push to talk')]], () => settings.pushToTalk, (pushToTalk) => change({ pushToTalk }));
 
@@ -377,6 +383,10 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
   const management = store.me.admin ? agentManagementPanel() : undefined;
   const receptionSign = receptionSignPanel();
   const panes: Record<SettingsPane, Node[]> = {
+    graphics: [
+      setting(uiText('Visual quality'), 'device', qualityRow, h('p.setting-note', {}, uiText('High preserves the current appearance. Balanced reduces resolution and shadow detail. Economy also disables shadows and outlines.'))),
+      setting(uiText('Rendering frequency'), 'device', rateRow, h('p.setting-note', {}, uiText('The limit affects only drawing the 3D world. Collaboration and audio continue normally. The world behind an open dialog is drawn at 15 FPS.'))),
+    ],
     connections: [connections?.element ?? h('p', {}, uiText('Administrator access required'))],
     management: [management?.element ?? h('p', {}, uiText('Administrator access required'))],
     'atrium-logo': [receptionSign.element],

@@ -11,6 +11,7 @@ import { bindConferenceWhiteboard } from '../../world/conference-whiteboard';
 import { createWhiteboardSurface } from '../whiteboard/surface';
 import type { NightParts } from '../../world/outside';
 import { toonUnique } from '../../world/toon';
+import { batchStaticMeshes } from '../../world/static-batches';
 import type { Collider, Interactable } from '../../world/types';
 
 export interface Rooftop {
@@ -83,6 +84,7 @@ export function buildRooftop(night: NightParts): Rooftop {
     if (chair && definition.role !== 'lounge') chair.traverse((n) => { n.userData.interact = it; });
   }
 
+  batchStaticMeshes(room.scene, new Set([CONFERENCE_DATA.whiteboard.surface_node, CONFERENCE_DATA.door.door_pivot, ...CONFERENCE_DATA.seats.map(seat => seat.chair)]));
   const exterior = buildCompanyExterior(night);
   group.add(exterior.group);
   // Interior lights stay useful at night, without animated DJ lights.

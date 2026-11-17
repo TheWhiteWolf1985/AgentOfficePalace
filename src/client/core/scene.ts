@@ -8,6 +8,7 @@ import type { Office } from '../world/types';
 import { HAZE_MAX, Sky } from '../world/sky';
 import type { Ctx } from './context';
 import { noOutline } from './outline';
+import { GraphicsController } from './graphics';
 
 /** How far the camera sees in the office: as far as the haze ever is, from the top floor. */
 export const FAR = HAZE_MAX + 20;
@@ -28,6 +29,7 @@ export interface Stage {
   readonly sun: THREE.DirectionalLight;
   readonly office: Office;
   readonly sky: Sky;
+  readonly graphics: GraphicsController;
 
 }
 
@@ -89,7 +91,8 @@ export function createScene(canvas: HTMLCanvasElement, renderer: THREE.WebGLRend
   sky = new Sky(scene, { sun, hemi, ambient }, office.night, () => store.officeNow());
 
   noOutline(office.group);
-  return { canvas, renderer, effect, scene, camera, hemi, ambient, sun, office, sky };
+  const graphics = new GraphicsController(renderer, scene, camera, sun);
+  return { canvas, renderer, effect, scene, camera, hemi, ambient, sun, office, sky, graphics };
 }
 
 /** The sky follows the office's weather and time of day, and its thunder is heard. */

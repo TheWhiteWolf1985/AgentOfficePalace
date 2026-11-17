@@ -1,0 +1,15 @@
+export const italianGraphics: Readonly<Record<string, string>> = {
+  'Graphics': 'Grafica',
+  'Balance visual detail and rendering load on this device.': 'Regola dettaglio visivo e carico grafico su questo dispositivo.',
+  'This device': 'Questo dispositivo',
+  'Kept in this browser, independently of your account': 'Salvato in questo browser, indipendentemente dal tuo account',
+  'Visual quality': 'Qualità visiva',
+  'High (default)': 'Alta (predefinita)',
+  'Balanced': 'Bilanciata',
+  'Economy': 'Risparmio',
+  'Rendering frequency': 'Frequenza di rendering',
+  '60 FPS (default)': '60 FPS (predefinito)',
+  'Display refresh rate': 'Frequenza del monitor',
+  'High preserves the current appearance. Balanced reduces resolution and shadow detail. Economy also disables shadows and outlines.': 'Alta conserva l’aspetto attuale. Bilanciata riduce risoluzione e dettaglio delle ombre. Risparmio disattiva anche ombre e contorni.',
+  'The limit affects only drawing the 3D world. Collaboration and audio continue normally. The world behind an open dialog is drawn at 15 FPS.': 'Il limite riguarda solo il disegno del mondo 3D. Collaborazione e audio continuano normalmente. Dietro una finestra aperta il mondo viene disegnato a 15 FPS.',
+};

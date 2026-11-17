@@ -12,6 +12,7 @@ import type { Parts } from './parts';
 import type { Frame } from './registry';
 import { FOV } from './scene';
 import { FirstPersonBody } from '../world/character/person-first';
+import { modalOpen } from '../ui/dom';
 
 /** Covering less ground than this (m/s) since your last footstep, your feet make no sound: a walk is 4.6. */
 const QUIET_FEET = 1.2;
@@ -157,6 +158,7 @@ export function installLoop(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'stage
 
   /** Draws the frame through the current view filters (see ctx.view). */
   function drawFrame(f: Frame) {
+    if (!parts.stage.graphics.shouldDraw(f.now, document.hidden, modalOpen())) return;
     ctx.view.draw(f, drawScene);
   }
 
@@ -166,7 +168,8 @@ export function installLoop(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'stage
     const { effect, scene } = parts.stage;
     const firstPerson = player.view === 'first';
     const unhide = firstBody?.hideExtras();
-    effect.render(scene, camera);
+    if (parts.stage.graphics.outline) effect.render(scene, camera);
+    else renderer.render(scene, camera);
     unhide?.();
 
     if (firstPerson && !ctx.view.covered() && !ctx.activities.any('hidesHands')) {
@@ -175,7 +178,8 @@ export function installLoop(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'stage
       renderer.clearDepth();
       hands.setLight(sky.lightAt(camera.position));
       sky.shading(false);
-      effect.render(hands.scene, hands.camera);
+      if (parts.stage.graphics.outline) effect.render(hands.scene, hands.camera);
+      else renderer.render(hands.scene, hands.camera);
       sky.shading(true);
     }
   }
@@ -190,8 +194,9 @@ export function frameLoop(ctx: Ctx, loading: { drew(): void }): (ts?: number) =>
   function frame(ts?: number) {
     timer.update(ts);
     const delta = timer.getDelta();
+    const before = ctx.renderer.info.render.frame;
     ctx.ticks.run({ delta, dt: Math.min(delta, 0.1), t: timer.getElapsed(), now: performance.now() });
-    loading.drew();
+    if (ctx.renderer.info.render.frame !== before) loading.drew();
     requestAnimationFrame(frame);
   }
   return frame;

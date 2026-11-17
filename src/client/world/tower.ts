@@ -4,6 +4,7 @@ import type { Collider } from './types';
 import type { Fixture } from './office/fixture';
 import { model } from './models';
 import { applyConferenceGlazing } from './conference-glazing';
+import { batchStaticMeshes } from './static-batches';
 import { bulb, type NightParts } from './outside';
 import { mergeByMaterial, mesh, toon, toonUnique } from './toon';
 
@@ -186,6 +187,8 @@ export function buildTower(colliders: Collider[], night: NightParts): Tower {
     const room = model('conference_room');
     if (!room) return;
     applyConferenceGlazing(room.scene);
+    room.scene.traverse(node => { if (node instanceof THREE.Mesh) node.userData.sharedImportedGeometry = true; });
+    batchStaticMeshes(room.scene, new Set(['whiteboard_surface']));
     room.scene.position.y = y;
     parts.add(room.scene);
   };
@@ -244,7 +247,7 @@ export function buildTower(colliders: Collider[], night: NightParts): Tower {
     for (const o of built) {
       o.removeFromParent();
       o.traverse((m) => {
-        if ((m as THREE.Mesh).isMesh) (m as THREE.Mesh).geometry.dispose();
+        if ((m as THREE.Mesh).isMesh && !m.userData.sharedImportedGeometry) (m as THREE.Mesh).geometry.dispose();
       });
     }
     built = [];

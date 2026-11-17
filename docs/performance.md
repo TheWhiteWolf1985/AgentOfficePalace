@@ -17,3 +17,23 @@ For a first-load comparison, use the same browser, viewport, device scale, accou
 Record a separate Performance trace for walking through the Atrium, visiting the shared meeting room, entering a project for the first time, and returning. The lazy resources intentionally move work to first office use. Screen sharing, drawing and avatar editing should be compared as separate interactions. Rendering resolution, shadows, frame rate and the supplied models remain unchanged by these two improvements. File-size reductions do not establish an FPS or RAM improvement.
 
 HTTP representation selection follows [RFC9110 section12.5.3](https://www.rfc-editor.org/rfc/rfc9110.html#section-12.5.3).
+
+## Graphics and rendering budget
+
+Settings → Graphics stores a device/browser preference (`agent-office.graphics`), independently of account preferences. High preserves the existing appearance: pixel ratio up to2,2048² shadows and toon outlines. Balanced caps pixel ratio at1.5 and shadows at1024². Economy caps pixel ratio at1 and disables shadows/outlines. Models, layout and interaction distances are unchanged.
+
+Drawing defaults to60FPS;30FPS and the display refresh rate are available. These are upper limits, not promised performance. Simulation, networking, audio and collaboration continue on the regular application loop. The world behind an open dialog draws at15FPS; hidden documents skip world drawing. A deadline accumulator tolerates RAF jitter and resets on resume/rate changes. The avatar editor keeps its own preview loop.
+
+## Static room geometry
+
+The runtime Atrium and meeting-room clones merge compatible opaque static leaf meshes in spatial cells. A batch shares the same material, vertex-attribute layout, shadow flags, render order and layers. Transforms are baked into derived geometry while positions, normals, UVs, triangles and original imported buffers are preserved. Delivered GLB/Blender files are not rewritten.
+
+Transparent surfaces, dynamic textures, the reception logo, whiteboard, door/pivots, seat interactions, floors/rugs, skinned/instanced/morphed objects and custom render callbacks stay separate. Pointer raycasts still use the room geometry for occlusion; collision/seat manifests remain authoritative. Batch object counts are not measured draw calls: shadows and outlines add passes, and culling varies with the camera.
+
+## Shader and audio preparation
+
+Only a requested destination is prepared with Three's `compileAsync`, using the current scene lights. Repeated visits share preparation; quality changes invalidate it. Elevator departure waits behind its fade for bounded preparation (maximum2seconds), and actual drawing of a newly revealed world waits for preparation to settle. Unsupported/failing drivers retain the normal first-use rendering path. Loading completion follows an actual draw, rather than an arbitrary RAF tick. This reduces first-use shader work without disabling shader diagnostics or changing agents.
+
+Audio sample buffers are generated lazily, cached and warmed one sample family per idle/background task. The browser can prepare AudioBuffers without creating or starting an AudioContext;48kHz prepared samples are resampled normally by the playing context. The context is still resumed during the user gesture. The initial sound graph and alerts remain immediately usable, while ambience starts in a separate task. Sound recipes, volume, visibility behavior, voice and alerts remain in place.
+
+Compare CPU/frame traces with the same graphics preference, viewport, camera, weather and route. Measure first room entry separately from a repeat visit. User-supplied November17traces locate an audio startup task around58ms and a shader-program first-use stall around201ms; these are a baseline, not evidence of a hardware-independent improvement after this change.

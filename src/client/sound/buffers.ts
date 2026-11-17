@@ -1,4 +1,5 @@
 import { rand } from './dsp';
+import { backgroundTask } from '../background-task';
 
 // ---- Sound samples, made once when audio starts -----------------------------------------------------
 
@@ -17,22 +18,53 @@ export interface Buffers {
   gurgle: AudioBuffer;
 }
 
-export function makeBuffers(ctx: BaseAudioContext): Buffers {
-  return {
-    keys: [0, 1, 2, 3, 4, 5].map(() => keyClick(ctx, { body: rand(190, 300), bright: rand(0.7, 1), release: rand(0.06, 0.09), decay: 95, len: 0.12 })),
-    spaces: [0, 1].map(() => keyClick(ctx, { body: rand(105, 130), bright: 0.55, release: rand(0.09, 0.12), decay: 55, len: 0.2 })),
-    mouse: keyClick(ctx, { body: 900, bright: 1, release: 0.07, decay: 400, len: 0.1 }),
-    steps: [0, 1, 2].map(() => footstep(ctx)),
-    rustle: rustle(ctx),
-    drop: sample(ctx, 0.06, (t) => (Math.sin(2 * Math.PI * 2400 * t * (1 - t * 5)) * 0.6 + (Math.random() * 2 - 1) * 0.4) * Math.exp(-t * 110), 0.9),
-    brown: loopable(ctx, 6, brownNoise()),
-    white: sample(ctx, 5, () => Math.random() * 2 - 1),
-    gurgle: loopable(ctx, 4, lumpy(ctx.sampleRate, 0.03, 0.11)),
+type BufferContext = Pick<BaseAudioContext, 'sampleRate' | 'createBuffer'>;
+
+/** Accessing one sample never builds all the other sounds. */
+export function lazyBuffers(ctx: BufferContext): Buffers {
+  const factories: { [K in keyof Buffers]: () => Buffers[K] } = {
+    keys: () => [0, 1, 2, 3, 4, 5].map(() => keyClick(ctx, { body: rand(190, 300), bright: rand(0.7, 1), release: rand(0.06, 0.09), decay: 95, len: 0.12 })),
+    spaces: () => [0, 1].map(() => keyClick(ctx, { body: rand(105, 130), bright: 0.55, release: rand(0.09, 0.12), decay: 55, len: 0.2 })),
+    mouse: () => keyClick(ctx, { body: 900, bright: 1, release: 0.07, decay: 400, len: 0.1 }),
+    steps: () => [0, 1, 2].map(() => footstep(ctx)),
+    rustle: () => rustle(ctx),
+    drop: () => sample(ctx, 0.06, (t) => (Math.sin(2 * Math.PI * 2400 * t * (1 - t * 5)) * 0.6 + (Math.random() * 2 - 1) * 0.4) * Math.exp(-t * 110), 0.9),
+    brown: () => loopable(ctx, 6, brownNoise()),
+    white: () => sample(ctx, 5, () => Math.random() * 2 - 1),
+    gurgle: () => loopable(ctx, 4, lumpy(ctx.sampleRate, 0.03, 0.11)),
   };
+  const bank = {} as Buffers;
+  for (const key of Object.keys(factories) as (keyof Buffers)[]) Object.defineProperty(bank, key, {
+    configurable: true, enumerable: true,
+    get() {
+      const value = factories[key]();
+      Object.defineProperty(bank, key, { value, enumerable: true });
+      return value;
+    },
+  });
+  return bank;
+}
+
+export function warmBuffers(bank: Buffers, schedule: (task: () => void) => void = backgroundTask) {
+  const keys = Object.keys(bank) as (keyof Buffers)[];
+  const next = () => {
+    const key = keys.shift();
+    if (!key) return;
+    schedule(() => { void bank[key]; next(); });
+  };
+  next();
+}
+
+/** AudioBuffer needs no playing context/user gesture; the context can resample these normally. */
+export function prepareBuffers(): Buffers | undefined {
+  if (typeof AudioBuffer === 'undefined') return;
+  const bank = lazyBuffers({ sampleRate: 48000, createBuffer: (numberOfChannels, length, sampleRate) => new AudioBuffer({ numberOfChannels, length, sampleRate }) });
+  warmBuffers(bank);
+  return bank;
 }
 
 /** `seconds` of whatever `next` gives for each moment, its loudest point brought to `peak` if there is one. */
-export function sample(ctx: BaseAudioContext, seconds: number, next: (t: number) => number, peak?: number): AudioBuffer {
+export function sample(ctx: BufferContext, seconds: number, next: (t: number) => number, peak?: number): AudioBuffer {
   const sr = ctx.sampleRate;
   const b = ctx.createBuffer(1, Math.ceil(sr * seconds), sr);
   const d = b.getChannelData(0);
@@ -46,7 +78,7 @@ export function sample(ctx: BaseAudioContext, seconds: number, next: (t: number)
 }
 
 /** A buffer whose end runs smoothly into its start, so it loops without a click. */
-function loopable(ctx: BaseAudioContext, seconds: number, next: () => number): AudioBuffer {
+function loopable(ctx: BufferContext, seconds: number, next: () => number): AudioBuffer {
   const sr = ctx.sampleRate;
   const n = Math.ceil(sr * seconds);
   const fade = Math.floor(sr * 0.25);
@@ -86,7 +118,7 @@ export function lumpy(sr: number, min: number, max: number): () => number {
 }
 
 /** A key bottoming out, a bright tick over a short woody thock, then a softer tick as it springs back. */
-function keyClick(ctx: BaseAudioContext, o: { body: number; bright: number; release: number; decay: number; len: number }): AudioBuffer {
+function keyClick(ctx: BufferContext, o: { body: number; bright: number; release: number; decay: number; len: number }): AudioBuffer {
   let prev = 0;
   let hiss = 0;
   let low = 0;
@@ -108,7 +140,7 @@ function keyClick(ctx: BaseAudioContext, o: { body: number; bright: number; rele
 }
 
 /** A muffled thud and a little scuff: something soft landing (a ball, a dart, a page), and the weight under a jump's landing. */
-function footstep(ctx: BaseAudioContext): AudioBuffer {
+function footstep(ctx: BufferContext): AudioBuffer {
   let low = 0;
   let prev = 0;
   const scuffAt = rand(0.025, 0.045);
@@ -130,7 +162,7 @@ function footstep(ctx: BaseAudioContext): AudioBuffer {
 }
 
 /** Paper being shuffled: crackly mid-range noise in uneven bursts. */
-function rustle(ctx: BaseAudioContext): AudioBuffer {
+function rustle(ctx: BufferContext): AudioBuffer {
   const len = 0.8;
   let a = 0;
   let b = 0;

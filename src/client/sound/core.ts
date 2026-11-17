@@ -1,5 +1,6 @@
 import { FLOOR, inWing } from '../../shared/layout';
-import { makeBuffers, type Buffers } from './buffers';
+import { lazyBuffers, prepareBuffers, warmBuffers, type Buffers } from './buffers';
+import { backgroundTask } from '../background-task';
 import { place, rms } from './dsp';
 import { WINDOWS, type Pos } from './places';
 
@@ -41,6 +42,8 @@ export class AudioCore {
   readonly played: Record<string, number> = {};
   /** What runs every frame (see every). */
   private readonly tickers: ((now: number) => void)[] = [];
+  private readonly prepared = prepareBuffers();
+  private ambienceReady = false;
 
   constructor(private readonly hooks: AudioHooks) {
     // Browsers only allow audio after a click or key press.
@@ -85,7 +88,8 @@ export class AudioCore {
       return; // no audio here
     }
     this.ctx = ctx;
-    this.buf = makeBuffers(ctx);
+    this.buf = this.prepared ?? lazyBuffers(ctx);
+    if (!this.prepared) warmBuffers(this.buf);
     // A gentle compressor, so a room full of typing never clips.
     const comp = ctx.createDynamicsCompressor();
     comp.threshold.value = -14;
@@ -109,7 +113,8 @@ export class AudioCore {
     this.outside.gain.value = 0;
     this.outside.connect(this.ambience);
     // The rest of the sound graph, and what plays all the time.
-    this.hooks.start(ctx);
+    this.applyVolume(); this.applyVisibility(); this.applyOutdoors();
+    backgroundTask(() => { this.hooks.start(ctx); this.ambienceReady = true; });
     void ctx.resume();
   }
 
@@ -138,7 +143,7 @@ export class AudioCore {
   /** Moves your ears and runs everything added with every(), in the order it was added. */
   update(l: Listener) {
     const ctx = this.ctx;
-    if (!ctx || ctx.state !== 'running') return;
+    if (!ctx || ctx.state !== 'running' || !this.ambienceReady) return;
     this.listener = l;
     // Level the facing, so looking straight down never lines it up with "up".
     const len = Math.hypot(l.fx, l.fz) || 1;

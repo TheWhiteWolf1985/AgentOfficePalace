@@ -122,6 +122,9 @@ export function installTravel(ctx: Ctx, core: CoreState, parts: TravelParts) {
     player.enabled = false;
     player.clearKeys();
     lift()?.setOpen(false);
+    // Prepare only a destination the user has requested, while doors/fade cover it.
+    const destination = floorId === ROOF ? parts.rooftop.theRoof().group : floorId === LOBBY ? parts.atrium.theAtrium().group : undefined;
+    const prepared = destination ? parts.stage.graphics.warmup.prepare(destination) : Promise.resolve();
     // Wait for the doors to shut on you, then dim the lights and go.
     setTimeout(
       () => {
@@ -130,7 +133,9 @@ export function installTravel(ctx: Ctx, core: CoreState, parts: TravelParts) {
           placeInCar(inside ? player.pos : undefined, garage && within);
           if (within) setTimeout(rodeWithin, 700);
           // Down to the garage from the roof: the bottom floor, and down its shaft once it's here (see arrive).
-          else net.send({ t: 'floor.go', floor: floorId, ...(garage ? { at: { x: player.pos.x, y: streetBelow(0), z: player.pos.z, rotY: 0 } } : {}) });
+          else void prepared.then(() => {
+            if (core.trip?.floor === floorId) net.send({ t: 'floor.go', floor: floorId, ...(garage ? { at: { x: player.pos.x, y: streetBelow(0), z: player.pos.z, rotY: 0 } } : {}) });
+          });
         }, 320);
       },
       inside ? 650 : 0,
@@ -225,6 +230,7 @@ export function installTravel(ctx: Ctx, core: CoreState, parts: TravelParts) {
     // Keep the company's own tower visible above/below the common rooms, including many offices.
     camera.far = up || lobby ? 700 : FAR;
     camera.updateProjectionMatrix();
+    void parts.stage.graphics.reveal(up ? r!.group : lobby ? atrium!.group : world.group);
     const { hanger } = parts.hanging;
     if (hanger.active) hanger.cancel();
     ctx.hint.invalidate();
