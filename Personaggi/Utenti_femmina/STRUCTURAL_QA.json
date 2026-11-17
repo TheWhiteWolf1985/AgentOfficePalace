@@ -1,0 +1,599 @@
+{
+  "status": "FAIL",
+  "functional_status": "PASS",
+  "component_checks": {
+    "short": {
+      "status": "PASS",
+      "errors": [],
+      "meshes": 1,
+      "primitives": 1,
+      "triangles": 120,
+      "bounds_at_attachment": {
+        "assembled_min": [
+          -0.314,
+          1.461,
+          -0.3035
+        ],
+        "assembled_max": [
+          0.314,
+          1.7655,
+          0.328
+        ]
+      },
+      "source_sha256": "ea60896444743e6233346c45c5787b8d149efb310e7d96d3ce7ec964fbe024eb",
+      "original_full_human_validator": "NOT_RUN",
+      "reason": "Hair components do not contain the full human rig; tested by component rules instead."
+    },
+    "long": {
+      "status": "PASS",
+      "errors": [],
+      "meshes": 1,
+      "primitives": 1,
+      "triangles": 192,
+      "bounds_at_attachment": {
+        "assembled_min": [
+          -0.314,
+          0.92,
+          -0.43
+        ],
+        "assembled_max": [
+          0.314,
+          1.7655,
+          0.328
+        ]
+      },
+      "source_sha256": "7e32ec4acf1bb0b85715ad329497281f7dd89b1b2a0f140bfc42ffa5d7776c3d",
+      "original_full_human_validator": "NOT_RUN",
+      "reason": "Hair components do not contain the full human rig; tested by component rules instead."
+    },
+    "bun": {
+      "status": "PASS",
+      "errors": [],
+      "meshes": 1,
+      "primitives": 1,
+      "triangles": 144,
+      "bounds_at_attachment": {
+        "assembled_min": [
+          -0.314,
+          1.461,
+          -0.457
+        ],
+        "assembled_max": [
+          0.314,
+          1.83,
+          0.328
+        ]
+      },
+      "source_sha256": "2d77e16c051597e51d9d53202624f1d295a156fb573105d2a780170d6a5e49af",
+      "original_full_human_validator": "NOT_RUN",
+      "reason": "Hair components do not contain the full human rig; tested by component rules instead."
+    },
+    "spiky": {
+      "status": "PASS",
+      "errors": [],
+      "meshes": 1,
+      "primitives": 1,
+      "triangles": 156,
+      "bounds_at_attachment": {
+        "assembled_min": [
+          -0.314,
+          1.461,
+          -0.3035
+        ],
+        "assembled_max": [
+          0.314,
+          1.84,
+          0.328
+        ]
+      },
+      "source_sha256": "299f24276a572f9506d2387b06723e506ed4f7f370b2b3ea53f3fb06826f9d65",
+      "original_full_human_validator": "NOT_RUN",
+      "reason": "Hair components do not contain the full human rig; tested by component rules instead."
+    },
+    "curly": {
+      "status": "PASS",
+      "errors": [],
+      "meshes": 1,
+      "primitives": 1,
+      "triangles": 408,
+      "bounds_at_attachment": {
+        "assembled_min": [
+          -0.3375,
+          1.461,
+          -0.3035
+        ],
+        "assembled_max": [
+          0.3375,
+          1.815,
+          0.3445
+        ]
+      },
+      "source_sha256": "2c8f5021865c9d8df629c64258f9a2018bc38d703530d5cec06fe38221a42306",
+      "original_full_human_validator": "NOT_RUN",
+      "reason": "Hair components do not contain the full human rig; tested by component rules instead."
+    },
+    "ponytail": {
+      "status": "PASS",
+      "errors": [],
+      "meshes": 1,
+      "primitives": 1,
+      "triangles": 156,
+      "bounds_at_attachment": {
+        "assembled_min": [
+          -0.314,
+          1.06,
+          -0.448
+        ],
+        "assembled_max": [
+          0.314,
+          1.7655,
+          0.328
+        ]
+      },
+      "source_sha256": "f7836f2a58df09077e5c12ed362bc3b720941028ed48add73523e31aa738297c",
+      "original_full_human_validator": "NOT_RUN",
+      "reason": "Hair components do not contain the full human rig; tested by component rules instead."
+    },
+    "bald": {
+      "status": "PASS",
+      "errors": [],
+      "meshes": 0,
+      "primitives": 0,
+      "triangles": 0,
+      "bounds_at_attachment": null,
+      "source_sha256": "480afbca6b61d7986f919550053e14fdd4434e73cc0214d48844eee0989e0e7e",
+      "original_full_human_validator": "NOT_RUN",
+      "reason": "Hair components do not contain the full human rig; tested by component rules instead."
+    }
+  },
+  "assembled_avatar_checks": {
+    "male_short": {
+      "status": "PASS",
+      "functional_status": "PASS",
+      "budget_status": "PASS",
+      "budget_errors": [],
+      "errors": [],
+      "metrics": {
+        "triangles": 522,
+        "mesh_instances": 13,
+        "primitives": 25,
+        "materials": 11,
+        "bytes": 43144,
+        "bounds_min": [
+          -0.45500001311302185,
+          0.0,
+          -0.3034999966621399
+        ],
+        "bounds_max": [
+          0.45500001311302185,
+          1.7654999494552612,
+          0.335999995470047
+        ]
+      },
+      "original_validator_status": "FAIL",
+      "original_validator_errors": [
+        "Budget exceeded: primitives",
+        "Budget exceeded: materials",
+        "Manifest deviations require separate review; not an in-contract PASS"
+      ],
+      "source_sha256": "6d1023a0e97712b0ba80fd36368190e05c8145e4f2da7d6ec039d0f6f9f630b0"
+    },
+    "male_long": {
+      "status": "PASS",
+      "functional_status": "PASS",
+      "budget_status": "PASS",
+      "budget_errors": [],
+      "errors": [],
+      "metrics": {
+        "triangles": 594,
+        "mesh_instances": 13,
+        "primitives": 25,
+        "materials": 11,
+        "bytes": 47036,
+        "bounds_min": [
+          -0.45500001311302185,
+          0.0,
+          -0.4300000071525574
+        ],
+        "bounds_max": [
+          0.45500001311302185,
+          1.7654999494552612,
+          0.335999995470047
+        ]
+      },
+      "original_validator_status": "FAIL",
+      "original_validator_errors": [
+        "Budget exceeded: primitives",
+        "Budget exceeded: materials",
+        "Manifest deviations require separate review; not an in-contract PASS"
+      ],
+      "source_sha256": "8925053889ada660de41a3b70e0e81bae797c68784158b3cf0b25fd888164e91"
+    },
+    "male_bun": {
+      "status": "PASS",
+      "functional_status": "PASS",
+      "budget_status": "PASS",
+      "budget_errors": [],
+      "errors": [],
+      "metrics": {
+        "triangles": 546,
+        "mesh_instances": 13,
+        "primitives": 25,
+        "materials": 11,
+        "bytes": 44440,
+        "bounds_min": [
+          -0.45500001311302185,
+          0.0,
+          -0.4569999873638153
+        ],
+        "bounds_max": [
+          0.45500001311302185,
+          1.8300000429153442,
+          0.335999995470047
+        ]
+      },
+      "original_validator_status": "FAIL",
+      "original_validator_errors": [
+        "Budget exceeded: primitives",
+        "Budget exceeded: materials",
+        "Manifest deviations require separate review; not an in-contract PASS"
+      ],
+      "source_sha256": "5fba35ab5c051ac754e2010a752094cc6b25109b15a8e9515e18f7de02eaf815"
+    },
+    "male_spiky": {
+      "status": "PASS",
+      "functional_status": "PASS",
+      "budget_status": "PASS",
+      "budget_errors": [],
+      "errors": [],
+      "metrics": {
+        "triangles": 558,
+        "mesh_instances": 13,
+        "primitives": 25,
+        "materials": 11,
+        "bytes": 45664,
+        "bounds_min": [
+          -0.45500001311302185,
+          0.0,
+          -0.3034999966621399
+        ],
+        "bounds_max": [
+          0.45500001311302185,
+          1.840000033378601,
+          0.335999995470047
+        ]
+      },
+      "original_validator_status": "FAIL",
+      "original_validator_errors": [
+        "Budget exceeded: primitives",
+        "Budget exceeded: materials",
+        "Manifest deviations require separate review; not an in-contract PASS"
+      ],
+      "source_sha256": "6e4d8adb3256a727bab1d5749c48e9161103f5f9231ddb6de2fbf120d79a17bd"
+    },
+    "male_curly": {
+      "status": "PASS",
+      "functional_status": "PASS",
+      "budget_status": "PASS",
+      "budget_errors": [],
+      "errors": [],
+      "metrics": {
+        "triangles": 810,
+        "mesh_instances": 13,
+        "primitives": 25,
+        "materials": 11,
+        "bytes": 58700,
+        "bounds_min": [
+          -0.45500001311302185,
+          0.0,
+          -0.3034999966621399
+        ],
+        "bounds_max": [
+          0.45500001311302185,
+          1.815000057220459,
+          0.34450000524520874
+        ]
+      },
+      "original_validator_status": "FAIL",
+      "original_validator_errors": [
+        "Budget exceeded: primitives",
+        "Budget exceeded: materials",
+        "Manifest deviations require separate review; not an in-contract PASS"
+      ],
+      "source_sha256": "0347f38fdf910caa4072a502da2c6d25ec9919eb8192baf4e9c93d4629f1faa2"
+    },
+    "male_ponytail": {
+      "status": "PASS",
+      "functional_status": "PASS",
+      "budget_status": "PASS",
+      "budget_errors": [],
+      "errors": [],
+      "metrics": {
+        "triangles": 558,
+        "mesh_instances": 13,
+        "primitives": 25,
+        "materials": 11,
+        "bytes": 45088,
+        "bounds_min": [
+          -0.45500001311302185,
+          0.0,
+          -0.4480000138282776
+        ],
+        "bounds_max": [
+          0.45500001311302185,
+          1.7654999494552612,
+          0.335999995470047
+        ]
+      },
+      "original_validator_status": "FAIL",
+      "original_validator_errors": [
+        "Budget exceeded: primitives",
+        "Budget exceeded: materials",
+        "Manifest deviations require separate review; not an in-contract PASS"
+      ],
+      "source_sha256": "4763fb18b1a1266f9a434b93b6437aead437e43e32b6d45f61d9f6a7f4840c73"
+    },
+    "male_bald": {
+      "status": "PASS",
+      "functional_status": "PASS",
+      "budget_status": "PASS",
+      "budget_errors": [],
+      "errors": [],
+      "metrics": {
+        "triangles": 402,
+        "mesh_instances": 12,
+        "primitives": 24,
+        "materials": 11,
+        "bytes": 35884,
+        "bounds_min": [
+          -0.45500001311302185,
+          0.0,
+          -0.27000001072883606
+        ],
+        "bounds_max": [
+          0.45500001311302185,
+          1.7200000286102295,
+          0.335999995470047
+        ]
+      },
+      "original_validator_status": "FAIL",
+      "original_validator_errors": [
+        "Budget exceeded: materials",
+        "Manifest deviations require separate review; not an in-contract PASS"
+      ],
+      "source_sha256": "b4ff6c13d67d9eb45fb4ea948eced9bc9e6d33f07496cb190febfbb0a11d3472"
+    },
+    "female_short": {
+      "status": "FAIL",
+      "functional_status": "PASS",
+      "budget_status": "FAIL",
+      "budget_errors": [
+        "requested budget exceeded"
+      ],
+      "errors": [],
+      "metrics": {
+        "triangles": 742,
+        "mesh_instances": 14,
+        "primitives": 26,
+        "materials": 12,
+        "bytes": 55336,
+        "bounds_min": [
+          -0.4399999976158142,
+          0.0,
+          -0.3034999966621399
+        ],
+        "bounds_max": [
+          0.4399999976158142,
+          1.7654999494552612,
+          0.38600000739097595
+        ]
+      },
+      "original_validator_status": "FAIL",
+      "original_validator_errors": [
+        "Budget exceeded: primitives",
+        "Budget exceeded: materials",
+        "Manifest deviations require separate review; not an in-contract PASS"
+      ],
+      "source_sha256": "1de1f40bf3728e76827655e2ee5c884ab74799047f78d45521ce6354e25b6f5d"
+    },
+    "female_long": {
+      "status": "FAIL",
+      "functional_status": "PASS",
+      "budget_status": "FAIL",
+      "budget_errors": [
+        "requested budget exceeded"
+      ],
+      "errors": [],
+      "metrics": {
+        "triangles": 814,
+        "mesh_instances": 14,
+        "primitives": 26,
+        "materials": 12,
+        "bytes": 59228,
+        "bounds_min": [
+          -0.4399999976158142,
+          0.0,
+          -0.4300000071525574
+        ],
+        "bounds_max": [
+          0.4399999976158142,
+          1.7654999494552612,
+          0.38600000739097595
+        ]
+      },
+      "original_validator_status": "FAIL",
+      "original_validator_errors": [
+        "Budget exceeded: primitives",
+        "Budget exceeded: materials",
+        "Manifest deviations require separate review; not an in-contract PASS"
+      ],
+      "source_sha256": "fb69c16537dd7380fe7290eb9a8b29643dfd16fe8ea5773b45a892c0d2fb9e10"
+    },
+    "female_bun": {
+      "status": "FAIL",
+      "functional_status": "PASS",
+      "budget_status": "FAIL",
+      "budget_errors": [
+        "requested budget exceeded"
+      ],
+      "errors": [],
+      "metrics": {
+        "triangles": 766,
+        "mesh_instances": 14,
+        "primitives": 26,
+        "materials": 12,
+        "bytes": 56632,
+        "bounds_min": [
+          -0.4399999976158142,
+          0.0,
+          -0.4569999873638153
+        ],
+        "bounds_max": [
+          0.4399999976158142,
+          1.8300000429153442,
+          0.38600000739097595
+        ]
+      },
+      "original_validator_status": "FAIL",
+      "original_validator_errors": [
+        "Budget exceeded: primitives",
+        "Budget exceeded: materials",
+        "Manifest deviations require separate review; not an in-contract PASS"
+      ],
+      "source_sha256": "13afa0b3d4fadef16f4d0323fd41186793542408a542c0520fdf1aa3711acc53"
+    },
+    "female_spiky": {
+      "status": "FAIL",
+      "functional_status": "PASS",
+      "budget_status": "FAIL",
+      "budget_errors": [
+        "requested budget exceeded"
+      ],
+      "errors": [],
+      "metrics": {
+        "triangles": 778,
+        "mesh_instances": 14,
+        "primitives": 26,
+        "materials": 12,
+        "bytes": 57856,
+        "bounds_min": [
+          -0.4399999976158142,
+          0.0,
+          -0.3034999966621399
+        ],
+        "bounds_max": [
+          0.4399999976158142,
+          1.840000033378601,
+          0.38600000739097595
+        ]
+      },
+      "original_validator_status": "FAIL",
+      "original_validator_errors": [
+        "Budget exceeded: primitives",
+        "Budget exceeded: materials",
+        "Manifest deviations require separate review; not an in-contract PASS"
+      ],
+      "source_sha256": "f767a10d63be5e06989b3f7a4a863f14764709db565501ed3f8d1c28a0fb8296"
+    },
+    "female_curly": {
+      "status": "FAIL",
+      "functional_status": "PASS",
+      "budget_status": "FAIL",
+      "budget_errors": [
+        "requested budget exceeded"
+      ],
+      "errors": [],
+      "metrics": {
+        "triangles": 1030,
+        "mesh_instances": 14,
+        "primitives": 26,
+        "materials": 12,
+        "bytes": 70892,
+        "bounds_min": [
+          -0.4399999976158142,
+          0.0,
+          -0.3034999966621399
+        ],
+        "bounds_max": [
+          0.4399999976158142,
+          1.815000057220459,
+          0.38600000739097595
+        ]
+      },
+      "original_validator_status": "FAIL",
+      "original_validator_errors": [
+        "Budget exceeded: primitives",
+        "Budget exceeded: materials",
+        "Manifest deviations require separate review; not an in-contract PASS"
+      ],
+      "source_sha256": "1386818e38e1255bcb43e7e5f9e8bc105c5e46715da5d0b04dd09d0fadc6f71c"
+    },
+    "female_ponytail": {
+      "status": "FAIL",
+      "functional_status": "PASS",
+      "budget_status": "FAIL",
+      "budget_errors": [
+        "requested budget exceeded"
+      ],
+      "errors": [],
+      "metrics": {
+        "triangles": 778,
+        "mesh_instances": 14,
+        "primitives": 26,
+        "materials": 12,
+        "bytes": 57280,
+        "bounds_min": [
+          -0.4399999976158142,
+          0.0,
+          -0.4480000138282776
+        ],
+        "bounds_max": [
+          0.4399999976158142,
+          1.7654999494552612,
+          0.38600000739097595
+        ]
+      },
+      "original_validator_status": "FAIL",
+      "original_validator_errors": [
+        "Budget exceeded: primitives",
+        "Budget exceeded: materials",
+        "Manifest deviations require separate review; not an in-contract PASS"
+      ],
+      "source_sha256": "e59090daa12e20d85848aaaa99be8563388c734d590997c15cdcbf4f00c5aabb"
+    },
+    "female_bald": {
+      "status": "FAIL",
+      "functional_status": "PASS",
+      "budget_status": "FAIL",
+      "budget_errors": [
+        "requested budget exceeded"
+      ],
+      "errors": [],
+      "metrics": {
+        "triangles": 622,
+        "mesh_instances": 13,
+        "primitives": 25,
+        "materials": 12,
+        "bytes": 48080,
+        "bounds_min": [
+          -0.4399999976158142,
+          0.0,
+          -0.27000001072883606
+        ],
+        "bounds_max": [
+          0.4399999976158142,
+          1.7350000143051147,
+          0.38600000739097595
+        ]
+      },
+      "original_validator_status": "FAIL",
+      "original_validator_errors": [
+        "Budget exceeded: primitives",
+        "Budget exceeded: materials",
+        "Manifest deviations require separate review; not an in-contract PASS"
+      ],
+      "source_sha256": "938171c5547e6e6bbf97debc7a460dbac38da80e3133f040759df86e45210e89"
+    }
+  },
+  "scope": "Current request: 11 materials/25 primitives, all other original limits unchanged. Legacy full-rig validator results retained separately."
+}

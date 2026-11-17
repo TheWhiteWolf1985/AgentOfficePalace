@@ -1,0 +1,31 @@
+{
+  "status": "PASS",
+  "glb_files_compared": 23,
+  "all_byte_identical": true,
+  "glb_results": {
+    "female_base.glb": true,
+    "assemblies/female_bald.glb": true,
+    "assemblies/female_bun.glb": true,
+    "assemblies/female_curly.glb": true,
+    "assemblies/female_long.glb": true,
+    "assemblies/female_ponytail.glb": true,
+    "assemblies/female_short.glb": true,
+    "assemblies/female_spiky.glb": true,
+    "assemblies/male_bald.glb": true,
+    "assemblies/male_bun.glb": true,
+    "assemblies/male_curly.glb": true,
+    "assemblies/male_long.glb": true,
+    "assemblies/male_ponytail.glb": true,
+    "assemblies/male_short.glb": true,
+    "assemblies/male_spiky.glb": true,
+    "hair/hair_bald.glb": true,
+    "hair/hair_bun.glb": true,
+    "hair/hair_curly.glb": true,
+    "hair/hair_long.glb": true,
+    "hair/hair_ponytail.glb": true,
+    "hair/hair_short.glb": true,
+    "hair/hair_spiky.glb": true,
+    "reference/male_reference.glb": true
+  },
+  "scope": "All generated GLBs rebuilt from the distributed source/modules/resources in a separate output directory; images and actual Blender roundtrips tested separately."
+}

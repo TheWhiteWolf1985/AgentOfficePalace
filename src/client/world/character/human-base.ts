@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import type { PersonRig } from './rig';
 import { toonUnique } from '../toon';
-import { AVATAR_COLOR_ROLES, DEFAULT_AVATAR_COLORS, sanitizeAvatarColors, type AvatarColors } from '../../../shared/avatar-colors';
+import { AVATAR_COLOR_ROLES, DEFAULT_AVATAR_COLORS, DEFAULT_BOW_COLOR, sanitizeAvatarColors, type AvatarColors } from '../../../shared/avatar-colors';
 
 /** Adapt one model clone to the procedural controller. Its cached geometry remains shared. */
 export function humanBase(asset: THREE.Object3D) {
@@ -58,6 +58,9 @@ export function humanBase(asset: THREE.Object3D) {
     const value = material(`char_mat_${role}`);
     return { role, material: value, original: value.color.clone() };
   });
+  const hairControl = find('char_hair'), hairMaterial = material('char_mat_hair');
+  const bowMaterial = [...materials.values()].find(m => m.name === 'char_mat_bow');
+  const originalBow = bowMaterial?.color.clone();
   return {
     rig, skin: material('char_mat_skin'), clothing: material('char_mat_clothing'), hair: material('char_mat_hair'),
     setColors: (value?: AvatarColors) => {
@@ -66,6 +69,22 @@ export function humanBase(asset: THREE.Object3D) {
         if (colors[channel.role] === DEFAULT_AVATAR_COLORS[channel.role]) channel.material.color.copy(channel.original);
         else channel.material.color.set(colors[channel.role]);
       }
+      if (bowMaterial) {
+        if (!colors.bow || colors.bow === DEFAULT_BOW_COLOR) bowMaterial.color.copy(originalBow!);
+        else bowMaterial.color.set(colors.bow);
+      }
+    },
+    /** Hair components share cached geometry and this avatar's own hair material. */
+    setHair: (component: THREE.Object3D | null) => {
+      hairControl.clear();
+      if (!component) return;
+      component.traverse(node => {
+        if (!(node instanceof THREE.Mesh)) return;
+        node.material = hairMaterial;
+        node.userData.sharedHumanGeometry = true;
+        node.castShadow = node.receiveShadow = true;
+      });
+      hairControl.add(component);
     },
     dispose: () => { for (const m of materials.values()) m.dispose(); },
   };

@@ -1,0 +1,34 @@
+{
+  "status": "FAIL",
+  "functional_status": "PASS",
+  "budget_status": "FAIL",
+  "errors": [],
+  "budget_errors": [
+    "Requested material budget exceeded",
+    "Requested primitive budget exceeded"
+  ],
+  "metrics": {
+    "triangles": 778,
+    "mesh_instances": 14,
+    "primitives": 26,
+    "materials": 12,
+    "bytes": 57280,
+    "bounds_min": [
+      -0.4399999976158142,
+      0.0,
+      -0.4480000138282776
+    ],
+    "bounds_max": [
+      0.4399999976158142,
+      1.7654999494552612,
+      0.38600000739097595
+    ]
+  },
+  "original_validator_status": "FAIL",
+  "original_validator_errors": [
+    "Budget exceeded: primitives",
+    "Budget exceeded: materials",
+    "Manifest deviations require separate review; not an in-contract PASS"
+  ],
+  "scope": "Current request 11 materials/25 primitives; all other original checks preserved"
+}

@@ -1,14 +1,14 @@
 import { OfficeSound } from '../sound';
 import { store, type Profile, type Settings } from '../state';
-import { Person } from '../world/character';
-import { model } from '../world/models';
+import type { Person } from '../world/character';
+import { createUserPerson } from '../world/character/user-assets';
 import { Dust } from '../world/dust';
 import type { Ctx } from './context';
 import { noOutline } from './outline';
 
 /** Your own character, as everyone else sees it (no name tag over your own head). */
 export function makeMe(ctx: Ctx): Person {
-  const me = new Person(store.profile.name, store.profile.color, store.profile.look, model('human_base')?.scene);
+  const me = createUserPerson(store.profile.name, store.profile.color, store.profile.look);
   me.showLabel(false);
   ctx.scene.add(me.root);
   noOutline(me.root);

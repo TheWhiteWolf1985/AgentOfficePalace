@@ -1,7 +1,8 @@
 /** The nine independent color channels of the delivered human revision 02. */
 export const AVATAR_COLOR_ROLES = ['skin', 'hair', 'eyebrows', 'iris', 'clothing', 'shirt', 'tie', 'pants', 'shoes'] as const;
 export type AvatarColorRole = (typeof AVATAR_COLOR_ROLES)[number];
-export type AvatarColors = Record<AvatarColorRole, string> & { version: 1 };
+export type AvatarColors = Record<AvatarColorRole, string> & { version: 1; bow?: string };
+export const DEFAULT_BOW_COLOR = '#b8161d';
 
 /** sRGB colors of the delivered GLB. Old profiles keep the previously displayed appearance. */
 export const DEFAULT_AVATAR_COLORS: Readonly<AvatarColors> = Object.freeze({
@@ -19,6 +20,7 @@ export function sanitizeAvatarColors(value: unknown, fallback: Readonly<AvatarCo
     const color = input[role];
     if (typeof color === 'string' && AVATAR_HEX.test(color)) result[role] = color.toLowerCase();
   }
+  if (typeof input.bow === 'string' && AVATAR_HEX.test(input.bow)) result.bow = input.bow.toLowerCase();
   return result;
 }
 

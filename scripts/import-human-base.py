@@ -1,7 +1,7 @@
 """Apply the explicit application policy, preserving the producer's strict original FAIL report."""
 from pathlib import Path
 import copy,hashlib,json,shutil,sys
-ROOT=Path(__file__).resolve().parents[1];SOURCE=ROOT/'Personaggi/Utenti'
+ROOT=Path(__file__).resolve().parents[1];SOURCE=ROOT/'Personaggi/Utenti_maschio'
 POLICY=json.loads((ROOT/'scripts/policies/human-base-v02.json').read_text(encoding='utf8'))
 
 def require(condition,message):

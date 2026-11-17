@@ -7,7 +7,7 @@ test('human color policy accepts the reviewed budgets while rejecting unrelated 
 from pathlib import Path
 import copy,importlib.util,json
 p=Path('scripts/import-human-base.py');spec=importlib.util.spec_from_file_location('human_import',p);m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
-source=Path('Personaggi/Utenti');raw=(source/'human_base.glb').read_bytes();contract=json.loads((source/'resources/constraints.json').read_text());manifest=json.loads((source/'human_base.manifest.json').read_text())
+source=Path('Personaggi/Utenti_maschio');raw=(source/'human_base.glb').read_bytes();contract=json.loads((source/'resources/constraints.json').read_text());manifest=json.loads((source/'human_base.manifest.json').read_text())
 report=m.validate(raw,contract,manifest)
 assert report['original_contract']['status']=='FAIL' and report['application_policy']['status']=='PASS'
 assert contract['profiles']['human']['limits']['materials']==8 and len(manifest['deviations'])==2

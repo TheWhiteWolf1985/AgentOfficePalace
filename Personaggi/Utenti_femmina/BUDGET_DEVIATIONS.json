@@ -1,0 +1,15 @@
+{
+  "status": "FAIL",
+  "previous_limits": {
+    "materials": 11,
+    "primitives": 25
+  },
+  "female_actual_maximum": {
+    "materials": 12,
+    "primitives": 26
+  },
+  "reason": "Fixed independently recolorable head bow adds one material and primitive",
+  "budget_extension_approval": "NOT_RUN",
+  "original_validator_and_contract_modified": false,
+  "functional_checks": "PASS"
+}

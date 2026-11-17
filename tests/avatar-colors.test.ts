@@ -35,7 +35,7 @@ test('profile storage keeps legacy fields and nine colors over reload without sh
   const before = Object.getOwnPropertyDescriptor(globalThis, 'localStorage'), data = new Map<string, string>();
   Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: { getItem: (key: string) => data.get(key), setItem: (key: string, value: string) => data.set(key, value) } });
   t.after(() => { if (before) Object.defineProperty(globalThis, 'localStorage', before); else delete (globalThis as any).localStorage; });
-  const profile = { name: 'Ann', color: '#4f86f7', look: { skin: 2, hair: 3, style: 1, colors: { ...DEFAULT_AVATAR_COLORS, eyebrows: '#123456' } } };
+  const profile = { name: 'Ann', color: '#4f86f7', look: { skin: 2, hair: 3, style: 1, model: 'female' as const, hairstyle: 'ponytail' as const, colors: { ...DEFAULT_AVATAR_COLORS, eyebrows: '#123456', bow: '#234567' } } };
   saveProfile(profile); const loaded = loadProfile()!;
   assert.deepEqual(loaded, profile);
   loaded.look!.colors!.eyebrows = '#000000'; assert.equal(loadProfile()!.look!.colors!.eyebrows, '#123456');

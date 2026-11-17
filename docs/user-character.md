@@ -1,13 +1,13 @@
 # Personaggio e colori degli utenti
 
-`Personaggi/Utenti/` conserva la consegna Blender revisione 02 immutata, compresi
+`Personaggi/Utenti_maschio/` conserva la consegna Blender revisione 02 immutata, compresi
 sorgenti, licenza e verifiche del produttore. `python -B scripts/import-human-base.py`
 verifica l’inventario SHA-256 e copia il solo GLB nella cartella runtime.
 
 Il rig rigido `AOP_CHAR_RIGID_1` resta in metri, scala 1:1, altezza 1,7655 m.
 Movimento, sedute, lettura, oggetti, scale e pali usano il controller esistente.
-NPC e agenti non cambiano. Il modello maschile e l’acconciatura corta sono le
-uniche varianti disponibili in questa consegna.
+NPC e agenti non cambiano. Le basi maschile e femminile condividono rig e
+acconciature modulari. I sorgenti femminili sono in `Personaggi/Utenti_femmina/`.
 
 ## Nove colori
 
@@ -53,3 +53,47 @@ FAIL originale dal PASS della policy applicativa.
 Le geometrie GLB restano condivise nella cache, i materiali toon sono privati
 per istanza. La chiusura dell’anteprima e la rimozione dei peer liberano le
 risorse proprie senza eliminare le geometrie degli altri personaggi.
+
+
+## Basi e acconciature
+
+Il selettore Modello offre Maschile e Femminile. Look.model usa gli ID stabili
+male/female; Look.hairstyle usa short, long, bun, spiky, curly, ponytail, bald.
+Sono campi opzionali: i vecchi profili mantengono maschile/corti, indipendentemente
+dal vecchio indice style che in precedenza non modificava il GLB. La femminile
+usa long quando non è stato scelto esplicitamente uno stile. Una scelta esplicita
+rimane valida passando da una base all’altra. Il salvataggio resta per browser.
+
+La femminile consegnata comprende gonna, gambe scoperte, tacchi e fiocco fisso.
+Il canale pants colora la gonna (etichetta Gonna); skin colora anche le gambe.
+Il campo opzionale Look.colors.bow personalizza soltanto il fiocco sulla testa;
+il nastro al collo conserva tie. Il controllo Fiocco appare soltanto sulla base
+femminile. Il fiocco resta sotto char_head con ogni stile, inclusa l’opzione
+Senza capelli, e si nasconde insieme alla testa in prima persona. Sopracciglia
+e fiocco sono esterni a char_hair.
+
+I corpi e sei componenti capelli sono precaricati. Ogni avatar visualizza una
+sola acconciatura; bald rimuove solo i figli di char_hair. I componenti riusano
+il materiale capelli privato dell’istanza e geometrie condivise della cache.
+Il cambio corpo preserva l’oggetto root e l’identità del rig del controller,
+trasferisce libro/carta tenuti e mantiene nome, microfono e posa. La prima
+persona rileva il cambio del body e riapplica la visibilità e le proporzioni.
+
+## Importazione femminile
+
+`python -B scripts/import-female-avatar.py` verifica i 358 checksum della
+consegna, le sette componenti e le quattordici combinazioni corporee. Copia nel
+runtime solo female_base.glb e i sei componenti non vuoti; il maschile rimane
+byte per byte invariato dopo la rinomina della cartella in Utenti_maschio.
+
+La policy AOP_FEMALE_COLORS_1, in scripts/policies/female-avatar-v03.json,
+autorizza per questa revisione femminile 12 materiali e 26 primitive, richiesti
+dal fiocco con colore indipendente. Richiede i nove ruoli originali più bow,
+rig e vincolo del fiocco fisso. La policy maschile 11/25 resta invariata. Il
+contratto originale e i rapporti del produttore conservano i FAIL di budget;
+il PASS applicativo viene registrato separatamente. Le componenti capelli
+hanno controlli propri e non vengono certificate come corpi completi.
+
+I rapporti Blender coprono il dominio dichiarato dal produttore; i test runtime
+coprono le quattordici combinazioni con il controller effettivo, il cambio
+corpo in prima persona, colori/fiocco e rilascio delle geometrie condivise.

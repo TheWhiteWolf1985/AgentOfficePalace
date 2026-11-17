@@ -12,8 +12,8 @@ import { store } from '../../state';
 import { clip } from '../../ui/dom';
 import { renderPeople, updateSpeaking } from '../../ui/people';
 import { whereabouts } from '../../ui/whereabouts';
-import { Person } from '../../world/character';
-import { model } from '../../world/models';
+import type { Person } from '../../world/character';
+import { createUserPerson } from '../../world/character/user-assets';
 import { disposeSprite, textSprite } from '../../world/toon';
 
 /** Going faster than this (m/s), someone's running: a walk is 4.6 and a run 7.5 (see player/index.ts). */
@@ -48,7 +48,7 @@ export function installPeers(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'worl
       if (id === store.you || !store.onMyFloor(peer) || peer.lite) continue;
       let r = remotes.get(id);
       if (!r) {
-        const person = new Person(peer.name, peer.color, peer.look, model('human_base')?.scene);
+        const person = createUserPerson(peer.name, peer.color, peer.look);
         person.root.position.set(peer.x, peer.y, peer.z);
         scene.add(person.root);
         noOutline(person.root);

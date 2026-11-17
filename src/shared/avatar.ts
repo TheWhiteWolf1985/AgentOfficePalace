@@ -1,14 +1,15 @@
 import { t as uiText } from './i18n.js';
-import { AVATAR_COLOR_ROLES, DEFAULT_AVATAR_COLORS, sanitizeAvatarColors, type AvatarColors } from './avatar-colors.js';
+import { AVATAR_COLOR_ROLES, DEFAULT_AVATAR_COLORS, DEFAULT_BOW_COLOR, sanitizeAvatarColors, type AvatarColors } from './avatar-colors.js';
+import { avatarModel, avatarHairstyle, sanitizeAvatarVariant, type AvatarVariant } from './avatar-variants.js';
 // What a person looks like in the office, picked on the character select screen.
-// Server and client share these lists so a look is just three small indexes on the wire.
+// Legacy indexes coexist with stable body/hair IDs and optional versioned colors.
 
 export const SKIN_TONES = ['#ffe3cc', '#ffd7b5', '#f1c27d', '#e0ac69', '#c68642', '#a0663a', '#8d5524', '#5c3a21'];
 export const HAIR_COLORS = ['#2b2d42', '#4a3222', '#6f4e37', '#e9c46a', '#c1440e', '#d9d9d9', '#d62828', '#ff8fab', '#9d4edd', '#264653'];
 export const HAIR_COLOR_NAMES = [uiText('Black'), uiText('Dark brown'), uiText('Brown'), uiText('Blonde'), uiText('Ginger'), uiText('Silver'), uiText('Red'), uiText('Pink'), uiText('Purple'), uiText('Teal')];
 export const HAIR_STYLES = [uiText('Short'), uiText('Long'), uiText('Bun'), uiText('Spiky'), uiText('Curly'), uiText('Ponytail'), uiText('Bald')];
 
-export interface Look {
+export interface Look extends AvatarVariant {
   skin: number;
   hair: number;
   style: number;
@@ -51,11 +52,14 @@ export function sanitizeLook(x: unknown, fallback: Look): Look {
     skin: idx(o.skin, SKIN_TONES.length, fallback.skin),
     hair: idx(o.hair, HAIR_COLORS.length, fallback.hair),
     style: idx(o.style, HAIR_STYLES.length, fallback.style),
+    ...sanitizeAvatarVariant(o, fallback),
     ...(colors ? { colors: { ...colors } } : {}),
   };
 }
 
 export function sameLook(a: Look, b: Look): boolean {
   return a.skin === b.skin && a.hair === b.hair && a.style === b.style &&
+    avatarModel(a) === avatarModel(b) && avatarHairstyle(a) === avatarHairstyle(b) &&
+    (a.colors?.bow ?? DEFAULT_BOW_COLOR) === (b.colors?.bow ?? DEFAULT_BOW_COLOR) &&
     AVATAR_COLOR_ROLES.every(role => (a.colors ?? DEFAULT_AVATAR_COLORS)[role] === (b.colors ?? DEFAULT_AVATAR_COLORS)[role]);
 }

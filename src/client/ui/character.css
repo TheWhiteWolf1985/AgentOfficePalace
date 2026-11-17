@@ -19,6 +19,9 @@
 .avatar-color-inputs input[type=color] { width: 40px; min-width: 40px; height: 36px; padding: 2px; cursor: pointer; }
 .avatar-color-inputs input[type=text] { width: 100%; min-width: 0; padding: 5px 6px; font-size: 12px; font-family: monospace; }
 .avatar-color-reset { grid-column: 1 / -1; justify-self: start; }
+.avatar-variants { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
+.charsel .avatar-variants label { display: block; margin: 0 0 5px; font-size: 12px; font-weight: 800; }
+.avatar-variants select { width: 100%; min-width: 0; }
 @media (max-width: 640px) {
   .charsel .body { grid-template-columns: 1fr; }
   .charsel-stage { min-height: 230px; }

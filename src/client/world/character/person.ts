@@ -8,6 +8,12 @@ import { disposeSprite, mesh, textSprite, toon, toonUnique } from '../toon';
 import { REACH_TIME, reachCurve } from './curves';
 import { styleHair } from './person-hair';
 import { humanBase } from './human-base';
+import { avatarModel, avatarHairstyle, type AvatarModel, type AvatarHairstyle } from '../../../shared/avatar-variants';
+
+export interface PersonAssets {
+  body(model: AvatarModel): THREE.Object3D | null;
+  hair(style: AvatarHairstyle): THREE.Object3D | null;
+}
 
 export type Pose = 'stand' | 'walk' | 'sit' | 'type';
 
@@ -25,6 +31,8 @@ export class Person {
 
   readonly rig: PersonRig;
   private baseVisual?: ReturnType<typeof humanBase>;
+  private appliedModel: AvatarModel;
+  private appliedHair?: AvatarHairstyle;
   get usesBaseModel() { return !!this.baseVisual; }
   private legL: THREE.Object3D;
   private legR: THREE.Object3D;
@@ -78,8 +86,10 @@ export class Person {
     color: string,
     look: Look,
     asset?: THREE.Object3D,
+    private assets?: PersonAssets,
   ) {
     this.look = { ...look };
+    this.appliedModel = avatarModel(look);
     let torso: THREE.Object3D;
     if (asset) {
       const base = this.baseVisual = humanBase(asset);
@@ -161,6 +171,7 @@ export class Person {
 
     this.rig = { root: this.root, body: this.body, torso, head: this.head, armL: this.armL, armR: this.armR, legL: this.legL, legR: this.legR };
     this.setLabel(name, false);
+    this.applyHairstyle(look);
   }
 
   setColor(color: string) {
@@ -175,14 +186,52 @@ export class Person {
 
   setLook(look: Look) {
     const restyle = look.style !== this.look.style;
+    const nextModel = avatarModel(look);
+    if (this.baseVisual && nextModel !== this.appliedModel) {
+      const asset = this.assets?.body(nextModel);
+      if (asset) {
+        this.replaceVisual(asset);
+        this.appliedModel = nextModel;
+      }
+    }
     this.look = { ...look };
     if (this.baseVisual) {
       this.baseVisual.setColors(look.colors);
+      this.applyHairstyle(look);
       return;
     }
     this.hairMat.color.set(HAIR_COLORS[look.hair]);
     if (restyle) this.buildHair();
     this.skin.color.set(SKIN_TONES[this.look.skin]);
+  }
+
+  /** Keep the controller's root/rig identity, labels, pose and held objects across body changes. */
+  private replaceVisual(asset: THREE.Object3D) {
+    const next = humanBase(asset), previous = this.baseVisual;
+    this.body.remove(this.cardHolder, this.bookHolder);
+    this.root.remove(this.body);
+    this.body = next.rig.body;
+    this.root.add(this.body);
+    this.body.add(this.cardHolder, this.bookHolder);
+    next.rig.root = this.root;
+    Object.assign(this.rig, next.rig);
+    this.head = next.rig.head;
+    this.armL = next.rig.armL; this.armR = next.rig.armR;
+    this.legL = next.rig.legL; this.legR = next.rig.legR;
+    this.shirt = next.clothing; this.skin = next.skin; this.hairMat = next.hair;
+    this.baseVisual = next;
+    this.appliedHair = undefined;
+    previous?.dispose();
+  }
+
+  private applyHairstyle(look: Look) {
+    if (!this.baseVisual || !this.assets) return;
+    const style = avatarHairstyle(look);
+    if (style === this.appliedHair) return;
+    const component = style === 'bald' ? null : this.assets.hair(style);
+    if (style !== 'bald' && !component) return;
+    this.baseVisual.setHair(component);
+    this.appliedHair = style;
   }
 
   /** Hair is a set of shapes on the head (see styleHair). */

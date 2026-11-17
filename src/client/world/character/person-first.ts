@@ -20,6 +20,7 @@ const UP = new THREE.Vector3(0, 1, 0);
  */
 export class FirstPersonBody {
   private on = false;
+  private lastBody: THREE.Object3D | null = null;
 
   constructor(private rig: PersonRig) {}
 
@@ -31,7 +32,9 @@ export class FirstPersonBody {
       camera.getWorldDirection(look).setY(0).normalize().applyAxisAngle(UP, -root.rotation.y);
       body.position.set(-look.x * BACK, body.position.y, -look.z * BACK);
     }
-    if (on === this.on) return;
+    const changedBody = body !== this.lastBody;
+    this.lastBody = body;
+    if (on === this.on && !changedBody) return;
     this.on = on;
     if (!on) body.position.set(0, body.position.y, 0);
     torso.scale.set(on ? SLIM.x : 1, 1, on ? SLIM.z : 1);

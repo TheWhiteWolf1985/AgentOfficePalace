@@ -4,11 +4,12 @@ import * as THREE from 'three';
 import { OutlineEffect } from 'three/examples/jsm/effects/OutlineEffect.js';
 import { HAIR_COLOR_NAMES, HAIR_COLORS, HAIR_STYLES, SKIN_TONES, randomLook, randomName, type Look } from '../../shared/avatar';
 import { AVATAR_COLORS, saveProfile, store, type Profile } from '../state';
-import { Person } from '../world/character';
-import { model } from '../world/models';
+import type { Person } from '../world/character';
+import { createUserPerson } from '../world/character/user-assets';
 import { toonUnique } from '../world/toon';
 import { h, openModal } from './dom';
 import { avatarColorFields } from './character-colors';
+import { AVATAR_MODELS, AVATAR_HAIRSTYLES, avatarModel, avatarHairstyle, type AvatarModel, type AvatarHairstyle } from '../../shared/avatar-variants';
 
 /** A turntable with your character on it, drawn with its own small renderer. */
 class Preview {
@@ -50,7 +51,7 @@ class Preview {
     rug.material.userData.outlineParameters = { visible: false };
     this.scene.add(rug);
 
-    this.person = new Person(p.name, p.color, p.look, model('human_base')?.scene);
+    this.person = createUserPerson(p.name, p.color, p.look);
     this.person.showLabel(false);
     this.scene.add(this.person.root);
     this.camera.position.set(0, 1.35, 4.6);
@@ -133,17 +134,37 @@ class Preview {
 }
 
 /**
- * The character select screen: your name and nine model colors, with a live preview.
+ * The character select screen: your name, model, hairstyle and colors, with a live preview.
  * `first` is the one you see when you join: closing it goes in as whoever's picked so far.
  */
 export function openCharacter(first: boolean, onSave: (p: Profile) => void) {
   const pick: Profile = { ...store.profile, look: { ...store.profile.look, ...(store.profile.look.colors ? { colors: { ...store.profile.look.colors } } : {}) } };
   const canvas = h('canvas', { 'aria-label': uiText('Your character, drag to spin') }) as HTMLCanvasElement;
   const preview = new Preview(canvas, pick);
-  const colorFields = preview.person.usesBaseModel ? avatarColorFields(pick.look.colors, colors => {
+  const colorFields = h('div');
+  const refreshColors = () => colorFields.replaceChildren(avatarColorFields(pick.look.colors, colors => {
     pick.look = { ...pick.look, colors };
     preview.person.setLook(pick.look);
-  }) : null;
+  }, avatarModel(pick.look) === 'female'));
+  if (preview.person.usesBaseModel) refreshColors();
+  const modelSelect = h('select', { id: 'avatar-model' }, ...AVATAR_MODELS.map(id => h('option', { value: id }, id === 'female' ? uiText('Female') : uiText('Male')))) as HTMLSelectElement;
+  const hairLabels = { short: uiText('Short'), long: uiText('Long'), bun: uiText('Bun'), spiky: uiText('Spiky'), curly: uiText('Curly'), ponytail: uiText('Ponytail'), bald: uiText('No hair') };
+  const hairSelect = h('select', { id: 'avatar-hairstyle' }, ...AVATAR_HAIRSTYLES.map(id => h('option', { value: id }, hairLabels[id]))) as HTMLSelectElement;
+  modelSelect.value = avatarModel(pick.look);
+  hairSelect.value = avatarHairstyle(pick.look);
+  modelSelect.addEventListener('change', () => {
+    pick.look = { ...pick.look, model: modelSelect.value as AvatarModel };
+    hairSelect.value = avatarHairstyle(pick.look);
+    preview.person.setLook(pick.look);
+    refreshColors();
+  });
+  hairSelect.addEventListener('change', () => {
+    pick.look = { ...pick.look, hairstyle: hairSelect.value as AvatarHairstyle };
+    preview.person.setLook(pick.look);
+  });
+  const variants = h('div.avatar-variants', {},
+    h('div', {}, h('label', { for: 'avatar-model' }, uiText('Avatar model')), modelSelect),
+    h('div', {}, h('label', { for: 'avatar-hairstyle' }, uiText('Hairstyle')), hairSelect));
 
   // Leave the name blank (or skip this) and you go by the made-up one in the box; 🎲 deals another.
   // Guest is what you were before you picked one, so it isn't a name to keep.
@@ -213,7 +234,7 @@ export function openCharacter(first: boolean, onSave: (p: Profile) => void) {
         h('label', {}, uiText('Your name')),
         account ? input : h('div.webhook', {}, input, reroll),
         account ? h('p.setting-note', {}, uiText`🔑 Signed in as ${account.name}, so that's your name here.`) : null,
-        ...(preview.person.usesBaseModel ? [colorFields, h('p.setting-note', {}, uiText('Everyone sees your changes after you save.'))] : [
+        ...(preview.person.usesBaseModel ? [variants, colorFields, h('p.setting-note', {}, uiText('Everyone sees your changes after you save.'))] : [
           h('label', {}, uiText('Skin tone')),
           skinRow,
           h('label', {}, uiText('Hair')),

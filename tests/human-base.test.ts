@@ -26,7 +26,7 @@ function canvas(t: TestContext) {
 }
 
 test('runtime user GLB is the delivered unit-scale model with an independently posed rigid rig', async () => {
-  assert.deepEqual(bytes, readFileSync(new URL('../Personaggi/Utenti/human_base.glb', import.meta.url)));
+  assert.deepEqual(bytes, readFileSync(new URL('../Personaggi/Utenti_maschio/human_base.glb', import.meta.url)));
   assert.equal(createHash('sha256').update(bytes).digest('hex'), '3340be53a3178dcdce048f33fe380a662ec1cc5675163ca922efeaa3ff2ee57f');
   const source = await load(), original = source.scene.getObjectByName('char_root')!;
   const before = new THREE.Box3().setFromObject(original), a = humanBase(source.scene.clone(true)), b = humanBase(source.scene.clone(true));

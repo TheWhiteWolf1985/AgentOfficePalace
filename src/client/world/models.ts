@@ -9,6 +9,13 @@ import loungeUrl from '../models/lounge.glb?url';
 import plantsUrl from '../models/plants.glb?url';
 import receptionAUrl from '../models/reception_a.glb?url';
 import receptionBUrl from '../models/reception_b.glb?url';
+import femaleBaseUrl from '../models/female_base.glb?url';
+import hairShortUrl from '../models/hair_short.glb?url';
+import hairLongUrl from '../models/hair_long.glb?url';
+import hairBunUrl from '../models/hair_bun.glb?url';
+import hairSpikyUrl from '../models/hair_spiky.glb?url';
+import hairCurlyUrl from '../models/hair_curly.glb?url';
+import hairPonytailUrl from '../models/hair_ponytail.glb?url';
 import humanBaseUrl from '../models/human_base.glb?url';
 import { toon } from './toon';
 
@@ -26,6 +33,14 @@ const MODELS = {
   reception_a: { url: receptionAUrl, preload: true },
   reception_b: { url: receptionBUrl, preload: true },
   human_base: { url: humanBaseUrl, preload: true },
+  human_female: { url: femaleBaseUrl, preload: true },
+  hair_short: { url: hairShortUrl, preload: true },
+  hair_long: { url: hairLongUrl, preload: true },
+  hair_bun: { url: hairBunUrl, preload: true },
+  hair_spiky: { url: hairSpikyUrl, preload: true },
+  hair_curly: { url: hairCurlyUrl, preload: true },
+  hair_ponytail: { url: hairPonytailUrl, preload: true },
+
 } satisfies Record<string, { url: string; preload: boolean }>;
 
 export type ModelName = keyof typeof MODELS;

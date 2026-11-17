@@ -1,0 +1,14 @@
+{
+  "id": "AOP_FEMALE_COLORS_1",
+  "extends": "AOP_CHAR_RIGID_1",
+  "contract_version": "1.0.0",
+  "asset_id": "female_base_v03",
+  "revision": "female_modular_v03_long_fixed_bow",
+  "limits": { "materials": 12, "primitives": 26 },
+  "material_roles": ["skin", "hair", "eyebrows", "iris", "clothing", "shirt", "tie", "pants", "shoes", "bow"],
+  "original_files": {
+    "constraints.json": "f8603ac1259bf986256913256e73ae52b10cfc26d61c10144396940c55f9eeb7",
+    "inspect_character.py": "9363f8aea7e15c4465babcb8d66a82b97085c5002b37e8d4437561deeeb250d4"
+  },
+  "styles": ["short", "long", "bun", "spiky", "curly", "ponytail", "bald"]
+}

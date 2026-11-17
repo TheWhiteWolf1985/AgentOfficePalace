@@ -584,3 +584,24 @@ test('nine avatar colors survive initial connections, validated broadcasts and r
     assert.deepEqual(rejoined.peers.find(p => p.id === rejoined.you)?.look.colors, expected);
   } finally { await a.close(); await b.close(); await again?.close(); }
 });
+
+
+test('female body, stable hairstyle and bow survive WebSocket join, model changes and legacy updates', async () => {
+  const colors = { ...DEFAULT_AVATAR_COLORS, bow: '#123456' };
+  const query = '?' + new URLSearchParams({ name: 'FemaleUser', floor: '@lobby', model: 'female', hairstyle: 'ponytail', colors: JSON.stringify(colors) });
+  const a = await Browser.open(query), b = await Browser.open('?name=VariantObserver&floor=%40lobby');
+  try {
+    const joined = await a.take('welcome'), observer = await b.take('welcome');
+    const first = observer.peers.find(p => p.id === joined.you)!;
+    assert.equal(first.look.model, 'female'); assert.equal(first.look.hairstyle, 'ponytail'); assert.deepEqual(first.look.colors, colors);
+    a.send({ t: 'profile', name: 'FemaleUser', color: '#4f86f7', look: { skin: 0, hair: 0, style: 0, model: 'male', hairstyle: 'bald', colors } });
+    let update = await b.take('peer.update', msg => msg.peer.id === joined.you);
+    assert.equal(update.peer.look.model, 'male'); assert.equal(update.peer.look.hairstyle, 'bald');
+    a.send({ t: 'profile', name: 'FemaleUser', color: '#4f86f7', look: { skin: 0, hair: 0, style: 0, model: 'invalid', hairstyle: 'invalid', colors: { version: 1, bow: 'invalid' } } });
+    update = await b.take('peer.update', msg => msg.peer.id === joined.you);
+    assert.equal(update.peer.look.model, 'male'); assert.equal(update.peer.look.hairstyle, 'bald'); assert.equal(update.peer.look.colors!.bow, '#123456');
+    a.send({ t: 'profile', name: 'FemaleUser', color: '#4f86f7', look: { skin: 0, hair: 0, style: 0 } });
+    update = await b.take('peer.update', msg => msg.peer.id === joined.you);
+    assert.equal(update.peer.look.hairstyle, 'bald'); assert.equal(update.peer.look.colors!.bow, '#123456');
+  } finally { await a.close(); await b.close(); }
+});

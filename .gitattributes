@@ -6,4 +6,5 @@
 sala_riunioni/** -text -whitespace
 sala_atrio/** -text -whitespace
 Personaggi/Atrio/** -text -whitespace
-Personaggi/Utenti/** -text -whitespace
+Personaggi/Utenti_maschio/** -text -whitespace
+Personaggi/Utenti_femmina/** -text -whitespace
