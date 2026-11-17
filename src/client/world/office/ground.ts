@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import { EXIT_DOOR, STOREY, STREET_Y, streetBelow } from '../../../shared/layout';
 import { model } from '../models';
 import { prepareAtrium } from '../atrium-materials';
-import { buildReceptionStaff } from '../character/reception-staff';
 import { mergeByMaterial } from '../toon';
 import type { Collider } from '../types';
 import { buildBalconyPosts, buildExitStairs } from './balcony';
@@ -10,17 +9,17 @@ import type { Fixture, Gives, StreetSite } from './fixture';
 import { exitDoor, type Door } from './shell';
 
 // Down to the street, which is the bottom floor's: its exit door and the steps down from it, the posts
-// under its balcony, the garage under it and the street out front. On a floor above it, all of it is
+// under its balcony, the atrium under it and the company lot. On a floor above it, all of it is
 // that many storeys further down (see Office.setLevel).
 
 /**
- * The fixtures down on the street, in order: first the exit door, the steps and the garage, then each
+ * The fixtures down on the street, in order: first the exit door, the steps and the atrium, then each
  * of `parts`, built into the street (see StreetSite), and last the street goes in under the floor.
  */
 export function downstairs<P extends Fixture<never, StreetSite>[]>(...parts: P): (Fixture | Fixture<Gives<P[number]>>)[] {
   let street: StreetSite;
   let exit: { group: THREE.Group; door: Door };
-  /** The exit door and the steps down from it, the posts under the balcony, and the garage. */
+  /** The exit door and its steps, the balcony posts, and the atrium's exterior. */
   const down: Fixture = (site) => {
     const ground = new THREE.Group();
     const groundColliders: Collider[] = [];
@@ -37,7 +36,6 @@ export function downstairs<P extends Fixture<never, StreetSite>[]>(...parts: P):
     const atrium = model('atrium');
     if (atrium) {
       prepareAtrium(atrium.scene);
-      atrium.scene.add(buildReceptionStaff(name => model(name)?.scene ?? null));
       atrium.scene.position.y = STREET_Y;
       ground.add(atrium.scene);
     }

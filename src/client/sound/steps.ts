@@ -1,5 +1,5 @@
 import { PAVEMENT, type Box } from '../../shared/ground';
-import { BALCONY, FLOOR, ROAD, inWing } from '../../shared/layout';
+import { BALCONY, FLOOR, inWing } from '../../shared/layout';
 import type { AudioCore } from './core';
 import { biquad, envelope, pick, rand } from './dsp';
 import { footfalls, type Footfalls, type Ground } from './feet';
@@ -21,8 +21,7 @@ export function groundAt(a: AudioCore, feet: Pos): Ground {
   const on = (b: Box) => x > b.minX && x < b.maxX && z > b.minZ && z < b.maxZ;
   // Up on the floor, whatever isn't the office is the landing outside its door, and the steps down from it.
   if (y > -0.5) return on(FLOOR) || on(BALCONY) || inWing(x, z, a.wing) ? 'wood' : 'concrete';
-  // The sidewalks run the length of the street, either side of the road.
-  return PAVEMENT.some(on) || (z > ROAD.minZ - 2 && z < ROAD.maxZ + 2) ? 'concrete' : 'grass';
+  return PAVEMENT.some(on) ? 'concrete' : 'grass';
 }
 
 /**

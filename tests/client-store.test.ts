@@ -253,7 +253,7 @@ test('retired layouts reset only the position, preserving profile and settings',
   const spot = { floor: 'f1', name: 'Project', x: 1, y: 0, z: 3, facing: 0 };
   state.saveProfile({ name: 'Kept', color: '#123456' });
   state.saveSettings({ ...state.loadSettings(), view: 'third', volume: 0.3 });
-  for (const legacy of [{ map: 'castle' }, { map: 'station' }, { map: 'custom-hall' }, { throne: true }, { x: 196, z: 372 }, { x: -222, z: 224 }]) {
+  for (const legacy of [{ map: 'castle' }, { map: 'station' }, { map: 'custom-hall' }, { throne: true }, { x: 196, z: 372 }, { x: -222, z: 224 }, { x: 50, z: 0 }, { x: 0, z: -60 }, { x: -100, z: 50 }]) {
     storage.set('agent-office.spot', JSON.stringify({ ...spot, ...legacy }));
     assert.equal(state.lastSpot(), null);
   }

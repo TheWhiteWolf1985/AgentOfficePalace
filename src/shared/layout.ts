@@ -62,8 +62,8 @@ export const DESKS: DeskDef[] = buildDesks();
  * The back office: a bay knocked through the north wall between the gong and the east wall, for a
  * floor that needs more desks than the room has. Each time someone expands the floor (see
  * shared/floorplan.ts), its back wall goes another `row` meters north, with two more desks back to
- * back in the middle, up to `rows` times: any further and it would stand in the street behind the
- * building (world/city.ts). It runs from `minX` (the gong keeps its bit of wall) to the east wall,
+ * back in the middle, up to `rows` times: the company lot reserves this space inside its perimeter
+ * road (shared/ground.ts). It runs from `minX` (the gong keeps its bit of wall) to the east wall,
  * and from the old north wall back to wingMinZ.
  */
 export const WING = { minX: 13.4, maxX: FLOOR.maxX, row: 4.6, rows: 2 } as const;

@@ -4,7 +4,7 @@ import { ELEVATOR, FLOOR } from '../../../shared/layout';
 import { LOBBY_NAME } from '../../../shared/rooftop';
 import { prepareAtrium } from '../../world/atrium-materials';
 import { buildReceptionStaff } from '../../world/character/reception-staff';
-import { buildCity } from '../../world/city';
+import { buildCompanyExterior } from '../../world/company-exterior';
 import { buildElevator } from '../../world/elevator';
 import { model } from '../../world/models';
 import type { NightParts } from '../../world/outside';
@@ -35,7 +35,7 @@ export function buildAtrium(night: NightParts) {
     targets.add(target);
   }
   group.add(targets);
-  const city = buildCity(night);
-  group.add(city.group, new THREE.AmbientLight('#fff2dc', 1.4));
-  return { group, colliders, interactables, elevator, city, pickables: [asset.scene, elevator.group, targets] };
+  const exterior = buildCompanyExterior(night, true);
+  group.add(exterior.group, new THREE.AmbientLight('#fff2dc', 1.4));
+  return { group, colliders, interactables, elevator, exterior, pickables: [asset.scene, elevator.group, targets] };
 }

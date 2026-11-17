@@ -220,7 +220,7 @@ export function installTravel(ctx: Ctx, core: CoreState, parts: TravelParts) {
     sky.setRoof(up || lobby, lobby ? 0 : roofDrop(rooftop.roofFloors()));
     sound.setOutdoors(false);
     player.room = { ...FLOOR, wall: WALL_T, enclosed: up || lobby };
-    // You can see the whole city from up there (and its clouds); from the top floors, as far as the haze.
+    // Keep the company's own tower visible above/below the common rooms, including many offices.
     camera.far = up || lobby ? 700 : FAR;
     camera.updateProjectionMatrix();
     const { hanger } = parts.hanging;

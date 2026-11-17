@@ -78,7 +78,6 @@ export default {
   "The back office is built all the way out": "Ampliamento massimo raggiunto",
   "Press E to go back another row: 2 more desks": "Premi E per un'altra fila: 2 scrivanie in più",
   "Press E to knock through: 2 more desks": "Premi E per ampliare: 2 scrivanie in più",
-  "🏎️  GARAGE": "🏎️ GARAGE",
   "Cloudy": "Nuvoloso",
   "Rain": "Pioggia",
   "Thunderstorm": "Temporale",

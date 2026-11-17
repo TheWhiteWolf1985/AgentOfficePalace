@@ -27,10 +27,10 @@ export function installRooftop(ctx: Ctx) {
     if (ctx.upTop()) ctx.sky.setRoof(true, roofDrop(roofFloors()));
   }
   store.on('floors', syncRoof);
-  ctx.ticks.add('env', ({ dt, t }) => {
+  ctx.ticks.add('env', ({ dt }) => {
     if (!ctx.upTop() || !roof) return;
     const people = [ctx.player.pos, ...[...store.peers.values()].filter((p) => p.id !== store.you && store.onMyFloor(p))];
-    roof.update(t, dt, ctx.sky.lampsOn, people);
+    roof.update(dt, people);
   });
   return { roof: () => roof, theRoof, roofFloors, syncRoof };
 }

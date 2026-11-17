@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { CONFERENCE_COLLIDERS, CONFERENCE_DATA, CONFERENCE_SEATING } from '../../../shared/conference-room';
 import { ELEVATOR, FLOOR } from '../../../shared/layout';
 import { ROOF_NAME } from '../../../shared/rooftop';
-import { buildCity, type City } from '../../world/city';
+import { buildCompanyExterior, type CompanyExterior } from '../../world/company-exterior';
 import { buildElevator, type Elevator } from '../../world/elevator';
 import { model } from '../../world/models';
 import { applyConferenceGlazing } from '../../world/conference-glazing';
@@ -18,11 +18,11 @@ export interface Rooftop {
   colliders: Collider[];
   interactables: Interactable[];
   elevator: Elevator;
-  city: City;
+  exterior: CompanyExterior;
   pickables: THREE.Object3D[];
   whiteboard: ReturnType<typeof bindConferenceWhiteboard>;
   setFloors(floors: number, wings?: readonly number[]): void;
-  update(t: number, dt: number, dark: number, people: Iterable<{ x: number; y: number; z: number }>): void;
+  update(dt: number, people: Iterable<{ x: number; y: number; z: number }>): void;
 }
 
 export function buildRooftop(night: NightParts): Rooftop {
@@ -83,8 +83,8 @@ export function buildRooftop(night: NightParts): Rooftop {
     if (chair && definition.role !== 'lounge') chair.traverse((n) => { n.userData.interact = it; });
   }
 
-  const city = buildCity(night);
-  group.add(city.group);
+  const exterior = buildCompanyExterior(night);
+  group.add(exterior.group);
   // Interior lights stay useful at night, without animated DJ lights.
   group.add(new THREE.AmbientLight('#fff2dc', 1.4));
   const door = room.scene.getObjectByName(CONFERENCE_DATA.door.door_pivot);
@@ -93,9 +93,8 @@ export function buildRooftop(night: NightParts): Rooftop {
   const closedTop = doorCollider.top;
   let open = 0;
   let hold = 0;
-  const update = (t: number, dt: number, dark: number, people: Iterable<{ x: number; y: number; z: number }>) => {
+  const update = (dt: number, people: Iterable<{ x: number; y: number; z: number }>) => {
     elevator.update(dt);
-    city.update(t, dt, dark);
     const nearby = [...people].some((p) => p.y < 2 && Math.abs(p.x - CONFERENCE_DATA.door.axis_x_m) < 2.3 && Math.abs(p.z) < 2.5);
     hold = nearby ? 1.8 : Math.max(0, hold - dt);
     open += ((hold > 0 ? 1 : 0) - open) * (1 - Math.exp(-dt * 8));
@@ -103,5 +102,5 @@ export function buildRooftop(night: NightParts): Rooftop {
     // Keep the passage solid until the leaf clears it; hold it open while anyone crosses.
     doorCollider.top = open > 0.8 ? -10 : closedTop;
   };
-  return { group, colliders, interactables, elevator, city, whiteboard, pickables: [room.scene, elevator.group, seatTargets], setFloors: (n, wings) => city.setFloors(Math.max(0, n), wings), update };
+  return { group, colliders, interactables, elevator, exterior, whiteboard, pickables: [room.scene, elevator.group, seatTargets], setFloors: (n, wings) => exterior.setFloors(Math.max(0, n), wings), update };
 }

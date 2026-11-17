@@ -9,7 +9,7 @@ import { buildAtrium } from './world';
 export function installAtrium(ctx: Ctx) {
   let atrium: ReturnType<typeof buildAtrium> | null = null;
   function syncAtrium() {
-    if (atrium) atrium.city.setFloors(builtFloors().length, floorWings(builtFloors()), true);
+    if (atrium) atrium.exterior.setFloors(builtFloors().length, floorWings(builtFloors()));
   }
   function theAtrium() {
     if (!atrium) {
@@ -22,10 +22,9 @@ export function installAtrium(ctx: Ctx) {
     return atrium;
   }
   store.on('floors', syncAtrium);
-  ctx.ticks.add('env', ({ dt, t }) => {
+  ctx.ticks.add('env', ({ dt }) => {
     if (store.floor !== LOBBY || !atrium) return;
     atrium.elevator.update(dt);
-    atrium.city.update(t, dt, ctx.sky.lampsOn);
   });
   return { atrium: () => atrium, theAtrium };
 }
