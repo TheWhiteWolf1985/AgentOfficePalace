@@ -1,4 +1,5 @@
 import { whenOfficeReady } from '../../world/deferred-office';
+import { lazyResource } from '../../lazy-resource';
 import { spaceCapabilities } from '../../../shared/space-capabilities';
 import { store } from '../../state';
 import { t as uiText } from '../../../shared/i18n';
@@ -25,14 +26,14 @@ export interface TvDeps {
 }
 
 export function installTv(ctx: Ctx, deps: TvDeps) {
-  // TV
-  const tvVideo = document.createElement('video');
-  tvVideo.muted = true;
-  tvVideo.playsInline = true;
-  tvVideo.autoplay = true;
-  const tvTexture = new THREE.VideoTexture(tvVideo);
-  tvTexture.colorSpace = THREE.SRGBColorSpace;
-  const tvIdle = (() => {
+  const media = lazyResource(() => {
+    const video = document.createElement('video');
+    video.muted = true; video.playsInline = true; video.autoplay = true;
+    const texture = new THREE.VideoTexture(video);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    return { video, texture };
+  });
+  const idle = lazyResource(() => {
     const c = document.createElement('canvas');
     c.width = 1280;
     c.height = 720;
@@ -51,11 +52,13 @@ export function installTv(ctx: Ctx, deps: TvDeps) {
     const t = new THREE.CanvasTexture(c);
     t.colorSpace = THREE.SRGBColorSpace;
     return t;
-  })();
+  });
   let tvMat: THREE.MeshBasicMaterial | undefined;
+  let requested: MediaStream | null = null, tvStream: MediaStream | null = null;
   whenOfficeReady(ctx.office, ready => {
     tvMat = ready.tvScreen.material as THREE.MeshBasicMaterial;
-    tvMat.color.set('#ffffff'); tvMat.map = tvIdle; tvMat.toneMapped = false;
+    tvMat.color.set('#ffffff'); tvMat.map = idle.get(); tvMat.toneMapped = false;
+    show(requested);
   });
   ctx.interactions.define('tv', {
     reach: 10,
@@ -66,16 +69,23 @@ export function installTv(ctx: Ctx, deps: TvDeps) {
     use: onE(() => deps.watch()),
   });
 
-  let tvStream: MediaStream | null = null;
   /** Puts `stream` up on the TV, or the idle card when there's none. */
   function show(stream: MediaStream | null) {
     if (!spaceCapabilities(store.floor, !!store.project).project) stream = null;
+    requested = stream;
     if (!tvMat) return;
     if (stream !== tvStream) {
       tvStream = stream;
-      tvVideo.srcObject = stream;
-      if (stream) void tvVideo.play().catch(() => {});
-      tvMat.map = stream ? tvTexture : tvIdle;
+      if (stream) {
+        const { video, texture } = media.get();
+        video.srcObject = stream;
+        void video.play().catch(() => {});
+        tvMat.map = texture;
+      } else {
+        const current = media.peek();
+        if (current) { current.video.pause(); current.video.srcObject = null; }
+        tvMat.map = idle.get();
+      }
       tvMat.needsUpdate = true;
     }
   }

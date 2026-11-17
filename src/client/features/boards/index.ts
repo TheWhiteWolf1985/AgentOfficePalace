@@ -1,4 +1,5 @@
 import { officeLoaded, whenOfficeReady } from '../../world/deferred-office';
+import { lazyResource } from '../../lazy-resource';
 import { t as uiText } from '../../../shared/i18n';
 /**
  * The boards on the walls: the issues board (the open issues nobody has started on, less the cards
@@ -46,10 +47,10 @@ export function installBoards(ctx: Ctx, deps: BoardsDeps) {
   const { office } = ctx;
   // Boards: each draws onto a canvas texture, redrawn whenever what it shows changes. The same
   // texture goes on that board in whichever world you're in (see dressBoards).
-  function mountBoard(mesh: () => THREE.Mesh | undefined, texture: THREE.Texture, render: () => void, topics: Topic[]) {
+  function mountBoard(mesh: () => THREE.Mesh | undefined, texture: () => THREE.Texture, render: () => void, topics: Topic[]) {
     whenOfficeReady(office, () => {
       const face = mesh();
-      if (face) showOn(face, texture);
+      if (face) showOn(face, texture());
       for (const topic of topics) store.on(topic, render);
       render();
     });
@@ -68,14 +69,22 @@ export function installBoards(ctx: Ctx, deps: BoardsDeps) {
     for (const p of store.peers.values()) if (p.carrying && p.id !== store.you && store.onMyFloor(p)) off.add(p.carrying.issue);
     return off;
   }
-  const issuesTex = new BoardTexture('issues');
+  const issues = lazyResource(() => new BoardTexture('issues'));
+  // Aim checks run even in common spaces; these handles must never allocate an office canvas.
+  const issuesTex = {
+    get hasNotes() { return issues.peek()?.hasNotes ?? false; },
+    noteAt: (uv: THREE.Vector2) => issues.peek()?.noteAt(uv),
+    lift: (number: number | null) => issues.peek()?.lift(number),
+  };
   // The cork holds the issues nobody has started on: one that's in progress comes off it, as a closed one does.
   const renderIssuesBoard = () => {
+    const board = issues.peek();
+    if (!board) return;
     const off = offBoard();
-    issuesTex.render({ ...store.issues, items: store.issues.items.filter((i) => !off.has(i.number) && !inProgress(i, store.taskForIssue(i.number))) });
+    board.render({ ...store.issues, items: store.issues.items.filter((i) => !off.has(i.number) && !inProgress(i, store.taskForIssue(i.number))) });
   };
   // The queue too: a task that starts running takes its issue off the board before GitHub says it's assigned.
-  mountBoard(() => office.boardMeshes.issues, issuesTex.texture, renderIssuesBoard, ['issues', 'queue']);
+  mountBoard(() => office.boardMeshes.issues, () => issues.get().texture, renderIssuesBoard, ['issues', 'queue']);
   let carriedOff = '';
   store.on('peers', () => {
     const k = [...offBoard()].join(',');
@@ -88,9 +97,9 @@ export function installBoards(ctx: Ctx, deps: BoardsDeps) {
     carriedOff = [...offBoard()].join(',');
     renderIssuesBoard();
   }
-  const pullsTex = new BoardTexture('pulls');
-  const renderPullsBoard = () => pullsTex.render(store.pulls, store.workers);
-  mountBoard(() => office.boardMeshes.pulls, pullsTex.texture, renderPullsBoard, ['pulls']);
+  const pulls = lazyResource(() => new BoardTexture('pulls'));
+  const renderPullsBoard = () => pulls.peek()?.render(store.pulls, store.workers);
+  mountBoard(() => office.boardMeshes.pulls, () => pulls.get().texture, renderPullsBoard, ['pulls']);
   // PR notes name the desk they came from. Redraw when that changes, not on every worker update.
   let deskLinks = '';
   store.on('workers', () => {
@@ -99,12 +108,12 @@ export function installBoards(ctx: Ctx, deps: BoardsDeps) {
     deskLinks = k;
     renderPullsBoard();
   });
-  const servicesTex = new ServicesBoardTexture();
-  const renderServicesBoard = () => servicesTex.render(store.services.items, store.workers);
-  mountBoard(() => office.boardMeshes.services, servicesTex.texture, renderServicesBoard, ['services', 'workers']);
-  const queueTex = new QueueBoardTexture();
-  const renderQueueBoard = () => queueTex.render(store.queue, store.workers);
-  mountBoard(() => office.boardMeshes.queue, queueTex.texture, renderQueueBoard, ['queue', 'workers']);
+  const services = lazyResource(() => new ServicesBoardTexture());
+  const renderServicesBoard = () => services.peek()?.render(store.services.items, store.workers);
+  mountBoard(() => office.boardMeshes.services, () => services.get().texture, renderServicesBoard, ['services', 'workers']);
+  const queue = lazyResource(() => new QueueBoardTexture());
+  const renderQueueBoard = () => queue.peek()?.render(store.queue, store.workers);
+  mountBoard(() => office.boardMeshes.queue, () => queue.get().texture, renderQueueBoard, ['queue', 'workers']);
   ctx.interactions.define('issues', {
     reach: 9,
     hint: () => {
@@ -138,22 +147,22 @@ export function installBoards(ctx: Ctx, deps: BoardsDeps) {
     use: onE(() => deps.showQueue()),
   });
   // The machine monitor on the west wall.
-  const machineTex = new MachineTexture();
-  mountBoard(() => office.machineScreen, machineTex.texture, () => machineTex.render(store.machine), ['machine']);
+  const machine = lazyResource(() => new MachineTexture());
+  mountBoard(() => office.machineScreen, () => machine.get().texture, () => machine.peek()?.render(store.machine), ['machine']);
   // The meeting room: its output as it's written on the back wall, and how it's going on the door.
-  const meetingBoardTex = new MeetingBoardTexture();
-  mountBoard(() => office.meetingBoard, meetingBoardTex.texture, () => meetingBoardTex.render(store.meeting), ['meeting']);
-  const meetingSignTex = new MeetingSignTexture();
-  mountBoard(() => office.meetingSign, meetingSignTex.texture, () => meetingSignTex.render(store.meeting), ['meeting']);
+  const meetingBoard = lazyResource(() => new MeetingBoardTexture());
+  mountBoard(() => office.meetingBoard, () => meetingBoard.get().texture, () => meetingBoard.peek()?.render(store.meeting), ['meeting']);
+  const meetingSign = lazyResource(() => new MeetingSignTexture());
+  mountBoard(() => office.meetingSign, () => meetingSign.get().texture, () => meetingSign.peek()?.render(store.meeting), ['meeting']);
   /** Puts every board's texture up on `w`'s boards. */
   function dressBoards(w: World) {
     if (!officeLoaded(office)) return;
-    showOn(w.boardMeshes.issues, issuesTex.texture);
-    showOn(w.boardMeshes.pulls, pullsTex.texture);
-    showOn(w.boardMeshes.services, servicesTex.texture);
-    showOn(w.boardMeshes.queue, queueTex.texture);
-    if (w.meetingBoard) showOn(w.meetingBoard, meetingBoardTex.texture);
-    if (w.meetingSign) showOn(w.meetingSign, meetingSignTex.texture);
+    showOn(w.boardMeshes.issues, issues.get().texture);
+    showOn(w.boardMeshes.pulls, pulls.get().texture);
+    showOn(w.boardMeshes.services, services.get().texture);
+    showOn(w.boardMeshes.queue, queue.get().texture);
+    if (w.meetingBoard) showOn(w.meetingBoard, meetingBoard.get().texture);
+    if (w.meetingSign) showOn(w.meetingSign, meetingSign.get().texture);
   }
 
   return { issuesTex, renderPullsBoard, renderServicesBoard, renderQueueBoard, dressBoards, cardMoved };
