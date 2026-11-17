@@ -1,3 +1,4 @@
+import { spaceCapabilities } from '../../../shared/space-capabilities';
 import { t as uiText } from '../../../shared/i18n';
 /**
  * The HUD: a few buttons on the top bar, everything else in the ☰ menu (Tab), with H for the controls
@@ -26,7 +27,7 @@ import { openUpgrade } from '../../ui/upgrade';
 import { openWhiteboard } from '../whiteboard/ui';
 import { describeSky } from '../../world/sky';
 
-export type HudParts = Pick<Parts, 'worlds' | 'place' | 'travel' | 'you' | 'actions' | 'waiting' | 'meeting' | 'bookshelf' | 'hanging' | 'talk' | 'notifier'>;
+export type HudParts = Pick<Parts, 'worlds' | 'place' | 'travel' | 'you' | 'actions' | 'waiting' | 'meeting' | 'bookshelf' | 'hanging' | 'talk' | 'notifier' | 'presentation'>;
 
 /** Listens for clicks on the HUD and the project, registers what the HUD follows (see mountHud), and binds Tab, H and F. */
 export function installHud(ctx: Ctx, core: CoreState, parts: HudParts) {
@@ -47,7 +48,7 @@ export function installHud(ctx: Ctx, core: CoreState, parts: HudParts) {
 
   // ---- The HUD: a few buttons on the top bar, everything else in the ☰ menu ----------------------------
   const waitingNow = () => waitingInOrder(store.workers.values());
-  const noMedia = () => (window.isSecureContext ? undefined : uiText('Voice and screen sharing need HTTPS or localhost — use a TLS proxy, --self-signed, or an SSH tunnel'));
+  const noMedia = () => (window.isSecureContext ? undefined : secureMediaUrl() ? uiText('Open the secure connection to use voice and screen sharing') : uiText('Voice and screen sharing require a secure connection'));
   const hud = mountHud(
     [
       { id: 'issues', icon: '📌', label: uiText('Issues'), section: 'Open', count: () => store.issues.items.filter((i) => i.state === 'OPEN').length, run: () => openBoard('issues', net, actions.boardActions()) },
@@ -67,11 +68,12 @@ export function installHud(ctx: Ctx, core: CoreState, parts: HudParts) {
         run: () => parts.meeting.showMeeting(),
       },
       { id: 'search', icon: '🔎', label: uiText('Search'), section: 'Open', key: '/', title: () => uiText('Search the chat and every terminal'), run: waiting.showSearch },
-      { id: 'docs', icon: '📚', label: uiText('Docs'), section: 'Open', shown: () => !inOffice(), title: () => uiText('Read the project’s docs'), run: parts.bookshelf.showBookshelf },
+      { id: 'docs', icon: '📚', label: uiText('Docs'), section: 'Open', shown: () => spaceCapabilities(store.floor, !!store.project).project, title: () => uiText('Read the project’s docs'), run: parts.bookshelf.showBookshelf },
       { id: 'elevator', icon: '🛗', label: () => (inOffice() ? uiText('Elevator') : uiText('Floors')), section: 'Open', count: () => store.floors.reduce((n, f) => n + (f.id === store.floor ? 0 : f.waiting), 0), title: () => (inOffice() ? uiText('Ride to another project') : uiText('Go to another project, or add one')), run: travel.showElevator },
       { id: 'roof', icon: '🤝', label: uiText('Meeting room'), section: 'Open', shown: () => !core.upTop, title: () => uiText('Visit the shared meeting room'), run: () => travel.ride(ROOF) },
       // In voice, V is push to talk, so leaving is only from here.
       { id: 'voice', icon: '🎙️', label: () => (voice.inVoice ? uiText('Leave voice') : uiText('Join voice')), section: 'Together', key: () => (voice.inVoice ? undefined : 'V'), on: () => voice.inVoice, blocked: noMedia, run: () => void talk.toggleVoice() },
+      { id: 'secure', icon: '🔒', label: uiText('Open secure connection'), section: 'Together', shown: () => !!secureMediaUrl(), run: () => { const url = secureMediaUrl(); if (url) location.assign(url); } },
       // While you're in voice, the top bar keeps the mute button handy. Muted is the usual with push to talk, so it doesn't stand out then.
       {
         id: 'mute',
@@ -87,6 +89,7 @@ export function installHud(ctx: Ctx, core: CoreState, parts: HudParts) {
         run: () => voice.toggleMute(),
       },
       { id: 'share', icon: '🖥️', label: () => (voice.sharing ? uiText('Stop sharing') : uiText('Share screen')), section: 'Together', on: () => voice.sharing, status: () => voice.sharing, chip: () => uiText('Sharing'), blocked: noMedia, run: () => void talk.toggleShare() },
+      { id: 'presentation', icon: '📽️', label: () => store.presentation.mode === 'presentation' ? uiText('Show whiteboard') : uiText('Present my screen'), section: 'Together', on: () => store.presentation.mode === 'presentation', status: () => store.floor === ROOF && store.presentation.mode === 'presentation', chip: () => uiText('Presentation'), blocked: () => store.presentation.mode === 'presentation' ? undefined : noMedia(), run: () => void parts.presentation.toggle() },
       { id: 'decor', icon: '🖼️', label: () => (hanging.hanger.active ? uiText('Stop hanging the picture') : uiText('Hang a picture')), section: 'Together', key: 'F', shown: () => inOffice(), on: () => hanging.hanger.active, status: () => hanging.hanger.active, run: () => (hanging.hanger.active ? hanging.hanger.cancel() : hanging.startHanging()) },
       { id: 'team', icon: '👥', label: uiText('Invite teammates'), section: 'Together', shown: () => store.invites, run: () => openTeam(net) },
       { id: 'accounts', icon: '🔑', label: uiText('Accounts'), section: 'Together', shown: () => store.me.admin, title: () => uiText('Invite people, see who has an account, revoke them'), run: () => openAccounts(net) },
@@ -142,7 +145,7 @@ export function installHud(ctx: Ctx, core: CoreState, parts: HudParts) {
   ctx.keys.bind({
     code: 'KeyF',
     run: () => {
-      hanging.startHanging();
+      if (spaceCapabilities(store.floor, !!store.project).project) hanging.startHanging();
     },
   });
   function showSettings(pane?: SettingsPane) {
@@ -184,3 +187,4 @@ export function installHud(ctx: Ctx, core: CoreState, parts: HudParts) {
 
   return { hud, showSettings, editProfile };
 }
+import { secureMediaUrl } from '../../secure-media';

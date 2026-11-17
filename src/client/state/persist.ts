@@ -11,12 +11,22 @@ export interface Profile {
 }
 
 const PROFILE_KEY = 'agent-office.profile';
+let preferenceAccount: string | undefined;
+const preferenceWatchers = new Set<(patch: { profile?: { color: string; look?: Look }; settings?: Settings }) => void>();
+const preferenceKey = (key: string) => preferenceAccount ? `${key}.${preferenceAccount}` : key;
+export function setPreferenceAccount(account?: string) { preferenceAccount = account; }
+export function onPreferenceSave(fn: (patch: { profile?: { color: string; look?: Look }; settings?: Settings }) => void) {
+  preferenceWatchers.add(fn); return () => preferenceWatchers.delete(fn);
+}
+const preferenceSaved = (patch: { profile?: { color: string; look?: Look }; settings?: Settings }) => {
+  if (preferenceAccount) for (const fn of preferenceWatchers) fn(structuredClone(patch));
+};
 export const AVATAR_COLORS = ['#ff8a5b', '#4f86f7', '#06d6a0', '#ef476f', '#ffd166', '#9d4edd', '#00b4d8', '#f77f00'];
 
 /** Your saved profile. `look` is missing if you joined before there was a character select screen. */
 export function loadProfile(): (Omit<Profile, 'look'> & { look?: Look }) | null {
   try {
-    const p = JSON.parse(localStorage.getItem(PROFILE_KEY) ?? 'null');
+    const p = JSON.parse(localStorage.getItem(preferenceKey(PROFILE_KEY)) ?? 'null');
     if (p && typeof p.name === 'string' && typeof p.color === 'string') {
       return { name: p.name, color: p.color, look: p.look ? sanitizeLook(p.look, randomLook()) : undefined };
     }
@@ -29,41 +39,15 @@ export function loadProfile(): (Omit<Profile, 'look'> & { look?: Look }) | null 
 /** Without a look, the 3D office still has you pick a character (the 2D view saves only a name). */
 export function saveProfile(p: Omit<Profile, 'look'> & { look?: Look }) {
   try {
-    localStorage.setItem(PROFILE_KEY, JSON.stringify(p));
+    localStorage.setItem(preferenceKey(PROFILE_KEY), JSON.stringify(p));
   } catch {
     // storage blocked
   }
+  preferenceSaved({ profile: { color: p.color, ...(p.look ? { look: p.look } : {}) } });
 }
 
-export type ViewMode = 'first' | 'third';
-
-/** The panels you can show or hide on screen, from the ☰ menu. */
-export type HudPanel = 'workers' | 'people' | 'spend' | 'limits' | 'chat' | 'floor';
-/** Out of the way by default: only the chat shows until you turn the rest on. */
-export const HUD_DEFAULTS: Record<HudPanel, boolean> = { workers: false, people: false, spend: false, limits: false, chat: true, floor: false };
-
-/** How the office rings when a worker needs you: not at all, once, or again and again until someone's at its terminal. */
-export const NEEDS_YOU_SOUNDS = ['off', 'once', 'remind'] as const;
-export type NeedsYouSound = (typeof NEEDS_YOU_SOUNDS)[number];
-
-export interface Settings {
-  view: ViewMode;
-  /** Office sounds, 0–1. */
-  volume: number;
-  muted: boolean;
-  /** The swish of a page turning as you read at the bookshelf. */
-  pageTurns: boolean;
-  /** Voice chat starts muted and V is held down to talk, instead of an open mic. */
-  pushToTalk: boolean;
-  /** Desktop notifications when a worker needs input or finishes while you're in another tab (once the browser allows them). */
-  notify: boolean;
-  /** The alarm when a worker stops to ask you something: not at all, once, or again every half minute until someone's at its terminal. */
-  needsYouSound: NeedsYouSound;
-  /** Which panels show on screen. */
-  hud: Record<HudPanel, boolean>;
-  /** The ☰ menu's actions you pinned to the top bar, by id. */
-  pins: string[];
-}
+import { defaultSettings, sanitizeSettings, type Settings } from '../../shared/personal-settings';
+export { HUD_DEFAULTS, NEEDS_YOU_SOUNDS, type ViewMode, type HudPanel, type NeedsYouSound, type Settings } from '../../shared/personal-settings';
 
 const SETTINGS_KEY = 'agent-office.settings';
 const FLOOR_KEY = 'agent-office.floor';
@@ -124,34 +108,19 @@ export function rememberSpot(s: Spot) {
 }
 
 export function loadSettings(): Settings {
-  const s: Settings = { view: 'first', volume: 0.7, muted: false, pageTurns: true, pushToTalk: false, notify: true, needsYouSound: 'once', hud: { ...HUD_DEFAULTS }, pins: [] };
   try {
     localStorage.removeItem('agent-office.golf');
     localStorage.removeItem('agent-office.bestLap');
-  } catch {
-    // Legacy score cleanup must not block loading the user's settings.
-  }
-  try {
-    const saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) ?? 'null');
-    if (saved?.view === 'first' || saved?.view === 'third') s.view = saved.view;
-    if (typeof saved?.volume === 'number' && Number.isFinite(saved.volume)) s.volume = Math.max(0, Math.min(1, saved.volume));
-    if (typeof saved?.muted === 'boolean') s.muted = saved.muted;
-    if (typeof saved?.pageTurns === 'boolean') s.pageTurns = saved.pageTurns;
-    if (typeof saved?.pushToTalk === 'boolean') s.pushToTalk = saved.pushToTalk;
-    if (typeof saved?.notify === 'boolean') s.notify = saved.notify;
-    if (NEEDS_YOU_SOUNDS.includes(saved?.needsYouSound)) s.needsYouSound = saved.needsYouSound;
-    for (const k of Object.keys(s.hud) as HudPanel[]) if (typeof saved?.hud?.[k] === 'boolean') s.hud[k] = saved.hud[k];
-    if (Array.isArray(saved?.pins)) s.pins = saved.pins.filter((p: unknown): p is string => typeof p === 'string').slice(0, 30);
-  } catch {
-    // storage blocked
-  }
-  return s;
+  } catch { /* Legacy cleanup must not block loading. */ }
+  try { return sanitizeSettings(JSON.parse(localStorage.getItem(preferenceKey(SETTINGS_KEY)) ?? 'null')); }
+  catch { return defaultSettings(); }
 }
 
 export function saveSettings(s: Settings) {
   try {
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify(s));
+    localStorage.setItem(preferenceKey(SETTINGS_KEY), JSON.stringify(s));
   } catch {
     // storage blocked
   }
+  preferenceSaved({ settings: s });
 }

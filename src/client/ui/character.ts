@@ -1,3 +1,4 @@
+import { preloadAvatar } from '../world/models';
 import { t as uiText } from '../../shared/i18n';
 import './character.css';
 import * as THREE from 'three';
@@ -7,7 +8,7 @@ import { AVATAR_COLORS, saveProfile, store, type Profile } from '../state';
 import type { Person } from '../world/character';
 import { createUserPerson } from '../world/character/user-assets';
 import { toonUnique } from '../world/toon';
-import { h, openModal } from './dom';
+import { h, openModal, toast } from './dom';
 import { avatarColorFields } from './character-colors';
 import { AVATAR_MODELS, AVATAR_HAIRSTYLES, avatarModel, avatarHairstyle, type AvatarModel, type AvatarHairstyle } from '../../shared/avatar-variants';
 
@@ -137,7 +138,8 @@ class Preview {
  * The character select screen: your name, model, hairstyle and colors, with a live preview.
  * `first` is the one you see when you join: closing it goes in as whoever's picked so far.
  */
-export function openCharacter(first: boolean, onSave: (p: Profile) => void) {
+export async function openCharacter(first: boolean, onSave: (p: Profile) => void) {
+  await preloadAvatar(store.profile.look);
   const pick: Profile = { ...store.profile, look: { ...store.profile.look, ...(store.profile.look.colors ? { colors: { ...store.profile.look.colors } } : {}) } };
   const canvas = h('canvas', { 'aria-label': uiText('Your character, drag to spin') }) as HTMLCanvasElement;
   const preview = new Preview(canvas, pick);
@@ -152,16 +154,25 @@ export function openCharacter(first: boolean, onSave: (p: Profile) => void) {
   const hairSelect = h('select', { id: 'avatar-hairstyle' }, ...AVATAR_HAIRSTYLES.map(id => h('option', { value: id }, hairLabels[id]))) as HTMLSelectElement;
   modelSelect.value = avatarModel(pick.look);
   hairSelect.value = avatarHairstyle(pick.look);
-  modelSelect.addEventListener('change', () => {
-    pick.look = { ...pick.look, model: modelSelect.value as AvatarModel };
-    hairSelect.value = avatarHairstyle(pick.look);
-    preview.person.setLook(pick.look);
-    refreshColors();
-  });
-  hairSelect.addEventListener('change', () => {
-    pick.look = { ...pick.look, hairstyle: hairSelect.value as AvatarHairstyle };
-    preview.person.setLook(pick.look);
-  });
+  let closed = false, selection = 0;
+  async function chooseVariant() {
+    const visit = ++selection;
+    const variant = { model: modelSelect.value as AvatarModel, hairstyle: hairSelect.value as AvatarHairstyle };
+    save.setAttribute('disabled', '');
+    try {
+      await preloadAvatar({ ...pick.look, ...variant });
+      if (closed || visit !== selection) return;
+      pick.look = { ...pick.look, ...variant };
+      preview.person.setLook(pick.look); refreshColors();
+    } catch {
+      if (!closed && visit === selection) {
+        modelSelect.value = avatarModel(pick.look); hairSelect.value = avatarHairstyle(pick.look);
+        toast(uiText('Could not load the character. Try again.'), 'warn');
+      }
+    } finally { if (!closed && visit === selection) save.removeAttribute('disabled'); }
+  }
+  modelSelect.addEventListener('change', () => void chooseVariant());
+  hairSelect.addEventListener('change', () => void chooseVariant());
   const variants = h('div.avatar-variants', {},
     h('div', {}, h('label', { for: 'avatar-model' }, uiText('Avatar model')), modelSelect),
     h('div', {}, h('label', { for: 'avatar-hairstyle' }, uiText('Hairstyle')), hairSelect));
@@ -262,6 +273,7 @@ export function openCharacter(first: boolean, onSave: (p: Profile) => void) {
     backdropCloses: !first,
     doing: uiText('🪞 picking a new look'),
     onClose: () => {
+      closed = true; selection++;
       preview.dispose();
       // The office only lets you in with a character: skipping it goes in with this one, and the name in the box.
       if (first && !done) finish(typedName());

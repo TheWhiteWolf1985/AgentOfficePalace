@@ -1,3 +1,4 @@
+import { createNightParts } from '../night';
 import * as THREE from 'three';
 import { BOARDS, LOFT, MACHINE_MONITOR, PLANTS, SEATING_BY_ID, STAIRS, STREET_Y, TV, WALL_HEIGHT, plantByWing } from '../../../shared/layout';
 import { wallFacing } from '../../../shared/decor';
@@ -40,20 +41,7 @@ export const rugs: Fixture = (site) => {
 };
 
 /** What the sky lights and darkens (see NightParts), which everything after it that has any adds to. */
-export const nightLights: Fixture<'night'> = () => ({
-  handle: {
-    night: {
-      bulbs: [],
-      halos: [],
-      lamps: [],
-      windows: [],
-      street: STREET_Y,
-      clouds: toonUnique('#ffffff'),
-      wetGlass: new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, side: THREE.DoubleSide, fog: false, visible: false }),
-      glows: [],
-    },
-  },
-});
+export const nightLights: Fixture<'night'> = () => ({ handle: { night: createNightParts() } });
 
 /** Cork boards on the walls. */
 export const boards: Fixture<'boardMeshes'> = (site) => {

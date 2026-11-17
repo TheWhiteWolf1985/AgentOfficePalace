@@ -19,5 +19,5 @@ export function bindConferenceWhiteboard(room: THREE.Object3D, display: Whiteboa
   face.material = display.material;
   face.castShadow = face.receiveShadow = false;
   face.userData.interact = interactable;
-  return { ...display, interactable };
+  return { ...display, interactable, showPresentation: (material: THREE.Material | null) => { face.material = material ?? display.material; } };
 }

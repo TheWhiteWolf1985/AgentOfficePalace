@@ -11,6 +11,7 @@ import { searchRoutes } from './search.js';
 import { serviceRoutes } from './services.js';
 import { receptionSignRoute } from './reception-sign.js';
 import { connectionsRoute } from './connections.js';
+import { preferencesRoute } from './preferences.js';
 
 export const routes: readonly Route[] = [
   // Anyone.
@@ -29,6 +30,7 @@ export const routes: readonly Route[] = [
   pageRoutes.favicon,
   // Signed in.
   authRoutes.whoami,
+  preferencesRoute,
   connectionsRoute,
   receptionSignRoute,
   agentRoutes.models,

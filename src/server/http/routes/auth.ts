@@ -109,6 +109,6 @@ export const authRoutes = {
       return send(res, 200, { ok: true }, signedIn(ctx, req));
     },
   },
-  logout: { method: 'POST', path: '/api/logout', auth: 'public', handle: (ctx, { req, res }) => send(res, 200, { ok: true }, { 'set-cookie': ctx.auth.clearCookie(req) }) },
-  whoami: { path: '/api/whoami', auth: 'session', handle: (ctx, { res, session }) => send(res, 200, { ok: true, me: ctx.meOf(session.account?.id) }) },
+  logout: { method: 'POST', path: '/api/logout', auth: 'public', handle: (ctx, { req, res }) => { res.setHeader('set-cookie', ctx.auth.clearCookies(req)); return send(res, 200, { ok: true }); } },
+  whoami: { path: '/api/whoami', auth: 'session', handle: (ctx, { res, session }) => send(res, 200, { ok: true, me: ctx.meOf(session.account?.id), ...(ctx.cfg.httpsPort ? { securePort: ctx.cfg.httpsPort } : {}) }) },
 } satisfies Record<string, Route>;

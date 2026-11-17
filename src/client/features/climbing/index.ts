@@ -1,3 +1,4 @@
+import { whenOfficeReady } from '../../world/deferred-office';
 import { t as uiText } from '../../../shared/i18n';
 /**
  * The ladder and the fire poles between floors: up or down the ladder through the hatches, down a pole
@@ -91,7 +92,7 @@ export function installClimbing(ctx: Ctx, deps: ClimbingDeps) {
     const f = store.currentFloor();
     toast(uiText`🚒 Wheee! Down to ${f?.name ?? uiText('the floor below')}`);
   }
-  office.stack.onHatch = (where, open) => ctx.sound.hatch({ x: LADDER.x + 0.3, y: where === 'floor' ? 0 : WALL_HEIGHT, z: LADDER.z }, open);
+  whenOfficeReady(office, ready => { ready.stack.onHatch = (where, open) => ctx.sound.hatch({ x: LADDER.x + 0.3, y: where === 'floor' ? 0 : WALL_HEIGHT, z: LADDER.z }, open); });
   // Speed lines round the edge of the screen, sliding down a pole.
   const whoosh = h('div', { id: 'whoosh' });
   $('app').append(whoosh);

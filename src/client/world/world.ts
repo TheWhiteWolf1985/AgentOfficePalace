@@ -53,10 +53,10 @@ export function officeWorld(office: Office, upstairs: () => boolean, wing: () =>
     interactables: office.interactables,
     pickables: [office.group],
     desks: office.desks,
-    boardMeshes: office.boardMeshes,
-    meetingBoard: office.meetingBoard,
-    meetingSign: office.meetingSign,
-    gong: office.gong,
+    get boardMeshes() { return office.boardMeshes; },
+    get meetingBoard() { return office.meetingBoard; },
+    get meetingSign() { return office.meetingSign; },
+    get gong() { return office.gong; },
     get nav() {
       return officeNav(wing());
     },

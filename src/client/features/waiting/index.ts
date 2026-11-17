@@ -1,3 +1,4 @@
+import { spaceCapabilities } from '../../../shared/space-capabilities';
 import { t as uiText } from '../../../shared/i18n';
 /**
  * Who's waiting on you: N (and the count in the Workers panel) takes you to each in turn, and the
@@ -30,6 +31,7 @@ export function installWaiting(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'wo
 
   /** N: to the first worker waiting on someone (the ones that need you, then the ones that are done, longest first), and on each press after, the next. */
   function goToNextWaiting() {
+    if (!spaceCapabilities(store.floor, !!store.project).project) return;
     if (core.trip) return;
     const w = nextUp.next(store.workers.values(), waitingBeside());
     nextToast?.remove();
@@ -122,6 +124,7 @@ export function installWaiting(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'wo
 
   /** 🔎 the chat and every terminal; a terminal line opens that terminal right at it. */
   function showSearch() {
+    if (!spaceCapabilities(store.floor, !!store.project).project) return;
     openSearch(openWorkerTerminal);
   }
   // By the character, so it's / on any keyboard layout. The search box opens without it.
@@ -142,6 +145,7 @@ export function installWaiting(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'wo
   }
 
   function showQueue() {
+    if (!spaceCapabilities(store.floor, !!store.project).project) return;
     openQueue(net, { openTerminal: openWorkerTerminal });
   }
 

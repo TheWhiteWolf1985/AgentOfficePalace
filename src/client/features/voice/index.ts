@@ -22,6 +22,7 @@ export function installVoice(ctx: Ctx, deps: VoiceDeps) {
   }
 
   async function joinVoice() {
+    if (!window.isSecureContext) { const url = secureMediaUrl(); if (url) location.assign(url); return; }
     const err = await voice.joinVoice(ctx.settings.pushToTalk);
     if (err) toast(err, 'warn');
     else if (ctx.settings.pushToTalk && voice.inVoice) toast(uiText('🎙️ In voice, muted: hold V to talk'));
@@ -47,6 +48,7 @@ export function installVoice(ctx: Ctx, deps: VoiceDeps) {
   });
 
   async function toggleShare() {
+    if (!window.isSecureContext) { const url = secureMediaUrl(); if (url) location.assign(url); return; }
     if (voice.sharing) voice.stopShare();
     else {
       const err = await voice.startShare();
@@ -117,7 +119,10 @@ export function installVoice(ctx: Ctx, deps: VoiceDeps) {
   });
   ctx.messages.on('peer.join', () => voice.syncPeers());
   ctx.messages.on('peer.leave', () => voice.syncPeers());
+  store.on('floor', () => { voice.syncScreenSenders(); refreshShares(); });
+  store.on('peers', () => { voice.syncScreenSenders(); refreshShares(); });
   ctx.messages.on('rtc', (msg) => void voice.handleSignal(msg.from, msg.data as never));
 
   return { toggleVoice, toggleShare, currentShares, refreshShares, watchShare };
 }
+import { secureMediaUrl } from '../../secure-media';

@@ -52,6 +52,8 @@ if (everywhere) {
   }
 }
 
+if (cfg.httpsPort) for (const address of [...urls]) { const secure = new URL(address); secure.protocol = 'https:'; secure.port = String(cfg.httpsPort); urls.add(secure.origin); }
+
 const agent = office.resolvedAgent;
 function floorsLine() {
   const floors = office.floors();
@@ -90,7 +92,7 @@ ${signIn ? `\n  sign in: ${signIn}\n           ${opened ? 'opened in your browse
   password: ${passwordLine()}
   default agent: ${[agent ?? `${cfg.agentCmd} (via login shell)`, ...cfg.agentArgs].join(' ')}
   choose a provider (including Pi and Cursor) when hiring or queueing a task
-${cfg.tls || loopback ? '' : '\n  tip: voice & screen share need https off localhost — use a reverse proxy or --self-signed\n'}`);
+${cfg.tls || cfg.httpsPort || loopback ? '' : '\n  tip: voice & screen share need https off localhost — use a reverse proxy or --self-signed\n'}`);
 
 let closing = false;
 // SIGTERM is a restart (tsx watch reloading, a plain `kill`, systemd): workers keep running in their

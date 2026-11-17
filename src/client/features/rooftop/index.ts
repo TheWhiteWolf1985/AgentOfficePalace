@@ -17,6 +17,7 @@ export function installRooftop(ctx: Ctx) {
       ctx.scene.add(roof.group);
       noOutline(roof.group);
       refreshWhiteboard();
+      store.emit('presentation');
     }
     return roof;
   }

@@ -5,7 +5,7 @@ export type AccountRole = 'admin' | 'member';
 /** Who this browser is signed in as. */
 export interface Me {
   /** Your own account; missing when you came in with the shared office password. */
-  account?: { name: string; role: AccountRole };
+  account?: { id?: string; name: string; role: AccountRole };
   /** May invite, list and revoke accounts. */
   admin: boolean;
 }

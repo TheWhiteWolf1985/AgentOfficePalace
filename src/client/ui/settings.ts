@@ -384,7 +384,7 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
       languageSelect(),
       h('p.setting-note', {}, uiText('Changing language reloads this page. Your agents keep working.')))],
     you: [
-      setting(uiText('Your character'), null, character),
+      setting(uiText('Your character'), null, character, h('p.setting-note', {}, account ? uiText('Your appearance and preferences follow your personal account.') : uiText('Shared access keeps appearance and preferences in this browser.'))),
       setting(uiText('Camera view'), 'you', seg, note),
       setting(uiText('Signed in'), null, h('div.volume', {}, signOut), h('p.setting-note', {}, account ? uiText`As ${account.name}, with your own account (${account.role}).` : uiText('With the shared office password.'))),
     ],

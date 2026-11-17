@@ -2,16 +2,18 @@ import './i18n';
 import { t as uiText } from '../shared/i18n';
 import './style.css';
 import { Net } from './net';
+import { bootstrapProfile } from './bootstrap-profile';
+import { prepareWorld } from './core/prepare-world';
 import { DesktopNotifier } from './notify';
 import { store, loadProfile, loadSettings } from './state';
 import { PlayerController, groundAt } from './player';
 import { Hands } from './world/hands';
 import { Confetti } from './world/confetti';
 import { Voice } from './voice';
-import { $ } from './ui/dom';
+import { $, h } from './ui/dom';
 import { openCharacter } from './ui/character';
 import { elevatorPanelOpen } from './ui/elevator';
-import { onModelsProgress, preloadModels } from './world/models';
+import { onModelsProgress, preloadModels, COMMON_MODELS, avatarModels } from './world/models';
 import { loadingScreen } from './ui/loading';
 import { offerLite, touchOnly } from './ui/litesuggest';
 import { createCtx } from './core/ctx';
@@ -48,6 +50,7 @@ import { installSeating } from './features/seating';
 import { installLamplight } from './features/lamplight';
 import { installTv } from './features/tv';
 import { installVoice } from './features/voice';
+import { installPresentation } from './features/presentation';
 import { installWaiting } from './features/waiting';
 import { installWalking } from './features/walking';
 import { installWhiteboard } from './features/whiteboard';
@@ -58,13 +61,22 @@ import { installWorkerViews } from './features/workers/views';
 const loading = loadingScreen(onModelsProgress);
 // Came here from the 2D view's 🏢 3D button: it isn't offered straight back.
 const chose3d = new URLSearchParams(location.search).has('3d');
-if (chose3d) history.replaceState(null, '', location.pathname);
+if (chose3d) { const url = new URL(location.href); url.searchParams.delete('3d'); history.replaceState(null, '', url.pathname + url.search + url.hash); }
 /** Offers the 2D view (/lite) where the 3D is hard going. */
 const offer2d = (why: 'touch' | 'slow') => chose3d || offerLite(why);
 // A phone can't walk around the office: the 2D view is made for it.
 if (touchOnly()) offer2d('touch');
 // The models made in Blender, loaded before the world they're in is built (see world/models.ts).
-await preloadModels();
+await bootstrapProfile();
+for (;;) {
+  try { await preloadModels([...COMMON_MODELS, ...avatarModels(store.profile.look)]); break; }
+  catch {
+    const retry = h('button.btn', { type: 'button' }, uiText('Retry'));
+    const message = h('div.asset-loading', { role: 'alert' }, uiText('Could not load the environment.'), retry);
+    document.body.append(message);
+    await new Promise<void>(resolve => retry.addEventListener('click', () => { message.remove(); resolve(); }, { once: true }));
+  }
+}
 
 // ---- The context every part of the office plugs into (see core/context.ts) ----------------------------
 // Built before the parts it hands out, which are there by the time anything asks for them. Every part
@@ -95,7 +107,7 @@ parts.atrium = installAtrium(ctx);
 installReceptionSign(ctx);
 
 // You, and how you talk to the office.
-parts.net = new Net(() => store.profile, () => parts.arrival.whereNow());
+parts.net = new Net(() => store.profile, () => parts.arrival.whereNow(), false, message => prepareWorld(parts, core, message));
 parts.voice = new Voice(parts.net);
 parts.me = makeMe(ctx);
 parts.settings = loadSettings();
@@ -150,6 +162,7 @@ parts.focus = installFocus(ctx, core, parts);
 parts.pointer = installPointer(ctx, core, parts);
 installChat(ctx);
 parts.talk = installVoice(ctx, { tv: parts.tv });
+parts.presentation = installPresentation(ctx, parts);
 installDictation(ctx);
 parts.hud = installHud(ctx, core, parts);
 
@@ -163,19 +176,7 @@ function boot() {
   requestAnimationFrame(frame);
 }
 
-/** Who you're signed in as. With an account of your own, your name is that account's. */
-async function whoami() {
-  try {
-    const res = await fetch('/api/whoami', { cache: 'no-store' });
-    if (res.status === 401) location.href = '/login';
-    const { me } = (await res.json()) as { me?: typeof store.me };
-    if (me) store.me = me;
-  } catch {
-    // the welcome message says it too
-  }
-}
-
-void whoami().then(() => {
+void Promise.resolve().then(() => {
   const saved = loadProfile();
   if (saved && store.me.account) saved.name = store.me.account.name;
   if (store.me.account) store.profile.name = store.me.account.name;
@@ -210,7 +211,7 @@ void whoami().then(() => {
 
 // Debug handle for quick checks from the console / headless screenshots.
 const { worlds, views, rooftop, hanging, climbing } = parts;
-(window as any).__office = { world: () => worlds.world(), plan: worlds.plan, roof: rooftop.roof, atrium: parts.atrium.atrium, store, player: parts.player, camera: ctx.camera, workerViews: views.workerViews, departures: views.departures, arrivals: views.arrivals, scene: ctx.scene, net: parts.net, renderer: ctx.renderer, hands: parts.hands, me: parts.me, remotes: parts.peers.remotes, settings: parts.settings, gallery: parts.gallery, hanger: hanging.hanger, office: ctx.office, ride: parts.travel.ride, switchFloor: parts.travel.switchFloor, climber: climbing.climber, elevatorPanelOpen, confetti: parts.confetti, sky: ctx.sky, carried: () => core.carrying };
+(window as any).__office = { world: () => worlds.world(), plan: worlds.plan, roof: rooftop.roof, atrium: parts.atrium.atrium, store, player: parts.player, camera: ctx.camera, workerViews: views.workerViews, departures: views.departures, arrivals: views.arrivals, scene: ctx.scene, net: parts.net, voice: parts.voice, renderer: ctx.renderer, hands: parts.hands, me: parts.me, remotes: parts.peers.remotes, settings: parts.settings, gallery: parts.gallery, hanger: hanging.hanger, office: ctx.office, ride: parts.travel.ride, switchFloor: parts.travel.switchFloor, climber: climbing.climber, elevatorPanelOpen, confetti: parts.confetti, sky: ctx.sky, carried: () => core.carrying };
 (window as any).__voice = parts.voice;
 (window as any).__sound = parts.sound;
 (window as any).__notify = parts.notifier;

@@ -1,7 +1,9 @@
 import * as THREE from 'three';
 import { OutlineEffect } from 'three/examples/jsm/effects/OutlineEffect.js';
 import { store } from '../state';
-import { buildOffice } from '../world/office';
+import { createDeferredOffice } from '../world/deferred-office';
+import { createNightParts } from '../world/night';
+import { OFFICE_MODELS, preloadModels } from '../world/models';
 import type { Office } from '../world/types';
 import { HAZE_MAX, Sky } from '../world/sky';
 import type { Ctx } from './context';
@@ -72,9 +74,19 @@ export function createScene(canvas: HTMLCanvasElement, renderer: THREE.WebGLRend
   sun.shadow.normalBias = 0.03;
   scene.add(sun);
 
-  const office = buildOffice();
+  let sky: Sky;
+  let buildProject: typeof import('../world/office')['buildOffice'];
+  const office = createDeferredOffice(createNightParts(), async () => {
+    await preloadModels(OFFICE_MODELS);
+    buildProject = (await import('../world/office')).buildOffice;
+  }, resources => {
+    const ready = buildProject(resources);
+    noOutline(ready.group);
+    sky.refreshLighting();
+    return ready;
+  });
   scene.add(office.group);
-  const sky = new Sky(scene, { sun, hemi, ambient }, office.night, () => store.officeNow());
+  sky = new Sky(scene, { sun, hemi, ambient }, office.night, () => store.officeNow());
 
   noOutline(office.group);
   return { canvas, renderer, effect, scene, camera, hemi, ambient, sun, office, sky };

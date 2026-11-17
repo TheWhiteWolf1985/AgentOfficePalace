@@ -2,6 +2,8 @@ import path from 'node:path';
 import type { Config } from '../config.js';
 import { Auth } from '../auth.js';
 import { Accounts } from '../accounts.js';
+import { PersonalPreferencesStore } from '../personal-preferences.js';
+import { ConferencePresentation } from '../conference-presentation.js';
 import { providerCommand } from '../agents.js';
 import type { AgentProvider } from '../../shared/providers.js';
 import { createModelCatalogues } from '../models.js';
@@ -36,5 +38,5 @@ export function createCore(ctx: Ctx, cfg: Config, publicDir: string): Core {
     if (err) console.error(`agent-office: --projects: ${err}`);
   }
   const floors = new Map<string, Floor>();
-  return { cfg, publicDir, accounts, auth, clients, chat, receptionSign: new ReceptionSign(cfg.dataDir), conferenceWhiteboard: new Whiteboard(path.join(cfg.dataDir, 'shared', 'conference-room')), officeName, models, building, floors };
+  return { cfg, publicDir, accounts, auth, clients, chat, preferences: new PersonalPreferencesStore(cfg.dataDir), conferencePresentation: new ConferencePresentation(), receptionSign: new ReceptionSign(cfg.dataDir), conferenceWhiteboard: new Whiteboard(path.join(cfg.dataDir, 'shared', 'conference-room')), officeName, models, building, floors };
 }

@@ -16,6 +16,9 @@ export interface Session {
 }
 
 export class Auth {
+  private secureSibling?: { primary: number; secure: number };
+  /** Only the optional HTTPS listener of this same application may reuse its HTTP sign-in. */
+  setSecureSibling(primary: number, secure: number) { this.secureSibling = { primary, secure }; }
   private attempts = new Map<string, { count: number; resetAt: number }>();
   /** Hashes of the one-time sign-in links' keys that haven't been used yet. */
   private links = new Set<string>();
@@ -115,7 +118,20 @@ export class Auth {
   }
 
   fromRequest(req: IncomingMessage): Session | undefined {
-    return this.verify(parseCookies(req.headers.cookie)[cookieName(req)]);
+    const cookies = parseCookies(req.headers.cookie), name = cookieName(req);
+    if (Object.hasOwn(cookies, name)) return this.verify(cookies[name]);
+    if (this.isSecureSibling(req)) return this.verify(cookies[`${COOKIE_NAME}_${this.secureSibling!.primary}`]);
+    return undefined;
+  }
+
+  private isSecureSibling(req: IncomingMessage): boolean {
+    return !!this.secureSibling && !!(req.socket as import('node:tls').TLSSocket)?.encrypted && req.socket.localPort === this.secureSibling.secure;
+  }
+
+  clearCookies(req: IncomingMessage): string[] {
+    const cookies = [this.clearCookie(req)];
+    if (this.isSecureSibling(req)) cookies.push(`${COOKIE_NAME}_${this.secureSibling!.primary}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0`);
+    return cookies;
   }
 
   /**

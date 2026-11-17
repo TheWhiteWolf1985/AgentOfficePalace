@@ -392,27 +392,8 @@ export class Sky {
     this.dome.add(this.stars, this.sunDisc, this.moonDisc);
     scene.add(this.dome);
 
-    // Halos round the bulbs at night, one set of points per size (and per floor or street).
-    const halo = blobTexture(0.25);
-    const bySize = new Map<string, { size: number; ground: boolean; pos: number[]; col: number[] }>();
-    for (const h of night.halos) {
-      const key = `${h.size}|${!!h.ground}`;
-      let set = bySize.get(key);
-      if (!set) bySize.set(key, (set = { size: h.size, ground: !!h.ground, pos: [], col: [] }));
-      set.pos.push(h.at.x, h.at.y, h.at.z);
-      const c = new THREE.Color(h.color);
-      set.col.push(c.r, c.g, c.b);
-    }
-    for (const { size, ground, pos, col } of bySize.values()) {
-      const geo = new THREE.BufferGeometry();
-      geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-      geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
-      const p = new THREE.Points(geo, new THREE.PointsMaterial({ size, map: halo, vertexColors: true, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending, fog: false }));
-      p.visible = false;
-      this.halos.push(p);
-      (ground ? this.groundHalos : scene).add(p);
-    }
     scene.add(this.groundHalos);
+    this.refreshLighting();
 
     // Rain: streaks falling around you (x, y, z, speed per drop).
     const RAIN = 3000;
@@ -439,6 +420,41 @@ export class Sky {
     this.glass = new WetGlass(night.wetGlass);
   }
 
+  /** Project geometry can arrive after the shared spaces; rebuild only its light registrations. */
+  refreshLighting() {
+    const maps = new Set<THREE.Texture>();
+    for (const p of this.halos) {
+      p.removeFromParent(); p.geometry.dispose();
+      if (p.material.map) maps.add(p.material.map);
+      p.material.dispose();
+    }
+    for (const map of maps) map.dispose();
+    this.halos.length = 0;
+    const night = this.night, scene = this.scene;
+    // Halos round the bulbs at night, one set of points per size (and per floor or street).
+    const halo = blobTexture(0.25);
+    const bySize = new Map<string, { size: number; ground: boolean; pos: number[]; col: number[] }>();
+    for (const h of night.halos) {
+      const key = `${h.size}|${!!h.ground}`;
+      let set = bySize.get(key);
+      if (!set) bySize.set(key, (set = { size: h.size, ground: !!h.ground, pos: [], col: [] }));
+      set.pos.push(h.at.x, h.at.y, h.at.z);
+      const c = new THREE.Color(h.color);
+      set.col.push(c.r, c.g, c.b);
+    }
+    for (const { size, ground, pos, col } of bySize.values()) {
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+      geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+      const p = new THREE.Points(geo, new THREE.PointsMaterial({ size, map: halo, vertexColors: true, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending, fog: false }));
+      p.visible = false;
+      this.halos.push(p);
+      (ground ? this.groundHalos : scene).add(p);
+    }
+
+    this.placeLamps();
+  }
+
   /** The server's word on the sky. The weather eases from one spell to the next; a new place lands at once. */
   set(state: SkyState) {
     if (!this.heard || state.lat !== this.state.lat || state.lon !== this.state.lon) this.snap = true;
@@ -463,6 +479,7 @@ export class Sky {
     this.groundHalos.position.y = -drop;
     const lo = uniforms.skyLampMin.value.set(Infinity, Infinity, Infinity);
     const hi = uniforms.skyLampMax.value.set(-Infinity, -Infinity, -Infinity);
+    if (!this.night.lamps.length) { lo.set(0, 0, 0); hi.set(0, 0, 0); }
     this.night.lamps.slice(0, MAX_LAMPS).forEach((l, i) => {
       const y = l.ground ? l.y - drop : l.y;
       uniforms.skyLamps.value[i].set(l.x, y, l.z, l.reach);

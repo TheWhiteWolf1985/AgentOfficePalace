@@ -1,6 +1,6 @@
 import http from 'node:http';
 import https from 'node:https';
-import type { Config } from './config.js';
+import { ensureSelfSigned, type Config } from './config.js';
 import { resolveCommand } from './workers.js';
 import type { Ctx } from './office/context.js';
 import { messaging } from './office/messaging.js';
@@ -23,6 +23,7 @@ export interface StartOptions {
 }
 
 export async function startServer(cfg: Config, opts: StartOptions = {}) {
+  if (cfg.httpsPort !== undefined && !cfg.httpsTls) await ensureSelfSigned(cfg);
   const publicDir = opts.publicDir ?? findPublicDir();
   // Everything the office's parts share (see office/context.ts), filled in a stage at a time in the
   // order the office has always started up in: the hook server already answers the workers still
@@ -39,17 +40,14 @@ export async function startServer(cfg: Config, opts: StartOptions = {}) {
   const handler = requestHandler(ctx, routes);
   const server = cfg.tls ? https.createServer({ cert: cfg.tls.cert, key: cfg.tls.key }, handler) : http.createServer(handler);
 
+  const secureServer = cfg.httpsPort !== undefined && cfg.httpsTls ? https.createServer(cfg.httpsTls, handler) : undefined;
+
   // --- WebSocket -------------------------------------------------------------------------------
   acceptWebSockets(ctx, server);
+  if (secureServer) acceptWebSockets(ctx, secureServer);
   const stopTimers = startTimers(ctx);
 
-  await new Promise<void>((resolve, reject) => {
-    server.once('error', reject);
-    server.listen(cfg.port, cfg.host, () => resolve());
-  });
   const { services, tailnet } = ctx;
-  services.start();
-  tailnet.start(() => services.list().map((s) => s.port));
 
   /** With `keep` (a restart), workers' terminals keep running for the next office to pick up. */
   const shutdown = (keep = false) => {
@@ -70,14 +68,29 @@ export async function startServer(cfg: Config, opts: StartOptions = {}) {
     ctx.signins.shutdown();
     for (const c of ctx.clients.values()) c.ws.close();
     server.close();
+    secureServer?.close();
     hookServer.close();
   };
+
+  try {
+    await new Promise<void>((resolve, reject) => {
+      server.once('error', reject); server.listen(cfg.port, cfg.host, resolve);
+    });
+    if (secureServer) await new Promise<void>((resolve, reject) => {
+      secureServer.once('error', reject); secureServer.listen(cfg.httpsPort!, cfg.host, resolve);
+    });
+    if (secureServer) cfg.httpsPort = (secureServer.address() as import('node:net').AddressInfo).port;
+    if (secureServer) ctx.auth.setSecureSibling((server.address() as import('node:net').AddressInfo).port, cfg.httpsPort!);
+    services.start();
+    tailnet.start(() => services.list().map(s => s.port));
+  } catch (error) { shutdown(); throw error; }
 
   /** A link (path and fragment) that signs one browser in, once; see Auth.linkKey. */
   const signInLink = () => `/login#key=${ctx.auth.linkKey()}`;
 
   return {
     server,
+    secureServer,
     shutdown,
     accounts: ctx.accounts,
     publicDir,

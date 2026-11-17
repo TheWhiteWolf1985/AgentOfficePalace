@@ -91,6 +91,8 @@ export interface RepoChoice {
 /** Everything that belongs to the floor you're on: sent when you walk in, and when you change floors. */
 
 export interface FloorView {
+  /** Ephemeral shared display selection, only in the common meeting room. Drawing data stays separate. */
+  presentation?: import('./presentation.js').PresentationState;
   /** The floor you're on; null while the building has none. */
   floor: string | null;
   project: ProjectInfo | null;

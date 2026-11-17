@@ -1,3 +1,6 @@
+import { whenOfficeReady } from '../../world/deferred-office';
+import { spaceCapabilities } from '../../../shared/space-capabilities';
+import { store } from '../../state';
 import { t as uiText } from '../../../shared/i18n';
 /**
  * The office TV: the screen someone on the floor is sharing, or its idle card while nobody is. What's
@@ -49,10 +52,11 @@ export function installTv(ctx: Ctx, deps: TvDeps) {
     t.colorSpace = THREE.SRGBColorSpace;
     return t;
   })();
-  const tvMat = ctx.office.tvScreen.material as THREE.MeshBasicMaterial;
-  tvMat.color.set('#ffffff');
-  tvMat.map = tvIdle;
-  tvMat.toneMapped = false;
+  let tvMat: THREE.MeshBasicMaterial | undefined;
+  whenOfficeReady(ctx.office, ready => {
+    tvMat = ready.tvScreen.material as THREE.MeshBasicMaterial;
+    tvMat.color.set('#ffffff'); tvMat.map = tvIdle; tvMat.toneMapped = false;
+  });
   ctx.interactions.define('tv', {
     reach: 10,
     hint: () => {
@@ -65,6 +69,8 @@ export function installTv(ctx: Ctx, deps: TvDeps) {
   let tvStream: MediaStream | null = null;
   /** Puts `stream` up on the TV, or the idle card when there's none. */
   function show(stream: MediaStream | null) {
+    if (!spaceCapabilities(store.floor, !!store.project).project) stream = null;
+    if (!tvMat) return;
     if (stream !== tvStream) {
       tvStream = stream;
       tvVideo.srcObject = stream;

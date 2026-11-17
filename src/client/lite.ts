@@ -1,3 +1,5 @@
+import { bootstrapProfile } from './bootstrap-profile';
+import { spaceCapabilities } from '../shared/space-capabilities';
 import './i18n';
 import { openLanguageSettings } from './ui/language';
 import { t as uiText } from '../shared/i18n';
@@ -41,6 +43,7 @@ if (new URLSearchParams(location.search).get('why') === 'webgl') {
 
 // Your name and color from the 3D office, if this browser has been in it. Nobody sees a character
 // of yours from here, so a look is only made up to connect with.
+await bootstrapProfile('/login?next=/lite');
 const saved = loadProfile();
 store.profile = { name: saved?.name ?? uiText('Guest'), color: saved?.color ?? AVATAR_COLORS[1], look: saved?.look ?? randomLook() };
 const net = new Net(() => store.profile, () => null, true);
@@ -312,13 +315,17 @@ function showMeeting(preset?: MeetingPreset) {
   );
 }
 
-$('btn-issues').addEventListener('click', () => openBoard('issues', net, boardActions()));
-$('btn-pulls').addEventListener('click', () => openBoard('pulls', net, boardActions()));
-$('btn-queue').addEventListener('click', () => openQueue(net, { openTerminal: openWorker }));
+$('btn-issues').addEventListener('click', () => { if (store.project) openBoard('issues', net, boardActions()); });
+$('btn-pulls').addEventListener('click', () => { if (store.project) openBoard('pulls', net, boardActions()); });
+$('btn-queue').addEventListener('click', () => { if (store.project) openQueue(net, { openTerminal: openWorker }); });
 $('btn-new').addEventListener('click', () => sendToWorker(uiText('✨ New task')));
 $('btn-settings').addEventListener('click', openLanguageSettings);
 
 function renderNav() {
+  const project = spaceCapabilities(store.floor, !!store.project).project;
+  document.querySelector('.lite-nav')?.classList.toggle('hidden', !project);
+  document.querySelector('.lite-h')?.classList.toggle('hidden', !project);
+  $('workers').classList.toggle('hidden', !project);
   const count = (id: string, n: number) => ($(id).querySelector('.n')!.textContent = n ? String(n) : '');
   count('btn-issues', store.issues.items.filter((i) => i.state === 'OPEN').length);
   count('btn-pulls', store.pulls.items.filter((p) => p.state === 'OPEN').length);
@@ -327,6 +334,8 @@ function renderNav() {
 store.on('issues', renderNav);
 store.on('pulls', renderNav);
 store.on('queue', renderNav);
+store.on('floor', renderNav);
+store.on('project', renderNav);
 
 // ---- What you have open, for the others (see PeerInfo.doing) -----------------------------------
 let doingSent: string | undefined;
@@ -378,14 +387,6 @@ function askName(done: (name: string) => void) {
 }
 
 void (async () => {
-  try {
-    const res = await fetch('/api/whoami', { cache: 'no-store' });
-    if (res.status === 401) return void (location.href = '/login?next=/lite');
-    const { me } = (await res.json()) as { me?: typeof store.me };
-    if (me) store.me = me;
-  } catch {
-    // the welcome message says it too
-  }
   // With an account of your own, your name is that account's.
   if (store.me.account) store.profile.name = store.me.account.name;
   if (saved || store.me.account) return net.connect();

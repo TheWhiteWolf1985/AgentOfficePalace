@@ -1,3 +1,4 @@
+import { presentationHandlers, presentationHooks } from './presentation.js';
 // Every message a browser can send, by type, and the features that keep something per person on a
 // floor. A new feature adds its handler file and a line here.
 import type { ClientMsg } from '../../../shared/protocol.js';
@@ -29,6 +30,7 @@ export const handlers: HandlerMap<ClientMsg> = {
   ...meetingHandlers,
   ...planHandlers,
   ...presenceHandlers,
+  ...presentationHandlers,
   ...queueHandlers,
   ...rooftopHandlers,
   ...settingsHandlers,
@@ -43,10 +45,11 @@ export const handlers: HandlerMap<ClientMsg> = {
  * The features that keep something per person on a floor, in the order they let go of it when
  * someone leaves the floor or the office (see FeatureHooks): the order the office has always done it in.
  */
-export const features: readonly FeatureHooks[] = [workerHooks, changesHooks, whiteboardHooks];
+export const features: readonly FeatureHooks[] = [workerHooks, changesHooks, whiteboardHooks, presentationHooks];
 
 /** What someone arriving on a floor is sent (see office/views.ts): a piece from each feature, in the order it has always gone out. */
 export const views: ViewPieces = {
+  presentation: () => undefined,
   project: projectView,
   workers: workersView,
   issues: issuesView,

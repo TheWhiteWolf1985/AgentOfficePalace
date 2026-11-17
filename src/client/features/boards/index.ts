@@ -1,3 +1,4 @@
+import { officeLoaded, whenOfficeReady } from '../../world/deferred-office';
 import { t as uiText } from '../../../shared/i18n';
 /**
  * The boards on the walls: the issues board (the open issues nobody has started on, less the cards
@@ -45,10 +46,13 @@ export function installBoards(ctx: Ctx, deps: BoardsDeps) {
   const { office } = ctx;
   // Boards: each draws onto a canvas texture, redrawn whenever what it shows changes. The same
   // texture goes on that board in whichever world you're in (see dressBoards).
-  function mountBoard(mesh: THREE.Mesh | undefined, texture: THREE.Texture, render: () => void, topics: Topic[]) {
-    if (mesh) showOn(mesh, texture);
-    for (const topic of topics) store.on(topic, render);
-    render();
+  function mountBoard(mesh: () => THREE.Mesh | undefined, texture: THREE.Texture, render: () => void, topics: Topic[]) {
+    whenOfficeReady(office, () => {
+      const face = mesh();
+      if (face) showOn(face, texture);
+      for (const topic of topics) store.on(topic, render);
+      render();
+    });
   }
   function showOn(mesh: THREE.Mesh, texture: THREE.Texture) {
     const mat = mesh.material as THREE.MeshBasicMaterial;
@@ -71,7 +75,7 @@ export function installBoards(ctx: Ctx, deps: BoardsDeps) {
     issuesTex.render({ ...store.issues, items: store.issues.items.filter((i) => !off.has(i.number) && !inProgress(i, store.taskForIssue(i.number))) });
   };
   // The queue too: a task that starts running takes its issue off the board before GitHub says it's assigned.
-  mountBoard(office.boardMeshes.issues, issuesTex.texture, renderIssuesBoard, ['issues', 'queue']);
+  mountBoard(() => office.boardMeshes.issues, issuesTex.texture, renderIssuesBoard, ['issues', 'queue']);
   let carriedOff = '';
   store.on('peers', () => {
     const k = [...offBoard()].join(',');
@@ -86,7 +90,7 @@ export function installBoards(ctx: Ctx, deps: BoardsDeps) {
   }
   const pullsTex = new BoardTexture('pulls');
   const renderPullsBoard = () => pullsTex.render(store.pulls, store.workers);
-  mountBoard(office.boardMeshes.pulls, pullsTex.texture, renderPullsBoard, ['pulls']);
+  mountBoard(() => office.boardMeshes.pulls, pullsTex.texture, renderPullsBoard, ['pulls']);
   // PR notes name the desk they came from. Redraw when that changes, not on every worker update.
   let deskLinks = '';
   store.on('workers', () => {
@@ -97,10 +101,10 @@ export function installBoards(ctx: Ctx, deps: BoardsDeps) {
   });
   const servicesTex = new ServicesBoardTexture();
   const renderServicesBoard = () => servicesTex.render(store.services.items, store.workers);
-  mountBoard(office.boardMeshes.services, servicesTex.texture, renderServicesBoard, ['services', 'workers']);
+  mountBoard(() => office.boardMeshes.services, servicesTex.texture, renderServicesBoard, ['services', 'workers']);
   const queueTex = new QueueBoardTexture();
   const renderQueueBoard = () => queueTex.render(store.queue, store.workers);
-  mountBoard(office.boardMeshes.queue, queueTex.texture, renderQueueBoard, ['queue', 'workers']);
+  mountBoard(() => office.boardMeshes.queue, queueTex.texture, renderQueueBoard, ['queue', 'workers']);
   ctx.interactions.define('issues', {
     reach: 9,
     hint: () => {
@@ -135,14 +139,15 @@ export function installBoards(ctx: Ctx, deps: BoardsDeps) {
   });
   // The machine monitor on the west wall.
   const machineTex = new MachineTexture();
-  mountBoard(office.machineScreen, machineTex.texture, () => machineTex.render(store.machine), ['machine']);
+  mountBoard(() => office.machineScreen, machineTex.texture, () => machineTex.render(store.machine), ['machine']);
   // The meeting room: its output as it's written on the back wall, and how it's going on the door.
   const meetingBoardTex = new MeetingBoardTexture();
-  mountBoard(office.meetingBoard, meetingBoardTex.texture, () => meetingBoardTex.render(store.meeting), ['meeting']);
+  mountBoard(() => office.meetingBoard, meetingBoardTex.texture, () => meetingBoardTex.render(store.meeting), ['meeting']);
   const meetingSignTex = new MeetingSignTexture();
-  mountBoard(office.meetingSign, meetingSignTex.texture, () => meetingSignTex.render(store.meeting), ['meeting']);
+  mountBoard(() => office.meetingSign, meetingSignTex.texture, () => meetingSignTex.render(store.meeting), ['meeting']);
   /** Puts every board's texture up on `w`'s boards. */
   function dressBoards(w: World) {
+    if (!officeLoaded(office)) return;
     showOn(w.boardMeshes.issues, issuesTex.texture);
     showOn(w.boardMeshes.pulls, pullsTex.texture);
     showOn(w.boardMeshes.services, servicesTex.texture);

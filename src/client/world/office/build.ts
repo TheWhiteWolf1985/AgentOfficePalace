@@ -1,3 +1,4 @@
+import type { OfficeResources } from '../deferred-office';
 import * as THREE from 'three';
 import type { WallRect } from '../../../shared/decor';
 import type { FloorPalette } from '../../../shared/floors';
@@ -69,10 +70,10 @@ function floorPlan() {
 type NoneMissing<Missing extends never> = Missing;
 export type EveryHandleGiven = NoneMissing<Exclude<keyof OfficeHandles, Gives<ReturnType<typeof floorPlan>[number]>>>;
 
-export function buildOffice(): Office {
-  const group = new THREE.Group();
-  const colliders: Collider[] = [];
-  const interactables: Interactable[] = [];
+export function buildOffice(resources?: OfficeResources): Office {
+  const group = resources?.group ?? new THREE.Group();
+  const colliders: Collider[] = resources?.colliders ?? [];
+  const interactables: Interactable[] = resources?.interactables ?? [];
   const walls: WallRect[] = [];
   // What each floor paints its own way (see setLook): the walls, their trim, the planks.
   const looks: Looks = { wall: toonUnique(PALETTE.wall), trim: toonUnique(PALETTE.wallTrim), planks: [] };
@@ -80,10 +81,10 @@ export function buildOffice(): Office {
   const floorTex = floorTexture();
   looks.planks.push(floorTex);
   const planks = new THREE.MeshToonMaterial({ map: floorTex, gradientMap: (toon('#fff') as THREE.MeshToonMaterial).gradientMap });
-  const desks = new Map<string, DeskView>();
+  const desks = resources?.desks ?? new Map<string, DeskView>();
   const doors: Door[] = [];
   /** What the fixtures built so far give the office. */
-  const given: Partial<OfficeHandles> = {};
+  const given: Partial<OfficeHandles> = resources ? { night: resources.night } : {};
   const site: Site = {
     group,
     colliders,
@@ -105,6 +106,7 @@ export function buildOffice(): Office {
   const levels: ((index: number, count: number, wings: readonly number[]) => void)[] = [];
   const plan: readonly Fixture[] = floorPlan();
   for (const fixture of plan) {
+    if (resources && fixture === nightLights) continue;
     const built = fixture(site);
     if (built.group) group.add(built.group);
     if (built.colliders) colliders.push(...built.colliders);

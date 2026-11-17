@@ -38,6 +38,9 @@ export interface Config {
   /** The DSH profile a DeepSeek Harness worker boots (`--dsh-profile`, default "acp"). */
   dshProfile: string;
   tls?: { cert: string; key: string };
+  /** Optional native HTTPS listener alongside the main HTTP endpoint. */
+  httpsPort?: number;
+  httpsTls?: { cert: string; key: string };
   trustProxy: boolean;
   iceServers: RTCIceServerLike[];
   /** How to run the script that deployed the office, e.g. "deploy/azure.sh --name team2" (set by deploy/provision.sh), for the commands it suggests. */
@@ -133,6 +136,7 @@ Options:
       --tls-cert <file>   Serve HTTPS with this certificate (PEM)
       --tls-key <file>    ...and this private key (PEM)
       --self-signed       Serve HTTPS with a generated self-signed certificate
+      --https-port <n>    Add native HTTPS alongside HTTP (env AGENT_OFFICE_HTTPS_PORT)
       --trust-proxy       Trust X-Forwarded-* headers (behind Caddy/nginx)
       --turn <url>        Add a TURN server for voice (repeatable), e.g.
                           turn:user:pass@turn.example.com:3478 (env
@@ -221,6 +225,7 @@ export function loadConfig(argv: string[]): Config {
   let homeGiven = !!process.env.AGENT_OFFICE_HOME;
   let projects = process.env.AGENT_OFFICE_PROJECTS ? path.resolve(process.env.AGENT_OFFICE_PROJECTS) : '';
   let port = Number(process.env.PORT) || 4600;
+  let httpsPort = process.env.AGENT_OFFICE_HTTPS_PORT ? Number(process.env.AGENT_OFFICE_HTTPS_PORT) : undefined;
   // Loopback unless asked: an office lets whoever signs in run commands on this machine.
   let host = '127.0.0.1';
   let open = !process.env.AGENT_OFFICE_NO_OPEN || process.env.AGENT_OFFICE_NO_OPEN === '0';
@@ -259,6 +264,9 @@ export function loadConfig(argv: string[]): Config {
       case '-H':
       case '--host':
         host = takeValue(argv, i++, a);
+        break;
+      case '--https-port':
+        httpsPort = Number(takeValue(argv, i++, a));
         break;
       case '--password':
         password = takeValue(argv, i++, a);
@@ -352,6 +360,10 @@ export function loadConfig(argv: string[]): Config {
     process.exit(2);
   }
   const budgetUsd = budget ? Number(budget.replace(/^\$/, '')) : undefined;
+  if (httpsPort !== undefined && (!Number.isInteger(httpsPort) || httpsPort <= 0 || httpsPort > 65535 || httpsPort === port)) {
+    console.error('agent-office: --https-port must be a different valid port');
+    process.exit(2);
+  }
   if (budgetUsd !== undefined && !(budgetUsd > 0)) {
     console.error('agent-office: --budget needs an amount in dollars, e.g. --budget 20');
     process.exit(2);
@@ -432,6 +444,7 @@ export function loadConfig(argv: string[]): Config {
     project: project || undefined,
     host,
     port,
+    httpsPort,
     open,
     password: password || undefined,
     passwordGenerated,
@@ -467,6 +480,11 @@ export function loadConfig(argv: string[]): Config {
 }
 
 export async function ensureSelfSigned(cfg: Config): Promise<void> {
+  if (cfg.httpsPort !== undefined && !cfg.httpsTls) {
+    const secure: Config = { ...cfg, httpsPort: undefined, tls: { cert: '', key: '' } };
+    await ensureSelfSigned(secure);
+    cfg.httpsTls = secure.tls;
+  }
   if (!cfg.tls || cfg.tls.cert) return;
   const certPath = path.join(cfg.dataDir, 'tls-cert.pem');
   const keyPath = path.join(cfg.dataDir, 'tls-key.pem');

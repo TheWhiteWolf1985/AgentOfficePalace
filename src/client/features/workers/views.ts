@@ -1,3 +1,4 @@
+import { officeLoaded } from '../../world/deferred-office';
 import { t as uiText } from '../../../shared/i18n';
 
 import * as THREE from 'three';
@@ -176,6 +177,7 @@ export function installWorkerViews(ctx: Ctx, core: CoreState, parts: WorkerViews
    * it, and once every desk is taken, bean bags come out for the workers who don't fit.
    */
   function arrangeSeats() {
+    if (!officeLoaded(ctx.office)) return;
     const world = ctx.world();
     // Someone sent home still counts until they get up, so a bean bag stays out under them.
     const free = vacantSeats(store.workers.values(), (id) => departures.seated(id));
@@ -211,6 +213,7 @@ export function installWorkerViews(ctx: Ctx, core: CoreState, parts: WorkerViews
    * dust, and anyone standing past where it goes now steps back in first.
    */
   function syncPlan() {
+    if (!officeLoaded(office)) return;
     const fp = store.floorPlan;
     const level = officeWing();
     const was = shownPlan;

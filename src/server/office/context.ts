@@ -5,6 +5,8 @@
 import type { Config } from '../config.js';
 import type { Auth } from '../auth.js';
 import type { Accounts } from '../accounts.js';
+import type { PersonalPreferencesStore } from '../personal-preferences.js';
+import type { ConferencePresentation } from '../conference-presentation.js';
 import type { SignIns, GhAs } from '../signins.js';
 import type { ModelCatalogue } from '../models.js';
 import type { Tailnet } from '../tailnet.js';
@@ -36,6 +38,8 @@ export interface Core {
   /** The client bundle the office serves. */
   publicDir: string;
   accounts: Accounts;
+  preferences: PersonalPreferencesStore;
+  conferencePresentation: ConferencePresentation;
   auth: Auth;
   /** Everyone in the office, by connection. */
   clients: Map<string, Client>;

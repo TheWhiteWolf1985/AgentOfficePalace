@@ -13,7 +13,7 @@ export const floorView = (ctx: Ctx, floor: Floor | undefined): FloorView => {
   return view as unknown as FloorView;
 };
 /** The shared meeting room: nobody works up there, so it has none of a floor's things. */
-export const roofView = (ctx: Ctx): FloorView => ({ ...floorView(ctx, undefined), floor: ROOF, whiteboard: whiteboardSpaceView(ctx, ROOF) });
+export const roofView = (ctx: Ctx): FloorView => ({ ...floorView(ctx, undefined), floor: ROOF, whiteboard: whiteboardSpaceView(ctx, ROOF), presentation: ctx.conferencePresentation.state() });
 export const lobbyView = (ctx: Ctx): FloorView => ({ ...floorView(ctx, undefined), floor: LOBBY });
 export const screensOf = (ctx: Ctx, c: Client, floor: Floor | undefined) => {
   for (const { workerId, frame } of floor?.workers.fullScreens() ?? []) ctx.sendTo(c, { t: 'screen', workerId, ...frame, full: true });

@@ -1,3 +1,4 @@
+import { presentation } from './presentation';
 // Every slice of the store, the core's included, in the one order the store runs them in: the order
 // they take in each message and each floor you arrive on, and so the order their topics fire in. On
 // `welcome`, after the map (see map.ts), the floor's topics fire from `floor` on down, then everyone
@@ -47,4 +48,5 @@ export const SLICES: readonly Slice[] = [
   team,
   accounts,
   signins,
+  presentation,
 ];

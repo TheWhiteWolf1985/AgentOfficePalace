@@ -63,6 +63,7 @@ export function openWhiteboard(net: Net) {
   const scope = currentScope();
   if (!scope) return toast(uiText('Take the elevator to an office or the meeting room first'), 'warn');
   const floor = scope.board;
+  if (floor === ROOF && store.presentation.mode === 'presentation') net.send({ t: 'conference.present', mode: 'whiteboard' });
   const title = floor === ROOF ? uiText('Meeting room whiteboard') : uiText('Whiteboard');
   const name = floor === ROOF ? title : uiText`${store.project?.name ?? 'office'} whiteboard`;
   const people = h('div.wb-people');

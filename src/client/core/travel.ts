@@ -1,3 +1,4 @@
+import { officeLoaded } from '../world/deferred-office';
 import { t as uiText } from '../../shared/i18n';
 /**
  * Floors and the elevator: the building as tall as its floors, riding the elevator (up to the roof,
@@ -43,6 +44,7 @@ export function installTravel(ctx: Ctx, core: CoreState, parts: TravelParts) {
       player.street = core.atLobby ? 0 : -roofDrop(floors.length);
       return;
     }
+    if (!officeLoaded(office)) return;
     const index = floors.findIndex((f) => f.id === store.floor);
     // Up on the roof there's no ladder or pole to take: nothing above, nothing below.
     const up = store.floor === ROOF ? undefined : floors[index + 1]?.name;
@@ -87,7 +89,7 @@ export function installTravel(ctx: Ctx, core: CoreState, parts: TravelParts) {
     hint: (it) => {
       const f = store.currentFloor();
       const n = store.floors.length;
-      if (it === office.garageLift.interactable) return { k: `garage|${f?.name}|${n}`, parts: [hintTitle(uiText('🛗 Elevator')), aside(f ? uiText`Garage · up to ${clip(f.name, 24)}` : uiText('Garage')), key('E', uiText('Choose a floor'))] };
+      if (officeLoaded(office) && it === office.garageLift.interactable) return { k: `garage|${f?.name}|${n}`, parts: [hintTitle(uiText('🛗 Elevator')), aside(f ? uiText`Garage · up to ${clip(f.name, 24)}` : uiText('Garage')), key('E', uiText('Choose a floor'))] };
       return { k: `${f?.name}|${n}`, parts: [hintTitle(uiText('🛗 Elevator')), f ? aside(uiText`${f.name} · ${n} floor${n === 1 ? '' : 's'}`) : '', key('E', n > 1 ? uiText('Choose a floor') : uiText('Floors & projects'))] };
     },
     use: onE(() => showElevator()),
@@ -269,5 +271,5 @@ export function installTravel(ctx: Ctx, core: CoreState, parts: TravelParts) {
     doorsOpen();
   }
 
-  return { syncStack, takenAway, showElevator, lift, ride, switchFloor, travel, setPlace, arrive };
+  return { syncStack, takenAway, showElevator, lift, ride, switchFloor, travel, setPlace, arrive, cancelTrip: tripFailed };
 }

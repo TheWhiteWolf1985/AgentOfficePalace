@@ -1,3 +1,5 @@
+import { spaceCapabilities } from '../../../shared/space-capabilities';
+import { LOBBY, ROOF } from '../../../shared/rooftop';
 import { t as uiText } from '../../../shared/i18n';
 /**
  * The command palette (Ctrl+K, ⌘K on a Mac): the workers, the office's actions, its boards, the pull
@@ -23,7 +25,7 @@ import { IS_MAC } from '../../ui/termkeys';
 import { hasWhiteboard, openWhiteboard } from '../whiteboard/ui';
 import type { InteractKind, Interactable } from '../../world/types';
 
-export type PaletteParts = Pick<Parts, 'walking' | 'waiting' | 'actions' | 'hud' | 'hanging' | 'meeting' | 'rooftop'>;
+export type PaletteParts = Pick<Parts, 'walking' | 'waiting' | 'actions' | 'hud' | 'hanging' | 'meeting' | 'rooftop' | 'travel' | 'presentation'>;
 
 /** Listens for Ctrl+K (⌘K) on the window. */
 export function installPalette(ctx: Ctx, parts: PaletteParts) {
@@ -69,7 +71,8 @@ export function installPalette(ctx: Ctx, parts: PaletteParts) {
   function paletteEntries(): PaletteEntry[] {
     const { waiting, actions, meeting, hanging } = parts;
     const out: PaletteEntry[] = [];
-    for (const w of store.workers.values()) {
+    const project = spaceCapabilities(store.floor, !!store.project).project;
+    if (project) for (const w of store.workers.values()) {
       const desk = DESK_BY_ID.get(w.deskId);
       const spot = desk && deskSpot(desk);
       const open = () => waiting.openWorkerTerminal(w.id);
@@ -84,6 +87,7 @@ export function installPalette(ctx: Ctx, parts: PaletteParts) {
       });
     }
 
+    if (project) {
     const free = nearestFreeDesk();
     const hireAt = (d: DeskDef) => () => actions.hireAtDesk(d.id);
     out.push({
@@ -96,19 +100,20 @@ export function installPalette(ctx: Ctx, parts: PaletteParts) {
       walk: free ? () => walkThen(deskSpot(free)!, free.label, hireAt(free), free) : undefined,
     });
     out.push(at('queue', uiText('the task queue'), { icon: '📋', kind: uiText('Action'), title: uiText('Open the task queue'), detail: uiText('Issues and tasks waiting for a worker'), keywords: ['backlog', 'tasks'], open: showQueue }));
+    }
     out.push({ icon: '⚙️', kind: uiText('Action'), title: uiText('Settings'), keywords: ['preferences', 'options'], open: () => parts.hud.showSettings() });
     if (store.invites) out.push({ icon: '👥', kind: uiText('Action'), title: uiText('Invite teammates'), keywords: ['team', uiText('add people')], open: () => openTeam(net) });
     else if (store.me.admin) out.push({ icon: '👥', kind: uiText('Action'), title: uiText('Invite people'), detail: uiText('Accounts'), keywords: [uiText('invite teammates'), 'accounts', 'team'], open: () => openAccounts(net) });
-    out.push({ icon: '🖼️', kind: uiText('Action'), title: uiText('Hang a picture'), detail: uiText('On a wall of this floor'), keywords: ['decorate', 'frame', 'art'], open: hanging.startHanging });
-    out.push({ icon: '🔎', kind: uiText('Action'), title: uiText('Search the chat and every terminal'), keywords: ['find'], open: showSearch });
+    if (project) out.push({ icon: '🖼️', kind: uiText('Action'), title: uiText('Hang a picture'), detail: uiText('On a wall of this floor'), keywords: ['decorate', 'frame', 'art'], open: hanging.startHanging });
+    if (project) out.push({ icon: '🔎', kind: uiText('Action'), title: uiText('Search the chat and every terminal'), keywords: ['find'], open: showSearch });
 
-    out.push(at('issues', uiText('the Issues board'), { icon: '📌', kind: uiText('Board'), title: uiText('Issues board'), open: () => openBoard('issues', net, actions.boardActions()) }));
-    out.push(at('pulls', uiText('the PR board'), { icon: '🔀', kind: uiText('Board'), title: uiText('PR board'), keywords: [uiText('pull requests')], open: () => openBoard('pulls', net, actions.boardActions()) }));
-    out.push(at('services', uiText('the Services board'), { icon: '🌐', kind: uiText('Board'), title: uiText('Services board'), detail: uiText('Web servers the workers are running'), open: () => openServices() }));
+    if (project) out.push(at('issues', uiText('the Issues board'), { icon: '📌', kind: uiText('Board'), title: uiText('Issues board'), open: () => openBoard('issues', net, actions.boardActions()) }));
+    if (project) out.push(at('pulls', uiText('the PR board'), { icon: '🔀', kind: uiText('Board'), title: uiText('PR board'), keywords: [uiText('pull requests')], open: () => openBoard('pulls', net, actions.boardActions()) }));
+    if (project) out.push(at('services', uiText('the Services board'), { icon: '🌐', kind: uiText('Board'), title: uiText('Services board'), detail: uiText('Web servers the workers are running'), open: () => openServices() }));
     if (hasWhiteboard()) out.push(at('whiteboard', uiText('the whiteboard'), { icon: '📝', kind: uiText('Board'), title: ctx.upTop() ? uiText('Meeting room whiteboard') : uiText('Whiteboard'), open: () => openWhiteboard(net) }));
-    out.push(at('meeting', uiText('the meeting room'), { icon: '🤝', kind: uiText('Board'), title: uiText('Meeting room'), keywords: [uiText('call a meeting')], open: () => meeting.showMeeting() }));
+    if (project) out.push(at('meeting', uiText('the meeting room'), { icon: '🤝', kind: uiText('Board'), title: uiText('Meeting room'), keywords: [uiText('call a meeting')], open: () => meeting.showMeeting() }));
 
-    for (const pr of store.pulls.items) {
+    if (project) for (const pr of store.pulls.items) {
       out.push(
         at('pulls', uiText('the PR board'), {
           icon: '🔀',
@@ -119,7 +124,7 @@ export function installPalette(ctx: Ctx, parts: PaletteParts) {
         }),
       );
     }
-    for (const issue of store.issues.items) {
+    if (project) for (const issue of store.issues.items) {
       out.push(
         at('issues', uiText('the Issues board'), {
           icon: '📌',
@@ -130,7 +135,7 @@ export function installPalette(ctx: Ctx, parts: PaletteParts) {
         }),
       );
     }
-    for (const svc of store.services.items) {
+    if (project) for (const svc of store.services.items) {
       const board = spotOf('services');
       out.push({
         icon: '🌐',
@@ -149,6 +154,9 @@ export function installPalette(ctx: Ctx, parts: PaletteParts) {
       // As clicking them under "In the office" does: over to them, by elevator if need be.
       out.push({ icon: '🙂', kind: uiText('Teammate'), title: p.name, detail: floor, open: () => parts.walking.walkTo(p.id) });
     }
+    if (store.floor !== LOBBY) out.push({ icon: '🏢', kind: uiText('Action'), title: uiText('Go to the atrium'), open: () => parts.travel.ride(LOBBY) });
+    if (store.floor !== ROOF) out.push({ icon: '🤝', kind: uiText('Action'), title: uiText('Go to the shared meeting room'), open: () => parts.travel.ride(ROOF) });
+    if (store.floor === ROOF) out.push({ icon: '📽️', kind: uiText('Action'), title: store.presentation.mode === 'presentation' ? uiText('Show whiteboard') : uiText('Present my screen'), open: () => void parts.presentation.toggle() });
     return out;
   }
 

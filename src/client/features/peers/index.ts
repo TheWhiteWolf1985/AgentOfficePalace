@@ -1,3 +1,4 @@
+import { avatarReady, avatarModels, preloadAvatar } from '../../world/models';
 import * as THREE from 'three';
 import { sameLook } from '../../../shared/avatar';
 import { seatOn } from '../../../shared/maps';
@@ -42,10 +43,19 @@ export function installPeers(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'worl
   const editProfile = () => parts.hud.editProfile();
   const walkTo = (id: string) => parts.walking.walkTo(id);
 
+  const warming = new Set<string>();
   function syncPeers() {
     for (const [id, peer] of store.peers) {
       // Only who's on your floor is in the room with you, and not someone on the 2D view: they're not standing anywhere.
       if (id === store.you || !store.onMyFloor(peer) || peer.lite) continue;
+      if (!avatarReady(peer.look)) {
+        const key = avatarModels(peer.look).join('|');
+        if (!warming.has(key)) {
+          warming.add(key);
+          void preloadAvatar(peer.look).then(() => { warming.delete(key); store.emit('peers'); }).catch(() => { warming.delete(key); });
+        }
+        continue;
+      }
       let r = remotes.get(id);
       if (!r) {
         const person = createUserPerson(peer.name, peer.color, peer.look);

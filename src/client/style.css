@@ -5,3 +5,5 @@
 @import './styles/base.css';
 @import './styles/hud.css';
 @import './styles/loading.css';
+/* A project floor is loaded only when first visited. */
+.asset-loading { position: fixed; inset: 0; z-index: 10000; display: grid; place-items: center; background: rgba(31, 35, 48, .92); color: white; font: 800 1.25rem Nunito, system-ui, sans-serif; }

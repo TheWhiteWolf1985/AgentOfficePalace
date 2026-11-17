@@ -1,6 +1,7 @@
 import { t as uiText } from '../shared/i18n';
 import type { Net } from './net';
 import { store } from './state';
+import { sameMediaSpace } from '../shared/space-capabilities';
 
 interface Conn {
   pc: RTCPeerConnection;
@@ -167,7 +168,7 @@ export class Voice {
     const track = this.screen.getVideoTracks()[0];
     track.contentHint = 'detail';
     track.addEventListener('ended', () => this.stopShare());
-    for (const c of this.conns.values()) c.screenSender = c.pc.addTrack(track, this.screen);
+    this.syncScreenSenders();
     this.changed();
     return null;
   }
@@ -194,6 +195,16 @@ export class Voice {
     // Nobody on the 2D view has voice (see PeerInfo.lite), so there's nothing to connect to.
     for (const [id, p] of store.peers) if (id !== store.you && !p.lite && !this.conns.has(id)) this.connect(id);
     for (const id of [...this.conns.keys()]) if (!store.peers.has(id) || store.peers.get(id)!.lite) this.drop(id);
+    this.syncScreenSenders();
+  }
+
+  /** A shared screen is sent only to people in the present space, including after either side moves. */
+  syncScreenSenders() {
+    for (const [id, c] of this.conns) {
+      const allowed = this.screen && sameMediaSpace(store.floor, store.peers.get(id)?.floor);
+      if (allowed && !c.screenSender) c.screenSender = c.pc.addTrack(this.screen!.getVideoTracks()[0], this.screen!);
+      else if (!allowed && c.screenSender) { c.pc.removeTrack(c.screenSender); c.screenSender = undefined; }
+    }
   }
 
   reset() {
@@ -301,7 +312,7 @@ export class Voice {
 
     // Share whatever we're already sending.
     if (this.mic) c.micSender = pc.addTrack(this.mic.getAudioTracks()[0], this.mic);
-    if (this.screen) c.screenSender = pc.addTrack(this.screen.getVideoTracks()[0], this.screen);
+    if (this.screen && sameMediaSpace(store.floor, store.peers.get(id)?.floor)) c.screenSender = pc.addTrack(this.screen.getVideoTracks()[0], this.screen);
     return c;
   }
 

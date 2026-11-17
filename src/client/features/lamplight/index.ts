@@ -1,3 +1,4 @@
+import { officeLoaded } from '../../world/deferred-office';
 import * as THREE from 'three';
 import type { Ctx } from '../../core/context';
 import type { Parts } from '../../core/parts';
@@ -25,6 +26,7 @@ export function installLamplight(ctx: Ctx, parts: Pick<Parts, 'stage' | 'place'>
   const from = new THREE.Vector3();
 
   ctx.ticks.add('env', ({ dt }) => {
+    if (!officeLoaded(ctx.office)) return;
     const { sun } = parts.stage;
     const { sky } = ctx;
 

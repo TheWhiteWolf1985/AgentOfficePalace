@@ -1,3 +1,4 @@
+import { spaceCapabilities } from '../../../shared/space-capabilities';
 import { t as uiText } from '../../../shared/i18n';
 /**
  * Hanging a picture on a wall of this floor (F), moving one, and looking closer at one hung already.
@@ -93,6 +94,7 @@ export function installHanging(ctx: Ctx, deps: HangingDeps) {
 
   /** F: hang a picture on a wall of this floor. There are no walls for them up on the roof. */
   function startHanging() {
+    if (!spaceCapabilities(store.floor, !!store.project).project) return;
     if (ctx.upTop()) return toast(uiText('No walls to hang pictures on up here — take the elevator down to a floor'), 'warn');
     if (!ctx.inOffice()) return toast(uiText`${ctx.plan().icon} ${ctx.plan().name}'s walls are hung already — pictures go up in the office`, 'warn');
     hanger.start();

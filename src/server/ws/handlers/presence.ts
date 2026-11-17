@@ -1,3 +1,4 @@
+import { releasePresentation } from './presentation.js';
 // their name and look, what they have open, voice and screen sharing, and chat.
 import type { ChatLine, PresenceClientMsg } from '../../../shared/protocol.js';
 import { OFFICE_PLAN, seatHereOn } from '../../../shared/maps/index.js';
@@ -59,6 +60,7 @@ export const presenceHandlers = {
     c.peer.voice = !!msg.voice;
     c.peer.muted = !!msg.muted;
     c.peer.sharing = !!msg.sharing;
+    if (!c.peer.sharing) releasePresentation(ctx, c.id);
     ctx.broadcast({ t: 'peer.update', peer: c.peer });
   },
   rtc(ctx, c, msg) {

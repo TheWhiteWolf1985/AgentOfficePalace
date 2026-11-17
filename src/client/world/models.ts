@@ -1,3 +1,5 @@
+import type { Look } from '../../shared/avatar';
+import { avatarModel, avatarHairstyle } from '../../shared/avatar-variants';
 import * as THREE from 'three';
 import { GLTFLoader, type GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { clone } from 'three/examples/jsm/utils/SkeletonUtils.js';
@@ -21,27 +23,27 @@ import { toon } from './toon';
 
 // The things in the world modelled in Blender rather than built in code. Each .glb is exported by a
 // script in blender/scripts/ (blender/README.md has the conventions they keep); add it here by name.
-// `preload` ones are loaded before the world is built, for builders that take theirs with model();
+// Builders request the assets they need before taking a copy with model().
 
 const MODELS = {
-  atrium: { url: atriumUrl, preload: true },
-  conference_room: { url: conferenceRoomUrl, preload: true },
-  desk_props: { url: deskPropsUrl, preload: true },
-  kitchen: { url: kitchenUrl, preload: true },
-  lounge: { url: loungeUrl, preload: true },
-  plants: { url: plantsUrl, preload: true },
-  reception_a: { url: receptionAUrl, preload: true },
-  reception_b: { url: receptionBUrl, preload: true },
-  human_base: { url: humanBaseUrl, preload: true },
-  human_female: { url: femaleBaseUrl, preload: true },
-  hair_short: { url: hairShortUrl, preload: true },
-  hair_long: { url: hairLongUrl, preload: true },
-  hair_bun: { url: hairBunUrl, preload: true },
-  hair_spiky: { url: hairSpikyUrl, preload: true },
-  hair_curly: { url: hairCurlyUrl, preload: true },
-  hair_ponytail: { url: hairPonytailUrl, preload: true },
+  atrium: { url: atriumUrl },
+  conference_room: { url: conferenceRoomUrl },
+  desk_props: { url: deskPropsUrl },
+  kitchen: { url: kitchenUrl },
+  lounge: { url: loungeUrl },
+  plants: { url: plantsUrl },
+  reception_a: { url: receptionAUrl },
+  reception_b: { url: receptionBUrl },
+  human_base: { url: humanBaseUrl },
+  human_female: { url: femaleBaseUrl },
+  hair_short: { url: hairShortUrl },
+  hair_long: { url: hairLongUrl },
+  hair_bun: { url: hairBunUrl },
+  hair_spiky: { url: hairSpikyUrl },
+  hair_curly: { url: hairCurlyUrl },
+  hair_ponytail: { url: hairPonytailUrl },
 
-} satisfies Record<string, { url: string; preload: boolean }>;
+} satisfies Record<string, { url: string }>;
 
 export type ModelName = keyof typeof MODELS;
 
@@ -91,7 +93,7 @@ function fetchModel(name: ModelName): Promise<GLTF> {
     p = new GLTFLoader().loadAsync(MODELS[name].url, () => tell()).then((gltf) => {
       loaded.set(name, gltf);
       return gltf;
-    });
+    }).catch(error => { loading.delete(name); throw error; });
     loading.set(name, p);
     progress.asked++;
     tell();
@@ -113,16 +115,22 @@ export async function loadModel(name: ModelName): Promise<Model> {
   return copy(await fetchModel(name));
 }
 
-/**
- * Loads every `preload` model, so the world can be built with them straight away (see model()). One
- * that doesn't load is logged and left out: whatever it was for goes missing, the office still opens.
- */
-export async function preloadModels(): Promise<void> {
-  const names = (Object.keys(MODELS) as ModelName[]).filter((name) => MODELS[name].preload);
-  await Promise.all(names.map((name) => fetchModel(name).catch((err: unknown) => console.error(`${name}.glb didn't load`, err))));
+/** Shared spaces need their own geometry and the meeting-room exterior visible on the tower. */
+export const COMMON_MODELS: readonly ModelName[] = ['atrium', 'conference_room', 'reception_a', 'reception_b'];
+export const OFFICE_MODELS: readonly ModelName[] = [...COMMON_MODELS, 'desk_props', 'kitchen', 'lounge', 'plants'];
+export function avatarModels(look: Look): ModelName[] {
+  const hair = avatarHairstyle(look);
+  return [avatarModel(look) === 'female' ? 'human_female' : 'human_base', ...(hair === 'bald' ? [] : [`hair_${hair}` as ModelName])];
+}
+export const avatarReady = (look: Look): boolean => avatarModels(look).every(name => loaded.has(name));
+export const preloadAvatar = (look: Look): Promise<void> => preloadModels(avatarModels(look));
+
+/** Load only the requested set, reusing both completed and concurrent requests. The lab can request all. */
+export async function preloadModels(names: readonly ModelName[] = Object.keys(MODELS) as ModelName[]): Promise<void> {
+  await Promise.all([...new Set(names)].map(name => fetchModel(name)));
 }
 
-/** A copy of a `preload` model (see preloadModels()), or null if it couldn't be loaded. */
+/** A copy of an already requested model, or null until it has loaded. */
 export function model(name: ModelName): Model | null {
   const gltf = loaded.get(name);
   return gltf ? copy(gltf) : null;
