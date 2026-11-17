@@ -6,6 +6,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { humanBase } from '../src/client/world/character/human-base.js';
 import { Person } from '../src/client/world/character/person.js';
+import { AVATAR_COLOR_ROLES, DEFAULT_AVATAR_COLORS } from '../src/shared/avatar-colors.js';
 import { FirstPersonBody } from '../src/client/world/character/person-first.js';
 
 const bytes = readFileSync(new URL('../src/client/models/human_base.glb', import.meta.url));
@@ -26,7 +27,7 @@ function canvas(t: TestContext) {
 
 test('runtime user GLB is the delivered unit-scale model with an independently posed rigid rig', async () => {
   assert.deepEqual(bytes, readFileSync(new URL('../Personaggi/Utenti/human_base.glb', import.meta.url)));
-  assert.equal(createHash('sha256').update(bytes).digest('hex'), 'fbe41af193d44b1069a8221136d35000cb849390a0a2acf43829552a04c9fde6');
+  assert.equal(createHash('sha256').update(bytes).digest('hex'), '3340be53a3178dcdce048f33fe380a662ec1cc5675163ca922efeaa3ff2ee57f');
   const source = await load(), original = source.scene.getObjectByName('char_root')!;
   const before = new THREE.Box3().setFromObject(original), a = humanBase(source.scene.clone(true)), b = humanBase(source.scene.clone(true));
   assert.equal(source.animations.length, 0);
@@ -45,7 +46,7 @@ test('runtime user GLB is the delivered unit-scale model with an independently p
 test('base colors and face primitives survive toon conversion without sharing instance materials', async () => {
   const source = (await load()).scene, a = humanBase(source.clone(true)), b = humanBase(source.clone(true));
   const original = materials(source), first = materials(a.rig.root), second = materials(b.rig.root);
-  assert.equal(first.size, 8);
+  assert.equal(first.size, 11);
   for (const [name, mat] of first) {
     assert.ok(mat instanceof THREE.MeshToonMaterial);
     assert.ok(mat.color.equals(original.get(name)!.color), name);
@@ -54,13 +55,13 @@ test('base colors and face primitives survive toon conversion without sharing in
   }
   let primitives = 0;
   a.rig.root.traverse(n => { if (n instanceof THREE.Mesh) { primitives++; assert.equal(n.userData.sharedHumanGeometry, true); } });
-  assert.equal(primitives, 23);
+  assert.equal(primitives, 25);
   first.get('char_mat_hair')!.color.set('#ff00ff');
   assert.ok(second.get('char_mat_hair')!.color.equals(original.get('char_mat_hair')!.color));
   a.dispose(); b.dispose();
 });
 
-test('user actions pose the new model while appearance remains fixed and the fallback remains customizable', async t => {
+test('user actions pose the new model while old profiles keep the delivered palette and the fallback remains customizable', async t => {
   canvas(t);
   const source = (await load()).scene, look = { skin: 5, hair: 4, style: 2 };
   const person = new Person('Human', '#ff00ff', look, source.clone(true));
@@ -134,11 +135,37 @@ test('closing a preview or removing a peer releases its materials without destro
   for (const material of materials(world.root).values()) material.addEventListener('dispose', () => worldMaterialsDisposed++);
   preview.read(true); preview.setDoing('Example'); preview.say('Example'); preview.dispose();
   assert.equal(geometriesDisposed, 0);
-  assert.equal(previewMaterialsDisposed, 8);
+  assert.equal(previewMaterialsDisposed, 11);
   assert.equal(worldMaterialsDisposed, 0);
   world.update(0.1, 1, true, false);
   const reopen = humanBase(source.clone(true));
   assert.ok(new THREE.Box3().setFromObject(reopen.rig.root).max.y > 1.76);
   assert.equal(geometriesDisposed, 0);
   world.dispose(); reopen.dispose();
+});
+
+
+test('all nine user colors are independent, preserve face accents and synchronize actual hand colors', async t => {
+  canvas(t);
+  const source = (await load()).scene, look = { skin: 0, hair: 0, style: 0 };
+  const a = new Person('A', '#ffffff', look, source.clone(true)), b = new Person('B', '#ffffff', look, source.clone(true));
+  const original = materials(source), first = materials(a.root), second = materials(b.root);
+  for (const role of AVATAR_COLOR_ROLES) {
+    assert.equal(first.get(`char_mat_${role}`)!.color.getHexString(), DEFAULT_AVATAR_COLORS[role].slice(1), role);
+    const colors = { ...DEFAULT_AVATAR_COLORS, [role]: '#ff00ff' };
+    a.setLook({ ...look, colors });
+    for (const other of AVATAR_COLOR_ROLES) {
+      assert.equal(first.get(`char_mat_${other}`)!.color.getHexString(), colors[other].slice(1));
+      assert.ok(second.get(`char_mat_${other}`)!.color.equals(original.get(`char_mat_${other}`)!.color));
+    }
+    assert.ok(first.get('char_mat_dark')!.color.equals(original.get('char_mat_dark')!.color));
+    assert.ok(first.get('char_mat_white')!.color.equals(original.get('char_mat_white')!.color));
+    if (role === 'skin') assert.equal(a.skinColor, '#ff00ff');
+    if (role === 'clothing') assert.equal(a.shirtColor, '#ff00ff');
+  }
+  a.setLook({ ...look, colors: { ...DEFAULT_AVATAR_COLORS } });
+  const hair = a.root.getObjectByName('char_hair')!, brows = a.root.getObjectByName('char_eyebrows_visual')!;
+  hair.visible = false;
+  assert.equal(brows.parent, a.rig.head); assert.equal(brows.visible, true);
+  a.dispose(); b.dispose();
 });

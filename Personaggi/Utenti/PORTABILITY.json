@@ -1,6 +1,6 @@
 {
   "status": "PASS",
-  "scope": "Rebuilt with distributed scripts/resources from the delivery directory; GLB byte-identical. Geometry-only rebuild, render QA separately recorded.",
-  "original_sha256": "fbe41af193d44b1069a8221136d35000cb849390a0a2acf43829552a04c9fde6",
-  "rebuilt_sha256": "fbe41af193d44b1069a8221136d35000cb849390a0a2acf43829552a04c9fde6"
+  "original_sha256": "3340be53a3178dcdce048f33fe380a662ec1cc5675163ca922efeaa3ff2ee57f",
+  "rebuilt_sha256": "3340be53a3178dcdce048f33fe380a662ec1cc5675163ca922efeaa3ff2ee57f",
+  "scope": "Distributed build_scene.py and included modules/resources generated a byte-identical GLB from the separate delivery directory. Geometry-only rebuild; final render and reimport evidence are recorded separately."
 }

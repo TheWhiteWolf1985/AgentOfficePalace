@@ -94,6 +94,7 @@ export class Person {
       this.shirt = base.clothing;
       this.skin = base.skin;
       this.hairMat = base.hair;
+      base.setColors(look.colors);
     } else {
       this.shirt = toonUnique(color);
       const skin = (this.skin = toonUnique(SKIN_TONES[look.skin]));
@@ -175,7 +176,10 @@ export class Person {
   setLook(look: Look) {
     const restyle = look.style !== this.look.style;
     this.look = { ...look };
-    if (this.baseVisual) return; // Preserve profile data; the new appearance is fixed in this first stage.
+    if (this.baseVisual) {
+      this.baseVisual.setColors(look.colors);
+      return;
+    }
     this.hairMat.color.set(HAIR_COLORS[look.hair]);
     if (restyle) this.buildHair();
     this.skin.color.set(SKIN_TONES[this.look.skin]);

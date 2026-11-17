@@ -1,0 +1,14 @@
+{
+  "id": "AOP_HUMAN_COLORS_1",
+  "extends": "AOP_CHAR_RIGID_1",
+  "contract_version": "1.0.0",
+  "profile": "human",
+  "asset_id": "human_base",
+  "revision": "human_base_voxel_v02_materials",
+  "original_files": {
+    "constraints.json": "f8603ac1259bf986256913256e73ae52b10cfc26d61c10144396940c55f9eeb7",
+    "inspect_character.py": "9363f8aea7e15c4465babcb8d66a82b97085c5002b37e8d4437561deeeb250d4"
+  },
+  "limits": { "materials": 11, "primitives": 25 },
+  "material_roles": ["skin", "hair", "eyebrows", "iris", "clothing", "shirt", "tie", "pants", "shoes"]
+}

@@ -8,6 +8,7 @@ import { Person } from '../world/character';
 import { model } from '../world/models';
 import { toonUnique } from '../world/toon';
 import { h, openModal } from './dom';
+import { avatarColorFields } from './character-colors';
 
 /** A turntable with your character on it, drawn with its own small renderer. */
 class Preview {
@@ -132,13 +133,17 @@ class Preview {
 }
 
 /**
- * The character select screen: your name, skin tone, hair and shirt, with a live preview.
+ * The character select screen: your name and nine model colors, with a live preview.
  * `first` is the one you see when you join: closing it goes in as whoever's picked so far.
  */
 export function openCharacter(first: boolean, onSave: (p: Profile) => void) {
-  const pick: Profile = { ...store.profile, look: { ...store.profile.look } };
+  const pick: Profile = { ...store.profile, look: { ...store.profile.look, ...(store.profile.look.colors ? { colors: { ...store.profile.look.colors } } : {}) } };
   const canvas = h('canvas', { 'aria-label': uiText('Your character, drag to spin') }) as HTMLCanvasElement;
   const preview = new Preview(canvas, pick);
+  const colorFields = preview.person.usesBaseModel ? avatarColorFields(pick.look.colors, colors => {
+    pick.look = { ...pick.look, colors };
+    preview.person.setLook(pick.look);
+  }) : null;
 
   // Leave the name blank (or skip this) and you go by the made-up one in the box; 🎲 deals another.
   // Guest is what you were before you picked one, so it isn't a name to keep.
@@ -208,7 +213,7 @@ export function openCharacter(first: boolean, onSave: (p: Profile) => void) {
         h('label', {}, uiText('Your name')),
         account ? input : h('div.webhook', {}, input, reroll),
         account ? h('p.setting-note', {}, uiText`🔑 Signed in as ${account.name}, so that's your name here.`) : null,
-        ...(preview.person.usesBaseModel ? [h('p.setting-note', {}, uiText('Base model. Appearance customization will be available later.'))] : [
+        ...(preview.person.usesBaseModel ? [colorFields, h('p.setting-note', {}, uiText('Everyone sees your changes after you save.'))] : [
           h('label', {}, uiText('Skin tone')),
           skinRow,
           h('label', {}, uiText('Hair')),

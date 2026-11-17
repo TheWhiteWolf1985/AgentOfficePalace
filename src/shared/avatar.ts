@@ -1,4 +1,5 @@
 import { t as uiText } from './i18n.js';
+import { AVATAR_COLOR_ROLES, DEFAULT_AVATAR_COLORS, sanitizeAvatarColors, type AvatarColors } from './avatar-colors.js';
 // What a person looks like in the office, picked on the character select screen.
 // Server and client share these lists so a look is just three small indexes on the wire.
 
@@ -11,6 +12,8 @@ export interface Look {
   skin: number;
   hair: number;
   style: number;
+  /** Optional for older clients/profiles; absent means the delivered human palette. */
+  colors?: AvatarColors;
 }
 
 function hash(s: string): number {
@@ -43,13 +46,16 @@ export function randomName(): string {
 export function sanitizeLook(x: unknown, fallback: Look): Look {
   const o = (x && typeof x === 'object' ? x : {}) as Record<string, unknown>;
   const idx = (v: unknown, n: number, d: number) => (Number.isInteger(v) && (v as number) >= 0 && (v as number) < n ? (v as number) : d);
+  const colors = o.colors === undefined ? fallback.colors : sanitizeAvatarColors(o.colors, fallback.colors);
   return {
     skin: idx(o.skin, SKIN_TONES.length, fallback.skin),
     hair: idx(o.hair, HAIR_COLORS.length, fallback.hair),
     style: idx(o.style, HAIR_STYLES.length, fallback.style),
+    ...(colors ? { colors: { ...colors } } : {}),
   };
 }
 
 export function sameLook(a: Look, b: Look): boolean {
-  return a.skin === b.skin && a.hair === b.hair && a.style === b.style;
+  return a.skin === b.skin && a.hair === b.hair && a.style === b.style &&
+    AVATAR_COLOR_ROLES.every(role => (a.colors ?? DEFAULT_AVATAR_COLORS)[role] === (b.colors ?? DEFAULT_AVATAR_COLORS)[role]);
 }

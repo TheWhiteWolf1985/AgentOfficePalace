@@ -1,4 +1,4 @@
-"""Build the first human user avatar at unit scale, in a fresh background Blender.
+"""Build revision 02: identical appearance, independent materials and head eyebrows.
 
 blender --background --factory-startup --python build_scene.py -- --out review
 All local geometry and all required modules are included. No network input.
@@ -26,12 +26,16 @@ def build_character():
         'clothing':(.009,.012,.018),
         'hair':(.30,.19,.082),
         'shirt':(.9,.91,.9),
-        'accent':(.48,.008,.012),
+        'tie':(.48,.008,.012),
         'dark':(.004,.006,.01),
         'white':(.95,.97,1),
         'iris':(.018,.20,.48),
+        'eyebrows':(.30,.19,.082),
+        'pants':(.009,.012,.018),
+        'shoes':(.004,.006,.01),
     }
     parts=Parts({k:material('char_mat_'+k,v) for k,v in colors.items()})
+    parts.parents['char_eyebrows']='char_head'
     box=parts.box
     # Straight black jacket, white V shirt, folded collar and long red tie.
     box('char_torso','clothing',(0,0,.878),(.46,.30,.48))
@@ -39,12 +43,12 @@ def build_character():
     # The top of the trousers belongs to the fixed pelvis/torso. Lower trouser
     # legs remain separate under the contract's low hip pivots at 0.42 m.
     for x in [-.125,.125]:
-        box('char_torso','clothing',(x,0,.538),(.23,.30,.236))
+        box('char_torso','pants',(x,0,.538),(.23,.30,.236))
     parts.face('char_torso','shirt',[(-.105,1.112),(.105,1.112),(.065,.982),(0,.88),(-.065,.982)],-.156)
     parts.face('char_torso','shirt',[(-.111,1.113),(-.015,1.078),(-.061,1.013)],-.160)
     parts.face('char_torso','shirt',[(.111,1.113),(.015,1.078),(.061,1.013)],-.160)
-    box('char_torso','accent',(0,-.17,1.068),(.047,.016,.044))
-    parts.face('char_torso','accent',[(-.018,1.048),(.018,1.048),(.029,.902),(0,.866),(-.029,.902)],-.179)
+    box('char_torso','tie',(0,-.17,1.068),(.047,.016,.044))
+    parts.face('char_torso','tie',[(-.018,1.048),(.018,1.048),(.029,.902),(0,.866),(-.029,.902)],-.179)
     # Discrete black lapel planes; geometry, no painted light/shadow texture.
     parts.face('char_torso','clothing',[(-.127,1.105),(-.066,1.012),(-.084,.965),(-.155,1.059)],-.164)
     parts.face('char_torso','clothing',[(.127,1.105),(.066,1.012),(.084,.965),(.155,1.059)],-.164)
@@ -58,8 +62,8 @@ def build_character():
         box('char_arm_'+side,'shirt',(x,-.002,.613),(.14,.264,.035))
         box('char_hand_'+side,'skin',(x,-.003,.552),(.14,.266,.087))
         lx=-.125 if side=='negx' else .125
-        box('char_leg_'+side,'clothing',(lx,0,.253),(.23,.30,.366))
-        box('char_leg_'+side,'dark',(lx,-.042,.040),(.234,.39,.080))
+        box('char_leg_'+side,'pants',(lx,0,.253),(.23,.30,.366))
+        box('char_leg_'+side,'shoes',(lx,-.042,.040),(.234,.39,.080))
     # Humanized eyes and smile, matching the approved direction of the NPCs.
     eye_shape=[(-.076,0),(-.052,.026),(-.02,.035),(.018,.034),(.052,.023),(.076,0),(.047,-.021),(.012,-.028),(-.026,-.026),(-.054,-.016)]
     brow=[(-.067,-.003),(-.034,.010),(.005,.014),(.042,.008),(.065,-.002),(.037,.001),(.002,.005),(-.033,.001)]
@@ -70,7 +74,7 @@ def build_character():
         parts.ellipse(eye,'iris',x,1.414,.025,.025,-.307)
         parts.ellipse(eye,'dark',x,1.414,.011,.017,-.309)
         parts.ellipse(eye,'white',x-.008,1.425,.006,.006,-.311,12)
-        parts.face('char_hair','hair',[(x+dx,1.482+dz) for dx,dz in brow],-.304)
+        parts.face('char_eyebrows','eyebrows',[(x+dx,1.482+dz) for dx,dz in brow],-.304)
     smile=[(-.080,1.301),(-.043,1.289),(0,1.286),(.043,1.289),(.080,1.301),(.060,1.271),(.030,1.252),(0,1.247),(-.030,1.252),(-.060,1.271)]
     parts.face('char_mouth','dark',smile,-.303)
     teeth=[(-.061,1.291),(-.03,1.283),(0,1.281),(.03,1.283),(.061,1.291),(.046,1.277),(0,1.269),(-.046,1.277)]
@@ -86,7 +90,7 @@ def build_character():
     root=bpy.data.objects['char_root']
     root['asset_id']=ASSET
     root['contract']='AOP_CHAR_RIGID_1'
-    root['design_revision']='human_base_voxel_v01'
+    root['design_revision']='human_base_voxel_v02_materials'
     root['intended_instance_scale']=1.0
 
 def automated_qa():
@@ -122,7 +126,7 @@ def main():
     # An authoring scene containing one character and only a photography stage.
     stage()
     camera_at('Review_camera',(2.6,-4.5,2.4),(0,0,.88),2.12)
-    bpy.context.scene.name='Human_Base_V01'
+    bpy.context.scene.name='Human_Base_V02_Materials'
     bpy.context.scene.render.filepath='//views/'
     bpy.ops.wm.save_as_mainfile(filepath=str(out/'human_base.blend'))
     report={'contract':contract_result,'instance_scale':1.0,'rig_profile':'human'}
@@ -134,7 +138,7 @@ def main():
         camera.location=(3,-5,2.3)
         camera.rotation_euler=(Vector((0,0,.88))-camera.location).to_track_quat('-Z','Y').to_euler()
         camera.data.ortho_scale=2.12
-        bpy.context.scene.name='Human_Base_V01_Review'
+        bpy.context.scene.name='Human_Base_V02_Materials_Review'
         bpy.context.scene.render.filepath='//views/'
         bpy.ops.wm.save_as_mainfile(filepath=str(out/'human_base.review.blend'))
         camera.location=(0,-5,1.445)
@@ -146,8 +150,8 @@ def main():
         sheet([views/(ASSET+'_pose_'+p+'.png') for p in poses],views/'poses.png',4,400)
     write_json(out/'BUILD_REPORT.json',report)
     write_json(out/'VALIDATION.json',{
-        'contract':'AOP_CHAR_RIGID_1','profile':'human','asset_id':ASSET,'design_revision':'human_base_voxel_v01',
-        'status':'NOT_RUN','purpose':'First visual iteration for Juri review, no software integration',
+        'contract':'AOP_CHAR_RIGID_1','profile':'human','asset_id':ASSET,'design_revision':'human_base_voxel_v02_materials',
+        'status':'FAIL','purpose':'Requested material separation; unchanged rig and appearance. Strict original budget is exceeded.',
         'blender_version':bpy.app.version_string,'instance_scale':1.0,
         'checks':{'glb_contract':contract_result['status'],
                   'reimport_blender':report.get('roundtrip',{}).get('status','NOT_RUN'),

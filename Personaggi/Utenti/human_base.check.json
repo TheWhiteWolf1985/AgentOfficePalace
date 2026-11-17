@@ -1,13 +1,17 @@
 {
-  "status": "PASS",
+  "status": "FAIL",
   "profile": "human",
-  "errors": [],
+  "errors": [
+    "Budget exceeded: primitives",
+    "Budget exceeded: materials",
+    "Manifest deviations require separate review; not an in-contract PASS"
+  ],
   "metrics": {
     "triangles": 522,
-    "mesh_instances": 12,
-    "primitives": 23,
-    "materials": 8,
-    "bytes": 41132,
+    "mesh_instances": 13,
+    "primitives": 25,
+    "materials": 11,
+    "bytes": 43044,
     "bounds_min": [
       -0.45500001311302185,
       0.0,
@@ -26,6 +30,7 @@
     "char_hand_posx_visual",
     "char_eye_negx_visual",
     "char_eye_posx_visual",
+    "char_eyebrows_visual",
     "char_hair_visual",
     "char_head_visual",
     "char_mouth_visual",

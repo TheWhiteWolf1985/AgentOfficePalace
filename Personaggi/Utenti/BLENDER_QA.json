@@ -1,0 +1,152 @@
+{
+  "scope": "Blender GLB roundtrip only; application/controller and renderer QA remain NOT_RUN.",
+  "checks": {
+    "independent_nine_color_channels": "PASS",
+    "initial_colors_restored": "PASS",
+    "hair_hidden_brows_and_head_visible": "PASS",
+    "hair_detach_does_not_detach_brows": "PASS",
+    "brows_follow_rotated_head": "PASS",
+    "pose_execution": "PASS"
+  },
+  "color_channels": {
+    "skin": {
+      "status": "PASS",
+      "material": "char_mat_skin",
+      "changed_materials": [
+        "char_mat_skin"
+      ]
+    },
+    "hair": {
+      "status": "PASS",
+      "material": "char_mat_hair",
+      "changed_materials": [
+        "char_mat_hair"
+      ]
+    },
+    "eyebrows": {
+      "status": "PASS",
+      "material": "char_mat_eyebrows",
+      "changed_materials": [
+        "char_mat_eyebrows"
+      ]
+    },
+    "iris": {
+      "status": "PASS",
+      "material": "char_mat_iris",
+      "changed_materials": [
+        "char_mat_iris"
+      ]
+    },
+    "clothing": {
+      "status": "PASS",
+      "material": "char_mat_clothing",
+      "changed_materials": [
+        "char_mat_clothing"
+      ]
+    },
+    "shirt": {
+      "status": "PASS",
+      "material": "char_mat_shirt",
+      "changed_materials": [
+        "char_mat_shirt"
+      ]
+    },
+    "tie": {
+      "status": "PASS",
+      "material": "char_mat_tie",
+      "changed_materials": [
+        "char_mat_tie"
+      ]
+    },
+    "pants": {
+      "status": "PASS",
+      "material": "char_mat_pants",
+      "changed_materials": [
+        "char_mat_pants"
+      ]
+    },
+    "shoes": {
+      "status": "PASS",
+      "material": "char_mat_shoes",
+      "changed_materials": [
+        "char_mat_shoes"
+      ]
+    }
+  },
+  "poses": {
+    "rest": {
+      "status": "PASS",
+      "actual_rotation_angles": {
+        "char_arm_negx": 0.0,
+        "char_arm_posx": 0.0,
+        "char_leg_negx": 0.0,
+        "char_leg_posx": 0.0
+      }
+    },
+    "walk_a": {
+      "status": "PASS",
+      "actual_rotation_angles": {
+        "char_arm_negx": 0.6999992728233337,
+        "char_arm_posx": 0.6999992728233337,
+        "char_leg_negx": 0.6999992728233337,
+        "char_leg_posx": 0.6999992728233337
+      }
+    },
+    "walk_b": {
+      "status": "PASS",
+      "actual_rotation_angles": {
+        "char_arm_negx": 0.6999992728233337,
+        "char_arm_posx": 0.6999992728233337,
+        "char_leg_negx": 0.6999992728233337,
+        "char_leg_posx": 0.6999992728233337
+      }
+    },
+    "sit": {
+      "status": "PASS",
+      "actual_rotation_angles": {
+        "char_arm_negx": 0.5499992966651917,
+        "char_arm_posx": 0.5499992966651917,
+        "char_leg_negx": 1.3499997854232788,
+        "char_leg_posx": 1.3499997854232788
+      }
+    },
+    "hold": {
+      "status": "PASS",
+      "actual_rotation_angles": {
+        "char_arm_negx": 1.649999976158142,
+        "char_arm_posx": 0.0,
+        "char_leg_negx": 0.0,
+        "char_leg_posx": 0.0
+      }
+    },
+    "paper_book": {
+      "status": "PASS",
+      "actual_rotation_angles": {
+        "char_arm_negx": 1.2000001668930054,
+        "char_arm_posx": 1.2000001668930054,
+        "char_leg_negx": 0.0,
+        "char_leg_posx": 0.0
+      }
+    },
+    "ladder": {
+      "status": "PASS",
+      "actual_rotation_angles": {
+        "char_arm_negx": 2.799999952316284,
+        "char_arm_posx": 2.799999952316284,
+        "char_leg_negx": 0.6999992728233337,
+        "char_leg_posx": 0.0
+      }
+    },
+    "pole": {
+      "status": "PASS",
+      "actual_rotation_angles": {
+        "char_arm_negx": 2.4000000953674316,
+        "char_arm_posx": 2.799999952316284,
+        "char_leg_negx": 0.0,
+        "char_leg_posx": 0.6999992728233337
+      }
+    }
+  },
+  "status": "PASS",
+  "source_glb_sha256": "3340be53a3178dcdce048f33fe380a662ec1cc5675163ca922efeaa3ff2ee57f"
+}

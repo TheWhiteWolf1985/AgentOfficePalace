@@ -1,0 +1,23 @@
+{
+  "contract": "AOP_CHAR_RIGID_1",
+  "strict_original_contract": "FAIL",
+  "deviations": [
+    {
+      "field": "profiles.human.limits.materials",
+      "original_limit": 8,
+      "actual": 11,
+      "reason": "Requested nine independent color channels plus unchanged dark and white facial materials. Original contract is not edited."
+    },
+    {
+      "field": "profiles.human.limits.primitives",
+      "original_limit": 24,
+      "actual": 25,
+      "reason": "Additional torso pants material and head eyebrows primitive, preserving geometry and independently moving controls."
+    }
+  ],
+  "original_contract_modified": false,
+  "rig_contract_preserved": true,
+  "requested_revision_checks": "PASS",
+  "budget_deviation_acceptance": "NOT_RUN",
+  "runtime_application": "NOT_RUN"
+}

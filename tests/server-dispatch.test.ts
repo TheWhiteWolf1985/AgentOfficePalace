@@ -12,6 +12,7 @@ import WebSocket from 'ws';
 import { loadConfig } from '../src/server/config.js';
 import { startServer } from '../src/server/server.js';
 import type { ServerMsg } from '../src/shared/protocol.js';
+import { DEFAULT_AVATAR_COLORS } from '../src/shared/avatar-colors.js';
 
 type Office = Awaited<ReturnType<typeof startServer>>;
 type Msg<T extends ServerMsg['t']> = Extract<ServerMsg, { t: T }>;
@@ -559,4 +560,27 @@ test('the shared meeting room survives the last project removal and accepts visi
     await b.close();
     await c?.close();
   }
+});
+
+
+test('nine avatar colors survive initial connections, validated broadcasts and reconnects with a legacy observer', async () => {
+  const colors = { ...DEFAULT_AVATAR_COLORS, skin: '#123456', clothing: '#345678', pants: '#56789a' };
+  const query = (value: unknown) => '?' + new URLSearchParams({ name: 'ColorUser', floor: '@lobby', skin: '0', hair: '0', style: '0', colors: JSON.stringify(value) });
+  const a = await Browser.open(query(colors)), b = await Browser.open('?name=LegacyObserver&floor=%40lobby');
+  let again: Browser | undefined;
+  try {
+    const joined = await a.take('welcome'), observer = await b.take('welcome');
+    assert.deepEqual(joined.peers.find(p => p.id === joined.you)?.look.colors, colors);
+    assert.deepEqual(observer.peers.find(p => p.id === joined.you)?.look.colors, colors);
+    a.send({ t: 'profile', name: 'ColorUser', color: '#4f86f7', look: { skin: 0, hair: 0, style: 0, colors: { version: 1, skin: 'invalid', tie: '#ABCDEF' } } });
+    const update = await b.take('peer.update', msg => msg.peer.id === joined.you);
+    const expected = { ...colors, tie: '#abcdef' };
+    assert.deepEqual(update.peer.look.colors, expected);
+    a.send({ t: 'profile', name: 'ColorUser', color: '#4f86f7', look: { skin: 0, hair: 0, style: 0 } });
+    assert.deepEqual((await b.take('peer.update', msg => msg.peer.id === joined.you)).peer.look.colors, expected);
+    await a.close();
+    again = await Browser.open(query(expected));
+    const rejoined = await again.take('welcome');
+    assert.deepEqual(rejoined.peers.find(p => p.id === rejoined.you)?.look.colors, expected);
+  } finally { await a.close(); await b.close(); await again?.close(); }
 });

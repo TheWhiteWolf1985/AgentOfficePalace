@@ -1,0 +1,9 @@
+{
+  "status": "PASS",
+  "unmodified_files_sha256": {
+    "constraints.json": "f8603ac1259bf986256913256e73ae52b10cfc26d61c10144396940c55f9eeb7",
+    "inspect_character.py": "9363f8aea7e15c4465babcb8d66a82b97085c5002b37e8d4437561deeeb250d4",
+    "export_character.py": "982d4962452e6b3304b657d8f11a5729d68d1cc36e543a5493f1192168fafa3c",
+    "glb_common.py": "cff55f060c8f57df81f58ed6659dcec1b033224243615850e76cf98e5556fcc1"
+  }
+}

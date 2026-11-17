@@ -16,7 +16,7 @@ export interface PeerInfo {
   id: string;
   name: string;
   color: string;
-  /** Skin tone and hair, picked on the character select screen. */
+  /** Legacy skin/hair choices and optional versioned colors, picked on the character select screen. */
   look: Look;
   x: number;
   y: number;

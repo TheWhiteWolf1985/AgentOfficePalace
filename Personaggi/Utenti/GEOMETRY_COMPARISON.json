@@ -1,0 +1,188 @@
+{
+  "status": "PASS",
+  "scope": "Requested revision, unchanged rig/geometry/color and separation semantics; this does not turn the original budget FAIL into PASS.",
+  "checks": {
+    "strict_failures_limited_to_declared_deviations": "PASS",
+    "controls_and_pivots_unchanged": "PASS",
+    "geometry_normals_and_initial_shader_unchanged_in_all_poses": "PASS",
+    "nine_distinct_required_materials": "PASS",
+    "pants_including_upper_part": "PASS",
+    "shoes_not_used_by_face": "PASS",
+    "eyebrows_follow_head_not_hair": "PASS",
+    "hair_replaceable_separate": "PASS",
+    "full_closed_head_under_hair": "PASS",
+    "unit_scale_feet_origin": "PASS"
+  },
+  "strict_original_contract": {
+    "status": "FAIL",
+    "profile": "human",
+    "errors": [
+      "Budget exceeded: primitives",
+      "Budget exceeded: materials",
+      "Manifest deviations require separate review; not an in-contract PASS"
+    ],
+    "metrics": {
+      "triangles": 522,
+      "mesh_instances": 13,
+      "primitives": 25,
+      "materials": 11,
+      "bytes": 43044,
+      "bounds_min": [
+        -0.45500001311302185,
+        0.0,
+        -0.3034999966621399
+      ],
+      "bounds_max": [
+        0.45500001311302185,
+        1.7654999494552612,
+        0.335999995470047
+      ]
+    },
+    "mesh_nodes": [
+      "char_arm_negx_visual",
+      "char_hand_negx_visual",
+      "char_arm_posx_visual",
+      "char_hand_posx_visual",
+      "char_eye_negx_visual",
+      "char_eye_posx_visual",
+      "char_eyebrows_visual",
+      "char_hair_visual",
+      "char_head_visual",
+      "char_mouth_visual",
+      "char_leg_negx_visual",
+      "char_leg_posx_visual",
+      "char_torso_visual"
+    ],
+    "scope": "static contract; no manual/Blender/runtime certification"
+  },
+  "controls": {
+    "char_root": "PASS",
+    "char_body": "PASS",
+    "char_torso": "PASS",
+    "char_head": "PASS",
+    "char_hair": "PASS",
+    "char_eye_negx": "PASS",
+    "char_eye_posx": "PASS",
+    "char_mouth": "PASS",
+    "char_arm_negx": "PASS",
+    "char_arm_posx": "PASS",
+    "char_leg_negx": "PASS",
+    "char_leg_posx": "PASS",
+    "char_hand_negx": "PASS",
+    "char_hand_posx": "PASS",
+    "char_socket_label": "PASS",
+    "char_socket_voice": "PASS",
+    "char_socket_bubble": "PASS",
+    "char_socket_card": "PASS"
+  },
+  "pose_comparisons": {
+    "rest": {
+      "status": "PASS",
+      "original_triangles": 522,
+      "new_triangles": 522,
+      "missing": 0,
+      "added": 0
+    },
+    "walk_a": {
+      "status": "PASS",
+      "original_triangles": 522,
+      "new_triangles": 522,
+      "missing": 0,
+      "added": 0
+    },
+    "walk_b": {
+      "status": "PASS",
+      "original_triangles": 522,
+      "new_triangles": 522,
+      "missing": 0,
+      "added": 0
+    },
+    "sit": {
+      "status": "PASS",
+      "original_triangles": 522,
+      "new_triangles": 522,
+      "missing": 0,
+      "added": 0
+    },
+    "hold": {
+      "status": "PASS",
+      "original_triangles": 522,
+      "new_triangles": 522,
+      "missing": 0,
+      "added": 0
+    },
+    "paper_book": {
+      "status": "PASS",
+      "original_triangles": 522,
+      "new_triangles": 522,
+      "missing": 0,
+      "added": 0
+    },
+    "ladder": {
+      "status": "PASS",
+      "original_triangles": 522,
+      "new_triangles": 522,
+      "missing": 0,
+      "added": 0
+    },
+    "pole": {
+      "status": "PASS",
+      "original_triangles": 522,
+      "new_triangles": 522,
+      "missing": 0,
+      "added": 0
+    }
+  },
+  "triangle_signature_tolerance_decimal_places": 6,
+  "underlying_head_nonclosed_edges": 0,
+  "material_bindings": {
+    "char_mat_clothing": {
+      "char_arm_negx_visual": 12,
+      "char_arm_posx_visual": 12,
+      "char_torso_visual": 28
+    },
+    "char_mat_dark": {
+      "char_eye_negx_visual": 26,
+      "char_eye_posx_visual": 26,
+      "char_mouth_visual": 8
+    },
+    "char_mat_eyebrows": {
+      "char_eyebrows_visual": 12
+    },
+    "char_mat_hair": {
+      "char_hair_visual": 120
+    },
+    "char_mat_iris": {
+      "char_eye_negx_visual": 18,
+      "char_eye_posx_visual": 18
+    },
+    "char_mat_pants": {
+      "char_leg_negx_visual": 12,
+      "char_leg_posx_visual": 12,
+      "char_torso_visual": 24
+    },
+    "char_mat_shirt": {
+      "char_arm_negx_visual": 12,
+      "char_arm_posx_visual": 12,
+      "char_torso_visual": 5
+    },
+    "char_mat_shoes": {
+      "char_leg_negx_visual": 12,
+      "char_leg_posx_visual": 12
+    },
+    "char_mat_skin": {
+      "char_hand_negx_visual": 12,
+      "char_hand_posx_visual": 12,
+      "char_head_visual": 60
+    },
+    "char_mat_tie": {
+      "char_torso_visual": 15
+    },
+    "char_mat_white": {
+      "char_eye_negx_visual": 18,
+      "char_eye_posx_visual": 18,
+      "char_mouth_visual": 6
+    }
+  },
+  "baseline_sha256": "fbe41af193d44b1069a8221136d35000cb849390a0a2acf43829552a04c9fde6"
+}

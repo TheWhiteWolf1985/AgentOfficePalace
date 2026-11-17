@@ -1,34 +1,69 @@
 {
   "contract": "AOP_CHAR_RIGID_1",
+  "contract_version": "1.0.0",
   "profile": "human",
   "asset_id": "human_base",
-  "design_revision": "human_base_voxel_v01",
-  "status": "NOT_RUN",
-  "purpose": "First visual iteration for Juri review, no software integration",
+  "design_revision": "human_base_voxel_v02_materials",
+  "date": "2026-11-16",
   "blender_version": "5.3.0",
-  "instance_scale": 1.0,
+  "status": "FAIL",
+  "status_reason": "Strict original limits exceeded: 11 materials / 25 primitives versus 8 / 24. Declared deviations are not a full-contract PASS.",
+  "requested_revision_checks": "PASS",
+  "ready_for_application": false,
   "checks": {
-    "glb_contract": "PASS",
+    "strict_original_contract": "FAIL",
+    "rig_scale_front_origin_and_pivots": "PASS",
+    "geometry_normals_initial_colors_unchanged": "PASS",
+    "independent_nine_color_channels": "PASS",
+    "upper_and_lower_pants_material": "PASS",
+    "shoes_separate_from_face": "PASS",
+    "brows_outside_hair_follow_head": "PASS",
+    "hair_hidden_and_detached": "PASS",
+    "head_complete_closed": "PASS",
     "reimport_blender": "PASS",
-    "rotation_and_visibility": "PASS",
-    "manual_geometry": "PASS",
-    "manual_all_poses": "PASS",
+    "all_eight_poses_geometry_and_execution": "PASS",
+    "manual_comparison_render_review": "PASS",
+    "original_contract_and_inspector_unmodified": "PASS",
+    "portable_rebuild": "PASS",
     "runtime_application": "NOT_RUN",
-    "artistic_approval": "PASS",
-    "kit_integrity": "PASS",
-    "portable_rebuild": "PASS"
+    "runtime_multi_instance_colors": "NOT_RUN",
+    "budget_deviation_acceptance": "NOT_RUN"
   },
-  "limitations": [
-    "Only human_base is created; agent and first-person hands are not included.",
-    "Procedural rigid controls are retained; no skinning, armature, clips or root motion.",
-    "No reception placement and no 1.15 multiplier. Render-stage ground/cameras/lights are excluded from the GLB."
+  "metrics": {
+    "triangles": 522,
+    "mesh_instances": 13,
+    "primitives": 25,
+    "materials": 11,
+    "bytes": 43044,
+    "bounds_min": [
+      -0.45500001311302185,
+      0.0,
+      -0.3034999966621399
+    ],
+    "bounds_max": [
+      0.45500001311302185,
+      1.7654999494552612,
+      0.335999995470047
+    ]
+  },
+  "evidence_files": [
+    "human_base.check.json",
+    "GEOMETRY_COMPARISON.json",
+    "BLENDER_QA.json",
+    "BUILD_REPORT.json",
+    "DEVIATIONS.json",
+    "ORIGINAL_CONTRACT_HASHES.json",
+    "views/comparison_three_quarter.png",
+    "views/comparison_hair_hidden.png",
+    "views/color_channels.png",
+    "views/poses.png",
+    "PORTABILITY.json"
   ],
-  "manual_review_scope": "Reviewed final GLB reimport renders: front, side, back, three-quarter, face close-up, visibility and eight poses. Rigid toy-like articulation; no anatomical elbow/knee deformation. Application and artistic acceptance not tested.",
-  "artistic_approval_evidence": {
-    "date": "2026-11-16",
-    "by": "Juri",
-    "quote": "Bene, mi piace",
-    "scope": "Appearance of human_base_voxel_v01, approved for this delivery; future revisions remain possible."
-  },
-  "overall_status_reason": "Local checks and visual acceptance PASS; application runtime QA remains NOT_RUN."
+  "manual_review_scope": "Reviewed original versus revised GLB renders, individual color tests including upper trousers and shoes, hair hidden front/three-quarter, head turn and all eight rigid poses. Geometry and shader equality additionally checked for every triangle at 1e-6 coordinate rounding.",
+  "limitations": [
+    "Application adapter and runtime remain untouched and untested.",
+    "Original rendering budgets are not met; only the unchanged rig and requested structural edits have PASS checks.",
+    "Facial dark is still shared by pupils/eye rims and mouth; facial white by sclera/highlights/teeth. These accessory channels are independent of all nine requested categories.",
+    "Only the existing short hairstyle is supplied; no additional hairstyles, agents or first-person hands."
+  ]
 }

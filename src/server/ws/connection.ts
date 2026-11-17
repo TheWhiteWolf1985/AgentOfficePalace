@@ -4,6 +4,7 @@ import type { Session } from '../auth.js';
 import type { ClientMsg } from '../../shared/protocol.js';
 import { elevatorSpot } from '../../shared/layout.js';
 import { lookFromSeed, sanitizeLook } from '../../shared/avatar.js';
+import { avatarColorsFromQuery } from '../../shared/avatar-colors.js';
 import { LOBBY, ROOF } from '../../shared/rooftop.js';
 import type { Ctx } from '../office/context.js';
 import { newClient } from '../office/client.js';
@@ -41,7 +42,7 @@ export function onConnection(ctx: Ctx, ws: WebSocket, url: URL, session: Session
     id,
     name,
     color: COLOR_RE.test(colorParam) ? colorParam : '#4f86f7',
-    look: sanitizeLook({ skin: intParam('skin'), hair: intParam('hair'), style: intParam('style') }, lookFromSeed(id)),
+    look: sanitizeLook({ skin: intParam('skin'), hair: intParam('hair'), style: intParam('style'), colors: avatarColorsFromQuery(url.searchParams.get('colors')) }, lookFromSeed(id)),
     x: spot.x,
     y: spot.y,
     z: spot.z,

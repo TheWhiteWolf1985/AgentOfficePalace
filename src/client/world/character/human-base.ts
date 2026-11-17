@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import type { PersonRig } from './rig';
 import { toonUnique } from '../toon';
+import { AVATAR_COLOR_ROLES, DEFAULT_AVATAR_COLORS, sanitizeAvatarColors, type AvatarColors } from '../../../shared/avatar-colors';
 
 /** Adapt one model clone to the procedural controller. Its cached geometry remains shared. */
 export function humanBase(asset: THREE.Object3D) {
@@ -53,8 +54,19 @@ export function humanBase(asset: THREE.Object3D) {
     if (!result) throw new Error(`human_base: missing material ${name}`);
     return result;
   };
+  const channels = AVATAR_COLOR_ROLES.map(role => {
+    const value = material(`char_mat_${role}`);
+    return { role, material: value, original: value.color.clone() };
+  });
   return {
     rig, skin: material('char_mat_skin'), clothing: material('char_mat_clothing'), hair: material('char_mat_hair'),
+    setColors: (value?: AvatarColors) => {
+      const colors = sanitizeAvatarColors(value);
+      for (const channel of channels) {
+        if (colors[channel.role] === DEFAULT_AVATAR_COLORS[channel.role]) channel.material.color.copy(channel.original);
+        else channel.material.color.set(colors[channel.role]);
+      }
+    },
     dispose: () => { for (const m of materials.values()) m.dispose(); },
   };
 }
