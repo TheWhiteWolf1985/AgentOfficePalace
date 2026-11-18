@@ -6,7 +6,7 @@ import { relayRequest, tunneledPort, tunneledService } from '../src/server/relay
 import type { ServiceInfo } from '../src/shared/protocol.js';
 
 const req = (host: string, extra: Record<string, string> = {}) => ({ headers: { host, ...extra } }) as unknown as http.IncomingMessage;
-const TAILNET = 'agent-office.tail1234.ts.net';
+const PUBLIC_HOST = 'office.example.com';
 
 test('a service tunnel names its port in the Host', () => {
   assert.equal(tunneledPort(req('localhost:5173'), 4600), 5173);
@@ -15,21 +15,15 @@ test('a service tunnel names its port in the Host', () => {
   assert.equal(tunneledPort(req('office.example.com'), 4600), undefined);
 });
 
-test("on the tailnet, <office>.ts.net:<port> is that worker's server, and the office's own name isn't", () => {
-  assert.equal(tunneledPort(req(`${TAILNET}:5173`), 4600, TAILNET), 5173);
-  assert.equal(tunneledPort(req(`AGENT-OFFICE.tail1234.ts.net:5173`), 4600, TAILNET), 5173);
-  assert.equal(tunneledPort(req(TAILNET), 4600, TAILNET), undefined);
-  // Another machine's name, or no tailnet at all.
-  assert.equal(tunneledPort(req(`other.tail1234.ts.net:5173`), 4600, TAILNET), undefined);
-  assert.equal(tunneledPort(req(`${TAILNET}:5173`), 4600), undefined);
-  // Something the office relayed already never loops back.
-  assert.equal(tunneledPort(req(`${TAILNET}:5173`, { 'x-agent-office-relay': '1' }), 4600, TAILNET), undefined);
+test('external hostnames do not create implicit service routes', () => {
+  assert.equal(tunneledPort(req('office.example.com:5173'), 4600), undefined);
+  assert.equal(tunneledPort(req('localhost:5173', { 'x-agent-office-relay': '1' }), 4600), undefined);
 });
 
 test("the tunnel client names the port in a header, and never gets the office's own pages for it", () => {
   const svc = { port: 5173, host: '127.0.0.1' } as ServiceInfo;
   const lookup = (port: number) => (port === 5173 ? svc : port === 3000 ? 'gone' : undefined);
-  const named = (port: string, host = 'office.example.com', extra: Record<string, string> = {}) => tunneledService(req(host, { 'x-agent-office-service': port, ...extra }), 4600, undefined, lookup);
+  const named = (port: string, host = 'office.example.com', extra: Record<string, string> = {}) => tunneledService(req(host, { 'x-agent-office-service': port, ...extra }), 4600, lookup);
   // Whatever address the office was reached at, the header says which server.
   assert.deepEqual(named('5173'), { port: 5173, svc });
   assert.deepEqual(named('5173', 'localhost:4600'), { port: 5173, svc });
@@ -45,7 +39,7 @@ test("the tunnel client names the port in a header, and never gets the office's 
   assert.deepEqual(named('8080', 'localhost:4600', { 'x-agent-office-relay': '1' }), { port: 8080, svc: 'gone' });
 
   // Without the header it goes by the Host, as a service tunnel does, and the office's own pages are its own.
-  const hosted = (host: string) => tunneledService(req(host), 4600, undefined, lookup);
+  const hosted = (host: string) => tunneledService(req(host), 4600, lookup);
   assert.deepEqual(hosted('localhost:5173'), { port: 5173, svc });
   assert.deepEqual(hosted('localhost:3000'), { port: 3000, svc: 'gone' });
   assert.equal(hosted('localhost:8080'), undefined);
@@ -53,7 +47,7 @@ test("the tunnel client names the port in a header, and never gets the office's 
   assert.equal(hosted('office.example.com'), undefined);
 });
 
-test('from the tailnet, the worker\'s server gets a localhost Host and no office cookie', async () => {
+test('through a public hostname, the worker\'s server gets a localhost Host and no office cookie', async () => {
   let seen: http.IncomingHttpHeaders = {};
   const upstream = http.createServer((r, res) => {
     seen = r.headers;
@@ -75,9 +69,9 @@ test('from the tailnet, the worker\'s server gets a localhost Host and no office
         }).on('error', reject);
       });
 
-    assert.equal(await get(`${TAILNET}:${port}`), 'hi');
+    assert.equal(await get(`${PUBLIC_HOST}:${port}`), 'hi');
     assert.equal(seen.host, `localhost:${port}`);
-    assert.equal(seen['x-forwarded-host'], `${TAILNET}:${port}`);
+    assert.equal(seen['x-forwarded-host'], `${PUBLIC_HOST}:${port}`);
     assert.equal(seen.cookie, 'theirs=1');
 
     // Through an SSH tunnel it already is one, and stays as it was.

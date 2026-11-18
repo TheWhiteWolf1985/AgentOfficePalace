@@ -111,8 +111,6 @@ export class Store {
   pulls: GhState<GhPull> = { items: [], fetchedAt: 0, loading: true };
   ice: RTCIceServer[] = [];
   chat: ChatLine[] = [];
-  /** Whether this office can invite teammates (deployed with deploy/aws.sh). */
-  invites = false;
   queue: QueueState = { tasks: [], maxWorkers: 0 };
   /** Who you're signed in as (see /api/whoami). */
   me: Me = { admin: false };

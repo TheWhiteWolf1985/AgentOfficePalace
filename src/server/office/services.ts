@@ -1,10 +1,8 @@
+import { applicationVersion } from '../version.js';
 import path from 'node:path';
 import { childEnv, resolveCommand } from '../workers.js';
 import { SignIns } from '../signins.js';
 import { agentProviders, configuredProvider } from '../agents.js';
-import { Tailnet } from '../tailnet.js';
-import { Team } from '../team.js';
-import { Upgrader } from '../upgrade.js';
 import { Services } from '../services.js';
 import { ImageProxy } from '../decor.js';
 import { Ledger } from '../usage.js';
@@ -120,38 +118,24 @@ export function createServices(ctx: Ctx): BuildingServices {
   return { sky, prompts, leaveOnMerge, ledger, signins, limits, accountLimits, webhook, machine, limitsOf, pumpQueues };
 }
 
-/** What's made once the floors are open: the SSH team, the tailnet, workers' web servers, pictures and upgrades. */
+/** Application services created after the floors are open. */
 export function createLateServices(ctx: Ctx): LateServices {
   const { cfg, clients, floors } = ctx;
-  const team = new Team(cfg.publicHost, cfg.port, cfg.tailnet);
-  const tailnet = new Tailnet(cfg.tailnet);
 
   // Web servers the workers start, for the Services board and service tunnels (see relay.ts).
   // One scan covers every floor; each floor's board lists its own workers' servers.
   const servicesState = (floor: Floor | undefined, items: ServiceInfo[] = services.list()): ServicesState => ({
     items: floor ? items.filter((s) => floor.workers.get(s.workerId)) : [],
     port: cfg.port,
-    deploy: cfg.deployScript,
-    ssh: team.ssh,
-    tailnet: cfg.tailnet,
   });
   const services = new Services(
     () => [...floors.values()].flatMap((f) => f.workers.owners()),
     (items) => {
       for (const c of clients.values()) ctx.sendTo(c, { t: 'services', state: servicesState(ctx.floorOf(c), items) });
-      tailnet.sync(items.map((s) => s.port));
     },
   );
 
   const images = new ImageProxy();
 
-  const upgrader = new Upgrader(
-    (state) => ctx.broadcast({ t: 'upgrade', state }),
-    () => {
-      // cli.ts shuts down gracefully, leaving the workers running in their terminal host; systemd
-      // (Restart=always) then starts the new version, which picks them back up.
-      process.kill(process.pid, 'SIGTERM');
-    },
-  );
-  return { team, tailnet, services, images, upgrader, servicesState };
+  return { services, images, version: applicationVersion, servicesState };
 }

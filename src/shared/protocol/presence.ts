@@ -3,7 +3,7 @@
 import type { Look } from '../avatar.js';
 import type { Me } from './accounts.js';
 import type { FloorInfo, FloorView, ProjectsDirState } from './floors.js';
-import type { LeaveOnMergeState, MachineState, NotifyState, PromptsState, SkyState, UpgradeState } from './settings.js';
+import type { LeaveOnMergeState, MachineState, NotifyState, PromptsState, SkyState } from './settings.js';
 import type { PlanLimits, UsageState } from './usage.js';
 
 /** The issue on a card someone carries around the floor (see PeerInfo.carrying). */
@@ -98,11 +98,8 @@ export type PresenceServerMsg =
       projectsDir: ProjectsDirState;
       ice: { urls: string | string[]; username?: string; credential?: string }[];
       chat: ChatLine[];
-      /** Whether teammates can be invited from the office (see TeamState). */
-      invites: boolean;
       /** The running server's version; a change after a reconnect means the office was upgraded. */
       version: string;
-      upgrade: UpgradeState;
       usage: UsageState;
       limits: PlanLimits;
       me: Me;

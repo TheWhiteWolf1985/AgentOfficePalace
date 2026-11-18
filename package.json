@@ -1,7 +1,7 @@
 {
   "name": "agent-office",
   "version": "0.1.0",
-  "description": "A cartoon 3D multiplayer office where your team spawns Claude Code workers at desks, shares live terminals, talks over voice, and tracks GitHub issues and PRs.",
+  "description": "Agent Office Palace: collaborative 3D workspaces, shared whiteboards, meetings and customizable avatars.",
   "type": "module",
   "bin": {
     "agent-office": "bin/agent-office.js"

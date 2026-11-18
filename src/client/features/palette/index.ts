@@ -20,7 +20,6 @@ import { STATUS_LABEL, toast } from '../../ui/dom';
 import { paletteOpen, togglePalette, type PaletteEntry } from '../../ui/palette';
 import { openIssue, openPull } from '../../ui/pull';
 import { openServices, serviceUrl } from '../../ui/services';
-import { openTeam } from '../../ui/team';
 import { IS_MAC } from '../../ui/termkeys';
 import { hasWhiteboard, openWhiteboard } from '../whiteboard/ui';
 import type { InteractKind, Interactable } from '../../world/types';
@@ -102,8 +101,7 @@ export function installPalette(ctx: Ctx, parts: PaletteParts) {
     out.push(at('queue', uiText('the task queue'), { icon: '📋', kind: uiText('Action'), title: uiText('Open the task queue'), detail: uiText('Issues and tasks waiting for a worker'), keywords: ['backlog', 'tasks'], open: showQueue }));
     }
     out.push({ icon: '⚙️', kind: uiText('Action'), title: uiText('Settings'), keywords: ['preferences', 'options'], open: () => parts.hud.showSettings() });
-    if (store.invites) out.push({ icon: '👥', kind: uiText('Action'), title: uiText('Invite teammates'), keywords: ['team', uiText('add people')], open: () => openTeam(net) });
-    else if (store.me.admin) out.push({ icon: '👥', kind: uiText('Action'), title: uiText('Invite people'), detail: uiText('Accounts'), keywords: [uiText('invite teammates'), 'accounts', 'team'], open: () => openAccounts(net) });
+    if (store.me.admin) out.push({ icon: '👥', kind: uiText('Action'), title: uiText('Invite people'), detail: uiText('Accounts'), keywords: [uiText('invite teammates'), 'accounts', 'team'], open: () => openAccounts(net) });
     if (project) out.push({ icon: '🖼️', kind: uiText('Action'), title: uiText('Hang a picture'), detail: uiText('On a wall of this floor'), keywords: ['decorate', 'frame', 'art'], open: hanging.startHanging });
     if (project) out.push({ icon: '🔎', kind: uiText('Action'), title: uiText('Search the chat and every terminal'), keywords: ['find'], open: showSearch });
 

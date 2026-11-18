@@ -5,7 +5,7 @@ import type { Net } from '../net';
 import { store } from '../state';
 import { h, openModal, type Modal } from './dom';
 import { confirmDialog } from './prompt';
-import { copyButton } from './team';
+import { copyButton } from './clipboard';
 
 const NAMES: Record<SignInKind, string> = { claude: 'Claude', github: 'GitHub' };
 

@@ -68,35 +68,6 @@ export interface AccountsState {
   sharedPassword: boolean;
 }
 
-export interface TeamMember {
-  /** GitHub username (or the name deploy/aws.sh or deploy/azure.sh invited a key file under). */
-  name: string;
-  keys: number;
-}
-
-/** Who may SSH-tunnel into the office. Only offices deployed with deploy/aws.sh or deploy/azure.sh manage this. */
-export interface TeamState {
-  /** Why invites can't be managed from the office, when they can't. */
-  unavailable?: string;
-  error?: string;
-  /** Where teammates tunnel to: office@203.0.113.7, or ssh://office@host:port off port 22 */
-  ssh?: string;
-  /** The office's port on the box (tunnel destination). */
-  port: number;
-  /** How to run the script that deployed the office (deploy/azure.sh, --name and all), for the commands the panel suggests. deploy/aws.sh when unknown. */
-  deploy?: string;
-  /** SHA256 fingerprint of the box's ED25519 host key, to check on first connect. */
-  fingerprint?: string;
-  members: TeamMember[];
-  /** The office's name on its Tailscale network (e.g. agent-office.tail1234.ts.net): everyone there opens https://<it>. */
-  tailnet?: string;
-}
-
-export type TeamClientMsg =
-  | { t: 'team.get' }
-  | { t: 'team.invite'; github: string }
-  | { t: 'team.remove'; name: string };
-
 export type AccountsClientMsg =
   /** The rest of the accounts messages are for admins only. */
   | { t: 'accounts.get' }
@@ -122,9 +93,6 @@ export type SignInsClientMsg =
   | { t: 'signins.signout'; which: SignInKind };
 
 export type AccountsServerMsg =
-  | { t: 'team'; state: TeamState }
-  /** Sent to whoever asked for the invite. */
-  | { t: 'team.invited'; github: string; name?: string; keys?: number; error?: string }
   /** Sent to admins, when asked and whenever accounts change. */
   | { t: 'accounts'; state: AccountsState }
   /** Sent to whoever made the invite. */

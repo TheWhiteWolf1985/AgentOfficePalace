@@ -9,9 +9,6 @@ import type { PersonalPreferencesStore } from '../personal-preferences.js';
 import type { ConferencePresentation } from '../conference-presentation.js';
 import type { SignIns, GhAs } from '../signins.js';
 import type { ModelCatalogue } from '../models.js';
-import type { Tailnet } from '../tailnet.js';
-import type { Team } from '../team.js';
-import type { Upgrader } from '../upgrade.js';
 import type { Services } from '../services.js';
 import type { ImageProxy } from '../decor.js';
 import type { Ledger } from '../usage.js';
@@ -84,11 +81,9 @@ export interface FloorsOpen {
 
 /** Made once the floors are open (office/services.ts). */
 export interface LateServices {
-  team: Team;
-  tailnet: Tailnet;
   services: Services;
   images: ImageProxy;
-  upgrader: Upgrader;
+  version: string;
   /** A floor's Services board: its own workers' servers. */
   servicesState(floor: Floor | undefined, items?: ServiceInfo[]): ServicesState;
 }

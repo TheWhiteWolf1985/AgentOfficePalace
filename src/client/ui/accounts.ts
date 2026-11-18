@@ -5,7 +5,7 @@ import type { Net } from '../net';
 import { store } from '../state';
 import { h, openModal, timeAgo } from './dom';
 import { confirmDialog } from './prompt';
-import { copyButton } from './team';
+import { copyButton } from './clipboard';
 
 export const inviteLink = (v: AccountInvite) => `${location.origin}/join#${v.token}`;
 
@@ -64,7 +64,6 @@ export function openAccounts(net: Net) {
       const v = fresh;
       body.append(h('div.cmd', {}, h('pre', {}, inviteLink(v)), copyButton(uiText('Copy'), () => inviteLink(v))));
     }
-    if (store.invites) body.append(h('p.note', {}, uiText('On this office they also need a way in first: see 👥 Invite teammates.')));
 
     const list = h('ul.team-list');
     for (const a of s.accounts) {

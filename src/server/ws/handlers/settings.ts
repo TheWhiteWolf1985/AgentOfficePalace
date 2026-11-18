@@ -34,16 +34,6 @@ export const settingsHandlers = {
     ctx.toastAll(limit !== undefined ? `⚙️ ${who} set the worker limit to ${now}` : now === undefined ? `⚙️ ${who} took the worker limit off` : `⚙️ ${who} put the worker limit back to ${now} (--max-workers)`);
     ctx.pumpQueues();
   },
-  'upgrade.check'(ctx) {
-    void ctx.upgrader.check();
-  },
-  'upgrade.start'(ctx, c) {
-    const who = c.peer.name;
-    void ctx.upgrader.start(who).then((err) => {
-      if (err) ctx.warn(c, err);
-      else ctx.toastAll(`${who} is upgrading the office — it restarts when the new version is built`);
-    });
-  },
   'sky.clock'(ctx, c, msg) {
     const real = msg.real === true;
     if (real === !!ctx.sky.state.realTime) return;

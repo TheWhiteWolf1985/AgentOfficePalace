@@ -8,7 +8,7 @@ When the office runs on a server, the web servers its workers start (`npm run de
 agent-office tunnel office@203.0.113.7
 ```
 
-That's the SSH address **👥 Invite teammates** shows (on Railway, Fly.io and Dokploy it looks like `ssh://office@host:2222`). It opens the SSH tunnel to the office, opens the office in your browser, and then follows the workers:
+Use an SSH account and address configured by the server administrator. The command opens the tunnel and browser, then follows the application's service list. This is an existing runtime feature; it does not provision host users or keys:
 
 ```
   🔌 agent-office tunnel
@@ -26,27 +26,16 @@ That's the SSH address **👥 Invite teammates** shows (on Railway, Fly.io and D
 Already have the office open in a browser? Give it that address instead, and it leaves the way you get there alone:
 
 ```bash
-agent-office tunnel                              # http://localhost:4600: deploy/aws.sh open, or the ssh command, is running
+agent-office tunnel                              # http://localhost:4600: the SSH forward is running
 agent-office tunnel http://localhost:4601        # a tunnel on another port
 agent-office tunnel https://office.example.com   # an office on its own domain
-agent-office tunnel https://agent-office.tail1234.ts.net   # or on your tailnet
 ```
 
 The **🌐 Services** board in the office shows the command for the way you came in, ready to copy.
 
-## Getting the command
+## Application command
 
-It's part of `agent-office`, so it needs Node.js 20 or newer and the office installed on your computer (you don't have to run one there). To install without starting an office:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/AgentSystemLabs/agent-office/main/install.sh | AGENT_OFFICE_INSTALL_ONLY=1 bash
-```
-
-```powershell
-$env:AGENT_OFFICE_INSTALL_ONLY = 1; irm https://raw.githubusercontent.com/AgentSystemLabs/agent-office/main/install.ps1 | iex
-```
-
-The office it talks to has to be new enough to list its workers' servers. If it isn't, the command says so: upgrade the office (**⬆️ Upgrade the office** in the **☰** menu, or the deploy script's `update`).
+Use the command from the verified compiled application package or checkout; see [the native deployment](../deploy/debian/README.md). No agent CLI or host provisioning is installed by this command.
 
 ## Signing in
 
@@ -79,4 +68,4 @@ agent-office tunnel [where] [options] [-- <ssh options>]
 
 Everything after `--` goes to `ssh`, for a key that isn't your default one: `agent-office tunnel office@203.0.113.7 -- -i ~/.ssh/office`.
 
-One server at a time still works, with nothing to install: click it on the **🌐 Services** board to copy an `ssh` command that opens just that one (*Reviewing what workers build* in the [AWS reference](aws.md)).
+One server at a time still works, with nothing to install: click it on the **🌐 Services** board to copy an `ssh` command that opens just that one.

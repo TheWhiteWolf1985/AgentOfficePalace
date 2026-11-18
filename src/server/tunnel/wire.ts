@@ -7,7 +7,7 @@ export const FORWARDS_PATH = '/api/services';
 
 /**
  * Names the worker's server a request is for. The client reaches the office at whatever address
- * the office has (an SSH tunnel, a domain, a tailnet), where the Host header can't always say.
+ * the office has (an SSH tunnel or a domain), where the Host header can't always say.
  */
 export const SERVICE_HEADER = 'x-agent-office-service';
 

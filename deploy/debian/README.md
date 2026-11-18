@@ -1,9 +1,8 @@
 # Applicazione su Debian senza agenti
 
 Questo avvio esegue soltanto il server Node.js e il frontend compilato di Agent
-Office Palace su un host Debian 13. Non usare gli
-installer generali del progetto per questa configurazione: installano anche
-strumenti degli agenti.
+Office Palace su un host Debian 13. Il repository mantiene questo avvio nativo
+per la sola applicazione; i vecchi installer e deployment automatici sono stati rimossi.
 
 ## Percorsi e prerequisiti
 

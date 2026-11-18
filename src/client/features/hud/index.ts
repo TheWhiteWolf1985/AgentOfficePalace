@@ -22,8 +22,6 @@ import { mountHud } from '../../ui/menu';
 import { openServices } from '../../ui/services';
 import { openSettings, type SettingsPane } from '../../ui/settings';
 import { needsSigningIn, openSignIns } from '../../ui/signins';
-import { openTeam } from '../../ui/team';
-import { openUpgrade } from '../../ui/upgrade';
 import { openWhiteboard } from '../whiteboard/ui';
 import { describeSky } from '../../world/sky';
 
@@ -91,25 +89,11 @@ export function installHud(ctx: Ctx, core: CoreState, parts: HudParts) {
       { id: 'share', icon: '🖥️', label: () => (voice.sharing ? uiText('Stop sharing') : uiText('Share screen')), section: 'Together', on: () => voice.sharing, status: () => voice.sharing, chip: () => uiText('Sharing'), blocked: noMedia, run: () => void talk.toggleShare() },
       { id: 'presentation', icon: '📽️', label: () => store.presentation.mode === 'presentation' ? uiText('Show whiteboard') : uiText('Present my screen'), section: 'Together', on: () => store.presentation.mode === 'presentation', status: () => store.floor === ROOF && store.presentation.mode === 'presentation', chip: () => uiText('Presentation'), blocked: () => store.presentation.mode === 'presentation' ? undefined : noMedia(), run: () => void parts.presentation.toggle() },
       { id: 'decor', icon: '🖼️', label: () => (hanging.hanger.active ? uiText('Stop hanging the picture') : uiText('Hang a picture')), section: 'Together', key: 'F', shown: () => inOffice(), on: () => hanging.hanger.active, status: () => hanging.hanger.active, run: () => (hanging.hanger.active ? hanging.hanger.cancel() : hanging.startHanging()) },
-      { id: 'team', icon: '👥', label: uiText('Invite teammates'), section: 'Together', shown: () => store.invites, run: () => openTeam(net) },
       { id: 'accounts', icon: '🔑', label: uiText('Accounts'), section: 'Together', shown: () => store.me.admin, title: () => uiText('Invite people, see who has an account, revoke them'), run: () => openAccounts(net) },
       { id: 'signins', icon: '🔐', label: uiText('Your sign-ins'), section: 'Together', shown: () => !!store.me.account, tone: () => (needsSigningIn() ? 'danger' : undefined), status: needsSigningIn, chip: () => uiText('Sign in to Claude'), title: () => uiText('The Claude plan and GitHub account your workers run on: your own'), run: () => openSignIns(net) },
       { id: 'settings', icon: '⚙️', label: uiText('Settings'), section: 'Office', run: showSettings },
       { id: 'help', icon: '❓', label: uiText('Controls'), section: 'Office', key: 'H', run: openHelp },
       { id: 'lite', icon: '📱', label: uiText('2D view'), section: 'Office', title: () => uiText('The workers, their terminals and the boards without the 3D: for a phone or a slow computer'), run: () => location.assign('/lite') },
-      {
-        id: 'upgrade',
-        icon: '⬆️',
-        label: () => (store.upgrade.phase === 'building' ? uiText('Upgrading…') : store.upgrade.latest ? uiText('Update the office') : uiText('Upgrade the office')),
-        section: 'Office',
-        shown: () => store.upgrade.available,
-        // A new version, or one being built, gets a place on the top bar until it's in.
-        status: () => !!store.upgrade.latest || store.upgrade.phase === 'building',
-        chip: () => (store.upgrade.phase === 'building' ? uiText('Upgrading…') : uiText('Update')),
-        tone: () => (store.upgrade.latest && store.upgrade.phase !== 'building' ? 'primary' : undefined),
-        title: () => (store.upgrade.latest ? uiText`New version: ${store.upgrade.latest.subject}` : uiText('Upgrade the office')),
-        run: () => openUpgrade(net),
-      },
       // Up on the top bar while workers wait on someone (N does the same), next to the Workers button.
       {
         id: 'waiting',

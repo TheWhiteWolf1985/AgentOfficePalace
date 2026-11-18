@@ -25,12 +25,12 @@ http://localhost:5173 on this computer is the worker's localhost:5173. It closes
 again when the worker stops the server. No command per server, nothing to restart.
 
 Where the office is:
-  office@203.0.113.7      An SSH address (the one 👥 Invite teammates shows, also
+  office@203.0.113.7      An SSH address configured by your administrator (also
   ssh://office@host:2222  as ssh://, or a Host from your ssh config). Opens the
                           tunnel to the office as well, and the office in your
                           browser, and opens the tunnel again when it drops
   http://localhost:4600   An office you can already open in a browser: through a
-  https://office.example  tunnel that's running, on a domain, or on your tailnet.
+  https://office.example  tunnel that's running, on the configured application URL.
                           The default is http://localhost:4600
 
 It signs in like a browser does. The first time it asks for the office password
@@ -176,7 +176,7 @@ export async function tunnelCommand(argv: string[]): Promise<number> {
   async function run(): Promise<number> {
     say(`\n  🔌 agent-office tunnel\n`);
     if (overSsh) {
-      // A tunnel that's already open (this command running twice, or the one from 👥 Invite teammates) will do.
+      // A tunnel that is already open, including another instance of this command, will do.
       if (await office.up()) say(`  the office is already open at ${office.origin}: using that tunnel`);
       else {
         say(`  opening the tunnel to ${o.where}…`);
@@ -185,7 +185,7 @@ export async function tunnelCommand(argv: string[]): Promise<number> {
           back: () => say('  ✓ the tunnel is open again'),
         });
         const err = await ssh.open();
-        if (err) return fail(`${err}. Is localhost:${office.port} free on this computer (--port picks another), and is your SSH key invited to the office?`);
+        if (err) return fail(`${err}. Is localhost:${office.port} free on this computer (--port picks another), and does your SSH key have access to the server?`);
       }
     } else if (!(await office.up())) {
       return fail(`no office answers at ${office.origin}. Open the tunnel to it first, or give its SSH address: agent-office tunnel office@<address>`);
@@ -210,7 +210,7 @@ export async function tunnelCommand(argv: string[]): Promise<number> {
         if (reachable) say("  … the office isn't answering: still trying");
         reachable = false;
       } else if (list === 'old') {
-        return fail("this office is a version from before it could list its workers' servers. Upgrade it (⬆️ Upgrade the office in its ☰ menu, or the deploy script's update), then run this again.");
+        return fail("this office is a version from before it could list its workers' servers. Ask the administrator to deploy the current application version, then run this again.");
       } else if (list === 'signed-out') {
         forget(office, key);
         say('  … signed out of the office (the password changed, or the session ran out)');

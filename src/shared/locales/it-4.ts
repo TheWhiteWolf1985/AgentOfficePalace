@@ -20,7 +20,6 @@ export default {
   "Server unreachable": "Server non raggiungibile",
   "This browser can't draw the 3D office (WebGL is off or missing), so here's the 2D view": "Il browser non può mostrare l'ufficio 3D (WebGL assente o disattivato): ecco la vista 2D",
   "Guest": "Ospite",
-  "⬆️ The office is restarting on its new version. Back in a minute.": "⬆️ L'ufficio si sta riavviando sulla nuova versione. Ritorna fra un minuto.",
   "No floors yet": "Nessun piano ancora presente",
   "👥 {0} here": "👥 Persone presenti: {0}",
   "Add a project from the elevator in the 3D office.": "Aggiungi un progetto dall'ascensore dell'ufficio 3D.",

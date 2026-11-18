@@ -5,29 +5,19 @@ import type { ServiceInfo } from '../shared/protocol.js';
 import { withoutOfficeCookies } from './auth.js';
 import { SERVICE_HEADER } from './tunnel/wire.js';
 
-// Service tunnels: `ssh -L 5173:localhost:4600 office@box` lands on the office's own port, and the
-// browser's Host header (localhost:5173) says which worker server it's for. So teammates reach
-// every service through the one port their SSH key may already forward to, and only while
-// signed in to the office. On a Tailscale network it's https://<office>.ts.net:5173 instead, which
-// Tailscale Serve points at the office's port too (see tailnet.ts). `agent-office tunnel` opens
-// every worker's server on someone's computer by itself, and names the port in a header (tunnel/).
+// Authenticated forwarding to worker web services: a local Host port or the generic
+// tunnel client's service header selects the destination. Host provisioning is external.
 
 /** Set on everything the office relays, so a server that proxies back to the office can't loop. */
 const RELAYED = 'x-agent-office-relay';
 const LOOPBACK_HOST = /^(?:localhost|127\.0\.0\.1|\[::1\]|[a-z0-9-]+\.localhost):(\d{1,5})$/i;
 
-/** "agent-office.tail1234.ts.net:5173" -> 5173, for the office's own name on the tailnet. */
-function tailnetPort(host: string, tailnet: string | undefined): number {
-  const i = host.lastIndexOf(':');
-  return tailnet && i > 0 && host.slice(0, i).toLowerCase() === tailnet ? Number(host.slice(i + 1)) || 0 : 0;
-}
-
-/** The service port a request came in for, when it came through a service tunnel or the tailnet. */
-export function tunneledPort(req: http.IncomingMessage, officePort: number, tailnet?: string): number | undefined {
+/** The service port a request came in for, when it came through a service tunnel . */
+export function tunneledPort(req: http.IncomingMessage, officePort: number): number | undefined {
   if (req.headers[RELAYED]) return undefined;
   const host = req.headers.host ?? '';
   const m = LOOPBACK_HOST.exec(host);
-  const port = m ? Number(m[1]) : tailnetPort(host, tailnet);
+  const port = m ? Number(m[1]) : 0;
   return port && port !== officePort ? port : undefined;
 }
 
@@ -43,13 +33,13 @@ export interface Tunneled {
  * serves the port it names: it carries the client's own session, and the page that made it is a
  * worker's. (It can't loop: what the office relays never has the header.)
  */
-export function tunneledService(req: http.IncomingMessage, officePort: number, tailnet: string | undefined, lookup: (port: number) => ServiceInfo | 'gone' | undefined): Tunneled | undefined {
+export function tunneledService(req: http.IncomingMessage, officePort: number, lookup: (port: number) => ServiceInfo | 'gone' | undefined): Tunneled | undefined {
   const named = req.headers[SERVICE_HEADER];
   if (named !== undefined) {
     const port = typeof named === 'string' && /^\d{1,5}$/.test(named) ? Number(named) : 0;
     return { port, svc: (port !== officePort && lookup(port)) || 'gone' };
   }
-  const port = tunneledPort(req, officePort, tailnet);
+  const port = tunneledPort(req, officePort);
   const svc = port ? lookup(port) : undefined;
   return port && svc ? { port, svc } : undefined;
 }
@@ -57,8 +47,8 @@ export function tunneledService(req: http.IncomingMessage, officePort: number, t
 function upstreamHeaders(req: http.IncomingMessage, svc: ServiceInfo): http.OutgoingHttpHeaders {
   const headers: http.OutgoingHttpHeaders = { ...req.headers, [RELAYED]: '1' };
   delete headers[SERVICE_HEADER];
-  // From the tailnet, the server gets the Host it would through a tunnel: dev servers like Vite
-  // refuse names they don't know. X-Forwarded-Host (set by Tailscale Serve) still has the real one.
+  // The upstream receives the same local Host as a service tunnel: dev servers like Vite
+  // refuse names they don't know. X-Forwarded-Host still carries the original name.
   if (!LOOPBACK_HOST.test(req.headers.host ?? '')) headers.host = `localhost:${svc.port}`;
   const cookie = withoutOfficeCookies(req.headers.cookie);
   if (cookie) headers.cookie = cookie;

@@ -697,3 +697,19 @@ test('with zero project floors the meeting board survives reconnect and a gracef
     again.send({ t: 'floor.go', floor: '@roof' }); assert.ok((await again.take('floor.enter')).whiteboard.elements.some(e => e.id === note.id));
   } finally { await again.close(); }
 });
+
+
+test('retired host deployment controls are inert while application accounts remain available', async () => {
+  const browser = await Browser.open();
+  try {
+    const welcome = await browser.take('welcome');
+    assert.equal(typeof welcome.version, 'string');
+    assert.ok(welcome.version.length > 0);
+    for (const key of ['upgrade', 'invites']) assert.equal(Object.hasOwn(welcome, key), false);
+    for (const message of [{ t: 'upgrade.check' }, { t: 'upgrade.start' }, { t: 'team.get' }, { t: 'team.invite', github: 'unused' }, { t: 'team.remove', name: 'unused' }]) browser.send(message);
+    browser.send({ t: 'ping', at: 981234 });
+    assert.equal((await browser.take('pong', m => m.at === 981234)).at, 981234);
+    browser.send({ t: 'accounts.get' });
+    assert.ok((await browser.take('accounts')).state);
+  } finally { browser.ws.close(); }
+});

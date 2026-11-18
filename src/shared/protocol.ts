@@ -4,7 +4,7 @@
 // file puts them back together, so everything is still imported from here, and makes the two
 // unions every frame is one of.
 
-import type { AccountsClientMsg, AccountsServerMsg, SignInsClientMsg, TeamClientMsg } from './protocol/accounts.js';
+import type { AccountsClientMsg, AccountsServerMsg, SignInsClientMsg } from './protocol/accounts.js';
 import type { ChangesClientMsg, ChangesServerMsg } from './protocol/changes.js';
 import type { FloorClientMsg, FloorServerMsg, PlanClientMsg } from './protocol/floors.js';
 import type { GitHubClientMsg, GitHubServerMsg } from './protocol/github.js';
@@ -44,7 +44,6 @@ export type ClientMsg =
   | FloorClientMsg
   | PlanClientMsg
   | ChangesClientMsg
-  | TeamClientMsg
   | AccountsClientMsg
   | SignInsClientMsg
   | SettingsClientMsg

@@ -3,17 +3,9 @@ import './services.css';
 import type { ServiceInfo, ServicesState } from '../../shared/protocol';
 import { store } from '../state';
 import { h, openModal, timeAgo } from './dom';
-import { copy, copyButton, guessOs, openCommand, OS_LABEL, type Os } from './team';
+import { copy, copyButton, guessOs, openCommand, OS_LABEL, type Os } from './clipboard';
 
-/** Whether this page came over the office's Tailscale network, where every server has its own link. */
-function onTailnet(s: ServicesState): boolean {
-  return !!s.tailnet && location.hostname === s.tailnet;
-}
-
-export function serviceUrl(port: number, s = store.services): string {
-  // Tailscale Serve points <office>.ts.net:<port> at the office, which relays it by the port.
-  if (onTailnet(s)) return `https://${s.tailnet}:${port}`;
-  // The tunnel lands on the office's own port, so it speaks whatever the office speaks.
+export function serviceUrl(port: number): string {
   return `${location.protocol}//localhost:${port}`;
 }
 
@@ -23,7 +15,7 @@ export function serviceUrl(port: number, s = store.services): string {
  */
 export function serviceTunnel(s: ServicesState, port: number, os: Os): string {
   const open = openCommand(serviceUrl(port), os);
-  return `ssh -N -o ExitOnForwardFailure=yes -o PermitLocalCommand=yes -o LocalCommand="${open}" -L ${port}:localhost:${s.port} ${s.ssh ?? 'you@your-server'}`;
+  return `ssh -N -o ExitOnForwardFailure=yes -o PermitLocalCommand=yes -o LocalCommand="${open}" -L ${port}:localhost:${s.port} you@your-server`;
 }
 
 /**
@@ -35,8 +27,8 @@ export function autoTunnel(origin = location.origin): string {
 }
 
 /** Whether the office is likely on another machine than this browser, so its workers' ports aren't already here. */
-function elsewhere(s: ServicesState): boolean {
-  return !!s.ssh || !/^(?:localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+function elsewhere(): boolean {
+  return !/^(?:localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
 }
 
 function describe(svc: ServiceInfo): { who: string; color: string; branch?: string } {
@@ -63,31 +55,26 @@ export function openServices() {
   const pick = async (svc: ServiceInfo) => {
     const s = store.services;
     picked = svc.port;
-    copied = (await copy(onTailnet(s) ? serviceUrl(svc.port) : serviceTunnel(s, svc.port, os))) ? svc.port : null;
+    copied = (await copy(serviceTunnel(s, svc.port, os))) ? svc.port : null;
     render();
   };
 
   const render = () => {
     const s = store.services;
-    const direct = onTailnet(s);
     tabs.replaceChildren(
-      ...(direct ? [] : (Object.keys(OS_LABEL) as Os[])).map((o) =>
+      ...(Object.keys(OS_LABEL) as Os[]).map((o) =>
         h('button.btn', { type: 'button', class: o === os ? 'on' : '', onclick: () => ((os = o), (copied = null), render()) }, OS_LABEL[o]),
       ),
     );
-    footer.firstElementChild!.textContent = direct
-      ? uiText('Every link goes through the office, so the office sign-in still guards every page.')
-      : uiText('Tunnels go through the office, so the office password still guards every page. Keep the terminal open while you look.');
+    footer.firstElementChild!.textContent = uiText('Tunnels go through the office, so the office password still guards every page. Keep the terminal open while you look.');
     body.replaceChildren(
       h(
         'p.note',
         { style: 'margin:0 0 12px' },
-        direct
-          ? uiText('Web servers the workers are running. Each has its own link on your Tailscale network: open it, or click the row to copy it for someone else on the network.')
-          : uiText('Web servers the workers are running. Click one to copy a command that opens it on your computer — run it in a terminal and the page opens by itself.'),
+        uiText('Web servers the workers are running. Click one to copy a command that opens it on your computer — run it in a terminal and the page opens by itself.'),
       ),
     );
-    if (!direct && elsewhere(s)) {
+    if (elsewhere()) {
       body.append(
         h(
           'div.svc-auto',
@@ -100,7 +87,7 @@ export function openServices() {
             h('code', {}, 'localhost:5173'),
             uiText(' is the worker’s), and closes when the worker stops it. It needs the '),
             h('code', {}, 'agent-office'),
-            uiText(' command on your computer: the install line in the README.'),
+            uiText(' command from the compiled application package or checkout; see the deployment guide.'),
           ),
           h('div.cmd', {}, h('pre', {}, autoTunnel()), copyButton(uiText('Copy'), () => autoTunnel())),
         ),
@@ -121,12 +108,12 @@ export function openServices() {
     for (const svc of s.items) {
       const { who, color, branch } = describe(svc);
       const on = picked === svc.port;
-      const title = direct ? uiText`Open ${serviceUrl(svc.port)}` : uiText`Open ${serviceUrl(svc.port)} (needs the tunnel, unless the office runs on this computer)`;
+      const title = uiText`Open ${serviceUrl(svc.port)} (needs the tunnel, unless the office runs on this computer)`;
       const open = h('a.btn', { href: serviceUrl(svc.port), target: '_blank', rel: 'noopener', title }, uiText('Open ↗'));
       open.addEventListener('click', (e) => e.stopPropagation());
       const li = h(
         'li',
-        { class: on ? 'on' : '', tabindex: 0, role: 'button', title: direct ? uiText('Copy the link') : uiText('Copy the tunnel command') },
+        { class: on ? 'on' : '', tabindex: 0, role: 'button', title: uiText('Copy the tunnel command') },
         h('span.dot', { style: `background:${color}` }),
         h(
           'div.svc-main',
@@ -149,13 +136,7 @@ export function openServices() {
     body.append(list);
 
     const svc = s.items.find((i) => i.port === picked);
-    if (svc && direct) {
-      body.append(
-        copied === svc.port
-          ? h('p.team-status.ok', {}, uiText`✅ Copied ${serviceUrl(svc.port)}. Anyone on the network who's signed in to the office can open it.`)
-          : h('p.team-status', {}, uiText`The link for :${svc.port}: ${serviceUrl(svc.port)}`),
-      );
-    } else if (svc) {
+    if (svc) {
       const cmd = serviceTunnel(s, svc.port, os);
       body.append(
         copied === svc.port
@@ -166,11 +147,8 @@ export function openServices() {
     } else if (picked !== null) {
       body.append(h('p.team-status.error', {}, uiText`The server on :${picked} stopped.`));
     }
-    if (direct) return;
     body.append(
-      s.ssh
-        ? h('p.note', {}, uiText('It uses the same SSH access as the office. Not invited yourself (you set the office up)? Run '), h('code', {}, `${s.deploy ?? 'deploy/aws.sh'} service <port>`), uiText(' instead.'))
-        : h('p.note', {}, uiText('Replace '), h('code', {}, 'you@your-server'), uiText(' with how you SSH to the office\'s machine. If the office runs on this computer, just click Open.')),
+      h('p.note', {}, uiText('Replace '), h('code', {}, 'you@your-server'), uiText(' with how you SSH to the office\'s machine. If the office runs on this computer, just click Open.')),
     );
   };
 

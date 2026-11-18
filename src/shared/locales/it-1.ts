@@ -16,7 +16,6 @@ export default {
   "Invite someone": "Invita qualcuno",
   "You get a link that makes one account, with its own name and password. It works once and expires after 7 days. Leave the name empty and they pick their own.": "Il link crea un solo account con nome e password propri. È utilizzabile una volta e scade dopo 7 giorni. Lascia vuoto il nome per permettere alla persona di sceglierlo.",
   "Copy": "Copia",
-  "On this office they also need a way in first: see 👥 Invite teammates.": "Serve anche l'accesso a questo ufficio: vedi 👥 Invita colleghi.",
   "in the office": "nell'ufficio",
   "seen {0}": "ultimo accesso: {0}",
   "never came in": "nessun accesso",

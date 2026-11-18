@@ -22,14 +22,11 @@ import { prompts } from './prompts';
 import { services } from './services';
 import { signins } from './signins';
 import { sky } from './sky';
-import { team } from './team';
-import { upgrade } from './upgrade';
 import { usage } from './usage';
 import { whiteboard } from './whiteboard';
 
 export const SLICES: readonly Slice[] = [
   presence,
-  upgrade,
   usage,
   me,
   notify,
@@ -45,7 +42,6 @@ export const SLICES: readonly Slice[] = [
   floorPlan,
   services,
   whiteboard,
-  team,
   accounts,
   signins,
   presentation,

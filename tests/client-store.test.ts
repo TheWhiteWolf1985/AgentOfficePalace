@@ -50,8 +50,6 @@ const welcome = () =>
     projectsDir: { dir: '~/p', custom: false },
     ice: [],
     chat: [],
-    invites: false,
-    upgrade: { available: false, phase: 'idle' },
     usage: { total: {}, today: {}, day: 'd', pauseHiring: false },
     limits: { windows: [], at: 1 },
     me: { admin: true },
@@ -67,11 +65,11 @@ const welcome = () =>
 const FLOOR_TOPICS = ['floor', 'project', 'workers', 'issues', 'pulls', 'queue', 'meeting', 'decor', 'floorPlan', 'services', 'whiteboard', 'drawing', 'presentation'];
 
 /** Every topic, to listen for them all. */
-const TOPICS = ['peers', 'workers', 'issues', 'pulls', 'chat', 'project', 'screens', 'team', 'upgrade', 'services', 'decor', 'floorPlan', 'usage', 'limits', 'queue', 'me', 'accounts', 'signins', 'notify', 'machine', 'floors', 'floor', 'projectsDir', 'repos', 'sky', 'leaveOnMerge', 'whiteboard', 'drawing', 'meeting', 'prompts', 'presentation'] as const;
+const TOPICS = ['peers', 'workers', 'issues', 'pulls', 'chat', 'project', 'screens', 'services', 'decor', 'floorPlan', 'usage', 'limits', 'queue', 'me', 'accounts', 'signins', 'notify', 'machine', 'floors', 'floor', 'projectsDir', 'repos', 'sky', 'leaveOnMerge', 'whiteboard', 'drawing', 'meeting', 'prompts', 'presentation'] as const;
 
 /** Every message the store takes in (and one it doesn't), and the topics it fires, in the order it has always fired them. */
 const RUN: [ServerMsg, string[]][] = [
-  [welcome(), [...FLOOR_TOPICS, 'peers', 'chat', 'upgrade', 'usage', 'limits', 'me', 'notify', 'machine', 'floors', 'projectsDir', 'sky', 'prompts', 'leaveOnMerge']],
+  [welcome(), [...FLOOR_TOPICS, 'peers', 'chat', 'usage', 'limits', 'me', 'notify', 'machine', 'floors', 'projectsDir', 'sky', 'prompts', 'leaveOnMerge']],
   [msg({ t: 'pong', at: 0, now: 1_000_000 }), []],
   [msg({ t: 'pong', at: -1e6, now: 1_000_000 }), []],
   [msg({ t: 'floors', floors: [{ id: 'f1', name: 'f1' }] }), ['floors']],
@@ -86,11 +84,9 @@ const RUN: [ServerMsg, string[]][] = [
   [msg({ t: 'worker.remove', workerId: 'w-2' }), ['workers']],
   [msg({ t: 'gh.issues', state: { items: [], fetchedAt: 2, loading: false } }), ['issues']],
   [msg({ t: 'gh.pulls', state: { items: [], fetchedAt: 2, loading: false } }), ['pulls']],
-  [msg({ t: 'team', state: {} }), ['team']],
   [msg({ t: 'me', me: { admin: false } }), ['me']],
   [msg({ t: 'accounts', state: {} }), ['accounts']],
   [msg({ t: 'signins', state: {} }), ['signins']],
-  [msg({ t: 'upgrade', state: { available: true, phase: 'idle' } }), ['upgrade']],
   [msg({ t: 'services', state: { items: [], port: 1 } }), ['services']],
   [msg({ t: 'decor', items: [] }), ['decor']],
   [msg({ t: 'plan', plan: { labels: {}, wing: 2 } }), ['floorPlan']],
@@ -185,7 +181,7 @@ test('what the browser remembers keeps its keys and shapes', () => {
 
 test("the store's keys are its state, as window.__office shows them", () => {
   // As the office had them before its store was split into slices: methods and the slices aren't among them.
-  assert.deepEqual(Object.keys(store).sort(), ['accounts', 'chat', 'clock', 'decor', 'drawing', 'floor', 'floorPlan', 'floors', 'ice', 'invites', 'issues', 'leaveOnMerge', 'limits', 'machine', 'me', 'meeting', 'notify', 'peers', 'presentation', 'profile', 'project', 'projectsDir', 'prompts', 'pulls', 'queue', 'repos', 'screens', 'services', 'signins', 'sky', 'subs', 'team', 'upgrade', 'usage', 'whiteboard', 'workers', 'you']);
+  assert.deepEqual(Object.keys(store).sort(), ['accounts', 'chat', 'clock', 'decor', 'drawing', 'floor', 'floorPlan', 'floors', 'ice', 'issues', 'leaveOnMerge', 'limits', 'machine', 'me', 'meeting', 'notify', 'peers', 'presentation', 'profile', 'project', 'projectsDir', 'prompts', 'pulls', 'queue', 'repos', 'screens', 'services', 'signins', 'sky', 'subs', 'usage', 'whiteboard', 'workers', 'you']);
 });
 
 test('a new store starts every field where it always has', async () => {
@@ -200,15 +196,14 @@ test('a new store starts every field where it always has', async () => {
     {
       you: '', peers: [], workers: [], screens: [], project: null, floors: [], floor: null, projectsDir: { dir: '', custom: false },
       repos: { list: [], loading: false, at: 0 }, issues: { items: [], fetchedAt: 0, loading: true }, pulls: { items: [], fetchedAt: 0, loading: true },
-      ice: [], chat: [], invites: false, queue: { tasks: [], maxWorkers: 0 }, me: { admin: false },
-      upgrade: { available: false, phase: 'idle' },
+      ice: [], chat: [], queue: { tasks: [], maxWorkers: 0 }, me: { admin: false },
       usage: { total: { input: 0, output: 0, cacheWrite: 0, cacheRead: 0, cost: 0, calls: 0 }, today: { input: 0, output: 0, cacheWrite: 0, cacheRead: 0, cost: 0, calls: 0 }, day: '', pauseHiring: false },
       limits: { windows: [], at: 0 }, notify: {}, machine: { cpu: 0, cores: 0, memUsed: 0, memTotal: 0, history: [], workers: 0 },
       sky: null, prompts: { custom: {} }, leaveOnMerge: { on: false },
       meeting: { current: null, past: [] }, decor: [], floorPlan: EMPTY_PLAN, services: { items: [], port: 4600 },
       clock: '<undefined>',
       whiteboard: [], drawing: [], presentation: { mode: 'whiteboard', revision: 0 },
-      team: null, accounts: null, signins: null,
+      accounts: null, signins: null,
     },
   );
 });

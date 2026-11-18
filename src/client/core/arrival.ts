@@ -3,7 +3,7 @@ import { t as uiText } from '../../shared/i18n';
  * Arriving: everything the office says goes through ctx.messages from here (each type's `before`
  * handlers, the store, the routers, then its `after` handlers), and arriving (a welcome, a
  * floor.enter) is handled here; the rest are registered with what they're about. Also what the page
- * says about where you are: the project in the corner and the tab's title, the upgrade banner, and the
+ * says about where you are: the project in the corner and the tab's title, the connection status, and the
  * sign-ins a newcomer is greeted with.
  */
 import { SLAB, inElevator } from '../../shared/layout';
@@ -17,9 +17,7 @@ import { routeElevatorMessage } from '../ui/elevator';
 import { providerLabel } from '../ui/provider';
 import { routePullMessage } from '../ui/pull';
 import { needsSigningIn, openSignIns } from '../ui/signins';
-import { routeTeamMessage } from '../ui/team';
 import { openTerminalFor, routeTerminalMessage } from '../ui/terminal';
-import { restarting, showRestarting, showUpgraded } from '../ui/upgrade';
 import { leaveWhiteboard, routeWhiteboardMessage } from '../features/whiteboard/ui';
 import type { Ctx } from './context';
 import type { CoreState } from './ctx';
@@ -29,7 +27,7 @@ import type { Parts } from './parts';
 export type ArrivalParts = Pick<Parts, 'worlds' | 'place' | 'travel' | 'views' | 'cards' | 'focus'>;
 
 /**
- * Registers arriving's messages and the routers (see the order below), and what follows the upgrade,
+ * Registers arriving's messages and the routers (see the order below), and what follows a server version change,
  * the floors and the project. Install it after core/travel.ts and before anything else hears a welcome.
  */
 export function installArrival(ctx: Ctx, core: CoreState, parts: ArrivalParts) {
@@ -41,7 +39,6 @@ export function installArrival(ctx: Ctx, core: CoreState, parts: ArrivalParts) {
   let firstWelcome = true;
   /** The server version this page was loaded with. */
   let bootVersion = '';
-  let upgradePhase = '';
 
   net.onStatus((up) => $('conn').classList.toggle('hidden', up));
   /** Whether this page has shown someone their sign-ins yet (it greets a newcomer once). */
@@ -65,7 +62,6 @@ export function installArrival(ctx: Ctx, core: CoreState, parts: ArrivalParts) {
   ctx.messages.onAny(() => parts.views.settled());
   ctx.messages.onAny(routeTerminalMessage);
   ctx.messages.onAny(routeChangesMessage);
-  ctx.messages.onAny(routeTeamMessage);
   ctx.messages.onAny(routeAccountsMessage);
   ctx.messages.onAny(routePullMessage);
   ctx.messages.onAny(routeElevatorMessage);
@@ -109,8 +105,7 @@ export function installArrival(ctx: Ctx, core: CoreState, parts: ArrivalParts) {
     ctx.hud.refresh();
     // Back from a restart on another version: this page's code is stale, so load the new one.
     if (!bootVersion) bootVersion = msg.version;
-    else if (msg.version !== bootVersion || restarting()) showUpgraded(msg.upgrade);
-    upgradePhase = msg.upgrade.phase;
+    else if (msg.version !== bootVersion) location.reload();
     voice.syncPeers();
   });
   ctx.messages.on('floor.enter', () => {
@@ -135,18 +130,7 @@ export function installArrival(ctx: Ctx, core: CoreState, parts: ArrivalParts) {
   ctx.messages.on('signins.needed', (msg) => openSignIns(net, msg.why));
   ctx.messages.on('toast', (msg) => toast(msg.text, msg.level));
 
-  function renderUpgrade() {
-    const u = store.upgrade;
-    const banner = $('upgrade-banner');
-    banner.classList.toggle('hidden', u.phase !== 'building');
-    banner.textContent = uiText`🛠️ ${u.by ?? uiText('Someone')} is upgrading the office. It restarts on the new version in a minute or two.`;
-  }
-  store.on('upgrade', renderUpgrade);
-  ctx.messages.on('upgrade', (msg) => {
-    if (msg.state.phase === 'restarting') showRestarting(msg.state, net);
-    if (msg.state.phase === 'failed' && upgradePhase === 'building') toast(uiText`The upgrade failed, so the office stays on ${msg.state.current?.sha ?? uiText('this version')}`, 'error');
-    upgradePhase = msg.state.phase;
-  });
+
 
   function renderProject() {
     const p = store.project;

@@ -9,7 +9,7 @@ import * as pty from '@lydell/node-pty';
 
 /**
  * Workers' terminals live in a small host process of their own (ptyhost.ts), not in the office.
- * When the office restarts (a dev-server reload, a self-upgrade), Claude keeps working in the host,
+ * When the office restarts (a dev-server reload, a service restart), Claude keeps working in the host,
  * and the new office picks every terminal back up where it was. Without a host, terminals run
  * in-process as before and die with the office.
  */

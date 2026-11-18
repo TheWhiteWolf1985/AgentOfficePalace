@@ -82,12 +82,6 @@ net.onMessage((msg) => {
     case 'signins.needed':
       openSignIns(net, msg.why);
       break;
-    case 'upgrade':
-      if (msg.state.phase === 'restarting') {
-        net.expectRestart();
-        toast(uiText('⬆️ The office is restarting on its new version. Back in a minute.'));
-      }
-      break;
   }
 });
 

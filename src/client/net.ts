@@ -16,8 +16,6 @@ export class Net {
   private statusHandlers: ((up: boolean) => void)[] = [];
   private retry = 0;
   private closedByUs = false;
-  /** The server is restarting on purpose: retry every second instead of backing off. */
-  private restartExpected = false;
   up = false;
   private initialFloor?: string;
 
@@ -95,13 +93,9 @@ export class Net {
       } catch {
         // offline; keep retrying
       }
-      const delay = this.restartExpected ? 1000 : Math.min(8000, 500 * 2 ** this.retry++);
+      const delay = Math.min(8000, 500 * 2 ** this.retry++);
       setTimeout(() => this.connect(), delay);
     };
-  }
-
-  expectRestart() {
-    this.restartExpected = true;
   }
 
   send(msg: ClientMsg) {

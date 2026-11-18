@@ -129,7 +129,7 @@ export function installVoice(ctx: Ctx, deps: VoiceDeps) {
     if (unreachable.has(id)) return;
     unreachable.add(id);
     const who = store.peers.get(id)?.name ?? 'someone';
-    toast(uiText`🎙️ Can't connect voice with ${who}: a network between you blocks direct calls. The office needs a TURN server (see self-hosting docs).`, 'warn');
+    toast(uiText`🎙️ Can't connect voice with ${who}: a network between you blocks direct calls. The office needs a TURN server (see the application configuration guide).`, 'warn');
   });
   ctx.messages.on('peer.join', () => voice.syncPeers());
   ctx.messages.on('peer.leave', () => voice.syncPeers());

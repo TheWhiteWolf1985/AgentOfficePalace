@@ -197,7 +197,6 @@ export default {
   "reviewed": "verificato",
   "close": "chiudi",
   "(you)": "(tu)",
-  "allow anywhere": "consenti ovunque",
   "other workers": "altri agenti",
   "uncommitted changes": "modifiche non committate",
   "commits": "commit",

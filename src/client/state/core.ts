@@ -21,7 +21,6 @@ export const presence: Slice = {
       s.peers = peersOf(m.peers);
       s.ice = m.ice as RTCIceServer[];
       s.chat = m.chat;
-      s.invites = m.invites;
       return ['peers', 'chat'];
     },
     'floor.enter'(s, m) {

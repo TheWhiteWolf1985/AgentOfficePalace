@@ -47,15 +47,13 @@ export async function startServer(cfg: Config, opts: StartOptions = {}) {
   if (secureServer) acceptWebSockets(ctx, secureServer);
   const stopTimers = startTimers(ctx);
 
-  const { services, tailnet } = ctx;
+  const { services } = ctx;
 
   /** With `keep` (a restart), workers' terminals keep running for the next office to pick up. */
   const shutdown = (keep = false) => {
     stopTimers();
     ctx.cancelFloorsChanged();
-    ctx.upgrader.stop();
     services.stop();
-    tailnet.stop();
     ctx.webhook.stop();
     ctx.machine.stop();
     ctx.sky.stop();
@@ -82,7 +80,6 @@ export async function startServer(cfg: Config, opts: StartOptions = {}) {
     if (secureServer) cfg.httpsPort = (secureServer.address() as import('node:net').AddressInfo).port;
     if (secureServer) ctx.auth.setSecureSibling((server.address() as import('node:net').AddressInfo).port, cfg.httpsPort!);
     services.start();
-    tailnet.start(() => services.list().map(s => s.port));
   } catch (error) { shutdown(); throw error; }
 
   /** A link (path and fragment) that signs one browser in, once; see Auth.linkKey. */
