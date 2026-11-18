@@ -1,8 +1,6 @@
 import * as THREE from 'three';
 import { roofDrop } from '../../shared/layout';
-import { model } from './models';
-import { prepareAtrium } from './atrium-materials';
-import { batchStaticMeshes } from './static-batches';
+import { exteriorModel } from './exterior-models';
 import { buildCompanyClouds, buildCompanyGround, type NightParts } from './outside';
 import { buildTower } from './tower';
 
@@ -21,12 +19,8 @@ export function buildCompanyExterior(night: NightParts, groundFloor = false): Co
   const building = buildTower([], night);
   group.add(building.group);
   if (!groundFloor) {
-    const atrium = model('atrium');
-    if (atrium) {
-      prepareAtrium(atrium.scene);
-      batchStaticMeshes(atrium.scene);
-      ground.add(atrium.scene);
-    }
+    const atrium = exteriorModel('atrium');
+    if (atrium) ground.add(atrium);
   }
   let floorsNow = -1, wingsNow = '';
   return {

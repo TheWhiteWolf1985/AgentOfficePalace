@@ -2,11 +2,10 @@ import * as THREE from 'three';
 import { BALCONY, BALCONY_DOOR, ELEVATOR, ELEVATOR_FRONT, EXIT_DOOR, FLOOR, SLAB, STOREY, STREET_Y, WALL_HEIGHT, WALL_T, WINDOWS, WING, wingMinZ, wingRowZ, type Opening, type Side } from '../../shared/layout';
 import type { Collider } from './types';
 import type { Fixture } from './office/fixture';
-import { model } from './models';
-import { applyConferenceGlazing } from './conference-glazing';
+import { exteriorModel } from './exterior-models';
 import { batchStaticMeshes } from './static-batches';
 import { bulb, type NightParts } from './outside';
-import { mergeByMaterial, mesh, toon, toonUnique } from './toon';
+import { mesh, toon, toonUnique } from './toon';
 
 // The rest of the building, from outside: a floor per project, stacked into a tower. Only the floor
 // you're on is really there; the others are its outside (walls, windows, a balcony off each, a
@@ -60,7 +59,7 @@ function onFace(g: THREE.Object3D, side: Side, u: number): THREE.Object3D {
   return g;
 }
 
-export function buildTower(colliders: Collider[], night: NightParts): Tower {
+export function buildTower(colliders: Collider[], night: NightParts, roomModel = exteriorModel): Tower {
   const group = new THREE.Group();
   // Big flat walls get no cartoon outline (the frames round the windows give it its ink lines).
   const flat = (color: string) => {
@@ -184,13 +183,10 @@ export function buildTower(colliders: Collider[], night: NightParts): Tower {
 
   /** The same supplied room, visible from the floors below. */
   const roofTop = (parts: THREE.Group, y: number) => {
-    const room = model('conference_room');
+    const room = roomModel('conference_room');
     if (!room) return;
-    applyConferenceGlazing(room.scene);
-    room.scene.traverse(node => { if (node instanceof THREE.Mesh) node.userData.sharedImportedGeometry = true; });
-    batchStaticMeshes(room.scene, new Set(['whiteboard_surface']));
-    room.scene.position.y = y;
-    parts.add(room.scene);
+    room.position.y = y;
+    parts.add(room);
   };
 
   /**
@@ -309,10 +305,11 @@ export function buildTower(colliders: Collider[], night: NightParts): Tower {
 
     // None of it casts a shadow (the sun lights the office through where its roof would be), and none
     // takes one from the floor you're on, which would fall on it as though nothing were in between.
-    const merged = mergeByMaterial(parts);
-    merged.traverse((o) => (o.receiveShadow = false));
-    group.add(merged);
-    built.push(merged);
+    // The cached room is already prepared: batch only new procedural walls, keeping glass sorted.
+    batchStaticMeshes(parts, new Set(['exterior-conference_room']));
+    parts.traverse((o) => (o.receiveShadow = false));
+    group.add(parts);
+    built.push(parts);
 
     // Below you, the outside walls down to the garage, which you can't walk into from the steps
     // outside the bottom floor's door, and the bottom floor's slab, which is the garage's ceiling.

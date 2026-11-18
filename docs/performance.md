@@ -20,9 +20,9 @@ HTTP representation selection follows [RFC9110 section12.5.3](https://www.rfc-ed
 
 ## Graphics and rendering budget
 
-Settings → Graphics stores a device/browser preference (`agent-office.graphics`), independently of account preferences. High preserves the existing appearance: pixel ratio up to2,2048² shadows and toon outlines. Balanced caps pixel ratio at1.5 and shadows at1024². Economy caps pixel ratio at1 and disables shadows/outlines. Models, layout and interaction distances are unchanged.
+Settings â†’ Graphics stores a device/browser preference (`agent-office.graphics`), independently of account preferences. High preserves the existing appearance: pixel ratio up to2,2048Â² shadows and toon outlines. Balanced caps pixel ratio at1.5 and shadows at1024Â². Economy caps pixel ratio at1 and disables shadows/outlines. Models, layout and interaction distances are unchanged.
 
-Drawing defaults to60FPS;30FPS and the display refresh rate are available. These are upper limits, not promised performance. Simulation, networking, audio and collaboration continue on the regular application loop. The world behind an open dialog draws at15FPS; hidden documents skip world drawing. A deadline accumulator tolerates RAF jitter and resets on resume/rate changes. The avatar editor keeps its own preview loop.
+Drawing defaults to60FPS;30FPS and the display refresh rate are available. These are upper limits, not promised performance. Simulation, networking, audio and collaboration continue on the regular application loop. The world behind an open dialog draws at15FPS; hidden documents skip world drawing. A deadline accumulator tolerates RAF jitter and resets on resume/rate changes. The avatar editor uses the dedicated preview budget described below.
 
 ## Static room geometry
 
@@ -40,6 +40,11 @@ Audio sample buffers are generated lazily, cached and warmed one sample family p
 
 Frequent pointer rays are bounded by the maximum interaction reach plus the camera-to-eyes distance and any click tolerance. Intersections are reused while the camera, geometry and object hierarchy stay still. The cache checks transforms, visibility, layers, materials and geometry revisions, including parent transforms. Tiny numerical settling below 1e-8 is ignored. Key actions and first-person clicks recheck the scene before using the target. Third-person clicks retain the distant-object feedback and board intersections retain their UV coordinates.
 
-Local character poses, hands, dust, confetti and sky updates follow the world's drawing cadence, including the reduced cadence behind a dialog. Their elapsed time accumulates between draws and is bounded on resume. Movement, collision handling, networking, audio, door/elevator state and shared updates continue on the normal loop. Solar position calculations are cached within one simulated second and refresh when time or location changes. The user-avatar editor keeps its own existing preview loop.
+Local character poses, hands, dust, confetti and sky updates follow the world's drawing cadence, including the reduced cadence behind a dialog. Their elapsed time accumulates between draws and is bounded on resume. Movement, collision handling, networking, audio, door/elevator state and shared updates continue on the normal loop. Solar position calculations are cached within one simulated second and refresh when time or location changes. The user-avatar editor uses the dedicated preview budget described below.
 
 Compare CPU/frame traces with the same graphics preference, viewport, camera, weather and route. Measure first room entry separately from a repeat visit. User-supplied November17traces locate an audio startup task around58ms and a shader-program first-use stall around201ms; these are a baseline, not evidence of a hardware-independent improvement after this change.
+## Anteprima dell'utente
+
+L'editor del personaggio usa il profilo grafico del dispositivo, con un limite di30fotogrammi/s per Alta/Bilanciata e20per Risparmio, anche con frequenza principale illimitata. DPR massimo1,5/1,25/1 rispettivamente; ombre1024/512/disabilitate e contorni disabilitati in Risparmio. Le ombre animate si aggiornano fino a15volte/s e una modifica del personaggio le invalida per il disegno successivo.
+
+L'anteprima sospende il proprio RAF con scheda nascosta, canvas fuori vista o finestra coperta da un'altra modale. Al ritorno mostra lo stato attuale senza recuperare il tempo trascorso. Rotazione, animazioni, selezione di modello/acconciatura e colori restano attive alla cadenza prevista. Chiusura e annullamento scollegano osservatori, listener, ciclo e risorse del renderer. Questi limiti riguardano l'editor dell'utente.

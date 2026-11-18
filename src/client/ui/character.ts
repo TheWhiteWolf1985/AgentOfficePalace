@@ -8,7 +8,9 @@ import { AVATAR_COLORS, saveProfile, store, type Profile } from '../state';
 import type { Person } from '../world/character';
 import { createUserPerson } from '../world/character/user-assets';
 import { toonUnique } from '../world/toon';
-import { h, openModal, toast } from './dom';
+import { h, onModalChange, openModal, toast } from './dom';
+import { loadGraphics, onGraphicsChange, RenderCadence } from '../graphics-settings';
+import { avatarPreviewPolicy, PreviewLoop } from './preview-loop';
 import { avatarColorFields } from './character-colors';
 import { AVATAR_MODELS, AVATAR_HAIRSTYLES, avatarModel, avatarHairstyle, type AvatarModel, type AvatarHairstyle } from '../../shared/avatar-variants';
 
@@ -19,8 +21,16 @@ class Preview {
   private effect: OutlineEffect;
   private scene = new THREE.Scene();
   private camera = new THREE.PerspectiveCamera(28, 1, 0.1, 20);
-  private raf = 0;
+  private loop: PreviewLoop;
   private resize: ResizeObserver;
+  private intersection: IntersectionObserver;
+  private events = new AbortController();
+  private cleanups: (() => unknown)[] = [];
+  private settings = loadGraphics();
+  private shadowCadence = new RenderCadence();
+  private sun: THREE.DirectionalLight;
+  private inView = true;
+  private disposed = false;
   private yaw = 0.5;
   private dragging = false;
   private lastDrag = -Infinity;
@@ -31,14 +41,13 @@ class Preview {
     p: Profile,
   ) {
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
-    this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.autoUpdate = false;
     this.effect = new OutlineEffect(this.renderer, { defaultThickness: 0.0045, defaultColor: [0.17, 0.18, 0.26] });
 
     this.scene.add(new THREE.HemisphereLight('#fff5e6', '#c9a27a', 1.5));
     this.scene.add(new THREE.AmbientLight('#ffffff', 0.5));
-    const sun = new THREE.DirectionalLight('#fff1d6', 2.2);
+    const sun = this.sun = new THREE.DirectionalLight('#fff1d6', 2.2);
     sun.position.set(-3, 6, 5);
     sun.castShadow = true;
     sun.shadow.mapSize.set(1024, 1024);
@@ -58,49 +67,83 @@ class Preview {
     this.camera.position.set(0, 1.35, 4.6);
     this.camera.lookAt(0, 0.95, 0);
 
+    this.loop = new PreviewLoop((dt, now) => this.tick(dt, now / 1000), 30);
+    this.cleanups.push(onGraphicsChange(settings => { this.settings = settings; this.applyPolicy(); }));
+    this.cleanups.push(onModalChange(() => this.updateVisibility()));
+    const options = { signal: this.events.signal };
+    document.addEventListener('visibilitychange', () => this.updateVisibility(), options);
+    window.addEventListener('resize', () => this.applyPolicy(), options);
+    this.intersection = new IntersectionObserver(entries => {
+      this.inView = entries.some(entry => entry.isIntersecting);
+      this.updateVisibility();
+    });
+    this.intersection.observe(canvas);
     this.resize = new ResizeObserver(() => this.fit());
     this.resize.observe(canvas);
-    this.fit();
+    this.applyPolicy();
 
     canvas.addEventListener('pointerdown', (e) => {
       this.dragging = true;
       canvas.setPointerCapture(e.pointerId);
-    });
+    }, options);
     canvas.addEventListener('pointermove', (e) => {
       if (!this.dragging) return;
       this.yaw += e.movementX * 0.012;
       this.lastDrag = performance.now();
-    });
+      this.refresh();
+    }, options);
     const release = () => {
       this.dragging = false;
       this.lastDrag = performance.now();
+      this.refresh();
     };
-    canvas.addEventListener('pointerup', release);
-    canvas.addEventListener('pointercancel', release);
-
-    let last = performance.now();
-    const frame = (now: number) => {
-      const dt = Math.min(0.1, (now - last) / 1000);
-      last = now;
-      this.tick(dt, now / 1000);
-      this.raf = requestAnimationFrame(frame);
-    };
-    this.raf = requestAnimationFrame(frame);
+    canvas.addEventListener('pointerup', release, options);
+    canvas.addEventListener('pointercancel', release, options);
+    canvas.addEventListener('lostpointercapture', release, options);
   }
 
   /** A little hop and wave, to show a change landed. */
   cheer() {
     this.hopT = 0;
     this.person.reach();
+    this.refresh();
+  }
+
+  refresh() { this.renderer.shadowMap.needsUpdate = true; this.loop.invalidate(); }
+
+  private updateVisibility() {
+    const backdrop = this.canvas.closest('.backdrop');
+    this.loop.setVisible(!document.hidden && this.inView && !!this.canvas.clientWidth && !!this.canvas.clientHeight &&
+      !!backdrop && backdrop === document.querySelector('#modal-root > .backdrop:last-child'));
+  }
+
+  private applyPolicy() {
+    if (this.disposed) return;
+    const policy = avatarPreviewPolicy(this.settings, window.devicePixelRatio);
+    const shadowChanged = this.renderer.shadowMap.enabled !== policy.shadows;
+    this.renderer.setPixelRatio(policy.pixelRatio);
+    this.renderer.shadowMap.enabled = policy.shadows;
+    if (this.sun.shadow.mapSize.x !== policy.shadowSize) {
+      this.sun.shadow.map?.dispose(); this.sun.shadow.map = null;
+      this.sun.shadow.mapSize.set(policy.shadowSize, policy.shadowSize);
+    }
+    if (shadowChanged) this.scene.traverse(node => {
+      if (node instanceof THREE.Mesh) for (const material of Array.isArray(node.material) ? node.material : [node.material]) material.needsUpdate = true;
+    });
+    this.effect.enabled = policy.outline;
+    this.loop.setRate(policy.fps); this.shadowCadence.reset(); this.fit(); this.refresh();
   }
 
   private fit() {
+    if (this.disposed) return;
+    this.updateVisibility();
     const w = this.canvas.clientWidth;
     const hgt = this.canvas.clientHeight;
     if (!w || !hgt) return;
     this.renderer.setSize(w, hgt, false);
     this.camera.aspect = w / hgt;
     this.camera.updateProjectionMatrix();
+    this.refresh();
   }
 
   private tick(dt: number, t: number) {
@@ -118,16 +161,24 @@ class Preview {
     }
     this.person.root.position.y = y;
     this.person.update(dt, t, false, y > 0.01);
+    if (this.renderer.shadowMap.enabled && this.shadowCadence.due(t * 1000, 15)) this.renderer.shadowMap.needsUpdate = true;
     this.effect.render(this.scene, this.camera);
   }
 
   dispose() {
-    cancelAnimationFrame(this.raf);
+    if (this.disposed) return;
+    this.disposed = true;
+    this.loop.dispose(); this.events.abort(); this.cleanups.forEach(off => off());
     this.resize.disconnect();
+    this.intersection.disconnect();
     this.scene.remove(this.person.root);
     this.person.dispose();
     this.scene.traverse((o) => {
-      if ((o as THREE.Mesh).isMesh) (o as THREE.Mesh).geometry.dispose();
+      if (o instanceof THREE.Mesh) {
+        o.geometry.dispose();
+        for (const material of Array.isArray(o.material) ? o.material : [o.material]) material.dispose();
+      }
+      if (o instanceof THREE.DirectionalLight) o.dispose();
     });
     this.renderer.dispose();
     this.renderer.forceContextLoss();
@@ -147,6 +198,7 @@ export async function openCharacter(first: boolean, onSave: (p: Profile) => void
   const refreshColors = () => colorFields.replaceChildren(avatarColorFields(pick.look.colors, colors => {
     pick.look = { ...pick.look, colors };
     preview.person.setLook(pick.look);
+    preview.refresh();
   }, avatarModel(pick.look) === 'female'));
   if (preview.person.usesBaseModel) refreshColors();
   const modelSelect = h('select', { id: 'avatar-model' }, ...AVATAR_MODELS.map(id => h('option', { value: id }, id === 'female' ? uiText('Female') : uiText('Male')))) as HTMLSelectElement;
@@ -163,7 +215,7 @@ export async function openCharacter(first: boolean, onSave: (p: Profile) => void
       await preloadAvatar({ ...pick.look, ...variant });
       if (closed || visit !== selection) return;
       pick.look = { ...pick.look, ...variant };
-      preview.person.setLook(pick.look); refreshColors();
+      preview.person.setLook(pick.look); preview.refresh(); refreshColors();
     } catch {
       if (!closed && visit === selection) {
         modelSelect.value = avatarModel(pick.look); hairSelect.value = avatarHairstyle(pick.look);

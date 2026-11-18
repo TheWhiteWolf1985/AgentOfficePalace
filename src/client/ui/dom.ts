@@ -43,6 +43,7 @@ const doingListeners = new Set<() => void>();
 
 export function onModalChange(fn: (open: boolean) => void) {
   listeners.add(fn);
+  return () => listeners.delete(fn);
 }
 
 export function modalOpen(): boolean {
