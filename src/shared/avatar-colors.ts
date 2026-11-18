@@ -1,14 +1,14 @@
-/** The nine independent color channels of the delivered human revision 02. */
+import { characterPalette } from './character-palette.js';
+
+/** The nine independent color channels shared by both human bases. */
 export const AVATAR_COLOR_ROLES = ['skin', 'hair', 'eyebrows', 'iris', 'clothing', 'shirt', 'tie', 'pants', 'shoes'] as const;
 export type AvatarColorRole = (typeof AVATAR_COLOR_ROLES)[number];
 export type AvatarColors = Record<AvatarColorRole, string> & { version: 1; bow?: string };
-export const DEFAULT_BOW_COLOR = '#b8161d';
+export const DEFAULT_BOW_COLOR = characterPalette.user.bow;
 
 /** sRGB colors of the delivered GLB. Old profiles keep the previously displayed appearance. */
-export const DEFAULT_AVATAR_COLORS: Readonly<AvatarColors> = Object.freeze({
-  version: 1, skin: '#deb58e', hair: '#957951', eyebrows: '#957951', iris: '#247cb8',
-  clothing: '#181d24', shirt: '#f3f5f3', tie: '#b8161d', pants: '#181d24', shoes: '#0d1219',
-});
+const { accent: _accent, bow: _bow, ...userColors } = characterPalette.user;
+export const DEFAULT_AVATAR_COLORS: Readonly<AvatarColors> = Object.freeze({ version: 1, ...userColors });
 export const AVATAR_HEX = /^#[0-9a-f]{6}$/i;
 
 /** Whitelist fields and color syntax; unknown schema versions keep the existing appearance. */

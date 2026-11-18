@@ -11,6 +11,8 @@ import { providerPicker } from './provider';
 import { officePrompt } from './prompts';
 import { issueVars } from './github/prompts';
 import { dictateField } from './dictate';
+import { editAgentAppearance } from './agent-appearance';
+import type { AgentAppearance } from '../../shared/agent-appearance';
 
 /** What a meeting called from an issue, a PR or a task starts out with. */
 export interface MeetingPreset {
@@ -130,6 +132,7 @@ const present = (...xs: (Node | null)[]): Node[] => xs.filter((x): x is Node => 
 function meetingForm(net: Net, preset: MeetingPreset | undefined, done: () => void, back: () => void) {
   let pattern: MeetingPattern = preset?.pattern ?? 'debate';
   let roles: string[] = [];
+  let appearances: (AgentAppearance | undefined)[] = [];
   let outputTouched = false;
   const patterns = h('div.meeting-patterns', { role: 'radiogroup', 'aria-label': uiText('Pattern') });
   const about = h('textarea', { rows: 4, placeholder: uiText('The question to settle, or the task to do: e.g. “How should we organize this project?”'), 'aria-label': uiText('What the meeting is about') }) as HTMLTextAreaElement;
@@ -173,7 +176,11 @@ function meetingForm(net: Net, preset: MeetingPreset | undefined, done: () => vo
       ...roles.map((r, i) => {
         const input = h('input', { type: 'text', value: r, maxlength: 40, 'aria-label': uiText`Role ${i + 1}` }) as HTMLInputElement;
         input.addEventListener('input', () => (roles[i] = input.value));
-        return h('div.meeting-role', {}, h('span.muted', {}, i === 0 ? '👑' : `${i + 1}`), input);
+        const avatar = h('button.btn.small', { type: 'button', onclick: () => editAgentAppearance(appearances[i], appearance => {
+          appearances[i] = appearance;
+          renderRoles();
+        }) }, uiText(appearances[i] ? 'Custom avatar' : 'Random avatar'));
+        return h('div.meeting-role', {}, h('span.muted', {}, i === 0 ? '👑' : `${i + 1}`), input, avatar);
       }),
     );
   };
@@ -181,6 +188,7 @@ function meetingForm(net: Net, preset: MeetingPreset | undefined, done: () => vo
     pattern = p;
     const d = def();
     roles = d.roles.slice(0, d.seats.default);
+    appearances = [];
     for (const b of patterns.children) b.classList.toggle('on', (b as HTMLElement).dataset.pattern === p);
     for (const b of patterns.children) b.setAttribute('aria-checked', String((b as HTMLElement).dataset.pattern === p));
     const fixed = fixedRounds(d);
@@ -202,7 +210,7 @@ function meetingForm(net: Net, preset: MeetingPreset | undefined, done: () => vo
     patterns.append(h('button.meeting-pattern', { type: 'button', role: 'radio', 'data-pattern': id, onclick: () => pickPattern(id) }, h('b', {}, `${d.icon} ${d.label}`), h('small', {}, d.blurb)));
   }
   minus.addEventListener('click', () => {
-    if (roles.length > def().seats.min) roles.pop();
+    if (roles.length > def().seats.min) { roles.pop(); appearances.length = roles.length; }
     renderRoles();
   });
   plus.addEventListener('click', () => {
@@ -253,6 +261,7 @@ function meetingForm(net: Net, preset: MeetingPreset | undefined, done: () => vo
       title: titleIn.value.trim() || undefined,
       output,
       roles: roles.map((r) => r.trim()),
+      appearances: roles.map((_, i) => appearances[i] ?? null),
       parts: def().needs === 'parts' ? parts : undefined,
       pr: def().needs === 'pr' ? pr() : undefined,
       issue: preset?.issue,

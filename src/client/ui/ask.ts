@@ -6,6 +6,8 @@ import { store } from '../state';
 import { providerPicker, type ProviderPicker } from './provider';
 import { repoPicker } from './prompt';
 import { dictateField } from './dictate';
+import { agentAppearancePicker } from './agent-appearance';
+import type { AgentAppearance } from '../../shared/agent-appearance';
 
 // Send a prompt about an issue or PR to a worker: a new one at a free desk, or one already sitting
 // at a desk (it lands in their input box, queued if they're busy).
@@ -34,7 +36,7 @@ export interface AskOptions {
   /** Other floors' projects a new worker in its own worktree can work in too (see WorkerInfo.repos). */
   repoOptions?: { id: string; name: string }[];
   /** `to` is a worker id, or null for a new worker. */
-  onSubmit(prompt: string, to: string | null, worktree: boolean, provider?: AgentProvider, model?: string, effort?: AgentEffort, repos?: string[]): void;
+  onSubmit(prompt: string, to: string | null, worktree: boolean, provider?: AgentProvider, model?: string, effort?: AgentEffort, repos?: string[], appearance?: AgentAppearance): void;
 }
 
 // Shared with the hire prompt, so the choice sticks either way.
@@ -54,6 +56,7 @@ export function openAsk(opts: AskOptions) {
   const repos = repoPicker(opts.worktreeOption ? opts.repoOptions : undefined, wtBox);
   const provider: ProviderPicker | null = opts.providerOption ? providerPicker(store.project, 'ask-provider') : null;
   const submit = h('button.btn.primary', { type: 'submit' });
+  const appearance = opts.newDesk ? agentAppearancePicker() : null;
 
   const choices = h('div.seg.ask-to');
   const pick = (id: string | null) => {
@@ -62,6 +65,7 @@ export function openAsk(opts: AskOptions) {
     wtRow.classList.toggle('hidden', !!id || !opts.worktreeOption);
     repos.element?.classList.toggle('hidden', !!id);
     provider?.element.classList.toggle('hidden', !!id);
+    appearance?.element.classList.toggle('hidden', !!id);
     submit.textContent = id ? uiText('Send ✨') : uiText('Hire & start');
   };
   if (opts.newDesk) choices.append(h('button.btn', { type: 'button', 'data-to': '', onclick: () => pick(null) }, uiText`✨ New worker · ${opts.newDesk}`));
@@ -85,13 +89,14 @@ export function openAsk(opts: AskOptions) {
       provider?.element ?? null,
       wtRow,
       repos.element,
+      appearance?.element ?? null,
     ),
     h('footer', {}, h('span.grow', {}, uiText('Enter to send · Shift+Enter for a new line')), cancel, submit),
   ) as HTMLFormElement;
   form.noValidate = true;
   pick(to);
 
-  const modal = openModal(form);
+  const modal = openModal(form, { onClose: () => appearance?.dispose() });
   cancel.addEventListener('click', () => modal.close());
   const send = () => {
     const text = ta.value.trim();
@@ -116,6 +121,7 @@ export function openAsk(opts: AskOptions) {
       !to ? provider?.model() : undefined,
       !to ? provider?.effort() : undefined,
       !to && opts.worktreeOption && wtBox.checked ? repos.value() : undefined,
+      !to ? appearance?.value() : undefined,
     );
   };
   form.addEventListener('submit', (e) => {

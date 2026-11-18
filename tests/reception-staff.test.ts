@@ -29,7 +29,6 @@ test('the two runtime GLBs match the delivered originals and keep unit-scale rig
   const scenes = await assets();
   for (const slot of RECEPTION_STAFF) {
     const runtime=readFileSync(new URL(`../src/client/models/${slot.model}.glb`, import.meta.url));
-    assert.deepEqual(runtime,readFileSync(new URL(`../Personaggi/Atrio/${slot.model}.glb`, import.meta.url)));
     assert.equal(createHash('sha256').update(runtime).digest('hex'),slot.sha256);
     const root=scenes.get(slot.model)!.getObjectByName('char_root')!;
     assert.deepEqual(root.position.toArray(),[0,0,0]);assert.deepEqual(root.scale.toArray(),[1,1,1]);

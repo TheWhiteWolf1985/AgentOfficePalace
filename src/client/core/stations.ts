@@ -5,6 +5,8 @@ import { Worker } from '../world/character';
 import type { DeskView } from '../world/types';
 import type { World } from '../world/world';
 import { noOutline } from './outline';
+import { agentAppearanceForId } from '../../shared/agent-appearance';
+import { loadAgentVisual } from '../world/character/agent-assets';
 
 /** What each board agent is for: its board's icon, what it offers on the card over its head, and an example ask. */
 export const STATION_INFO: Record<StationKind, { icon: string; offer: string; does: string; example: string }> = {
@@ -29,6 +31,10 @@ export function idleAgentsIn(w: World): IdleAgent[] {
     model.setTask({ name: STATION_INFO[kind].offer, summary: STATION_INFO[kind].does });
     const view = w.desks.get(def.id)!;
     view.vacancy.children[0].add(model.root);
+    void loadAgentVisual(agentAppearanceForId(kind)).then(visual => {
+      model.setVisual(visual);
+      noOutline(model.root);
+    }).catch(error => console.warn('Board avatar could not be loaded', error));
     noOutline(model.root);
     return { model, view };
   });

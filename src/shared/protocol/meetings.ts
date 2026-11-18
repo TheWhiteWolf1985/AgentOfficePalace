@@ -125,6 +125,7 @@ export interface MeetingRequest {
   output?: string;
   /** A role per worker, the head of the table first. */
   roles: string[];
+  appearances?: (import('../agent-appearance.js').AgentAppearance | null)[];
   parts?: string[];
   pr?: number;
   issue?: number;

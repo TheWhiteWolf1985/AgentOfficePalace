@@ -1,3 +1,4 @@
+import type { AgentAppearance } from '../shared/agent-appearance';
 import { bootstrapProfile } from './bootstrap-profile';
 import { spaceCapabilities } from '../shared/space-capabilities';
 import './i18n';
@@ -254,8 +255,8 @@ function promptWorker(id: string) {
 }
 
 // ---- New work: a prompt for a worker who's here, or a new one at a free desk -------------------
-function hire(deskId: string, prompt: string, worktree: boolean, provider?: AgentProvider, model?: string, effort?: AgentEffort, repos?: string[], issue?: number) {
-  net.send({ t: 'worker.spawn', deskId, prompt, worktree, provider, model, effort, issue, repos: repos?.length ? repos : undefined });
+function hire(deskId: string, prompt: string, worktree: boolean, provider?: AgentProvider, model?: string, effort?: AgentEffort, repos?: string[], issue?: number, appearance?: AgentAppearance) {
+  net.send({ t: 'worker.spawn', deskId, prompt, worktree, provider, model, effort, issue, repos: repos?.length ? repos : undefined, appearance });
 }
 
 /** With `issue`, the worker the prompt goes to takes that GitHub issue. */
@@ -273,9 +274,9 @@ function sendToWorker(title: string, text: { context?: string; initial?: string 
     worktreeOption: !!store.project.branch,
     providerOption: true,
     repoOptions: repoChoices(),
-    onSubmit: (prompt, to, worktree, provider, model, effort, repos) => {
+    onSubmit: (prompt, to, worktree, provider, model, effort, repos, appearance) => {
       if (to) net.send({ t: 'worker.prompt', workerId: to, prompt, issue });
-      else if (desk) hire(desk, prompt, worktree, provider, model, effort, repos, issue);
+      else if (desk) hire(desk, prompt, worktree, provider, model, effort, repos, issue, appearance);
     },
   });
 }

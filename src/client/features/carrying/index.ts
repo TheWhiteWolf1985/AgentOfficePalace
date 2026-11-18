@@ -13,6 +13,8 @@ import { issuePrompt } from '../../ui/github/prompts';
 import { closeAllModals, h, toast } from '../../ui/dom';
 import { issueMeeting, type MeetingPreset } from '../../ui/meeting';
 import { worktreePref } from '../../ui/prompt';
+import { editAgentAppearance } from '../../ui/agent-appearance';
+import type { AgentAppearance } from '../../../shared/agent-appearance';
 import { officeChoice } from '../../ui/provider';
 import { hiringPaused } from '../../ui/usage';
 import type { Interactable } from '../../world/types';
@@ -27,7 +29,7 @@ export interface CarryingDeps {
   /** Plays the reach on your hands and your character, and shows it to everyone else. */
   reach(): void;
   /** Hires a worker at `deskId` (see hire in features/workers/actions.ts). */
-  hire(deskId: string, prompt?: string, worktree?: boolean, provider?: AgentProvider, model?: string, effort?: AgentEffort, issue?: number, repos?: string[]): void;
+  hire(deskId: string, prompt?: string, worktree?: boolean, provider?: AgentProvider, model?: string, effort?: AgentEffort, issue?: number, repos?: string[], appearance?: AgentAppearance): void;
   /** The office is at its worker limit: says so, and says yes. */
   officeIsFull(): boolean;
   /** The meeting room's window, prefilled with `preset`. */
@@ -110,8 +112,12 @@ export function installCarrying(ctx: Ctx, deps: CarryingDeps) {
       putDown();
     } else if (!deps.officeIsFull()) {
       const { provider, model, effort } = officeChoice(store.project);
-      deps.hire(it.deskId, prompt, !!store.project?.branch && worktreePref(), provider, model, effort, card.issue);
-      putDown();
+      const deskId = it.deskId;
+      editAgentAppearance(undefined, appearance => {
+        if (store.workerAtDesk(deskId) || deps.officeIsFull()) return;
+        deps.hire(deskId, prompt, !!store.project?.branch && worktreePref(), provider, model, effort, card.issue, undefined, appearance);
+        putDown();
+      });
     }
     return true;
   }

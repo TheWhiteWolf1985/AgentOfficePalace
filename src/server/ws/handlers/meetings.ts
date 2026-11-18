@@ -2,6 +2,7 @@
 import { isAgentEffort, isAgentProvider, type MeetingClientMsg, type MeetingRequest } from '../../../shared/protocol.js';
 import { OPEN_CODE_MODEL_MAX } from '../../../shared/providers.js';
 import { str } from '../../office/input.js';
+import { sanitizeAgentAppearance } from '../../../shared/agent-appearance.js';
 import { here } from './common.js';
 import type { HandlerMap, ViewPieces } from './types.js';
 
@@ -23,6 +24,7 @@ export const meetingHandlers = {
       title: str(msg.title, 200) || undefined,
       output: str(msg.output, 300) || undefined,
       roles: Array.isArray(msg.roles) ? msg.roles.slice(0, 8).map((r) => str(r, 80)) : [],
+      appearances: Array.isArray(msg.appearances) ? msg.appearances.slice(0, 8).map(value => sanitizeAgentAppearance(value) ?? null) : undefined,
       parts: Array.isArray(msg.parts) ? msg.parts.slice(0, 200).map((p) => str(p, 500)) : undefined,
       pr: count(msg.pr),
       issue: count(msg.issue),

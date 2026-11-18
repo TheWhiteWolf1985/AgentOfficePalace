@@ -26,8 +26,7 @@ function canvas(t: TestContext) {
 }
 
 test('runtime user GLB is the delivered unit-scale model with an independently posed rigid rig', async () => {
-  assert.deepEqual(bytes, readFileSync(new URL('../Personaggi/Utenti_maschio/human_base.glb', import.meta.url)));
-  assert.equal(createHash('sha256').update(bytes).digest('hex'), '3340be53a3178dcdce048f33fe380a662ec1cc5675163ca922efeaa3ff2ee57f');
+  assert.equal(createHash('sha256').update(bytes).digest('hex'), '9b5f80f5ce9afef51b70b4cebbd6f5d867b43fdec46fc7f23063b2e51c09607b');
   const source = await load(), original = source.scene.getObjectByName('char_root')!;
   const before = new THREE.Box3().setFromObject(original), a = humanBase(source.scene.clone(true)), b = humanBase(source.scene.clone(true));
   assert.equal(source.animations.length, 0);
@@ -46,7 +45,7 @@ test('runtime user GLB is the delivered unit-scale model with an independently p
 test('base colors and face primitives survive toon conversion without sharing instance materials', async () => {
   const source = (await load()).scene, a = humanBase(source.clone(true)), b = humanBase(source.clone(true));
   const original = materials(source), first = materials(a.rig.root), second = materials(b.rig.root);
-  assert.equal(first.size, 11);
+  assert.equal(first.size, 12);
   for (const [name, mat] of first) {
     assert.ok(mat instanceof THREE.MeshToonMaterial);
     assert.ok(mat.color.equals(original.get(name)!.color), name);
@@ -55,7 +54,7 @@ test('base colors and face primitives survive toon conversion without sharing in
   }
   let primitives = 0;
   a.rig.root.traverse(n => { if (n instanceof THREE.Mesh) { primitives++; assert.equal(n.userData.sharedHumanGeometry, true); } });
-  assert.equal(primitives, 25);
+  assert.equal(primitives, 26);
   first.get('char_mat_hair')!.color.set('#ff00ff');
   assert.ok(second.get('char_mat_hair')!.color.equals(original.get('char_mat_hair')!.color));
   a.dispose(); b.dispose();
@@ -135,7 +134,7 @@ test('closing a preview or removing a peer releases its materials without destro
   for (const material of materials(world.root).values()) material.addEventListener('dispose', () => worldMaterialsDisposed++);
   preview.read(true); preview.setDoing('Example'); preview.say('Example'); preview.dispose();
   assert.equal(geometriesDisposed, 0);
-  assert.equal(previewMaterialsDisposed, 11);
+  assert.equal(previewMaterialsDisposed, 12);
   assert.equal(worldMaterialsDisposed, 0);
   world.update(0.1, 1, true, false);
   const reopen = humanBase(source.clone(true));

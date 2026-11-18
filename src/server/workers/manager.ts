@@ -1,3 +1,4 @@
+import { randomAgentAppearance, sanitizeAgentAppearance, type AgentAppearance } from '../../shared/agent-appearance.js';
 import { checkBlocked } from './readiness.js';
 import { workerConnections } from '../connections/git.js';
 import { configureWorker } from './configure.js';
@@ -220,11 +221,10 @@ export class WorkerManager {
   }
 
   /**
-   * Hires a worker at a desk. `meeting` seats one at the meeting room's table instead, for that meeting
-   * (see meetings.ts), in the meeting's own worktree, which everyone at the table shares. `repos` are
-   * other floors' repositories a worker in its own worktree works in too (see makeWorkspace).
+   * Hires at a desk, or seats the worker in a meeting with its shared worktree.
+   * `repos` lists other floors' repositories available from the worker's own worktree.
    */
-  spawn(deskId: string, by: string, prompt?: string, worktree = false, kind: WorkerKind = 'agent', provider?: AgentProvider, model?: string, effort?: AgentEffort, meeting?: { id: string; worktree?: WorkerInfo['worktree'] }, owner?: string, repos: RepoSource[] = []): WorkerInfo | string {
+  spawn(deskId: string, by: string, prompt?: string, worktree = false, kind: WorkerKind = 'agent', provider?: AgentProvider, model?: string, effort?: AgentEffort, meeting?: { id: string; worktree?: WorkerInfo['worktree'] }, owner?: string, repos: RepoSource[] = [], appearance?: AgentAppearance): WorkerInfo | string {
     // Nobody picked (a board agent, say): the office's default worker, model and effort included.
     if (kind === 'agent' && provider === undefined) ({ provider, model, effort } = this.officeDefault);
     const selectedProvider = kind === 'agent' ? provider : undefined;
@@ -280,6 +280,7 @@ export class WorkerManager {
       deskId,
       name: kind === 'shell' ? `${name} 🐚` : name,
       color: kind === 'shell' ? '#8d99ae' : agent ? agent.color : COLORS[Math.floor(Math.random() * COLORS.length)],
+      ...(kind === 'agent' ? { appearance: sanitizeAgentAppearance(appearance) ?? randomAgentAppearance() } : {}),
       status: 'starting',
       acked: true,
       createdBy: by,
@@ -337,13 +338,13 @@ export class WorkerManager {
    * up with it if it's asleep, or it's hired there with it when nobody is. Returns what went wrong, or
    * the agent and whether it was just hired.
    */
-  station(deskId: string, by: string, text: string, owner?: string): { info: WorkerInfo; hired: boolean } | string {
+  station(deskId: string, by: string, text: string, owner?: string, appearance?: AgentAppearance): { info: WorkerInfo; hired: boolean } | string {
     if (!DESK_BY_ID.get(deskId)?.station) return 'There is no agent to ask there';
     const clean = text.replace(/\r\n?/g, '\n').trim();
     if (!clean) return 'Empty prompt';
     const w = [...this.workers.values()].find((x) => x.info.deskId === deskId);
     if (!w) {
-      const info = this.spawn(deskId, by, clean, false, 'agent', undefined, undefined, undefined, undefined, owner);
+      const info = this.spawn(deskId, by, clean, false, 'agent', undefined, undefined, undefined, undefined, owner, [], appearance);
       return typeof info === 'string' ? info : { info, hired: true };
     }
     // Typed into the question it's asking, the prompt would answer it.

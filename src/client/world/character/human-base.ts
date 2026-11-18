@@ -63,6 +63,7 @@ export function humanBase(asset: THREE.Object3D) {
   const originalBow = bowMaterial?.color.clone();
   return {
     rig, skin: material('char_mat_skin'), clothing: material('char_mat_clothing'), hair: material('char_mat_hair'),
+    material,
     setColors: (value?: AvatarColors) => {
       const colors = sanitizeAvatarColors(value);
       for (const channel of channels) {

@@ -1,4 +1,5 @@
 // workers.json: every worker as the office last saw it, to pick them all back up after a restart.
+import { agentAppearanceForId, sanitizeAgentAppearance } from '../../shared/agent-appearance.js';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import type { AgentProvider, WorkerInfo, WorkerStatus, WorkerTask } from '../../shared/protocol.js';
 import { DESK_BY_ID } from '../../shared/layout.js';
@@ -25,6 +26,7 @@ export function saveWorkers(file: string, workers: Iterable<Worker>, stopping: b
     model: info.model,
     effort: info.effort,
     connectionAccountId: info.connectionAccountId,
+    appearance: info.appearance,
     deskId: info.deskId,
     name: info.name,
     color: info.color,
@@ -83,6 +85,7 @@ export function restoreWorkers(file: string, workers: Map<string, Worker>, defau
         deskId: s.deskId,
         name: s.name ?? 'Worker',
         color: s.color ?? COLORS[0],
+        ...(s.kind !== 'shell' ? { appearance: sanitizeAgentAppearance(s.appearance) ?? agentAppearanceForId(s.id) } : {}),
         status: 'offline',
         acked: true,
         createdBy: s.createdBy ?? '?',

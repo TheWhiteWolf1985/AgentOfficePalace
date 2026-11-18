@@ -19,6 +19,8 @@ import hairSpikyUrl from '../models/hair_spiky.glb?url';
 import hairCurlyUrl from '../models/hair_curly.glb?url';
 import hairPonytailUrl from '../models/hair_ponytail.glb?url';
 import humanBaseUrl from '../models/human_base.glb?url';
+import agentMaleUrl from '../models/agent_male_base.glb?url';
+import agentFemaleUrl from '../models/agent_female_base.glb?url';
 import { toon } from './toon';
 
 // The things in the world modelled in Blender rather than built in code. Each .glb is exported by a
@@ -36,6 +38,8 @@ const MODELS = {
   reception_b: { url: receptionBUrl },
   human_base: { url: humanBaseUrl },
   human_female: { url: femaleBaseUrl },
+  agent_male: { url: agentMaleUrl },
+  agent_female: { url: agentFemaleUrl },
   hair_short: { url: hairShortUrl },
   hair_long: { url: hairLongUrl },
   hair_bun: { url: hairBunUrl },

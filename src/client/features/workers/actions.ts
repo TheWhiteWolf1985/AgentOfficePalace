@@ -1,3 +1,4 @@
+import type { AgentAppearance } from '../../../shared/agent-appearance';
 import { t as uiText } from '../../../shared/i18n';
 /**
  * What you do with workers: hire one at a desk (with a task, or a shell), prompt it, wake it, send it
@@ -78,8 +79,8 @@ export function installWorkerActions(ctx: Ctx, core: CoreState, parts: WorkerAct
     return true;
   }
 
-  function hire(deskId: string, prompt?: string, worktree = false, provider?: AgentProvider, model?: string, effort?: AgentEffort, issue?: number, repos?: string[]) {
-    net.send({ t: 'worker.spawn', deskId, prompt, worktree, provider, model, effort, issue, repos: repos?.length ? repos : undefined });
+  function hire(deskId: string, prompt?: string, worktree = false, provider?: AgentProvider, model?: string, effort?: AgentEffort, issue?: number, repos?: string[], appearance?: AgentAppearance) {
+    net.send({ t: 'worker.spawn', deskId, prompt, worktree, provider, model, effort, issue, repos: repos?.length ? repos : undefined, appearance });
     // The moment notifications start to matter: ask once (it has to come from a key press or click).
     if (settings.notify && notifyPermission() === 'default' && !askedToNotify) {
       askedToNotify = true;
@@ -105,7 +106,8 @@ export function installWorkerActions(ctx: Ctx, core: CoreState, parts: WorkerAct
         providerOption: true,
         worktreeOption: !!store.project?.branch,
         repoOptions: repoChoices(),
-        onSubmit: (text, o) => hire(deskId, text, o.worktree, o.provider, o.model, o.effort, undefined, o.repos),
+        appearanceOption: true,
+        onSubmit: (text, o) => hire(deskId, text, o.worktree, o.provider, o.model, o.effort, undefined, o.repos, o.appearance),
       });
     } else if (w.lost) {
       fixLostWorktree(w);
@@ -141,7 +143,8 @@ export function installWorkerActions(ctx: Ctx, core: CoreState, parts: WorkerAct
       providerOption: true,
       worktreeOption: !!store.project?.branch,
       repoOptions: repoChoices(),
-      onSubmit: (text, o) => hire(deskId, text || undefined, o.worktree, o.provider, o.model, o.effort, undefined, o.repos),
+      appearanceOption: true,
+      onSubmit: (text, o) => hire(deskId, text || undefined, o.worktree, o.provider, o.model, o.effort, undefined, o.repos, o.appearance),
     });
   }
 
@@ -204,7 +207,8 @@ export function installWorkerActions(ctx: Ctx, core: CoreState, parts: WorkerAct
       placeholder: `e.g. ${info.example}`,
       submitLabel: uiText('Send ✨'),
       warning: w ? undefined : pressureNote(store.machine),
-      onSubmit: (text) => net.send({ t: 'station.prompt', deskId, prompt: text }),
+      appearanceOption: !w,
+      onSubmit: (text, opts) => net.send({ t: 'station.prompt', deskId, prompt: text, appearance: opts.appearance }),
     });
   }
 
@@ -457,9 +461,9 @@ export function installWorkerActions(ctx: Ctx, core: CoreState, parts: WorkerAct
       worktreeOption: !!store.project?.branch,
       providerOption: true,
       repoOptions: repoChoices(),
-      onSubmit: (prompt, to, worktree, provider, model, effort, repos) => {
+      onSubmit: (prompt, to, worktree, provider, model, effort, repos, appearance) => {
         if (to) net.send({ t: 'worker.prompt', workerId: to, prompt, issue });
-        else if (desk) hire(desk, prompt, worktree, provider, model, effort, issue, repos);
+        else if (desk) hire(desk, prompt, worktree, provider, model, effort, issue, repos, appearance);
       },
     });
   }

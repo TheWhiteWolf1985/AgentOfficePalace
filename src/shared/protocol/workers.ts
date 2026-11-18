@@ -2,6 +2,7 @@
 
 import type { AgentEffort, AgentProvider } from './agents.js';
 import type { Usage } from './usage.js';
+import type { AgentAppearance } from '../agent-appearance.js';
 
 export type WorkerStatus =
   | 'starting' // PTY launched, agent booting
@@ -40,6 +41,7 @@ export interface WorkerInfo {
   deskId: string;
   name: string;
   color: string;
+  appearance?: AgentAppearance;
   status: WorkerStatus;
   /** True once someone opened the terminal after the last done / needs_input. */
   acked: boolean;
@@ -156,7 +158,7 @@ export const FLAG_DIM = 4;
 export type WorkerClientMsg =
   /** With `issue`, the worker is there for that GitHub issue: it moves to In progress at once, is assigned on GitHub (which keeps it there) and taken off the queue. */
   /** With `repos` (other floors' ids), the worker works in their repositories too, each in a worktree of its own (see WorkerInfo.repos). */
-  | { t: 'worker.spawn'; deskId: string; prompt?: string; worktree?: boolean; kind?: WorkerKind; provider?: AgentProvider; model?: string; effort?: AgentEffort; issue?: number; repos?: string[] }
+  | { t: 'worker.spawn'; deskId: string; prompt?: string; worktree?: boolean; kind?: WorkerKind; provider?: AgentProvider; model?: string; effort?: AgentEffort; issue?: number; repos?: string[]; appearance?: AgentAppearance }
   | { t: 'worker.resume'; workerId: string }
   | { t: 'worker.kill'; workerId: string; cleanup?: WorktreeCleanup }
   /** Asks what the worker's worktree holds; answered with a `worker.worktree` message. */
@@ -171,7 +173,7 @@ export type WorkerClientMsg =
    * A prompt for the agent standing by a board (`deskId` is its kiosk, see STATIONS in layout). It's
    * typed into its session, which is woken up first if it's asleep, or hired there when nobody is.
    */
-  | { t: 'station.prompt'; deskId: string; prompt: string }
+  | { t: 'station.prompt'; deskId: string; prompt: string; appearance?: AgentAppearance }
   /** Push a worktree worker's branch and open a pull request for it, drafted from its task. */
   | { t: 'worker.pr'; workerId: string }
   | { t: 'term.input'; workerId: string; data: string }

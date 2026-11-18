@@ -22,6 +22,8 @@ import { renderLimits } from '../../ui/limits';
 import { modelBadge, providerLabel } from '../../ui/provider';
 import { renderUsage } from '../../ui/usage';
 import { Worker } from '../../world/character';
+import { loadAgentVisual } from '../../world/character/agent-assets';
+import { sanitizeAgentAppearance, agentAppearanceForId } from '../../../shared/agent-appearance';
 import { Laptop } from './laptop';
 import { Arrivals, Departures } from './leaving';
 
@@ -91,6 +93,12 @@ export function installWorkerViews(ctx: Ctx, core: CoreState, parts: WorkerViews
         departures.vacate(w.deskId);
         const model = new Worker(w.name, w.color);
         desk.seatAnchor.add(model.root);
+        if (w.kind === 'agent') {
+          void loadAgentVisual(sanitizeAgentAppearance(w.appearance) ?? agentAppearanceForId(w.id)).then(visual => {
+            model.setVisual(visual, desk.def.station ? undefined : desk.seatAnchor);
+            noOutline(model.root);
+          }).catch(error => console.warn('Agent avatar could not be loaded', error));
+        }
         // Its globe floats beside the laptop (or the kiosk's counter), out from behind the card over
         // its head and the back of its chair, so it shows from across the room.
         const beside = desk.def.station ? new THREE.Vector3(0.62, 0.9, 0) : new THREE.Vector3(0.64, 0.5, -0.1);

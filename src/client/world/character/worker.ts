@@ -9,6 +9,7 @@ import { STATUS_BULB, bubbleFor } from './worker-badges';
 import { globe, papers } from './worker-props';
 import { DANCE, groove, type Dancing, type Stage } from './worker-dance';
 import { packUp, waddle, type Leaving } from './worker-leave';
+import type { agentVisual } from './agent-visual';
 
 /** The little Claude worker that sits at a desk. Forward is +z. */
 export class Worker {
@@ -71,6 +72,10 @@ export class Worker {
   private stride = 0;
   /** How quick its steps are, next to a walk: more running, less shuffling (see Court). */
   gait = 1;
+  private visual?: ReturnType<typeof agentVisual>;
+  private visualSeat?: THREE.Object3D;
+  private legacyMeshes: THREE.Mesh[] = [];
+  private disposed = false;
 
   constructor(
     name: string,
@@ -124,6 +129,8 @@ export class Worker {
       this.feet.push(foot);
     }
 
+    this.body.traverse(node => { if (node instanceof THREE.Mesh) this.legacyMeshes.push(node); });
+
     // What it acts out with: papers in its hands, and a globe beside its laptop.
     this.papers = papers();
     this.papers.group.position.set(0, 0.86, 0.4);
@@ -135,6 +142,24 @@ export class Worker {
 
     this.rig = { root: this.root, body: this.body, skin: this.skin, armL: this.armL, armR: this.armR, feet: this.feet, pupils: this.pupils, bulb: this.bulb, bulbMesh: this.bulbMesh, props: [this.papers.group, this.globe.group] };
     this.setName(name);
+  }
+
+  setVisual(visual: ReturnType<typeof agentVisual>, seat?: THREE.Object3D) {
+    if (this.disposed) { visual.dispose(); return; }
+    this.visual?.root.removeFromParent();
+    this.visual?.dispose();
+    this.visual = visual;
+    this.visualSeat = seat;
+    for (const mesh of this.legacyMeshes) mesh.visible = false;
+    this.body.add(visual.root);
+    this.poseVisual();
+  }
+
+  private poseVisual() {
+    if (!this.visual) return;
+    const seated = this.root.parent === this.visualSeat && !this.walking && !this.leaving && !this.dancing;
+    this.visual.pose(this.rig, this.eyes[0].scale.y, seated, this.walking);
+    return seated;
   }
 
   /** Where the globe floats, in its own space: beside its laptop, where the card over its head doesn't hide it. */
@@ -348,6 +373,10 @@ export class Worker {
       this.body.position.y += Math.abs(s) * 0.05;
       this.body.rotation.z = s * 0.1;
     }
+    if (this.poseVisual() === false) {
+      if (this.nameTag) this.nameTag.position.y += 0.48;
+      if (this.bubble) this.bubble.position.y += 0.48;
+    }
   }
 
   /** Eases toward `act`'s stance, out of whatever it was doing before. */
@@ -381,8 +410,9 @@ export class Worker {
   private carry(l: NonNullable<Worker['leaving']>, dt: number, t: number) {
     waddle(this.rig, l, this.walking, dt);
     this.blink(dt);
-    if (this.bubble) this.bubble.position.y = 1.95 + Math.sin(t * 3) * 0.03;
-    if (this.nameTag) this.nameTag.position.y = 1.55;
+    this.poseVisual();
+    if (this.bubble) this.bubble.position.y = (this.visual ? 2.43 : 1.95) + Math.sin(t * 3) * 0.03;
+    if (this.nameTag) this.nameTag.position.y = this.visual ? 2.03 : 1.55;
   }
 
   /** Up on the desk dancing: hop up, groove side to side, twirl, jump twice, hop back down. */
@@ -396,8 +426,10 @@ export class Worker {
     }
     const lift = groove(this.rig, d, dt, t);
     this.blink(dt);
-    if (this.bubble) this.bubble.position.y = (this.bubbleIsCard ? 1.74 : 1.95) + lift + Math.sin(t * 3) * 0.03;
-    if (this.nameTag) this.nameTag.position.y = 1.55 + lift;
+    this.poseVisual();
+    const height = lift + (this.visual ? 0.48 : 0);
+    if (this.bubble) this.bubble.position.y = (this.bubbleIsCard ? 1.74 : 1.95) + height + Math.sin(t * 3) * 0.03;
+    if (this.nameTag) this.nameTag.position.y = 1.55 + height;
   }
 
   /** Back in its seat, standing straight, its light showing its status again. */
@@ -422,6 +454,11 @@ export class Worker {
   }
 
   dispose() {
+    this.disposed = true;
+    this.visual?.dispose();
+    for (const mesh of this.legacyMeshes) mesh.geometry.dispose();
+    this.skin.dispose();
+    this.bulb.dispose();
     if (this.bubble) disposeSprite(this.bubble);
     if (this.nameTag) disposeSprite(this.nameTag);
   }

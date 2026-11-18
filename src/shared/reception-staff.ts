@@ -3,7 +3,7 @@ export const RECEPTION_STAFF = [
   {
     "id": "reception_npc_a",
     "model": "reception_a",
-    "sha256": "5f1159b78735218145a75d5a71937e6cba5a9776c90af558d557ce30c0883800",
+    "sha256": "dd8473eae487f881852439ddc42dd218ccb801022fc2c3ba4ec6a11bc583746d",
     "position": {
       "x": -1.1,
       "y": 0,
@@ -13,10 +13,10 @@ export const RECEPTION_STAFF = [
     "scale": 1.15,
     "collider": {
       "id": "reception_npc_a",
-      "minX": -1.62325,
-      "maxX": -0.57675,
-      "minZ": -11.17835,
-      "maxZ": -10.4136,
+      "minX": -1.606,
+      "maxX": -0.594,
+      "minZ": -11.21745,
+      "maxZ": -10.3561,
       "bottom": 0.0,
       "top": 2.030325
     }
@@ -24,7 +24,7 @@ export const RECEPTION_STAFF = [
   {
     "id": "reception_npc_b",
     "model": "reception_b",
-    "sha256": "3956080d749b0313bbd62840ba19d61f02e1a48ee8f7c461812bbbae9ddb00b0",
+    "sha256": "f881303ba6001c44065029a4a1ecffc5326865f74f617643ddae40cee4079a84",
     "position": {
       "x": 1.1,
       "y": 0,
@@ -34,12 +34,12 @@ export const RECEPTION_STAFF = [
     "scale": 1.15,
     "collider": {
       "id": "reception_npc_b",
-      "minX": 0.57675,
-      "maxX": 1.62325,
+      "minX": 0.594,
+      "maxX": 1.606,
       "minZ": -11.175475,
       "maxZ": -10.4136,
       "bottom": 0.0,
-      "top": 2.030325
+      "top": 2.047
     }
   }
 ] as const;

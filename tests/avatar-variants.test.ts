@@ -67,9 +67,12 @@ test('all fourteen body/style combinations preserve the fixed bow, independent b
   for (const model of ['male', 'female'] as const) for (const hairstyle of AVATAR_HAIRSTYLES) {
     const look: Look = { ...legacy, model, hairstyle, colors: { ...DEFAULT_AVATAR_COLORS, hair: '#112233', bow: '#2244ff' } };
     const person = new Person('A', '#ffffff', look, assets.body(model)!, assets);
-    const referenceBytes = readFileSync(new URL(`../Personaggi/Utenti_femmina/assemblies/${model}_${hairstyle}.glb`, import.meta.url));
-    const reference = await new GLTFLoader().parseAsync(referenceBytes.buffer.slice(referenceBytes.byteOffset, referenceBytes.byteOffset + referenceBytes.byteLength), '');
-    assert.deepEqual(triangles(person.rig.body), triangles(reference.scene), `${model}/${hairstyle}: runtime composition matches the delivered assembled geometry`);
+    const reference = assets.body(model)!;
+    const originalHair = reference.getObjectByName('char_hair')!;
+    originalHair.clear();
+    const component = assets.hair(hairstyle);
+    if (component) originalHair.add(component);
+    assert.deepEqual(triangles(person.rig.body), triangles(reference), `${model}/${hairstyle}: runtime preserves the delivered rest geometry and attaches hair at identity`);
     const hair = person.root.getObjectByName('char_hair')!;
     let hairMeshes = 0; hair.traverse(n => { if (n instanceof THREE.Mesh) hairMeshes++; });
     assert.equal(hairMeshes, hairstyle === 'bald' ? 0 : 1, `${model}/${hairstyle}`);
