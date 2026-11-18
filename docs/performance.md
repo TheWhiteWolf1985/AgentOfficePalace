@@ -36,4 +36,10 @@ Only a requested destination is prepared with Three's `compileAsync`, using the 
 
 Audio sample buffers are generated lazily, cached and warmed one sample family per idle/background task. The browser can prepare AudioBuffers without creating or starting an AudioContext;48kHz prepared samples are resampled normally by the playing context. The context is still resumed during the user gesture. The initial sound graph and alerts remain immediately usable, while ambience starts in a separate task. Sound recipes, volume, visibility behavior, voice and alerts remain in place.
 
+## Picking and visual updates
+
+Frequent pointer rays are bounded by the maximum interaction reach plus the camera-to-eyes distance and any click tolerance. Intersections are reused while the camera, geometry and object hierarchy stay still. The cache checks transforms, visibility, layers, materials and geometry revisions, including parent transforms. Tiny numerical settling below 1e-8 is ignored. Key actions and first-person clicks recheck the scene before using the target. Third-person clicks retain the distant-object feedback and board intersections retain their UV coordinates.
+
+Local character poses, hands, dust, confetti and sky updates follow the world's drawing cadence, including the reduced cadence behind a dialog. Their elapsed time accumulates between draws and is bounded on resume. Movement, collision handling, networking, audio, door/elevator state and shared updates continue on the normal loop. Solar position calculations are cached within one simulated second and refresh when time or location changes. The user-avatar editor keeps its own existing preview loop.
+
 Compare CPU/frame traces with the same graphics preference, viewport, camera, weather and route. Measure first room entry separately from a repeat visit. User-supplied November17traces locate an audio startup task around58ms and a shader-program first-use stall around201ms; these are a baseline, not evidence of a hardware-independent improvement after this change.

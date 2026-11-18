@@ -28,7 +28,7 @@ export function installKeyboard(ctx: Ctx, parts: Pick<Parts, 'pointer'>) {
     code: Object.keys(DESK_KEYS),
     run: (e) => {
       const deskKey = DESK_KEYS[e.code as keyof typeof DESK_KEYS];
-      const handled = parts.pointer.use(parts.pointer.target(), deskKey);
+      const handled = parts.pointer.use(parts.pointer.currentTarget(), deskKey);
       // P and L open a text box, which the key mustn't land in.
       if (handled && (deskKey === 'P' || deskKey === 'L')) e.preventDefault();
       return handled;

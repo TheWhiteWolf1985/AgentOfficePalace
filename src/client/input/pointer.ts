@@ -15,6 +15,7 @@ import { EYE_HEIGHT } from '../player';
 import { store } from '../state';
 import { modalOpen, toast } from '../ui/dom';
 import type { Interactable } from '../world/types';
+import { SceneRaycast } from './scene-raycast';
 
 export type PointerParts = Pick<Parts, 'worlds' | 'rooftop' | 'atrium' | 'place' | 'you' | 'boards' | 'cards' | 'seating' | 'hanging' | 'hintbar'>;
 
@@ -81,17 +82,20 @@ export function installPointer(ctx: Ctx, core: CoreState, parts: PointerParts) {
   }
 
   // ---- Clicking the world: use what's under the crosshair (first person) or the mouse (third) ----------
-  const raycaster = new THREE.Raycaster();
+  const raycast = new SceneRaycast();
   const CROSSHAIR = new THREE.Vector2(0, 0);
   const eye = new THREE.Vector3();
+  const cameraAt = new THREE.Vector3();
 
   /** What the ray through `ndc` lands on first, whether it is within reach (plus `slack` meters), and where it hit. */
-  function aimedAt(ndc: THREE.Vector2, slack = 0): { it: Interactable; near: boolean; hit: THREE.Intersection } | null {
-    raycaster.setFromCamera(ndc, camera);
+  function aimedAt(ndc: THREE.Vector2, slack = 0, distant = false): { it: Interactable; near: boolean; hit: THREE.Intersection } | null {
     eye.set(player.pos.x, player.pos.y + EYE_HEIGHT, player.pos.z);
-
+    camera.updateWorldMatrix(true, false);
+    // Any point within reach of the eyes lies within this distance along the camera ray.
+    const far = distant ? Infinity : camera.getWorldPosition(cameraAt).distanceTo(eye) + ctx.interactions.maxReach + slack;
     const roof = parts.rooftop.roof();
-    for (const hit of raycaster.intersectObjects(core.atLobby ? (parts.atrium.atrium()?.pickables ?? []) : core.upTop && roof ? roof.pickables : [office.group, ...ctx.usables.pickables()], true)) {
+    const pickables = core.atLobby ? (parts.atrium.atrium()?.pickables ?? []) : core.upTop && roof ? roof.pickables : [office.group, ...ctx.usables.pickables()];
+    for (const hit of raycast.intersect(camera, ndc, pickables, far)) {
       let it: Interactable | undefined;
       let shown = true;
       for (let o: THREE.Object3D | null = hit.object; o; o = o.parent) {
@@ -119,7 +123,7 @@ export function installPointer(ctx: Ctx, core: CoreState, parts: PointerParts) {
   });
   canvas.addEventListener('pointerleave', () => (pointer = null));
   // What you're pointing at (first person) or standing at (third), and what the hint bar says about it.
-  ctx.ticks.add('aim', () => {
+  function updateTarget() {
     const { seating } = parts;
     const firstPerson = player.view === 'first';
     aimedNote = null;
@@ -136,6 +140,9 @@ export function installPointer(ctx: Ctx, core: CoreState, parts: PointerParts) {
         if (aim?.near) aimedNote = noteUnder(aim);
       }
     }
+  }
+  ctx.ticks.add('aim', () => {
+    updateTarget();
     parts.boards.issuesTex.lift(aimedNote?.number ?? null);
     parts.hintbar.renderHint();
     parts.hintbar.renderCrosshair();
@@ -151,12 +158,13 @@ export function installPointer(ctx: Ctx, core: CoreState, parts: PointerParts) {
       return;
     }
     if (player.view === 'first') {
+      updateTarget();
       // Reach out even at nothing, like poking the air.
       reach();
       if (target) interact(target, 'E');
       return;
     }
-    const aim = aimedAt(ndc, 2.5);
+    const aim = aimedAt(ndc, 2.5, true);
     if (!aim) return;
     if (!aim.near) {
       toast(uiText('Walk closer to that first'));
@@ -168,6 +176,8 @@ export function installPointer(ctx: Ctx, core: CoreState, parts: PointerParts) {
   return {
     /** What you're pointing at (first person) or standing at (third), if anything. */
     target: () => target,
+    /** Recheck moving geometry before a key uses the cached hint. */
+    currentTarget: () => { updateTarget(); return target; },
 
     clearTarget: () => void (target = null),
     aimedNote: () => aimedNote,

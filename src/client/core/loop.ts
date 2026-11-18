@@ -13,6 +13,7 @@ import type { Frame } from './registry';
 import { FOV } from './scene';
 import { FirstPersonBody } from '../world/character/person-first';
 import { modalOpen } from '../ui/dom';
+import { VisualClock } from './visual-clock';
 
 /** Covering less ground than this (m/s) since your last footstep, your feet make no sound: a walk is 4.6. */
 const QUIET_FEET = 1.2;
@@ -25,7 +26,13 @@ export interface LoopDeps {
 /** Registers the office's own ticks: install it before anything else registers one. */
 export function installLoop(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'stage' | 'peers' | 'views' | 'worlds' | 'place'>, deps: LoopDeps) {
   let landing: ReturnType<Ctx['player']['effects']['add']> | undefined;
+  const visualClock = new VisualClock();
+  let visual: Frame | null = null;
   // Registered before anything else's, so within a phase they come first.
+  ctx.ticks.add('pre', frame => {
+    const hidden = document.hidden;
+    visual = visualClock.advance(frame, parts.stage.graphics.shouldDraw(frame.now, hidden, modalOpen()), hidden);
+  });
   ctx.ticks.add('pre', watchFrameRate);
   ctx.ticks.add('pre', easeShake);
   ctx.ticks.add('move', ({ dt }) => ctx.player.update(dt));
@@ -72,8 +79,10 @@ export function installLoop(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'stage
     // Holding on to the ladder or a pole (see ctx.view).
     const grip = ctx.view.grip();
     me.setGrip(grip);
-    me.update(dt, t, (player.moving && player.grounded) || (grip === 'ladder' && player.moving), !player.grounded && !grip && !ctx.activities.any('hidesHands'), player.effects.speed);
-    me.setVoiceLevel(voice.inVoice ? voice.localLevel : 0);
+    if (visual) {
+      me.update(visual.dt, t, (player.moving && player.grounded) || (grip === 'ladder' && player.moving), !player.grounded && !grip && !ctx.activities.any('hidesHands'), player.effects.speed);
+      me.setVoiceLevel(voice.inVoice ? voice.localLevel : 0);
+    }
     const firstPerson = player.view === 'first';
     // In first person you are the camera; in third, hide yourself when it's zoomed in right behind your head.
     // At the tee the camera's behind the ball, and you're the one holding the club.
@@ -82,7 +91,7 @@ export function installLoop(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'stage
     const ownBody = firstPerson && !ctx.activities.any('takesCamera') && !ctx.activities.any('hidesHands');
     (firstBody ??= new FirstPersonBody(me.rig)).set(ownBody, camera);
     me.root.visible = ownBody || ctx.activities.any('takesCamera') || (!firstPerson && camera.position.distanceTo(headPos.set(player.pos.x, player.pos.y + 1.3, player.pos.z)) > 1.5);
-    if (firstPerson && !ctx.activities.any('hidesHands')) hands.update(dt, t, { yaw: player.camYaw, pitch: player.lookPitch, walkPhase: player.walkPhase, walking: player.moving && player.grounded, airborne: !player.grounded, jitter: player.effects.jitter, grip });
+    if (visual && firstPerson && !ctx.activities.any('hidesHands')) hands.update(visual.dt, t, { yaw: player.camYaw, pitch: player.lookPitch, walkPhase: player.walkPhase, walking: player.moving && player.grounded, airborne: !player.grounded, jitter: player.effects.jitter, grip });
     // Activities such as sliding down a pole can widen the field of view.
 
     const fov = ctx.view.fov(FOV);
@@ -144,21 +153,24 @@ export function installLoop(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'stage
         office.stack.update(dt, [{ x: player.pos.x, y: player.pos.y, z: player.pos.z, grip: ctx.view.grip() }, ...[...remotes.values()].map((r) => ({ x: r.person.root.position.x, y: r.person.root.position.y, z: r.person.root.position.z, grip: r.grip }))], camera.position);
       }
     }
-    ctx.dust.update(dt, camera);
-    ctx.confetti.update(dt);
+    if (visual) {
+      ctx.dust.update(visual.dt, camera);
+      ctx.confetti.update(visual.dt);
+    }
   }
 
   /** The sky, the weather and the light. */
   function updateSky({ dt, t }: Frame) {
+    if (!visual) return;
     const { camera, sky, sound } = ctx;
-    sky.update(dt, t, camera);
+    sky.update(visual.dt, t, camera);
 
     sound.setWeather(sky.rain, 1 - sky.daylight);
   }
 
   /** Draws the frame through the current view filters (see ctx.view). */
   function drawFrame(f: Frame) {
-    if (!parts.stage.graphics.shouldDraw(f.now, document.hidden, modalOpen())) return;
+    if (!visual) return;
     ctx.view.draw(f, drawScene);
   }
 

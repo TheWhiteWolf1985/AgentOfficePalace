@@ -403,6 +403,12 @@ export class Interactions<T extends InteractionTypes> {
     return this.def(kind).reach;
   }
 
+  get maxReach(): number {
+    let reach = 0;
+    for (const def of this.defs.values()) reach = Math.max(reach, def.reach);
+    return reach;
+  }
+
   hint(it: T['it']): T['hint'] {
     return this.def(it.kind).hint(it);
   }

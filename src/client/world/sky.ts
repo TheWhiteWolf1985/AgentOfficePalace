@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { FLOOR, SLAB, STREET_Y, WALL_HEIGHT, WALL_T, WING, wingMinZ } from '../../shared/layout';
 import type { SkyState, Weather } from '../../shared/protocol';
 import { guessPlace, skyNow, sunPosition } from '../../shared/sun';
+import { SunPositionCache } from './sky-clock';
 import type { NightParts } from './outside';
 
 /*
@@ -11,8 +12,7 @@ import type { NightParts } from './outside';
  * night go by every hour (see skyTime), this works out where the sun is, and every frame it sets
  * the sky's color, the fog, the sun (or the moon), the lamps that come on at night, and the rain or snow.
  *
- * The office has no roof, and the sun and the sky light everything, inside and out, so at night the
- * room would go as dark as the street. A few lines added to every lit material (below) give light
+ * A few lines added to every lit material (below) give light
  * back where there are lamps: the office and the garage fill with lamplight, and each street lamp,
  * the balcony's string lights and the lamp over the exit throw a pool of light around them. The
  * same lines darken the ground outside when it's wet and lay snow on whatever faces up out there.
@@ -325,6 +325,7 @@ export class Sky {
   private state: SkyState;
   private heard = false;
   private snap = true;
+  private sunPosition = new SunPositionCache();
   private readonly moonAt = new THREE.Vector3();
   private cover = 0;
   private fog = 0;
@@ -569,7 +570,7 @@ export class Sky {
     uniforms.skySnow.value = this.lying * 0.9;
 
     // The sun, and how much light it and the sky give.
-    const { el, az } = sunPosition(this.now(), s.lat, s.lon);
+    const { el, az } = this.sunPosition.at(this.now(), s.lat, s.lon);
     const elD = el / DEG;
     const day = smooth(-8, 4, elD);
     const dusk = Math.max(0, 1 - Math.abs(elD + 1) / 9) * (1 - this.cover);
