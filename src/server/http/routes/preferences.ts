@@ -7,14 +7,14 @@ export const preferencesRoute: Route = {
     const account = session.account?.id;
     if (!account || !ctx.accounts.get(account)) return send(res, 403, { error: 'Personal preferences require your own account' });
     res.setHeader('Cache-Control', 'no-store');
-    if (req.method === 'GET') return send(res, 200, { account, preferences: ctx.preferences.get(account), sequence: ctx.preferences.sequence(account, url.searchParams.get('device') ?? undefined) });
+    if (req.method === 'GET') return send(res, 200, { account, ...ctx.preferences.snapshot(account, url.searchParams.get('device') ?? undefined) });
     if (req.method !== 'POST') return send(res, 405, { error: 'Method not allowed' });
     if (!sameOrigin(req, ctx.cfg)) return send(res, 403, { error: 'Origin not allowed' });
     try {
       const body = JSON.parse(await readBody(req, 16384));
       const mutation = body?.device !== undefined || body?.sequence !== undefined ? { device: body.device, sequence: body.sequence } : undefined;
-      const preferences = ctx.preferences.update(account, body, body?.onlyIfEmpty === true, mutation);
-      return send(res, 200, { account, preferences, sequence: ctx.preferences.sequence(account, mutation?.device) });
+      const result = ctx.preferences.updateSnapshot(account, body, body?.onlyIfEmpty === true, mutation);
+      return send(res, 200, { account, ...result });
     } catch (error) {
       if (error instanceof SyntaxError) return send(res, 400, { error: 'Invalid preferences' });
       const message = error instanceof Error ? error.message : '';

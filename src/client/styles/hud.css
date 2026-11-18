@@ -1,5 +1,5 @@
 /* The HUD over the 3D office (index.html's #hud, filled by the features: features/hud and the rest): the floor's name and
-   the dock, the side panels, the chat, hints and meters, the telescope, coffee and darts. Only the
+   the dock, the side panels, chat, interaction hints and screen-share thumbnails. Only the
    office loads it, through style.css. */
 
 #app { position: fixed; inset: 0; }
@@ -137,14 +137,6 @@
 .crosshair.free .look-hint { display: block; }
 .crosshair.on .look-hint { transform: translateX(-50%) scale(.625); transform-origin: top center; }
 #shares { position: absolute; left: 12px; top: 72px; display: flex; flex-direction: column; gap: 8px; }
-/* At the rooftop bar's dart board or axe lane (see features/bargames/controller.ts): the meter with its green, and the round so far. */
-.throw { position: absolute; left: 50%; top: 14px; transform: translateX(-50%); width: min(320px, calc(100vw - 32px)); padding: 8px 12px 9px; display: grid; gap: 6px; font-size: 13px; font-weight: 900; text-align: center; pointer-events: none !important; }
-.throw-meter { position: relative; height: 16px; border: 3px solid var(--ink); border-radius: 999px; background: #f1e4d3; overflow: hidden; }
-.throw-sweet { position: absolute; top: 0; bottom: 0; background: var(--good); }
-.throw-fill { position: absolute; inset: 0 auto 0 0; background: linear-gradient(90deg, rgba(255,209,102,.3), rgba(255,138,91,.75)); border-right: 3px solid var(--ink); }
-.throw-last { position: absolute; top: -2px; bottom: -2px; width: 3px; margin-left: -1px; background: var(--ink); opacity: .45; }
-.throw-info { font-weight: 800; font-variant-numeric: tabular-nums; }
-#hud:has(.throw:not(.hidden)) #toasts { translate: 0 48px; }
 /* The floor details make the name taller: what's under it moves down. */
 #hud:has(#project-meta:not(.hud-off)) #shares { translate: 0 16px; }
 .share-thumb { width: 220px; border: 3px solid var(--ink); border-radius: 12px; overflow: hidden; background: #000; box-shadow: var(--shadow); cursor: pointer; position: relative; }

@@ -10,7 +10,7 @@ export const HELP_ROWS: readonly (readonly [string, string])[] = [
   [uiText('Mouse'), uiText('Look around in first person (click to capture the mouse, Esc to free it)')],
   [uiText('Click / E'), uiText("Use what you look at: hire a worker, open its terminal, read a board, call a meeting in the meeting room, watch the TV, sit on a couch, a beanbag, a chair or the balcony bench (walk off to get up)")],
   ['👥', uiText('Click someone under "In the office" to walk over to them (on another floor, you ride the elevator first). The line under their name says what they have open or where they are')],
-  ['🛗', uiText('Every project is a floor: step into the elevator on the north wall and press E (or click the project name, top left) to go to another one or add a project. It goes down to the garage too, and back up from there')],
+  ['🛗', uiText('Every project is a floor: press E at the elevator or click the floor name to change floors or add a project. The ground-floor Atrium and top-floor meeting room are always available, even without any projects.')],
   ['🤖', uiText('An agent stands by the issues board, the PR board and the task queue. Press E at one and type what you want: it runs as an agent that knows that board. O there opens its terminal; Hide, ✕ or Esc closes the terminal without sending it home; X sends it home')],
   ['📝', uiText('Draw together in the offices or the shared meeting room: press E at the whiteboard. Text, drawings and pictures stay on that board and everyone in the same space sees them live.')],
   ['🎉', uiText('Whenever a pull request merges, the gong next to the PR board rings, confetti rains down all over the floor and every worker gets up on its desk for a quick dance. Walk up to the gong and press E to bang it yourself')],

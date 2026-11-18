@@ -4,10 +4,10 @@ Back to the [README](../README.md).
 
 | Key | Action |
 | --- | --- |
-| W A S D / arrows | Walk (hold Shift to run); on the ladder, W and S climb; in a car, W is the gas, S brakes and reverses, A and D steer |
+| W A S D / arrows | Walk (hold Shift to run); on the ladder, W and S climb |
 | Space | Jump (you can land on desks and couches) |
 | Mouse drag / wheel | Orbit / zoom the camera |
-| E | Interact: hire a worker, open its terminal, read a board, take an issue's note off the board, prompt a board agent, call a meeting in the meeting room, draw on the whiteboard, read the docs at the bookshelf, watch the TV, sit down (or get up), ride the elevator, climb the ladder (or get off it), slide down a fire pole, order a drink at the rooftop bar, blow the DJ's air horn, step up to the dart board or the axe lane on the roof (then hold Space and let go to throw), knock through the north wall past the gong for 2 more desks (at the **🚧 Room to grow** sign). |
+| E | Interact: hire a worker, open its terminal, read a board, take an issue's note off the board, prompt a board agent, call a meeting in the meeting room, draw on the shared whiteboard in an office or the Sala riunioni, read the docs at the bookshelf, watch the TV, sit down (or get up), ride the elevator, climb the ladder (or get off it), slide down a fire pole, knock through the north wall past the gong for 2 more desks (at the **🚧 Room to grow** sign). |
 | P | Prompt: give a task to a new worker, or to the one at this desk |
 | C | Changes: the files the worker at this desk changed and their diff; commit, discard or open a PR |
 | B | Open a shared shell at an empty desk |
@@ -18,7 +18,7 @@ Back to the [README](../README.md).
 | N | Go to the worker that has waited longest on someone; again for the next one |
 | F | Hang a picture from the web on a wall (scroll to size it, click to hang it) |
 | Q | Put back the issue card you're carrying |
-| H | These controls; in a car, honk the horn |
+| H | These controls |
 | T / Enter | Chat |
 | / | Search the chat and every terminal on your floor |
 | Ctrl + K (⌘K on a Mac) | Command palette: find a worker, issue, PR, service, board, teammate or action; Enter opens it, Shift+Enter walks you there first |
@@ -45,3 +45,5 @@ The prompt edits the way it does in your own terminal (iTerm2's *Natural Text Ed
 | ⌘ + ⌫ | Delete to the start of the line (Mac) |
 | ⌘ + ⌦ | Delete to the end of the line (Mac) |
 | ⌘ + ← / → | Jump to the start / end of the line (Mac) |
+
+The elevator always includes the ground-floor Atrium and top-floor Sala riunioni. In the meeting room, use the presentation control to display a shared screen on the large board. Configure the reception panel through **Settings → Atrium logo**.
