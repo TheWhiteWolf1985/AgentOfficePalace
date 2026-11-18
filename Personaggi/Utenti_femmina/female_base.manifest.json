@@ -2,9 +2,9 @@
   "contract": "AOP_CHAR_RIGID_1",
   "contract_version": "1.0.0",
   "profile": "human",
-  "asset_id": "female_base_v03",
+  "asset_id": "female_base_concept01_v01",
   "file": "female_base.glb",
-  "sha256": "0aea1d53998c457f4d4aeab3b90157e8f84230e3e03efd26206cd0a57e4d5037",
+  "sha256": "e855eedebebc147d786140bba3123e1f65f0a3d66e552422da9807d4d2f630bd",
   "blender_version": "5.3.0",
   "root": "char_root",
   "units": "meters",
@@ -363,6 +363,7 @@
     "tie": "char_mat_tie",
     "pants": "char_mat_pants",
     "shoes": "char_mat_shoes",
+    "accent": "char_mat_accent",
     "facial_dark": "char_mat_dark",
     "eye_and_teeth_white": "char_mat_white",
     "bow": "char_mat_bow"
@@ -372,6 +373,7 @@
     "char_hand_negx_visual",
     "char_arm_posx_visual",
     "char_hand_posx_visual",
+    "char_accent_visual",
     "char_bow_visual",
     "char_eye_negx_visual",
     "char_eye_posx_visual",
@@ -389,57 +391,69 @@
     "char_arm_posx"
   ],
   "modular_hair": {
-    "strategy": "One shared component, one hairstyle active; eyebrows under char_head",
-    "head_attachment_surface": "upper head x +/-0.27, Blender y [-0.30,+0.27], top z=1.72; attachment origin z=1.32",
-    "inactive_hair_material": false
+    "strategy": "separate deliveries per style; no baked overlapping hairstyles",
+    "current_style_indices": [
+      "Short",
+      "Long",
+      "Bun",
+      "Spiky",
+      "Curly",
+      "Ponytail",
+      "Bald"
+    ]
   },
   "animations": [],
-  "license": "Original designs for Juri; MIT scaffold/tools, copyright 2026 AgentSystemLabs",
+  "license": "Original design for Juri; scaffold/tools MIT, copyright 2026 AgentSystemLabs",
   "third_party_assets": [],
   "deviations": [
     {
-      "field": "materials",
-      "legacy_limit": 8,
-      "requested_limit": 11
-    },
-    {
-      "field": "primitives",
-      "legacy_limit": 24,
-      "requested_limit": 25
-    },
-    {
-      "field": "current_request.materials",
-      "limit": 11,
-      "actual": 12,
-      "reason": "Fixed bow independent color"
-    },
-    {
-      "field": "current_request.primitives",
-      "limit": 25,
-      "actual": 26,
-      "reason": "Fixed bow under head"
+      "field": "materials/primitives",
+      "original_limit": [
+        8,
+        24
+      ],
+      "previous_reference_limit": [
+        11,
+        25
+      ],
+      "reason": "Independent color channels, including temple accent and female fixed bow",
+      "technical_budget_approval": "NOT_RUN"
     }
   ],
+  "mesh_parents": {
+    "char_arm_negx_visual": "char_arm_negx",
+    "char_hand_negx_visual": "char_hand_negx",
+    "char_arm_posx_visual": "char_arm_posx",
+    "char_hand_posx_visual": "char_hand_posx",
+    "char_accent_visual": "char_head",
+    "char_bow_visual": "char_head",
+    "char_eye_negx_visual": "char_eye_negx",
+    "char_eye_posx_visual": "char_eye_posx",
+    "char_eyebrows_visual": "char_head",
+    "char_hair_visual": "char_hair",
+    "char_head_visual": "char_head",
+    "char_mouth_visual": "char_mouth",
+    "char_leg_negx_visual": "char_leg_negx",
+    "char_leg_posx_visual": "char_leg_posx",
+    "char_torso_visual": "char_torso"
+  },
+  "design_revision": "human_concept01_v01",
+  "status": "ARTISTIC_APPROVED",
+  "checks": {
+    "artistic_approval": "PASS",
+    "approval_source": "Juri: Perfetti, 17 novembre 2026",
+    "application_QA": "NOT_RUN"
+  },
+  "customization": {
+    "clothing": "jacket, lapels, pockets and button only",
+    "pants": "trousers including upper torso-connected part; on female skirt",
+    "shoes": "independent from pupils and mouth",
+    "eyebrows": "under char_head outside char_hair",
+    "accent": "temple marks, independent color",
+    "bow": "female permanent head accessory with independent color"
+  },
   "hairstyle": {
     "active_style": "long",
-    "attach_control": "char_hair",
-    "component_local_translation": [
-      0,
-      0,
-      0
-    ],
-    "component_local_rotation": [
-      0,
-      0,
-      0,
-      1
-    ],
-    "component_local_scale": [
-      1,
-      1,
-      1
-    ],
-    "replace": "Remove existing hair mesh children, attach exactly one component at identity; bald removes all hair geometry.",
     "compatible_styles": [
       "short",
       "long",
@@ -448,41 +462,35 @@
       "curly",
       "ponytail",
       "bald"
-    ]
+    ],
+    "attach_to": "char_hair",
+    "local_translation": [
+      0,
+      0,
+      0
+    ],
+    "local_rotation": [
+      0,
+      0,
+      0,
+      1
+    ],
+    "local_scale": [
+      1,
+      1,
+      1
+    ],
+    "replace": "Remove existing hair meshes; attach exactly one component at identity. Bald removes hair geometry only."
   },
-  "requested_budget": {
-    "materials": 11,
-    "primitives": 25,
-    "other_limits": "unchanged original human profile"
-  },
-  "runtime_application": "NOT_RUN",
-  "design_revision": "female_modular_v03_long_fixed_bow",
-  "appearance": "Fitted cropped feminine jacket, blouse collar and neck ribbon, skirt, heels; default long hair and permanent head bow",
-  "fixed_accessory": {
-    "node": "char_bow_visual",
-    "parent": "char_head",
-    "outside_hair_group": true,
-    "removable": false,
-    "editable_property": "color_only",
-    "color_role": "bow",
-    "material": "char_mat_bow"
-  },
-  "budget_extension": {
-    "source": "New fixed independently recolorable bow",
-    "materials_added": 1,
-    "primitives_added": 1,
-    "previous_budget_materials": 11,
-    "previous_budget_primitives": 25,
-    "approval": "NOT_RUN"
-  },
-  "lower_body_material_roles": {
-    "skirt": "char_mat_pants",
-    "bare_legs": "char_mat_skin",
-    "heels": "char_mat_shoes"
-  },
-  "role_semantics_note": "On the female base the stable pants channel colors the skirt. On male reference it still colors trousers.",
-  "assembly_normal_preservation": {
-    "restored_normal_vertices": 0,
-    "scope": "Non-hair normals restored exactly from the base when Blender recalculates them; positions and topology unchanged."
-  }
+  "provenance": [
+    {
+      "file": "resources/starter_human.glb",
+      "license": "MIT",
+      "role": "contract scaffold"
+    },
+    {
+      "file": "character_design.py",
+      "role": "original geometry; common details in concept_style.py; procedural hair in delivery_runtime.py"
+    }
+  ]
 }

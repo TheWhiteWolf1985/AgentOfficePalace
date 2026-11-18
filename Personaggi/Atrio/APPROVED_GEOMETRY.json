@@ -1,0 +1,70 @@
+{
+  "artistic_approval": "PASS",
+  "source": "Juri: Perfetto, 2026-11-17",
+  "poses": {
+    "rest": {},
+    "walk_a": {
+      "char_arm_negx": 0.7,
+      "char_arm_posx": -0.7,
+      "char_leg_negx": -0.7,
+      "char_leg_posx": 0.7
+    },
+    "walk_b": {
+      "char_arm_negx": -0.7,
+      "char_arm_posx": 0.7,
+      "char_leg_negx": 0.7,
+      "char_leg_posx": -0.7
+    },
+    "sit": {
+      "char_leg_negx": -1.35,
+      "char_leg_posx": -1.35,
+      "char_arm_negx": -0.55,
+      "char_arm_posx": -0.55
+    },
+    "hold": {
+      "char_arm_negx": -1.65
+    },
+    "paper_book": {
+      "char_arm_negx": -1.2,
+      "char_arm_posx": -1.2
+    },
+    "ladder": {
+      "char_arm_negx": -2.8,
+      "char_arm_posx": -2.8,
+      "char_leg_negx": -0.7
+    },
+    "pole": {
+      "char_arm_negx": -2.4,
+      "char_arm_posx": -2.8,
+      "char_leg_posx": -0.7
+    }
+  },
+  "assets": {
+    "reception_a": {
+      "source_sha256": "504ad265d2648caf73aa7ba48065fd2c19bf4355c68918bac876d3a53d456232",
+      "signatures": {
+        "rest": "e71cf7e4bcd5f8dc961eafe8eccc959729774c6b4eed779c5b25c049783aa68a",
+        "walk_a": "a5fee8f0ecb6a07e67bb1d141071656d962658b909b1e5f32dbae154371e0085",
+        "walk_b": "9f929e159bf9e5fa7be05b200d947d5429d004cdeaf1946013e3b4a80358cfd5",
+        "sit": "e364837a969ba9e3ebcf8422e53fbba3558b044f97952fde337ae0a265ac895d",
+        "hold": "d6023c209bc1f65aa1e22f6faf6ad0a51d6322611b9dcaa58f0ba7b2271b63f0",
+        "paper_book": "51c8b941cb95193c0b4dc5aa11e43608303ab15d23b494784eda05590f1fba0e",
+        "ladder": "d407ed14d16e95ebcf7d6885764b463e37a50e27a245da245eee3f4f3b59db2d",
+        "pole": "c5cdcca479637be27a7cee73483fe097935e605efb39181fd1545f48fa254397"
+      }
+    },
+    "reception_b": {
+      "source_sha256": "8ddf3b716507f20a0a867514637916d94f55d146c95f959bb456b7188535ed7c",
+      "signatures": {
+        "rest": "1f7ec4dc6e60038fb8d85d77b6f2bb627df52fdb4da2d63d4d6205d99bb953ec",
+        "walk_a": "260fe8e0bea298393fc3cf7df744ac56c26efbf8a97c108a7ffa73673d77220a",
+        "walk_b": "79d298d378eb358218a16447ebd72f4d3a03efe3172292046cdde63b3b2a179f",
+        "sit": "387ce7521a46c5a49298913aa89b1f805a0e1c51d38219244faed053f26dcb50",
+        "hold": "94276cd0621a9fc37982f276309a89c4434f654cee4fbc691429aee827ce556e",
+        "paper_book": "422852627f92b3c6265f65a5c699bc8711705f8bf92477428016ba520dbcd519",
+        "ladder": "295bc9802955bb4e1ea28bf427389f66b0c10398447e7777fe0ce59ef57c77bc",
+        "pole": "21f31610cad90b0f8358da6c4868afefb94ff8fe2284cb758528c27366a156f7"
+      }
+    }
+  }
+}

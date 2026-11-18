@@ -1,0 +1,458 @@
+{
+  "contract": "AOP_CHAR_RIGID_1",
+  "contract_version": "1.0.0",
+  "profile": "human",
+  "asset_id": "human_base",
+  "file": "human_base.glb",
+  "sha256": "3340be53a3178dcdce048f33fe380a662ec1cc5675163ca922efeaa3ff2ee57f",
+  "blender_version": "5.3.0",
+  "root": "char_root",
+  "units": "meters",
+  "forward": "+Z",
+  "nodes": {
+    "char_root": {
+      "parent": null,
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_body": {
+      "parent": "char_root",
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_torso": {
+      "parent": "char_body",
+      "translation": [
+        0,
+        0.72,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_head": {
+      "parent": "char_body",
+      "translation": [
+        0,
+        1.32,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_hair": {
+      "parent": "char_head",
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_eye_negx": {
+      "parent": "char_head",
+      "translation": [
+        -0.12,
+        0.02,
+        0.3
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_eye_posx": {
+      "parent": "char_head",
+      "translation": [
+        0.12,
+        0.02,
+        0.3
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_mouth": {
+      "parent": "char_head",
+      "translation": [
+        0,
+        -0.1,
+        0.32
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_arm_negx": {
+      "parent": "char_body",
+      "translation": [
+        -0.33,
+        0.9,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_arm_posx": {
+      "parent": "char_body",
+      "translation": [
+        0.33,
+        0.9,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_leg_negx": {
+      "parent": "char_body",
+      "translation": [
+        -0.12,
+        0.42,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_leg_posx": {
+      "parent": "char_body",
+      "translation": [
+        0.12,
+        0.42,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_hand_negx": {
+      "parent": "char_arm_negx",
+      "translation": [
+        0,
+        -0.38,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_hand_posx": {
+      "parent": "char_arm_posx",
+      "translation": [
+        0,
+        -0.38,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_socket_label": {
+      "parent": "char_root",
+      "translation": [
+        0,
+        2,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_socket_voice": {
+      "parent": "char_root",
+      "translation": [
+        0,
+        2.25,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_socket_bubble": {
+      "parent": "char_root",
+      "translation": [
+        0,
+        2.45,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_socket_card": {
+      "parent": "char_body",
+      "translation": [
+        0,
+        0.8,
+        0.36
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  "material_roles": {
+    "skin": "char_mat_skin",
+    "hair": "char_mat_hair",
+    "eyebrows": "char_mat_eyebrows",
+    "iris": "char_mat_iris",
+    "clothing": "char_mat_clothing",
+    "shirt": "char_mat_shirt",
+    "tie": "char_mat_tie",
+    "pants": "char_mat_pants",
+    "shoes": "char_mat_shoes",
+    "facial_dark": "char_mat_dark",
+    "eye_and_teeth_white": "char_mat_white"
+  },
+  "body_mesh_nodes": [
+    "char_arm_negx_visual",
+    "char_hand_negx_visual",
+    "char_arm_posx_visual",
+    "char_hand_posx_visual",
+    "char_eye_negx_visual",
+    "char_eye_posx_visual",
+    "char_eyebrows_visual",
+    "char_hair_visual",
+    "char_head_visual",
+    "char_mouth_visual",
+    "char_leg_negx_visual",
+    "char_leg_posx_visual",
+    "char_torso_visual"
+  ],
+  "first_person_hide_nodes": [
+    "char_head",
+    "char_arm_negx",
+    "char_arm_posx"
+  ],
+  "modular_hair": {
+    "strategy": "current short hairstyle only; char_hair is replaceable; eyebrows are under char_head",
+    "hair_control": "char_hair",
+    "eyebrows_mesh": "char_eyebrows_visual",
+    "eyebrows_parent": "char_head"
+  },
+  "animations": [],
+  "license": "Original generated geometry for Juri; scaffold MIT, copyright 2026 AgentSystemLabs",
+  "third_party_assets": [],
+  "deviations": [
+    {
+      "field": "profiles.human.limits.materials",
+      "original_limit": 8,
+      "actual": 11,
+      "reason": "Requested nine independent color channels plus unchanged dark and white facial materials. Original contract is not edited."
+    },
+    {
+      "field": "profiles.human.limits.primitives",
+      "original_limit": 24,
+      "actual": 25,
+      "reason": "Additional torso pants material and head eyebrows primitive, preserving geometry and independently moving controls."
+    }
+  ],
+  "design_revision": "human_base_voxel_v02_materials",
+  "appearance": "User avatar: short light-brown hair, black suit and trousers, white shirt, red tie, flat black shoes, humanized blue eyes and smile; unit scale",
+  "provenance": [
+    {
+      "kind": "scaffold",
+      "file": "resources/starter_human.glb",
+      "license": "MIT"
+    },
+    {
+      "kind": "original_design",
+      "file": "build_scene.py",
+      "note": "Original cuboid geometry, no third party skins or textures. User image used only as visual inspiration; not distributed."
+    }
+  ],
+  "checks": {
+    "runtime_application": "NOT_RUN",
+    "artistic_approval": "NOT_RUN",
+    "rig_and_pivots_unchanged": "PASS",
+    "geometry_and_initial_colors_unchanged": "PASS",
+    "independent_requested_channels": "PASS",
+    "hair_hiding_and_head_brows": "PASS",
+    "reimport_blender": "PASS",
+    "poses": "PASS"
+  },
+  "material_roles_note": "clothing is the jacket only; pants includes upper torso-connected trousers. Facial dark remains shared between pupils/eye rims and smile, while shoes are independent.",
+  "mesh_parents": {
+    "char_arm_negx_visual": "char_arm_negx",
+    "char_arm_posx_visual": "char_arm_posx",
+    "char_eye_negx_visual": "char_eye_negx",
+    "char_eye_posx_visual": "char_eye_posx",
+    "char_eyebrows_visual": "char_head",
+    "char_hair_visual": "char_hair",
+    "char_hand_negx_visual": "char_hand_negx",
+    "char_hand_posx_visual": "char_hand_posx",
+    "char_head_visual": "char_head",
+    "char_leg_negx_visual": "char_leg_negx",
+    "char_leg_posx_visual": "char_leg_posx",
+    "char_mouth_visual": "char_mouth",
+    "char_torso_visual": "char_torso"
+  },
+  "compliance": {
+    "rig_contract": "AOP_CHAR_RIGID_1",
+    "strict_original_contract": "FAIL",
+    "budget_deviation_acceptance": "NOT_RUN",
+    "runtime_application": "NOT_RUN"
+  }
+}

@@ -1,414 +1,190 @@
-"""Original voxel reception women, revision 01. Run in a fresh background Blender.
+"""Build local Concept 02 NPC review assets and original-Atrium fit views.
 
-blender --background --factory-startup --python build_scene.py -- --out ../../delivery
-All build dependencies are distributed in resources/. No network or author paths.
-Coordinates in the design below are Blender Z-up, front -Y, in metres.
+blender --background --factory-startup --python build_scene.py
+Only work files are written. Original rooms and active deliveries stay intact.
 """
 from pathlib import Path
-import argparse, bpy, json, sys, hashlib, math, runpy, shutil
+import sys,json,hashlib,runpy,math,struct
+import bpy
 from mathutils import Vector
-
-HERE = Path(__file__).resolve().parent
-RES = HERE / 'resources'
-sys.path.insert(0, str(HERE))
-sys.path.insert(0, str(RES))
+HERE=Path(__file__).resolve().parent;sys.path.insert(0,str(HERE));sys.path.insert(0,str(HERE/'resources'))
+from support import *
+from design import build_character
 from inspect_character import inspect
 from glb_common import parse
-
-CONTRACT = json.loads((RES / 'constraints.json').read_text(encoding='utf8'))
-
-def write_json(path, obj):
-    path.write_text(json.dumps(obj, indent=2, ensure_ascii=False)+'\n', encoding='utf8')
-
-def empty_scene():
-    bpy.ops.wm.read_factory_settings(use_empty=True)
-    bpy.context.scene.unit_settings.system = 'METRIC'
-    bpy.context.scene.unit_settings.scale_length = 1
-
-def material(name, color, roughness=.8):
-    m = bpy.data.materials.new(name)
-    m.diffuse_color = (*color, 1)
-    m.use_nodes = True
-    p = next(n for n in m.node_tree.nodes if n.type == 'BSDF_PRINCIPLED')
-    p.inputs['Base Color'].default_value = (*color, 1)
-    p.inputs['Roughness'].default_value = roughness
-    return m
-
-class Parts:
-    """Collect cuboids into one mesh per independent control, without welding controls."""
-    def __init__(self, mats):
-        self.mats = mats
-        self.groups = {}
-
-    def box(self, control, mat, center, size):
-        verts, faces, roles = self.groups.setdefault(control, ([], [], []))
-        x,y,z = center
-        a,b,c = [v/2 for v in size]
-        i = len(verts)
-        verts.extend([(x-a,y-b,z-c),(x+a,y-b,z-c),(x+a,y+b,z-c),(x-a,y+b,z-c),
-                      (x-a,y-b,z+c),(x+a,y-b,z+c),(x+a,y+b,z+c),(x-a,y+b,z+c)])
-        faces.extend([tuple(i+k for k in f) for f in [(0,3,2,1),(4,5,6,7),(0,1,5,4),
-                     (1,2,6,5),(2,3,7,6),(3,0,4,7)]])
-        roles.extend([mat]*6)
-
-    def face(self, control, mat, outline, depth):
-        """A flat facial detail facing -Y; outline contains world (X,Z) pairs."""
-        verts, faces, roles = self.groups.setdefault(control, ([], [], []))
-        i=len(verts)
-        verts.extend((x,depth,z) for x,z in outline)
-        # Counterclockwise in X/Z gives the outward -Y normal.
-        area=sum(outline[k][0]*outline[(k+1)%len(outline)][1]-outline[(k+1)%len(outline)][0]*outline[k][1] for k in range(len(outline)))
-        order=list(range(len(outline)))
-        if area<0:order.reverse()
-        faces.append(tuple(i+k for k in order));roles.append(mat)
-
-    def ellipse(self, control, mat, x, z, rx, rz, depth, segments=20):
-        self.face(control,mat,[(x+rx*math.cos(k*2*math.pi/segments),z+rz*math.sin(k*2*math.pi/segments)) for k in range(segments)],depth)
-
-    def finish(self):
-        result = []
-        for control,(verts,faces,roles) in self.groups.items():
-            parent = bpy.data.objects[control]
-            inv = parent.matrix_world.inverted()
-            mesh = bpy.data.meshes.new(control+'_voxel_geometry')
-            mesh.from_pydata([inv @ Vector(v) for v in verts], [], faces)
-            mesh.update()
-            obj = bpy.data.objects.new(control+'_visual', mesh)
-            bpy.context.collection.objects.link(obj)
-            obj.parent = parent
-            unique = list(dict.fromkeys(roles))
-            for role in unique:
-                mesh.materials.append(self.mats[role])
-            for poly,role in zip(mesh.polygons,roles):
-                poly.material_index = unique.index(role)
-                poly.use_smooth = False
-            result.append(obj)
-        return result
-
-def build_character(asset):
-    empty_scene()
-    # Import the contractual scaffold before replacing its placeholder geometry.
-    bpy.ops.import_scene.gltf(filepath=str(RES / 'starter_human.glb'))
-    for o in list(bpy.data.objects):
-        if o.type == 'MESH':
-            bpy.data.objects.remove(o, do_unlink=True)
-    for m in list(bpy.data.materials):
-        bpy.data.materials.remove(m)
-    bpy.context.view_layer.update()
-    blonde = asset == 'reception_a'
-    palette = {
-        'skin': (.71,.43,.25) if blonde else (.58,.31,.17),
-        'clothing': (.026,.032,.048) if blonde else (.045,.028,.037),
-        'hair': (.69,.43,.115) if blonde else (.115,.047,.023),
-        'shirt': (.85,.87,.84),
-        'accent': (.39,.018,.03) if blonde else (.016,.22,.19),
-        'dark': (.008,.011,.017),
-        'white': (.95,.97,1),
-        'iris': (.018,.20,.48) if blonde else (.10,.27,.11),
-    }
-    mats = {k:material('char_mat_'+k, v) for k,v in palette.items()}
-    p = Parts(mats)
-    box = p.box
-    # Tailored black jacket, ivory shirt and a small square scarf inspired by the reference.
-    box('char_torso','clothing',(0,0,.905),(.44,.30,.43))
-    box('char_torso','clothing',(0,0,1.065),(.64,.30,.09))
-    box('char_torso','clothing',(0,0,.735),(.40,.30,.13))
-    # Three stepped skirt tiers are a single rigid garment under the torso control.
-    for center,width,depth,height in [(.663,.43,.32,.11),(.559,.47,.34,.10),(.467,.51,.36,.084)]:
-        box('char_torso','clothing',(0,0,center),(width,depth,height))
-    box('char_torso','shirt',(0,-.156,1.025),(.15,.012,.17))
-    box('char_torso','shirt',(-.076,-.164,1.082),(.055,.016,.055))
-    box('char_torso','shirt',(.076,-.164,1.082),(.055,.016,.055))
-    box('char_torso','accent',(0,-.17,1.069),(.045,.016,.042))
-    box('char_torso','accent',(0,-.171,.994),(.037,.016,.11))
-    # Neck, ears and small square nose stay with the head.
-    box('char_head','skin',(0,0,1.14),(.15,.16,.12))
-    box('char_head','skin',(0,-.015,1.445),(.54,.57,.55))
-    box('char_head','skin',(-.286,0,1.40),(.036,.12,.12))
-    box('char_head','skin',(.286,0,1.40),(.036,.12,.12))
-    box('char_head','skin',(0,-.318,1.365),(.064,.036,.054))
-    # Mesh offsets leave clearance for the head/hair in raised-arm tests.
-    # The contractual shoulder pivots themselves remain at +/-0.33 m.
-    for side,x in [('negx',-.385),('posx',.385)]:
-        arm = 'char_arm_'+side
-        box(arm,'clothing',(x,0,.852),(.136,.26,.45))
-        box(arm,'shirt',(x,-.002,.613),(.14,.264,.035))
-        box('char_hand_'+side,'skin',(x,-.003,.552),(.14,.266,.087))
-        leg = 'char_leg_'+side
-        lx = -.125 if side=='negx' else .125
-        box(leg,'skin',(lx,0,.28),(.15,.17,.30))
-        # Block heel, raised rear of shoe, stepped instep and projecting square toe.
-        box(leg,'dark',(lx,.054,.042),(.095,.078,.084))
-        box(leg,'dark',(lx,-.109,.024),(.172,.145,.048))
-        box(leg,'dark',(lx,-.073,.058),(.172,.19,.045))
-        box(leg,'dark',(lx,-.009,.087),(.166,.125,.045))
-        box(leg,'dark',(lx,.032,.115),(.16,.080,.043))
-    # Human-style almond eyes on the voxel head; each eye keeps its own control.
-    for side,x in [('negx',-.12),('posx',.12)]:
-        eye = 'char_eye_'+side
-        eye_shape=[(-.076,0),(-.052,.026),(-.02,.035),(.018,.034),(.052,.023),(.076,0),(.047,-.021),(.012,-.028),(-.026,-.026),(-.054,-.016)]
-        p.face(eye,'dark',[(x+dx,1.414+dz) for dx,dz in eye_shape],-.303)
-        p.face(eye,'white',[(x+dx*.92,1.414+dz*.78-.001) for dx,dz in eye_shape],-.305)
-        p.ellipse(eye,'iris',x,1.414,.025,.025,-.307)
-        p.ellipse(eye,'dark',x,1.414,.011,.017,-.309)
-        p.ellipse(eye,'white',x-.008,1.425,.006,.006,-.311,12)
-        # Tapered, gently arched eyebrows in the recolorable hair material.
-        brow=[(-.067,-.003),(-.034,.010),(.005,.014),(.042,.008),(.065,-.002),(.037,.001),(.002,.005),(-.033,.001)]
-        p.face('char_hair','hair',[(x+dx,1.482+dz) for dx,dz in brow],-.304)
-    # An open upturned smile with teeth; no texture or animation clip.
-    smile=[(-.080,1.301),(-.043,1.289),(0,1.286),(.043,1.289),(.080,1.301),(.060,1.271),(.030,1.252),(0,1.247),(-.030,1.252),(-.060,1.271)]
-    p.face('char_mouth','dark',smile,-.303)
-    teeth=[(-.061,1.291),(-.03,1.283),(0,1.281),(.03,1.283),(.061,1.291),(.046,1.277),(0,1.269),(-.046,1.277)]
-    p.face('char_mouth','white',teeth,-.305)
-    # All hair uses one uniform dynamic material, no painted shading or skin texture.
-    box('char_hair','hair',(0,-.012,1.738),(.586,.606,.055))
-    box('char_hair','hair',(0,.281,1.488),(.586,.045,.45))
-    for x in [-.282,.282]:
-        box('char_hair','hair',(x,-.005,1.665),(.064,.58,.13))
-    # Asymmetric stair-step fringe leaves the pixel eyes unobstructed.
-    for x,width,bottom in [(-.245,.096,1.53),(-.147,.10,1.57),(-.049,.10,1.61),(.049,.10,1.65),(.147,.10,1.62),(.245,.096,1.57)]:
-        box('char_hair','hair',(x,-.311,(bottom+1.72)/2),(width,.034,1.72-bottom))
-    if blonde:
-        box('char_hair','hair',(0,.294,1.205),(.586,.070,.37))
-        for x in [-.267,.267]:
-            box('char_hair','hair',(x,.05,1.405),(.052,.46,.46))
-            box('char_hair','hair',(x,-.17,1.20),(.075,.12,.28))
-            box('char_hair','hair',(x,-.16,1.035),(.059,.10,.05))
-    else:
-        for x in [-.282,.282]:
-            box('char_hair','hair',(x,-.005,1.415),(.064,.58,.50))
-        box('char_hair','hair',(0,.293,1.195),(.62,.067,.09))
-    mesh_objects = p.finish()
-    root = bpy.data.objects['char_root']
-    root['asset_id'] = asset
-    root['contract'] = 'AOP_CHAR_RIGID_1'
-    root['design_revision'] = 'voxel_women_v01'
-    return mesh_objects
-
-def camera_at(name, location, target, orthographic=None, lens=50):
-    data = bpy.data.cameras.new(name)
-    o = bpy.data.objects.new(name,data)
-    bpy.context.collection.objects.link(o)
-    o.location = location
-    o.rotation_euler = (Vector(target)-o.location).to_track_quat('-Z','Y').to_euler()
-    if orthographic:
-        data.type = 'ORTHO'
-        data.ortho_scale = orthographic
-    else:
-        data.lens = lens
-    data.clip_start = .01
-    data.clip_end = 150
-    bpy.context.scene.camera = o
-    return o
-
-def stage(width=1000,height=1000, ground=True):
-    s = bpy.context.scene
-    # Blender 5.3 engine, with a portable fallback to Cycles.
+ASSETS=['reception_a','reception_b']
+ROLES={r:'char_mat_'+r for r in ['skin','hair','eyebrows','iris','clothing','shirt','tie','pants','shoes','accent']}
+ROLES.update(facial_dark='char_mat_dark',eye_and_teeth_white='char_mat_white')
+def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+def write(path,obj):Path(path).write_text(json.dumps(obj,indent=2,ensure_ascii=False)+'\n',encoding='utf8')
+def aim(camera,pos,target,scale=None):
+    camera.location=pos;camera.rotation_euler=(Vector(target)-camera.location).to_track_quat('-Z','Y').to_euler()
+    if scale:camera.data.ortho_scale=scale
+def load(path):empty_scene();bpy.ops.import_scene.gltf(filepath=str(path));bpy.context.view_layer.update()
+def export_asset(path,asset):
+    old=sys.argv[:]
     try:
-        s.render.engine = 'BLENDER_EEVEE'
-    except TypeError:
-        s.render.engine = 'CYCLES'
-        s.cycles.samples = 24
-        s.cycles.use_denoising = True
-    s.render.resolution_x = width
-    s.render.resolution_y = height
-    s.render.resolution_percentage = 100
-    s.render.image_settings.file_format = 'PNG'
-    s.world = bpy.data.worlds.new('Review_world')
-    s.world.use_nodes = True
-    bg = next(n for n in s.world.node_tree.nodes if n.type=='BACKGROUND')
-    bg.inputs['Color'].default_value = (.57,.65,.74,1)
-    bg.inputs['Strength'].default_value = .55
-    s.view_settings.view_transform = 'AgX'
-    for name,pos,power,size in [('Review_key',(2,-4,6),450,5),('Review_fill',(-3,-1,3),220,4),('Review_rim',(1,3,4),350,3)]:
-        light = bpy.data.lights.new(name,'AREA')
-        light.energy = power
-        light.shape = 'DISK'
-        light.size = size
-        obj = bpy.data.objects.new(name,light)
-        bpy.context.collection.objects.link(obj)
-        obj.location = pos
-        obj.rotation_euler = (Vector((0,0,.9))-obj.location).to_track_quat('-Z','Y').to_euler()
-    if ground:
-        bpy.ops.mesh.primitive_plane_add(size=200, location=(0,0,-.002))
-        bpy.context.object.name = 'Review_ground'
-        bpy.context.object.data.materials.append(material('Review_ground_mat',(.18,.23,.28)))
-
-def render(path):
-    bpy.context.scene.render.filepath = str(path)
-    bpy.ops.render.render(write_still=True)
-
-def export(out, asset):
-    old = sys.argv[:]
-    try:
-        sys.argv = ['export_character.py','--','--profile','human','--out',str(out/(asset+'.glb'))]
+        sys.argv=['export_character.py','--','--profile','human','--out',str(path)]
         runpy.run_path(str(RES/'export_character.py'),run_name='__main__')
-    finally:
-        sys.argv = old
-    glb = out/(asset+'.glb')
-    manifest = json.loads((RES/'human.manifest.json').read_text(encoding='utf8'))
-    g,_ = parse(glb.read_bytes())
-    manifest.update(asset_id=asset,file=glb.name,sha256=hashlib.sha256(glb.read_bytes()).hexdigest(),
-                    blender_version=bpy.app.version_string,license='Original generated geometry for Juri; scaffold MIT, copyright 2026 AgentSystemLabs')
-    manifest['body_mesh_nodes'] = [n['name'] for n in g['nodes'] if 'mesh' in n]
-    manifest['design_revision'] = 'voxel_women_v01'
-    manifest['appearance'] = 'Woman, long blonde hair, skirt and block heels' if asset=='reception_a' else 'Woman, brown bob, skirt and block heels'
-    manifest['provenance'] = [{'kind':'scaffold','file':'resources/starter_human.glb','license':'MIT'},
-                              {'kind':'original_design','file':'build_scene.py','note':'Original cuboid geometry, no third party skins or textures. User image used only as visual inspiration; not distributed.'}]
-    manifest['checks'] = {'runtime_application':'NOT_RUN','artistic_approval':'NOT_RUN'}
-    write_json(out/(asset+'.manifest.json'),manifest)
-    result = inspect(glb.read_bytes(),CONTRACT,'human',manifest)
-    write_json(out/(asset+'.check.json'),result)
-    if result['status'] != 'PASS':
-        raise RuntimeError(result)
+    finally:sys.argv=old
+    g,_=parse(path.read_bytes());manifest=json.loads((RES/'human.manifest.json').read_text(encoding='utf8'))
+    root=bpy.data.objects['char_root']
+    manifest.update(asset_id=asset+'_concept02_v01',file=path.name,sha256=sha(path),blender_version=bpy.app.version_string,
+        license='Original design for Juri; scaffold/tools MIT, copyright 2026 AgentSystemLabs',
+        design_revision='reception_concept02_v01',material_roles=dict(ROLES,**({'bow':'char_mat_bow'} if asset=='reception_a' else {'headband':'char_mat_headband'})),
+        body_mesh_nodes=[n['name'] for n in g['nodes'] if 'mesh' in n],
+        mesh_parents={o.name:o.parent.name for o in root.children_recursive if o.type=='MESH'},
+        appearance='Warm peach porcelain face/hands/legs; ivory fitted jacket, dark blouse, cobalt trim, charcoal skirt, heels; blonde long hair with independently colored bow' if asset=='reception_a' else 'Warm peach porcelain face/hands/legs; ivory fitted jacket, dark blouse, cobalt trim, charcoal skirt, heels; brunette bob with independently colored headband',
+        intended_use={'role':'decorative_reception_npc','profile':'human','pose':'standing_fixed','tasks':None,'ai':None,'movement':False,'connected_person':False},
+        placement={'file':'reception.placements.json','asset_local_origin':[0,0,0],'asset_scale':[1,1,1],
+            'instance_scale_only':1.15,'scale_not_baked':True},
+        customization={'clothing':'ivory jacket only','shirt':'dark inner blouse and cuffs','tie':'small collar clasp',
+            'pants':'skirt','shoes':'heels, independent from face','accent':'cobalt jacket piping',
+            'hair':'one replaceable mesh under char_hair','eyebrows':'separate under char_head',
+            'facial_dark':'pupils, outlines, smile and fine decorative cheek seam',
+            'head_accessory':{'node':'char_bow_visual' if asset=='reception_a' else 'char_headband_visual','parent':'char_head','outside_hair':True,'independent_color':True}},
+        deviations=[{'field':'materials/primitives','reason':'Independent color roles, cobalt trim, separate facial materials and head accessory; original budgets unchanged','approval':'NOT_RUN'}],
+        checks={'artistic_approval':'PASS','approval_source':'Juri: Perfetto, 17 novembre 2026','application_QA':'NOT_RUN'})
+    write(path.with_suffix('.manifest.json'),manifest)
+    result=inspect(path.read_bytes(),CONTRACT,'human',manifest);write(path.with_suffix('.original_check.json'),result)
     return result
-
-def pose(name):
-    # Runtime X rotation maps to Blender X rotation (same axis).
-    for n in ['char_arm_negx','char_arm_posx','char_leg_negx','char_leg_posx']:
-        bpy.data.objects[n].rotation_mode = 'XYZ'
-        bpy.data.objects[n].rotation_euler = (0,0,0)
-    values = {
-        'rest':{},
-        'walk_a':{'char_arm_negx':.70,'char_arm_posx':-.70,'char_leg_negx':-.70,'char_leg_posx':.70},
-        'walk_b':{'char_arm_negx':-.70,'char_arm_posx':.70,'char_leg_negx':.70,'char_leg_posx':-.70},
-        'sit':{'char_leg_negx':-1.35,'char_leg_posx':-1.35,'char_arm_negx':-.55,'char_arm_posx':-.55},
-        'hold':{'char_arm_negx':-1.65},
-        'paper_book':{'char_arm_negx':-1.20,'char_arm_posx':-1.20},
-        'ladder':{'char_arm_negx':-2.80,'char_arm_posx':-2.80,'char_leg_negx':-.70},
-        'pole':{'char_arm_negx':-2.40,'char_arm_posx':-2.80,'char_leg_posx':-.70},
-    }
-    for n,v in values[name].items():
-        bpy.data.objects[n].rotation_euler.x = v
-    bpy.context.view_layer.update()
-
-def reimport_asset(out,asset,views):
-    empty_scene()
-    bpy.ops.import_scene.gltf(filepath=str(out/(asset+'.glb')))
-    names = {o.name:o for o in bpy.data.objects}
-    # Verify Blender local-space conversion and parent relationships after GLB roundtrip.
+def imported_qa():
     errors=[]
-    for name,d in CONTRACT['profiles']['human']['nodes'].items():
-        o=names.get(name)
-        expected=Vector((d['translation'][0],-d['translation'][2],d['translation'][1]))
-        if o is None:
-            errors.append('missing '+name)
-            continue
-        if (o.location-expected).length > CONTRACT['tolerance_m']:errors.append('location '+name)
-        if (o.parent.name if o.parent else None)!=d['parent']:errors.append('parent '+name)
-        if max(abs(v-1) for v in o.scale)>.001:errors.append('scale '+name)
-        if o.matrix_local.to_quaternion().angle > .001:errors.append('rotation '+name)
-    original=set(names)
-    stage()
-    camera_at('Review_camera',(2.6,-4.5,2.4),(0,0,.88),2.12)
-    bpy.ops.wm.save_as_mainfile(filepath=str(out/(asset+'.reimport.blend')))
-    for name,pos in [('front',(0,-5,.89)),('side',(5,0,.89)),('back',(0,5,.89)),('three_quarter',(3,-5,2.3))]:
-        camera=bpy.context.scene.camera
-        camera.location=pos
-        camera.rotation_euler=(Vector((0,0,.88))-camera.location).to_track_quat('-Z','Y').to_euler()
-        render(views/(asset+'_'+name+'.png'))
-    # Exercise inheritance/visibility on the imported file, restoring rest afterwards.
-    hidden={}
-    for control in ['char_head','char_arm_negx','char_arm_posx']:
-        children={o.name for o in names[control].children_recursive if o.type=='MESH'}
-        for name in children:names[name].hide_render=True
-        hidden[control]=sorted(children)
-    camera=bpy.context.scene.camera
-    camera.location=(0,-5,.89)
-    camera.rotation_euler=(Vector((0,0,.88))-camera.location).to_track_quat('-Z','Y').to_euler()
-    render(views/(asset+'_visibility.png'))
-    for o in bpy.data.objects:
-        if o.name in original:o.hide_render=False
-    pose_results={}
-    # Pose images use a side-biased three-quarter view to expose garment intersections.
+    for name,c in CONTRACT['profiles']['human']['nodes'].items():
+        o=bpy.data.objects.get(name);t=c['translation'];expected=Vector((t[0],-t[2],t[1]))
+        if o is None:errors.append('missing '+name);continue
+        if (o.parent.name if o.parent else None)!=c['parent']:errors.append('parent '+name)
+        if (o.location-expected).length>1e-5:errors.append('translation '+name)
+        if max(abs(v-1) for v in o.scale)>1e-5 or o.matrix_local.to_quaternion().angle>1e-5:errors.append('TRS '+name)
+    root=bpy.data.objects['char_root'];meshes=[o for o in root.children_recursive if o.type=='MESH']
+    if bpy.data.objects['char_eyebrows_visual'].parent.name!='char_head':errors.append('eyebrows parent')
+    if bpy.data.objects['char_eyebrows_visual'] in bpy.data.objects['char_hair'].children_recursive:errors.append('eyebrows hidden with hair')
+    accessory=bpy.data.objects.get('char_bow_visual') or bpy.data.objects.get('char_headband_visual')
+    if accessory is None or accessory.parent.name!='char_head' or accessory in bpy.data.objects['char_hair'].children_recursive:errors.append('accessory parent')
+    mats={m.name:m for o in meshes for m in o.data.materials}
+    def node(m):return next(n for n in m.node_tree.nodes if n.type=='BSDF_PRINCIPLED')
+    initial={n:tuple(node(m).inputs['Base Color'].default_value) for n,m in mats.items()}
+    for name,m in mats.items():
+        node(m).inputs['Base Color'].default_value=(.85,.01,.52,1)
+        if any(tuple(node(other).inputs['Base Color'].default_value)!=initial[n] for n,other in mats.items() if n!=name):errors.append('coupled '+name)
+        node(m).inputs['Base Color'].default_value=initial[name]
+    hidden={o for name in ['char_head','char_arm_negx','char_arm_posx'] for o in bpy.data.objects[name].children_recursive}
+    remaining={o.name for o in meshes if o not in hidden}
+    if remaining!={'char_torso_visual','char_leg_negx_visual','char_leg_posx_visual'}:errors.append('first person branches')
+    poses={}
     for name in ['rest','walk_a','walk_b','sit','hold','paper_book','ladder','pole']:
-        pose(name)
-        camera.location=(3,-4,2.0)
-        camera.rotation_euler=(Vector((0,0,.95))-camera.location).to_track_quat('-Z','Y').to_euler()
-        camera.data.ortho_scale=2.5
-        render(views/(asset+'_pose_'+name+'.png'))
-        pose_results[name]='PASS' # Execution only, artistic/intersection review is separate.
+        pose(name);poses[name]='PASS' if all(math.isfinite(v) for o in meshes for row in o.matrix_world for v in row) else 'FAIL'
     pose('rest')
-    return {'status':'FAIL' if errors else 'PASS','errors':errors,'visibility_descendants':hidden,
-            'pose_execution':pose_results,'scope':'Roundtrip local transforms, inheritance and render execution; manual anatomy review is separate.'}
-
-def pair_scene(out,views,atrium=None):
+    points=[o.matrix_world@v.co for o in meshes for v in o.data.vertices]
+    return {'status':'FAIL' if errors else 'PASS','errors':errors,'hierarchy_TRS_scale':'PASS' if not errors else 'FAIL',
+        'independent_color_edits':'PASS' if not any('coupled' in e for e in errors) else 'FAIL',
+        'eyebrows_outside_hair':'PASS' if not any('eyebrows' in e for e in errors) else 'FAIL',
+        'first_person_remaining':sorted(remaining),'finite_pose_tests':poses,
+        'height_m':max(p.z for p in points)-min(p.z for p in points),
+        'all_pose_intersections':'NOT_RUN','application_QA':'NOT_RUN'}
+def single_views(asset):
+    folder=HERE/'views'/asset;folder.mkdir(exist_ok=True)
+    stage(900,1000);camera=camera_at('Review_camera',(3,-5,2.3),(0,0,.9),2.12)
+    for name,pos in [('front',(0,-5,.9)),('side',(5,0,.9)),('back',(0,5,.9)),('three_quarter',(3,-5,2.3))]:
+        aim(camera,pos,(0,0,.9),2.12);render(folder/(name+'.png'))
+    aim(camera,(2,-5,1.65),(0,0,1.445),.94);render(folder/'face.png')
+    for o in bpy.data.objects['char_hair'].children_recursive:o.hide_render=True
+    render(folder/'without_hair.png')
+    for o in bpy.data.objects['char_hair'].children_recursive:o.hide_render=False
+    head=bpy.data.objects['char_head'];head.rotation_mode='XYZ';head.rotation_euler=(.15,.10,.30)
+    render(folder/'head_rotation.png');head.rotation_euler=(0,0,0);bpy.context.view_layer.update()
+    aim(camera,(3,-5,2.3),(0,0,.9),2.12)
+    for name in ['walk_a','sit','hold','paper_book','ladder','pole']:
+        pose(name);render(folder/('technical_pose_'+name+'.png'))
+    pose('rest')
+    for name in ['char_head','char_arm_negx','char_arm_posx']:
+        for o in bpy.data.objects[name].children_recursive:o.hide_render=True
+    render(folder/'first_person_visibility.png')
+    for o in bpy.data.objects['char_root'].children_recursive:o.hide_render=False
+    bpy.context.scene.name=asset+'_Concept02_Roundtrip'
+    bpy.context.scene.render.filepath='//../views/'+asset+'/'
+    bpy.ops.wm.save_as_mainfile(filepath=str(HERE/(asset+'.reimport.blend')))
+def add_npc(asset,index,placement=None):
+    before=set(bpy.data.objects);bpy.ops.import_scene.gltf(filepath=str(HERE/(asset+'.glb')))
+    objects=set(bpy.data.objects)-before
+    for o in objects:o.name=asset+'__'+o.name.split('.')[0]
+    root=next(o for o in objects if o.parent not in objects)
+    if placement:
+        root.location=placement['blender_position'];root.scale=placement['runtime_instance_scale']
+    else:root.location.x=(-.6 if index==0 else .6)
+    bpy.context.view_layer.update();return root,objects
+def reference_state(objects):
+    h=hashlib.sha256()
+    for o in sorted(objects,key=lambda o:o.name):
+        h.update(o.name.encode());h.update(str(tuple(v for row in o.matrix_world for v in row)).encode())
+        if o.type=='MESH':
+            for v in o.data.vertices:h.update(struct.pack('<fff',*v.co))
+            for p in o.data.polygons:h.update(str((tuple(p.vertices),p.material_index)).encode())
+            for m in o.data.materials:
+                h.update(m.name.encode());h.update(str(tuple(m.diffuse_color)).encode())
+                if m.use_nodes:
+                    for n in m.node_tree.nodes:
+                        if n.type=='BSDF_PRINCIPLED':h.update(str(tuple(n.inputs['Base Color'].default_value)).encode())
+    return h.hexdigest()
+def pair_review():
     empty_scene()
+    for i,asset in enumerate(ASSETS):add_npc(asset,i)
+    stage(1500,1100);camera=camera_at('Concept02_Review_camera',(2.4,-7,2.55),(0,0,.89),2.9)
+    render(HERE/'views/pair_three_quarter.png')
+    aim(camera,(0,-7,.9),(0,0,.9),2.8);render(HERE/'views/pair_front.png')
+    bpy.context.scene.render.resolution_y=650;aim(camera,(0,-7,1.44),(0,0,1.44),2.1);render(HERE/'views/faces.png')
+    bpy.context.scene.render.resolution_y=1100;aim(camera,(2.4,-7,2.55),(0,0,.89),2.9)
+    bpy.context.scene.name='Atrio_NPC_Concept02_Bionda_Castana'
+    bpy.context.scene.render.filepath='//views/'
+    bpy.ops.wm.save_as_mainfile(filepath=str(HERE/'npc_concept02.review.blend'))
+def fit_review():
     placements=json.loads((RES/'reception.placements.json').read_text(encoding='utf8'))
-    if atrium:
-        bpy.ops.import_scene.gltf(filepath=str(atrium))
-    for index,asset in enumerate(['reception_a','reception_b']):
-        previous=set(bpy.data.objects)
-        bpy.ops.import_scene.gltf(filepath=str(out/(asset+'.glb')))
-        imported=set(bpy.data.objects)-previous
-        roots=[o for o in imported if o.parent not in imported]
-        for root in roots:
-            if atrium:
-                root.location=placements['placements'][index]['blender_position']
-                root.scale=placements['placements'][index]['runtime_instance_scale']
-            else:
-                root.location.x=(-.65 if index==0 else .65)
-    if atrium:
-        stage(1500,1000,ground=False)
-        # Keep the original reference materials, glass, floor and geometry unchanged.
-        for o in bpy.data.objects:
-            if o.type=='LIGHT':
-                o.location.y+=7
-                o.location.z+=1
-                o.rotation_euler=(Vector((0,10.8,1.5))-o.location).to_track_quat('-Z','Y').to_euler()
-                o.data.energy*=3
-        cam=camera_at('Review_visitor',(0,5.5,1.40),(0,10.8,1.40),lens=42)
-        render(views/'reception_from_visitor.png')
-        bpy.ops.wm.save_as_mainfile(filepath=str(out/'reception_fit.reimport.blend'))
-    else:
-        stage(1500,1000)
-        camera_at('Review_camera',(2.5,-7,2.8),(0,0,.9),3.35)
-        render(views/'pair_three_quarter.png')
-        bpy.context.scene.camera.location=(0,-6,.9)
-        bpy.context.scene.camera.rotation_euler=(Vector((0,0,.9))-bpy.context.scene.camera.location).to_track_quat('-Z','Y').to_euler()
-        render(views/'front.png')
-        bpy.ops.wm.save_as_mainfile(filepath=str(out/'pair_review.blend'))
-        bpy.context.scene.render.resolution_y=600
-        bpy.context.scene.camera.location=(0,-6,1.43)
-        bpy.context.scene.camera.rotation_euler=(Vector((0,0,1.43))-bpy.context.scene.camera.location).to_track_quat('-Z','Y').to_euler()
-        bpy.context.scene.camera.data.ortho_scale=2.15
-        render(views/'faces_closeup.png')
-
+    reference=RES/'atrium_reference.glb'
+    if sha(reference)!=placements['source_atrium_sha256']:raise RuntimeError('Atrium SHA mismatch')
+    empty_scene();bpy.ops.import_scene.gltf(filepath=str(reference));bpy.context.view_layer.update()
+    original=set(bpy.data.objects);before=reference_state(original);npcs=[]
+    for i,asset in enumerate(ASSETS):npcs.append(add_npc(asset,i,placements['placements'][i]))
+    after=reference_state(original)
+    stage(1500,1000,ground=False)
+    for o in bpy.context.scene.objects:
+        if o.type=='LIGHT' and o not in original:
+            o.location.y+=7;o.location.z+=1;o.rotation_euler=(Vector((0,10.8,1.5))-o.location).to_track_quat('-Z','Y').to_euler();o.data.energy*=3
+    camera=camera_at('Review_visitor',(0,5.5,1.4),(0,10.8,1.4),lens=42)
+    render(HERE/'views/reception_from_visitor.png')
+    eye_visibility={};deps=bpy.context.evaluated_depsgraph_get()
+    for asset,(root,objects) in zip(ASSETS,npcs):
+        checks={}
+        for name,p in [('eye_negx',(-.12,-.310,1.414)),('eye_posx',(.12,-.310,1.414)),('smile',(0,-.306,1.28))]:
+            target=root.matrix_world@Vector(p);delta=target-camera.location
+            hit,location,normal,index,obj,matrix=bpy.context.scene.ray_cast(deps,camera.location,delta.normalized(),distance=delta.length+.02)
+            checks[name]={'status':'PASS' if hit and (obj.original in objects or obj in objects) else 'FAIL','first_hit':obj.name if hit else None}
+        eye_visibility[asset]=checks
+    bpy.context.scene.name='Atrio_Concept02_Fit_Originale'
+    bpy.context.scene.render.filepath='//views/'
+    bpy.ops.wm.save_as_mainfile(filepath=str(HERE/'npc_concept02.fit.review.blend'))
+    aim(camera,(0,7.2,1.6),(0,10.8,1.62));render(HERE/'views/reception_from_visitor_close.png')
+    camera.data.lens=28;aim(camera,(0,5.5,1.4),(0,10.8,1.7));render(HERE/'views/reception_visitor_wide.png')
+    write(HERE/'FIT_VALIDATION.json',{'asset_source_sha256':{a:sha(HERE/(a+'.glb')) for a in ASSETS},'original_reference_sha256':sha(reference),'source_matches_placements':'PASS',
+        'reference_geometry_transforms_materials_unchanged':'PASS' if before==after else 'FAIL',
+        'placements_applied_unmodified':True,'instance_scale_only':1.15,'asset_source_scale':1.0,
+        'visitor_eye_height_m':1.4,'face_visibility_rays':eye_visibility,'ray_scope':'first visible surface belongs to the intended NPC; not a whole-body collision proof',
+        'whole_body_furniture_intersections':'NOT_RUN','application_QA':'NOT_RUN'})
 def main():
-    ap=argparse.ArgumentParser()
-    ap.add_argument('--out',type=Path,default=HERE/'generated')
-    ap.add_argument('--atrium',type=Path)
-    ap.add_argument('--skip-views',action='store_true')
-    a=ap.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else [])
-    if '--factory-startup' not in sys.argv or not bpy.app.background:
-        raise RuntimeError('Run in a separate Blender --background --factory-startup process.')
-    out=a.out.resolve()
-    out.mkdir(parents=True,exist_ok=True)
-    views=out/'views'
-    views.mkdir(exist_ok=True)
-    reports={}
-    for asset in ['reception_a','reception_b']:
-        build_character(asset)
-        result=export(out,asset)
-        stage()
-        camera_at('Review_camera',(2.6,-4.5,2.4),(0,0,.88),2.12)
-        bpy.ops.wm.save_as_mainfile(filepath=str(out/(asset+'.blend')))
-        reports[asset]={'glb_contract':result}
-        write_json(out/'BUILD_REPORT.json',reports)
-    if not a.skip_views:
-        pair_scene(out,views)
-        for asset in ['reception_a','reception_b']:
-            reports[asset]['roundtrip']=reimport_asset(out,asset,views)
-            write_json(out/'BUILD_REPORT.json',reports)
-        if a.atrium:
-            expected=json.loads((RES/'reception.placements.json').read_text(encoding='utf8'))['source_atrium_sha256']
-            if hashlib.sha256(a.atrium.read_bytes()).hexdigest()!=expected:
-                raise RuntimeError('Atrium reference SHA does not match placements')
-            pair_scene(out,views,a.atrium)
-        from contact_sheets import create
-        create(views)
-    shutil.copy2(RES/'reception.placements.json',out/'reception.placements.json')
-    print('BUILD_COMPLETED',out,flush=True)
-
-if __name__=='__main__':
-    main()
+    global HERE
+    ap=argparse.ArgumentParser();ap.add_argument('--out',type=Path,default=HERE);ap.add_argument('--skip-views',action='store_true')
+    args=ap.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else [])
+    HERE=args.out.resolve();HERE.mkdir(parents=True,exist_ok=True);(HERE/'views').mkdir(exist_ok=True)
+    if not bpy.app.background:raise RuntimeError('Use an isolated background Blender process')
+    bpy.context.preferences.filepaths.save_version=0;reports={}
+    shutil.copy2(RES/'reception.placements.json',HERE/'reception.placements.json')
+    for asset in ASSETS:
+        build_character(asset);bpy.context.scene.name=asset+'_Concept02_Source'
+        path=HERE/(asset+'.glb');bpy.ops.wm.save_as_mainfile(filepath=str(path.with_suffix('.blend')))
+        static=export_asset(path,asset);load(path);qa=imported_qa()
+        reports[asset]={'source_sha256':sha(path),'original_validator':static,'roundtrip':qa}
+        if not args.skip_views:single_views(asset)
+        else:bpy.ops.wm.save_as_mainfile(filepath=str(path.with_suffix('.reimport.blend')))
+    write(HERE/'BUILD_REPORT.json',reports)
+    if not args.skip_views:pair_review();fit_review()
+    print('CONCEPT02_NPC_REVIEW_COMPLETE',str(HERE),flush=True)
+if __name__=='__main__':main()

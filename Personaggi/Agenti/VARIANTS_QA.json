@@ -1,0 +1,278 @@
+{
+  "functional_draft_status": "PASS",
+  "combinations": {
+    "agent_male_base_short": {
+      "functional_draft_status": "PASS",
+      "errors": [],
+      "profile": "PROPOSED_NOT_APPROVED",
+      "source_sha256": "c84e0ec6e9e9492d8cf6225166f59039e5aa78e90bcf388b5bd2609f8eba2556",
+      "rig_and_material_checks": "PASS",
+      "first_person_remaining": [
+        "char_leg_negx_visual",
+        "char_leg_posx_visual",
+        "char_status_visual",
+        "char_torso_visual"
+      ],
+      "body_pose_finite_tests": 8,
+      "agent_pose_finite_tests": 8,
+      "all_pose_intersections": "NOT_RUN",
+      "application_QA": "NOT_RUN",
+      "non_hair_geometry_materials_unchanged": "PASS",
+      "one_active_hair": "PASS"
+    },
+    "agent_male_base_long": {
+      "functional_draft_status": "PASS",
+      "errors": [],
+      "profile": "PROPOSED_NOT_APPROVED",
+      "source_sha256": "7d594ce72526dfb499048fc8b66323b2401ef5327ceaba725c8a53110aa1e26a",
+      "rig_and_material_checks": "PASS",
+      "first_person_remaining": [
+        "char_leg_negx_visual",
+        "char_leg_posx_visual",
+        "char_status_visual",
+        "char_torso_visual"
+      ],
+      "body_pose_finite_tests": 8,
+      "agent_pose_finite_tests": 8,
+      "all_pose_intersections": "NOT_RUN",
+      "application_QA": "NOT_RUN",
+      "non_hair_geometry_materials_unchanged": "PASS",
+      "one_active_hair": "PASS"
+    },
+    "agent_male_base_bun": {
+      "functional_draft_status": "PASS",
+      "errors": [],
+      "profile": "PROPOSED_NOT_APPROVED",
+      "source_sha256": "79428dbef84c79282f2ab61f3015025ba882c45421bc1a7e291bab7852a911c6",
+      "rig_and_material_checks": "PASS",
+      "first_person_remaining": [
+        "char_leg_negx_visual",
+        "char_leg_posx_visual",
+        "char_status_visual",
+        "char_torso_visual"
+      ],
+      "body_pose_finite_tests": 8,
+      "agent_pose_finite_tests": 8,
+      "all_pose_intersections": "NOT_RUN",
+      "application_QA": "NOT_RUN",
+      "non_hair_geometry_materials_unchanged": "PASS",
+      "one_active_hair": "PASS"
+    },
+    "agent_male_base_spiky": {
+      "functional_draft_status": "PASS",
+      "errors": [],
+      "profile": "PROPOSED_NOT_APPROVED",
+      "source_sha256": "db6abec689f27b68f348573a7e2784803b530faba7f4fe626c78112b0dcce344",
+      "rig_and_material_checks": "PASS",
+      "first_person_remaining": [
+        "char_leg_negx_visual",
+        "char_leg_posx_visual",
+        "char_status_visual",
+        "char_torso_visual"
+      ],
+      "body_pose_finite_tests": 8,
+      "agent_pose_finite_tests": 8,
+      "all_pose_intersections": "NOT_RUN",
+      "application_QA": "NOT_RUN",
+      "non_hair_geometry_materials_unchanged": "PASS",
+      "one_active_hair": "PASS"
+    },
+    "agent_male_base_curly": {
+      "functional_draft_status": "PASS",
+      "errors": [],
+      "profile": "PROPOSED_NOT_APPROVED",
+      "source_sha256": "49cfac7d301b1848ea23d9e01cf14d439fd2d7885e8eceeb337f2009f5170d9c",
+      "rig_and_material_checks": "PASS",
+      "first_person_remaining": [
+        "char_leg_negx_visual",
+        "char_leg_posx_visual",
+        "char_status_visual",
+        "char_torso_visual"
+      ],
+      "body_pose_finite_tests": 8,
+      "agent_pose_finite_tests": 8,
+      "all_pose_intersections": "NOT_RUN",
+      "application_QA": "NOT_RUN",
+      "non_hair_geometry_materials_unchanged": "PASS",
+      "one_active_hair": "PASS"
+    },
+    "agent_male_base_ponytail": {
+      "functional_draft_status": "PASS",
+      "errors": [],
+      "profile": "PROPOSED_NOT_APPROVED",
+      "source_sha256": "81c8ae3a1e1b43fbaca0799c0ba210e3336dadaf7b03b3a080ae7b88be51b2c8",
+      "rig_and_material_checks": "PASS",
+      "first_person_remaining": [
+        "char_leg_negx_visual",
+        "char_leg_posx_visual",
+        "char_status_visual",
+        "char_torso_visual"
+      ],
+      "body_pose_finite_tests": 8,
+      "agent_pose_finite_tests": 8,
+      "all_pose_intersections": "NOT_RUN",
+      "application_QA": "NOT_RUN",
+      "non_hair_geometry_materials_unchanged": "PASS",
+      "one_active_hair": "PASS"
+    },
+    "agent_male_base_bald": {
+      "functional_draft_status": "PASS",
+      "errors": [],
+      "profile": "PROPOSED_NOT_APPROVED",
+      "source_sha256": "b6220814bc689afd0117c37c23ffc38804e897a10b70a75bd343652dffb80209",
+      "rig_and_material_checks": "PASS",
+      "first_person_remaining": [
+        "char_leg_negx_visual",
+        "char_leg_posx_visual",
+        "char_status_visual",
+        "char_torso_visual"
+      ],
+      "body_pose_finite_tests": 8,
+      "agent_pose_finite_tests": 8,
+      "all_pose_intersections": "NOT_RUN",
+      "application_QA": "NOT_RUN",
+      "non_hair_geometry_materials_unchanged": "PASS",
+      "one_active_hair": "PASS"
+    },
+    "agent_female_base_short": {
+      "functional_draft_status": "PASS",
+      "errors": [],
+      "profile": "PROPOSED_NOT_APPROVED",
+      "source_sha256": "efd71ede75290a478bed90b4fe5b8d07bd6c0a67fe42d5d20eb55ab63a908842",
+      "rig_and_material_checks": "PASS",
+      "first_person_remaining": [
+        "char_leg_negx_visual",
+        "char_leg_posx_visual",
+        "char_status_visual",
+        "char_torso_visual"
+      ],
+      "body_pose_finite_tests": 8,
+      "agent_pose_finite_tests": 8,
+      "all_pose_intersections": "NOT_RUN",
+      "application_QA": "NOT_RUN",
+      "non_hair_geometry_materials_unchanged": "PASS",
+      "one_active_hair": "PASS"
+    },
+    "agent_female_base_long": {
+      "functional_draft_status": "PASS",
+      "errors": [],
+      "profile": "PROPOSED_NOT_APPROVED",
+      "source_sha256": "f016ddd5c221938b25278a8de89db069e9a05b69523376553669ce9058e0f5cf",
+      "rig_and_material_checks": "PASS",
+      "first_person_remaining": [
+        "char_leg_negx_visual",
+        "char_leg_posx_visual",
+        "char_status_visual",
+        "char_torso_visual"
+      ],
+      "body_pose_finite_tests": 8,
+      "agent_pose_finite_tests": 8,
+      "all_pose_intersections": "NOT_RUN",
+      "application_QA": "NOT_RUN",
+      "non_hair_geometry_materials_unchanged": "PASS",
+      "one_active_hair": "PASS"
+    },
+    "agent_female_base_bun": {
+      "functional_draft_status": "PASS",
+      "errors": [],
+      "profile": "PROPOSED_NOT_APPROVED",
+      "source_sha256": "783ac54d4024e546f5d03bdc0a99da9189e9992fe7a09f849ae1c62c46b78451",
+      "rig_and_material_checks": "PASS",
+      "first_person_remaining": [
+        "char_leg_negx_visual",
+        "char_leg_posx_visual",
+        "char_status_visual",
+        "char_torso_visual"
+      ],
+      "body_pose_finite_tests": 8,
+      "agent_pose_finite_tests": 8,
+      "all_pose_intersections": "NOT_RUN",
+      "application_QA": "NOT_RUN",
+      "non_hair_geometry_materials_unchanged": "PASS",
+      "one_active_hair": "PASS"
+    },
+    "agent_female_base_spiky": {
+      "functional_draft_status": "PASS",
+      "errors": [],
+      "profile": "PROPOSED_NOT_APPROVED",
+      "source_sha256": "fe930cbc484b7428475ac6e6d7a3a196a1347667cdcc36a34ad5bed628260eea",
+      "rig_and_material_checks": "PASS",
+      "first_person_remaining": [
+        "char_leg_negx_visual",
+        "char_leg_posx_visual",
+        "char_status_visual",
+        "char_torso_visual"
+      ],
+      "body_pose_finite_tests": 8,
+      "agent_pose_finite_tests": 8,
+      "all_pose_intersections": "NOT_RUN",
+      "application_QA": "NOT_RUN",
+      "non_hair_geometry_materials_unchanged": "PASS",
+      "one_active_hair": "PASS"
+    },
+    "agent_female_base_curly": {
+      "functional_draft_status": "PASS",
+      "errors": [],
+      "profile": "PROPOSED_NOT_APPROVED",
+      "source_sha256": "c1772c7626c1b9d28ededeafd9a1a80d0233ed8796a46b28d3d6363d18b9a179",
+      "rig_and_material_checks": "PASS",
+      "first_person_remaining": [
+        "char_leg_negx_visual",
+        "char_leg_posx_visual",
+        "char_status_visual",
+        "char_torso_visual"
+      ],
+      "body_pose_finite_tests": 8,
+      "agent_pose_finite_tests": 8,
+      "all_pose_intersections": "NOT_RUN",
+      "application_QA": "NOT_RUN",
+      "non_hair_geometry_materials_unchanged": "PASS",
+      "one_active_hair": "PASS"
+    },
+    "agent_female_base_ponytail": {
+      "functional_draft_status": "PASS",
+      "errors": [],
+      "profile": "PROPOSED_NOT_APPROVED",
+      "source_sha256": "9973d5f6d8782bdd2f112c79bc3033da7d5e5405a7de7f69e6db50919e28da24",
+      "rig_and_material_checks": "PASS",
+      "first_person_remaining": [
+        "char_leg_negx_visual",
+        "char_leg_posx_visual",
+        "char_status_visual",
+        "char_torso_visual"
+      ],
+      "body_pose_finite_tests": 8,
+      "agent_pose_finite_tests": 8,
+      "all_pose_intersections": "NOT_RUN",
+      "application_QA": "NOT_RUN",
+      "non_hair_geometry_materials_unchanged": "PASS",
+      "one_active_hair": "PASS"
+    },
+    "agent_female_base_bald": {
+      "functional_draft_status": "PASS",
+      "errors": [],
+      "profile": "PROPOSED_NOT_APPROVED",
+      "source_sha256": "73b36610f75694081b56cd3e57a1450942bddbd61a566197e34d02b905530678",
+      "rig_and_material_checks": "PASS",
+      "first_person_remaining": [
+        "char_leg_negx_visual",
+        "char_leg_posx_visual",
+        "char_status_visual",
+        "char_torso_visual"
+      ],
+      "body_pose_finite_tests": 8,
+      "agent_pose_finite_tests": 8,
+      "all_pose_intersections": "NOT_RUN",
+      "application_QA": "NOT_RUN",
+      "non_hair_geometry_materials_unchanged": "PASS",
+      "one_active_hair": "PASS"
+    }
+  },
+  "seed_cases": 512,
+  "random_errors": [],
+  "independent_material_datablocks_two_imports": "PASS",
+  "runtime_randomization": "NOT_RUN",
+  "legacy_agent_profile": "FAIL",
+  "new_profile_approval": "NOT_RUN",
+  "all_intersections": "NOT_RUN"
+}

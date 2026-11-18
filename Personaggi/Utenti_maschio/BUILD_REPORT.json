@@ -1,5 +1,12 @@
 {
-  "contract": {
+  "asset": "human_base",
+  "roundtrip": {
+    "status": "PASS",
+    "errors": [],
+    "source_sha256": "9b5f80f5ce9afef51b70b4cebbd6f5d867b43fdec46fc7f23063b2e51c09607b",
+    "scope": "rig/rest TRS, independent material edits, branch separation, eight finite poses; not full collision QA"
+  },
+  "original_validator": {
     "status": "FAIL",
     "profile": "human",
     "errors": [
@@ -8,11 +15,11 @@
       "Manifest deviations require separate review; not an in-contract PASS"
     ],
     "metrics": {
-      "triangles": 522,
-      "mesh_instances": 13,
-      "primitives": 25,
-      "materials": 11,
-      "bytes": 43044,
+      "triangles": 653,
+      "mesh_instances": 14,
+      "primitives": 26,
+      "materials": 12,
+      "bytes": 50788,
       "bounds_min": [
         -0.45500001311302185,
         0.0,
@@ -29,6 +36,7 @@
       "char_hand_negx_visual",
       "char_arm_posx_visual",
       "char_hand_posx_visual",
+      "char_accent_visual",
       "char_eye_negx_visual",
       "char_eye_posx_visual",
       "char_eyebrows_visual",
@@ -41,50 +49,7 @@
     ],
     "scope": "static contract; no manual/Blender/runtime certification"
   },
-  "instance_scale": 1.0,
-  "rig_profile": "human",
-  "roundtrip": {
-    "status": "PASS",
-    "errors": [],
-    "visibility_descendants": {
-      "char_head": [
-        "char_eye_negx_visual",
-        "char_eye_posx_visual",
-        "char_eyebrows_visual",
-        "char_hair_visual",
-        "char_head_visual",
-        "char_mouth_visual"
-      ],
-      "char_arm_negx": [
-        "char_arm_negx_visual",
-        "char_hand_negx_visual"
-      ],
-      "char_arm_posx": [
-        "char_arm_posx_visual",
-        "char_hand_posx_visual"
-      ]
-    },
-    "pose_execution": {
-      "rest": "PASS",
-      "walk_a": "PASS",
-      "walk_b": "PASS",
-      "sit": "PASS",
-      "hold": "PASS",
-      "paper_book": "PASS",
-      "ladder": "PASS",
-      "pole": "PASS"
-    },
-    "scope": "Roundtrip local transforms, inheritance and render execution; manual anatomy review is separate."
-  },
-  "automated_qa": {
-    "unit_scale": "PASS",
-    "pose_walk_a": "PASS",
-    "pose_walk_b": "PASS",
-    "pose_sit": "PASS",
-    "pose_hold": "PASS",
-    "pose_paper_book": "PASS",
-    "pose_ladder": "PASS",
-    "pose_pole": "PASS",
-    "hide_head_and_arms": "PASS"
-  }
+  "artistic_approval": "PASS",
+  "technical_budget_approval": "NOT_RUN",
+  "application_QA": "NOT_RUN"
 }

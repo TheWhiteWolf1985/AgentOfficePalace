@@ -2,9 +2,9 @@
   "contract": "AOP_CHAR_RIGID_1",
   "contract_version": "1.0.0",
   "profile": "human",
-  "asset_id": "human_base",
+  "asset_id": "human_base_concept01_v01",
   "file": "human_base.glb",
-  "sha256": "3340be53a3178dcdce048f33fe380a662ec1cc5675163ca922efeaa3ff2ee57f",
+  "sha256": "9b5f80f5ce9afef51b70b4cebbd6f5d867b43fdec46fc7f23063b2e51c09607b",
   "blender_version": "5.3.0",
   "root": "char_root",
   "units": "meters",
@@ -363,6 +363,7 @@
     "tie": "char_mat_tie",
     "pants": "char_mat_pants",
     "shoes": "char_mat_shoes",
+    "accent": "char_mat_accent",
     "facial_dark": "char_mat_dark",
     "eye_and_teeth_white": "char_mat_white"
   },
@@ -371,6 +372,7 @@
     "char_hand_negx_visual",
     "char_arm_posx_visual",
     "char_hand_posx_visual",
+    "char_accent_visual",
     "char_eye_negx_visual",
     "char_eye_posx_visual",
     "char_eyebrows_visual",
@@ -387,72 +389,105 @@
     "char_arm_posx"
   ],
   "modular_hair": {
-    "strategy": "current short hairstyle only; char_hair is replaceable; eyebrows are under char_head",
-    "hair_control": "char_hair",
-    "eyebrows_mesh": "char_eyebrows_visual",
-    "eyebrows_parent": "char_head"
+    "strategy": "separate deliveries per style; no baked overlapping hairstyles",
+    "current_style_indices": [
+      "Short",
+      "Long",
+      "Bun",
+      "Spiky",
+      "Curly",
+      "Ponytail",
+      "Bald"
+    ]
   },
   "animations": [],
-  "license": "Original generated geometry for Juri; scaffold MIT, copyright 2026 AgentSystemLabs",
+  "license": "Original design for Juri; scaffold/tools MIT, copyright 2026 AgentSystemLabs",
   "third_party_assets": [],
   "deviations": [
     {
-      "field": "profiles.human.limits.materials",
-      "original_limit": 8,
-      "actual": 11,
-      "reason": "Requested nine independent color channels plus unchanged dark and white facial materials. Original contract is not edited."
-    },
-    {
-      "field": "profiles.human.limits.primitives",
-      "original_limit": 24,
-      "actual": 25,
-      "reason": "Additional torso pants material and head eyebrows primitive, preserving geometry and independently moving controls."
+      "field": "materials/primitives",
+      "original_limit": [
+        8,
+        24
+      ],
+      "previous_reference_limit": [
+        11,
+        25
+      ],
+      "reason": "Independent color channels, including temple accent and female fixed bow",
+      "technical_budget_approval": "NOT_RUN"
     }
   ],
-  "design_revision": "human_base_voxel_v02_materials",
-  "appearance": "User avatar: short light-brown hair, black suit and trousers, white shirt, red tie, flat black shoes, humanized blue eyes and smile; unit scale",
-  "provenance": [
-    {
-      "kind": "scaffold",
-      "file": "resources/starter_human.glb",
-      "license": "MIT"
-    },
-    {
-      "kind": "original_design",
-      "file": "build_scene.py",
-      "note": "Original cuboid geometry, no third party skins or textures. User image used only as visual inspiration; not distributed."
-    }
-  ],
-  "checks": {
-    "runtime_application": "NOT_RUN",
-    "artistic_approval": "NOT_RUN",
-    "rig_and_pivots_unchanged": "PASS",
-    "geometry_and_initial_colors_unchanged": "PASS",
-    "independent_requested_channels": "PASS",
-    "hair_hiding_and_head_brows": "PASS",
-    "reimport_blender": "PASS",
-    "poses": "PASS"
-  },
-  "material_roles_note": "clothing is the jacket only; pants includes upper torso-connected trousers. Facial dark remains shared between pupils/eye rims and smile, while shoes are independent.",
   "mesh_parents": {
     "char_arm_negx_visual": "char_arm_negx",
+    "char_hand_negx_visual": "char_hand_negx",
     "char_arm_posx_visual": "char_arm_posx",
+    "char_hand_posx_visual": "char_hand_posx",
+    "char_accent_visual": "char_head",
     "char_eye_negx_visual": "char_eye_negx",
     "char_eye_posx_visual": "char_eye_posx",
     "char_eyebrows_visual": "char_head",
     "char_hair_visual": "char_hair",
-    "char_hand_negx_visual": "char_hand_negx",
-    "char_hand_posx_visual": "char_hand_posx",
     "char_head_visual": "char_head",
+    "char_mouth_visual": "char_mouth",
     "char_leg_negx_visual": "char_leg_negx",
     "char_leg_posx_visual": "char_leg_posx",
-    "char_mouth_visual": "char_mouth",
     "char_torso_visual": "char_torso"
   },
-  "compliance": {
-    "rig_contract": "AOP_CHAR_RIGID_1",
-    "strict_original_contract": "FAIL",
-    "budget_deviation_acceptance": "NOT_RUN",
-    "runtime_application": "NOT_RUN"
-  }
+  "design_revision": "human_concept01_v01",
+  "status": "ARTISTIC_APPROVED",
+  "checks": {
+    "artistic_approval": "PASS",
+    "approval_source": "Juri: Perfetti, 17 novembre 2026",
+    "application_QA": "NOT_RUN"
+  },
+  "customization": {
+    "clothing": "jacket, lapels, pockets and button only",
+    "pants": "trousers including upper torso-connected part; on female skirt",
+    "shoes": "independent from pupils and mouth",
+    "eyebrows": "under char_head outside char_hair",
+    "accent": "temple marks, independent color",
+    "bow": "female permanent head accessory with independent color"
+  },
+  "hairstyle": {
+    "active_style": "short",
+    "compatible_styles": [
+      "short",
+      "long",
+      "bun",
+      "spiky",
+      "curly",
+      "ponytail",
+      "bald"
+    ],
+    "attach_to": "char_hair",
+    "local_translation": [
+      0,
+      0,
+      0
+    ],
+    "local_rotation": [
+      0,
+      0,
+      0,
+      1
+    ],
+    "local_scale": [
+      1,
+      1,
+      1
+    ],
+    "replace": "Remove existing hair meshes; attach exactly one component at identity. Bald removes hair geometry only."
+  },
+  "provenance": [
+    {
+      "file": "resources/starter_human.glb",
+      "license": "MIT",
+      "role": "contract scaffold"
+    },
+    {
+      "file": "character_design.py",
+      "role": "original geometry; common details in concept_style.py; procedural hair in delivery_runtime.py"
+    }
+  ]
 }

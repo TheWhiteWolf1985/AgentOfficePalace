@@ -1,0 +1,43 @@
+{
+  "status": "FAIL",
+  "profile": "human",
+  "errors": [
+    "Budget exceeded: primitives",
+    "Budget exceeded: materials",
+    "Manifest deviations require separate review; not an in-contract PASS"
+  ],
+  "metrics": {
+    "triangles": 884,
+    "mesh_instances": 14,
+    "primitives": 28,
+    "materials": 13,
+    "bytes": 63516,
+    "bounds_min": [
+      -0.4399999976158142,
+      0.0,
+      -0.3630000054836273
+    ],
+    "bounds_max": [
+      0.4399999976158142,
+      1.7654999494552612,
+      0.38600000739097595
+    ]
+  },
+  "mesh_nodes": [
+    "char_arm_negx_visual",
+    "char_hand_negx_visual",
+    "char_arm_posx_visual",
+    "char_hand_posx_visual",
+    "char_bow_visual",
+    "char_eye_negx_visual",
+    "char_eye_posx_visual",
+    "char_eyebrows_visual",
+    "char_hair_visual",
+    "char_head_visual",
+    "char_mouth_visual",
+    "char_leg_negx_visual",
+    "char_leg_posx_visual",
+    "char_torso_visual"
+  ],
+  "scope": "static contract; no manual/Blender/runtime certification"
+}

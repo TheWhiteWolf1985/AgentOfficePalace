@@ -1,0 +1,196 @@
+{
+  "styles": [
+    {
+      "style_id": "short",
+      "file": "hair_short.glb",
+      "sha256": "3cef96d3bb5da4b75a7d4e22758ef9e4e8d32fcd86b11c01ad61a3c990d88814",
+      "geometry": true,
+      "compatible_bases": [
+        "human_base_concept01_v01",
+        "female_base_concept01_v01"
+      ],
+      "attach_to": "char_hair",
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "style_id": "long",
+      "file": "hair_long.glb",
+      "sha256": "1f5d41b4f986cff62e603788b9f7a6c120d0787d07ed7a6239e40184302adeaa",
+      "geometry": true,
+      "compatible_bases": [
+        "human_base_concept01_v01",
+        "female_base_concept01_v01"
+      ],
+      "attach_to": "char_hair",
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "style_id": "bun",
+      "file": "hair_bun.glb",
+      "sha256": "0d8915252da4428c72a1823e0a002ebd9e688ef1466cfa7a525caf393871859e",
+      "geometry": true,
+      "compatible_bases": [
+        "human_base_concept01_v01",
+        "female_base_concept01_v01"
+      ],
+      "attach_to": "char_hair",
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "style_id": "spiky",
+      "file": "hair_spiky.glb",
+      "sha256": "6e75084a6320f66a0abc513f4422a38692b0514c1e77649138f607502e336a8b",
+      "geometry": true,
+      "compatible_bases": [
+        "human_base_concept01_v01",
+        "female_base_concept01_v01"
+      ],
+      "attach_to": "char_hair",
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "style_id": "curly",
+      "file": "hair_curly.glb",
+      "sha256": "bc3f84eedeeca382cb9a615500ada44065bc1d447d8096c949f8d8ec6a9fa098",
+      "geometry": true,
+      "compatible_bases": [
+        "human_base_concept01_v01",
+        "female_base_concept01_v01"
+      ],
+      "attach_to": "char_hair",
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "style_id": "ponytail",
+      "file": "hair_ponytail.glb",
+      "sha256": "f8231094b265bd6629e6971bd691d637fc1da67ca87e6133c70e1c9f12da6bea",
+      "geometry": true,
+      "compatible_bases": [
+        "human_base_concept01_v01",
+        "female_base_concept01_v01"
+      ],
+      "attach_to": "char_hair",
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "style_id": "bald",
+      "file": "hair_bald.glb",
+      "sha256": "fc6c8e1fe606f4cb7fba733bba3cab098f45db5ee8792661929bbf4b5a7a80c7",
+      "geometry": false,
+      "compatible_bases": [
+        "human_base_concept01_v01",
+        "female_base_concept01_v01"
+      ],
+      "attach_to": "char_hair",
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  ],
+  "one_active_only": true,
+  "default": "short",
+  "bald": "remove hair geometry; keep head, eyebrows and female fixed bow"
+}

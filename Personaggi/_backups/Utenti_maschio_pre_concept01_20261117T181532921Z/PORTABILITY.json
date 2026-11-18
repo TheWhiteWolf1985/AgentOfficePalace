@@ -1,0 +1,6 @@
+{
+  "status": "PASS",
+  "original_sha256": "3340be53a3178dcdce048f33fe380a662ec1cc5675163ca922efeaa3ff2ee57f",
+  "rebuilt_sha256": "3340be53a3178dcdce048f33fe380a662ec1cc5675163ca922efeaa3ff2ee57f",
+  "scope": "Distributed build_scene.py and included modules/resources generated a byte-identical GLB from the separate delivery directory. Geometry-only rebuild; final render and reimport evidence are recorded separately."
+}

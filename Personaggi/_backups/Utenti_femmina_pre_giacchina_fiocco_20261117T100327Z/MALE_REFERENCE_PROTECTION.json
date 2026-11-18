@@ -1,0 +1,8 @@
+{
+  "status": "PASS",
+  "local_files": 77,
+  "remote_files": 77,
+  "all_original_file_hashes_unchanged": true,
+  "reference_glb_sha256": "3340be53a3178dcdce048f33fe380a662ec1cc5675163ca922efeaa3ff2ee57f",
+  "reference_package": "male human_base revision02; active remote folder Utenti_maschio; never written by this task"
+}

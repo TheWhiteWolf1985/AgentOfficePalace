@@ -1,24 +1,29 @@
 {
   "reception_a": {
-    "glb_contract": {
-      "status": "PASS",
+    "source_sha256": "dd8473eae487f881852439ddc42dd218ccb801022fc2c3ba4ec6a11bc583746d",
+    "original_validator": {
+      "status": "FAIL",
       "profile": "human",
-      "errors": [],
+      "errors": [
+        "Budget exceeded: primitives",
+        "Budget exceeded: materials",
+        "Manifest deviations require separate review; not an in-contract PASS"
+      ],
       "metrics": {
-        "triangles": 762,
-        "mesh_instances": 12,
-        "primitives": 23,
-        "materials": 8,
-        "bytes": 53488,
+        "triangles": 884,
+        "mesh_instances": 14,
+        "primitives": 28,
+        "materials": 13,
+        "bytes": 63516,
         "bounds_min": [
-          -0.45500001311302185,
+          -0.4399999976158142,
           0.0,
-          -0.32899999618530273
+          -0.3630000054836273
         ],
         "bounds_max": [
-          0.45500001311302185,
+          0.4399999976158142,
           1.7654999494552612,
-          0.335999995470047
+          0.38600000739097595
         ]
       },
       "mesh_nodes": [
@@ -26,8 +31,10 @@
         "char_hand_negx_visual",
         "char_arm_posx_visual",
         "char_hand_posx_visual",
+        "char_bow_visual",
         "char_eye_negx_visual",
         "char_eye_posx_visual",
+        "char_eyebrows_visual",
         "char_hair_visual",
         "char_head_visual",
         "char_mouth_visual",
@@ -40,24 +47,15 @@
     "roundtrip": {
       "status": "PASS",
       "errors": [],
-      "visibility_descendants": {
-        "char_head": [
-          "char_eye_negx_visual",
-          "char_eye_posx_visual",
-          "char_hair_visual",
-          "char_head_visual",
-          "char_mouth_visual"
-        ],
-        "char_arm_negx": [
-          "char_arm_negx_visual",
-          "char_hand_negx_visual"
-        ],
-        "char_arm_posx": [
-          "char_arm_posx_visual",
-          "char_hand_posx_visual"
-        ]
-      },
-      "pose_execution": {
+      "hierarchy_TRS_scale": "PASS",
+      "independent_color_edits": "PASS",
+      "eyebrows_outside_hair": "PASS",
+      "first_person_remaining": [
+        "char_leg_negx_visual",
+        "char_leg_posx_visual",
+        "char_torso_visual"
+      ],
+      "finite_pose_tests": {
         "rest": "PASS",
         "walk_a": "PASS",
         "walk_b": "PASS",
@@ -67,28 +65,35 @@
         "ladder": "PASS",
         "pole": "PASS"
       },
-      "scope": "Roundtrip local transforms, inheritance and render execution; manual anatomy review is separate."
+      "height_m": 1.7654999494552612,
+      "all_pose_intersections": "NOT_RUN",
+      "application_QA": "NOT_RUN"
     }
   },
   "reception_b": {
-    "glb_contract": {
-      "status": "PASS",
+    "source_sha256": "f881303ba6001c44065029a4a1ecffc5326865f74f617643ddae40cee4079a84",
+    "original_validator": {
+      "status": "FAIL",
       "profile": "human",
-      "errors": [],
+      "errors": [
+        "Budget exceeded: primitives",
+        "Budget exceeded: materials",
+        "Manifest deviations require separate review; not an in-contract PASS"
+      ],
       "metrics": {
-        "triangles": 714,
-        "mesh_instances": 12,
-        "primitives": 23,
-        "materials": 8,
-        "bytes": 50904,
+        "triangles": 800,
+        "mesh_instances": 14,
+        "primitives": 28,
+        "materials": 13,
+        "bytes": 59120,
         "bounds_min": [
-          -0.45500001311302185,
+          -0.4399999976158142,
           0.0,
           -0.3264999985694885
         ],
         "bounds_max": [
-          0.45500001311302185,
-          1.7654999494552612,
+          0.4399999976158142,
+          1.7799999713897705,
           0.335999995470047
         ]
       },
@@ -99,8 +104,10 @@
         "char_hand_posx_visual",
         "char_eye_negx_visual",
         "char_eye_posx_visual",
+        "char_eyebrows_visual",
         "char_hair_visual",
         "char_head_visual",
+        "char_headband_visual",
         "char_mouth_visual",
         "char_leg_negx_visual",
         "char_leg_posx_visual",
@@ -111,24 +118,15 @@
     "roundtrip": {
       "status": "PASS",
       "errors": [],
-      "visibility_descendants": {
-        "char_head": [
-          "char_eye_negx_visual",
-          "char_eye_posx_visual",
-          "char_hair_visual",
-          "char_head_visual",
-          "char_mouth_visual"
-        ],
-        "char_arm_negx": [
-          "char_arm_negx_visual",
-          "char_hand_negx_visual"
-        ],
-        "char_arm_posx": [
-          "char_arm_posx_visual",
-          "char_hand_posx_visual"
-        ]
-      },
-      "pose_execution": {
+      "hierarchy_TRS_scale": "PASS",
+      "independent_color_edits": "PASS",
+      "eyebrows_outside_hair": "PASS",
+      "first_person_remaining": [
+        "char_leg_negx_visual",
+        "char_leg_posx_visual",
+        "char_torso_visual"
+      ],
+      "finite_pose_tests": {
         "rest": "PASS",
         "walk_a": "PASS",
         "walk_b": "PASS",
@@ -138,7 +136,9 @@
         "ladder": "PASS",
         "pole": "PASS"
       },
-      "scope": "Roundtrip local transforms, inheritance and render execution; manual anatomy review is separate."
+      "height_m": 1.7799999713897705,
+      "all_pose_intersections": "NOT_RUN",
+      "application_QA": "NOT_RUN"
     }
   }
 }

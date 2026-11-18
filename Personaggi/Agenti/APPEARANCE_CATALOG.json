@@ -1,0 +1,347 @@
+{
+  "status": "DRAFT",
+  "bases": [
+    "agent_male_base",
+    "agent_female_base"
+  ],
+  "hairstyles": [
+    "short",
+    "long",
+    "bun",
+    "spiky",
+    "curly",
+    "ponytail",
+    "bald"
+  ],
+  "material_palettes_linear_rgb": {
+    "skin": [
+      [
+        0.02,
+        0.025,
+        0.033
+      ],
+      [
+        0.03,
+        0.048,
+        0.07
+      ],
+      [
+        0.065,
+        0.06,
+        0.08
+      ],
+      [
+        0.1,
+        0.12,
+        0.14
+      ]
+    ],
+    "hair": [
+      [
+        0.38,
+        0.245,
+        0.115
+      ],
+      [
+        0.69,
+        0.43,
+        0.115
+      ],
+      [
+        0.08,
+        0.03,
+        0.014
+      ],
+      [
+        0.018,
+        0.012,
+        0.009
+      ],
+      [
+        0.3,
+        0.025,
+        0.014
+      ],
+      [
+        0.5,
+        0.53,
+        0.57
+      ]
+    ],
+    "eyebrows": [
+      [
+        0.008,
+        0.72,
+        0.78
+      ],
+      [
+        0.02,
+        0.38,
+        0.95
+      ],
+      [
+        0.45,
+        0.05,
+        0.75
+      ],
+      [
+        0.1,
+        0.6,
+        0.2
+      ],
+      [
+        0.85,
+        0.42,
+        0.015
+      ]
+    ],
+    "iris": [
+      [
+        0.008,
+        0.72,
+        0.78
+      ],
+      [
+        0.02,
+        0.38,
+        0.95
+      ],
+      [
+        0.45,
+        0.05,
+        0.75
+      ],
+      [
+        0.1,
+        0.6,
+        0.2
+      ],
+      [
+        0.85,
+        0.42,
+        0.015
+      ]
+    ],
+    "clothing": [
+      [
+        0.075,
+        0.016,
+        0.047
+      ],
+      [
+        0.018,
+        0.032,
+        0.075
+      ],
+      [
+        0.012,
+        0.06,
+        0.047
+      ],
+      [
+        0.045,
+        0.045,
+        0.055
+      ],
+      [
+        0.1,
+        0.022,
+        0.019
+      ]
+    ],
+    "shirt": [
+      [
+        0.78,
+        0.82,
+        0.84
+      ],
+      [
+        0.9,
+        0.88,
+        0.82
+      ],
+      [
+        0.13,
+        0.17,
+        0.21
+      ]
+    ],
+    "tie": [
+      [
+        0.008,
+        0.72,
+        0.78
+      ],
+      [
+        0.02,
+        0.38,
+        0.95
+      ],
+      [
+        0.45,
+        0.05,
+        0.75
+      ],
+      [
+        0.85,
+        0.42,
+        0.015
+      ]
+    ],
+    "pants": [
+      [
+        0.055,
+        0.012,
+        0.036
+      ],
+      [
+        0.018,
+        0.032,
+        0.075
+      ],
+      [
+        0.02,
+        0.024,
+        0.03
+      ],
+      [
+        0.012,
+        0.045,
+        0.033
+      ]
+    ],
+    "shoes": [
+      [
+        0.006,
+        0.009,
+        0.014
+      ],
+      [
+        0.03,
+        0.025,
+        0.021
+      ],
+      [
+        0.045,
+        0.055,
+        0.07
+      ]
+    ],
+    "accent": [
+      [
+        0.008,
+        0.72,
+        0.78
+      ],
+      [
+        0.02,
+        0.38,
+        0.95
+      ],
+      [
+        0.45,
+        0.05,
+        0.75
+      ],
+      [
+        0.85,
+        0.42,
+        0.015
+      ]
+    ],
+    "mouth": [
+      [
+        0.008,
+        0.72,
+        0.78
+      ],
+      [
+        0.02,
+        0.38,
+        0.95
+      ],
+      [
+        0.45,
+        0.05,
+        0.75
+      ],
+      [
+        0.1,
+        0.6,
+        0.2
+      ]
+    ],
+    "bow": [
+      [
+        0.008,
+        0.72,
+        0.78
+      ],
+      [
+        0.02,
+        0.38,
+        0.95
+      ],
+      [
+        0.45,
+        0.05,
+        0.75
+      ],
+      [
+        0.85,
+        0.42,
+        0.015
+      ]
+    ]
+  },
+  "material_roles": {
+    "agent_male_base": {
+      "skin": "char_mat_skin",
+      "hair": "char_mat_hair",
+      "eyebrows": "char_mat_eyebrows",
+      "iris": "char_mat_iris",
+      "clothing": "char_mat_clothing",
+      "shirt": "char_mat_shirt",
+      "tie": "char_mat_tie",
+      "pants": "char_mat_pants",
+      "shoes": "char_mat_shoes",
+      "accent": "char_mat_accent",
+      "mouth": "char_mat_mouth",
+      "status": "char_mat_status",
+      "facial_dark": "char_mat_dark",
+      "eye_and_teeth_white": "char_mat_white",
+      "body": "char_mat_skin"
+    },
+    "agent_female_base": {
+      "skin": "char_mat_skin",
+      "hair": "char_mat_hair",
+      "eyebrows": "char_mat_eyebrows",
+      "iris": "char_mat_iris",
+      "clothing": "char_mat_clothing",
+      "shirt": "char_mat_shirt",
+      "tie": "char_mat_tie",
+      "pants": "char_mat_pants",
+      "shoes": "char_mat_shoes",
+      "accent": "char_mat_accent",
+      "mouth": "char_mat_mouth",
+      "status": "char_mat_status",
+      "bow": "char_mat_bow",
+      "facial_dark": "char_mat_dark",
+      "eye_and_teeth_white": "char_mat_white",
+      "body": "char_mat_skin"
+    }
+  },
+  "excluded_from_random": [
+    "status",
+    "facial_dark",
+    "eye_and_teeth_white"
+  ],
+  "color_update_rule": "Update baseColorFactor; for iris/eyebrows/mouth update emissiveFactor as well. Clone materials per instance.",
+  "runtime_randomization": "NOT_RUN",
+  "emissive_gain": {
+    "iris": 0.35,
+    "eyebrows": 0.35,
+    "mouth": 0.35,
+    "status": 1.0
+  }
+}

@@ -1,0 +1,510 @@
+{
+  "contract": "AOP_AGENT_HUMANOID_DRAFT_1",
+  "contract_version": "0.1.0",
+  "profile": "agent_humanoid_draft",
+  "asset_id": "agent_male_base",
+  "file": "agent_male_base.glb",
+  "sha256": "ca7079b1ed9c5efd22e915c03ebbd51d14060b4dba620044ee1af7d4f812ba85",
+  "blender_version": "5.3.0",
+  "root": "char_root",
+  "units": "meters",
+  "forward": "+Z",
+  "nodes": {
+    "char_root": {
+      "parent": null,
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_body": {
+      "parent": "char_root",
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_torso": {
+      "parent": "char_body",
+      "translation": [
+        0,
+        0.72,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_head": {
+      "parent": "char_body",
+      "translation": [
+        0,
+        1.32,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_hair": {
+      "parent": "char_head",
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_eye_negx": {
+      "parent": "char_head",
+      "translation": [
+        -0.12,
+        0.02,
+        0.3
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_eye_posx": {
+      "parent": "char_head",
+      "translation": [
+        0.12,
+        0.02,
+        0.3
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_mouth": {
+      "parent": "char_head",
+      "translation": [
+        0,
+        -0.1,
+        0.32
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_arm_negx": {
+      "parent": "char_body",
+      "translation": [
+        -0.33,
+        0.9,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_arm_posx": {
+      "parent": "char_body",
+      "translation": [
+        0.33,
+        0.9,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_leg_negx": {
+      "parent": "char_body",
+      "translation": [
+        -0.12,
+        0.42,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_leg_posx": {
+      "parent": "char_body",
+      "translation": [
+        0.12,
+        0.42,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_hand_negx": {
+      "parent": "char_arm_negx",
+      "translation": [
+        0,
+        -0.38,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_hand_posx": {
+      "parent": "char_arm_posx",
+      "translation": [
+        0,
+        -0.38,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_socket_label": {
+      "parent": "char_root",
+      "translation": [
+        0,
+        2,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_socket_voice": {
+      "parent": "char_root",
+      "translation": [
+        0,
+        2.25,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_socket_bubble": {
+      "parent": "char_root",
+      "translation": [
+        0,
+        2.45,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_socket_card": {
+      "parent": "char_body",
+      "translation": [
+        0,
+        0.8,
+        0.36
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_pupil_negx": {
+      "parent": "char_eye_negx",
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_pupil_posx": {
+      "parent": "char_eye_posx",
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_status": {
+      "parent": "char_torso",
+      "translation": [
+        0.155,
+        0.31,
+        0.197
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  "material_roles": {
+    "skin": "char_mat_skin",
+    "hair": "char_mat_hair",
+    "eyebrows": "char_mat_eyebrows",
+    "iris": "char_mat_iris",
+    "clothing": "char_mat_clothing",
+    "shirt": "char_mat_shirt",
+    "tie": "char_mat_tie",
+    "pants": "char_mat_pants",
+    "shoes": "char_mat_shoes",
+    "accent": "char_mat_accent",
+    "mouth": "char_mat_mouth",
+    "status": "char_mat_status",
+    "facial_dark": "char_mat_dark",
+    "eye_and_teeth_white": "char_mat_white",
+    "body": "char_mat_skin"
+  },
+  "body_mesh_nodes": [
+    "char_arm_negx_visual",
+    "char_hand_negx_visual",
+    "char_arm_posx_visual",
+    "char_hand_posx_visual",
+    "char_eye_negx_visual",
+    "char_pupil_negx_visual",
+    "char_eye_posx_visual",
+    "char_pupil_posx_visual",
+    "char_eyebrows_visual",
+    "char_hair_visual",
+    "char_head_visual",
+    "char_mouth_visual",
+    "char_leg_negx_visual",
+    "char_leg_posx_visual",
+    "char_status_visual",
+    "char_torso_visual"
+  ],
+  "first_person_hide_nodes": [],
+  "modular_hair": null,
+  "animations": [],
+  "license": "Original design for Juri; MIT scaffold/tools, copyright 2026 AgentSystemLabs",
+  "third_party_assets": [],
+  "deviations": [
+    {
+      "reason": "Human-size bodies with user-rig pivots requested; separate humanoid-agent proposal, not legacy agent conformity"
+    }
+  ],
+  "status": "PROPOSED_NOT_APPROVED",
+  "source_contract": "AOP_CHAR_RIGID_1",
+  "original_agent_profile_compatible": false,
+  "hairstyle": {
+    "active": "short",
+    "compatible": [
+      "short",
+      "long",
+      "bun",
+      "spiky",
+      "curly",
+      "ponytail",
+      "bald"
+    ],
+    "attach_to": "char_hair",
+    "translation": [
+      0,
+      0,
+      0
+    ],
+    "rotation": [
+      0,
+      0,
+      0,
+      1
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  "customization": {
+    "same_user_color_roles": true,
+    "pants": "trousers including upper torso part, or female skirt",
+    "clothing": "jacket only",
+    "eyebrows": "outside hair under head",
+    "shoes": "independent from facial graphics",
+    "mouth": "new independent digital smile color",
+    "status": "dedicated emissive char_mat_status, excluded from random appearance",
+    "fixed_bow": "female only, outside hair, independent color"
+  },
+  "procedural_controls": {
+    "pupils": "children of each eye, local identity; move for gaze, eyes parent scale for blink",
+    "status": "small neutral chest indicator, separate control/material, no task or state text baked"
+  },
+  "checks": {
+    "artistic_approval": "PASS",
+    "new_technical_contract_approval": "NOT_RUN",
+    "runtime_application": "NOT_RUN",
+    "approval_source": "Juri: Bene, 17 novembre 2026; base design and shown examples"
+  }
+}

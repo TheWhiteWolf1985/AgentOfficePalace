@@ -5,6 +5,4 @@
 # Preserve the original Blender package and its SHA-256 manifests.
 sala_riunioni/** -text -whitespace
 sala_atrio/** -text -whitespace
-Personaggi/Atrio/** -text -whitespace
-Personaggi/Utenti_maschio/** -text -whitespace
-Personaggi/Utenti_femmina/** -text -whitespace
+Personaggi/** -text -whitespace

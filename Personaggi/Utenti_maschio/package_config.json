@@ -1,0 +1,12 @@
+{
+  "asset": "human_base",
+  "sex": "maschio",
+  "revision": "concept01_v01",
+  "default_hair": "short",
+  "artistic_approval": {
+    "status": "PASS",
+    "source": "Juri: Perfetti",
+    "date": "2026-11-17"
+  },
+  "application_QA": "NOT_RUN"
+}

@@ -1,0 +1,27 @@
+{
+  "status": "PASS",
+  "errors": [],
+  "metrics": {
+    "triangles": 402,
+    "mesh_instances": 12,
+    "primitives": 24,
+    "materials": 11,
+    "bytes": 35884,
+    "bounds_min": [
+      -0.45500001311302185,
+      0.0,
+      -0.27000001072883606
+    ],
+    "bounds_max": [
+      0.45500001311302185,
+      1.7200000286102295,
+      0.335999995470047
+    ]
+  },
+  "original_validator_status": "FAIL",
+  "original_validator_errors": [
+    "Budget exceeded: materials",
+    "Manifest deviations require separate review; not an in-contract PASS"
+  ],
+  "scope": "Current request 11 materials/25 primitives; all other original checks preserved"
+}

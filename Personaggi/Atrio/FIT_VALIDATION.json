@@ -1,0 +1,46 @@
+{
+  "asset_source_sha256": {
+    "reception_a": "dd8473eae487f881852439ddc42dd218ccb801022fc2c3ba4ec6a11bc583746d",
+    "reception_b": "f881303ba6001c44065029a4a1ecffc5326865f74f617643ddae40cee4079a84"
+  },
+  "original_reference_sha256": "5655594f52a4be97977d7cc98f00f1e514d73de5276de31d095a771fb7da774c",
+  "source_matches_placements": "PASS",
+  "reference_geometry_transforms_materials_unchanged": "PASS",
+  "placements_applied_unmodified": true,
+  "instance_scale_only": 1.15,
+  "asset_source_scale": 1.0,
+  "visitor_eye_height_m": 1.4,
+  "face_visibility_rays": {
+    "reception_a": {
+      "eye_negx": {
+        "status": "PASS",
+        "first_hit": "reception_a__char_eye_negx_visual"
+      },
+      "eye_posx": {
+        "status": "PASS",
+        "first_hit": "reception_a__char_eye_posx_visual"
+      },
+      "smile": {
+        "status": "PASS",
+        "first_hit": "reception_a__char_mouth_visual"
+      }
+    },
+    "reception_b": {
+      "eye_negx": {
+        "status": "PASS",
+        "first_hit": "reception_b__char_eye_negx_visual"
+      },
+      "eye_posx": {
+        "status": "PASS",
+        "first_hit": "reception_b__char_eye_posx_visual"
+      },
+      "smile": {
+        "status": "PASS",
+        "first_hit": "reception_b__char_mouth_visual"
+      }
+    }
+  },
+  "ray_scope": "first visible surface belongs to the intended NPC; not a whole-body collision proof",
+  "whole_body_furniture_intersections": "NOT_RUN",
+  "application_QA": "NOT_RUN"
+}

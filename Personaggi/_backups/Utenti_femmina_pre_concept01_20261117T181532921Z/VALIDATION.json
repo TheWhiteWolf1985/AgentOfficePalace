@@ -1,0 +1,95 @@
+{
+  "status": "FAIL",
+  "functional_status": "PASS",
+  "date": "2026-11-17",
+  "design_revision": "female_modular_v03_long_fixed_bow",
+  "reason": "Current 11/25 and original 8/24 budgets are exceeded; all functional checks are separate.",
+  "default_female_style": "long",
+  "fixed_accessory": {
+    "node": "char_bow_visual",
+    "parent": "char_head",
+    "removable": false,
+    "editable_property": "color_only",
+    "material": "char_mat_bow"
+  },
+  "checks": {
+    "rig_and_unit_scale": "PASS",
+    "origin_front_and_bounds": "PASS",
+    "nine_original_colors": "PASS",
+    "independent_bow_color": "PASS",
+    "fixed_bow_with_all_styles_and_bald": "PASS",
+    "female_skirt_and_heels": "PASS",
+    "component_roundtrip": "PASS",
+    "fourteen_assemblies": "PASS",
+    "1008_pose_head_cases": "PASS",
+    "first_person_visibility": "PASS",
+    "complete_head_and_independent_brows": "PASS",
+    "male_original_preserved": "PASS",
+    "manual_render_review": "PASS",
+    "current_budget_11_25": "FAIL",
+    "legacy_budget_8_24": "FAIL",
+    "portable_rebuild": "PASS",
+    "budget_extension_approval": "NOT_RUN",
+    "runtime_application": "NOT_RUN",
+    "assembler_cli": "PASS"
+  },
+  "maximum_metrics": {
+    "triangles": 1030,
+    "mesh_instances": 14,
+    "materials": 12,
+    "primitives": 26,
+    "bytes": 70892
+  },
+  "head_domain_degrees": {
+    "neutral": [
+      0,
+      0,
+      0
+    ],
+    "yaw_neg": [
+      0,
+      0,
+      -25
+    ],
+    "yaw_pos": [
+      0,
+      0,
+      25
+    ],
+    "pitch_neg": [
+      -15,
+      0,
+      0
+    ],
+    "pitch_pos": [
+      15,
+      0,
+      0
+    ],
+    "roll_neg": [
+      0,
+      -10,
+      0
+    ],
+    "roll_pos": [
+      0,
+      10,
+      0
+    ],
+    "yaw_neg_pitch_neg": [
+      -15,
+      0,
+      -25
+    ],
+    "yaw_pos_pitch_pos": [
+      15,
+      0,
+      25
+    ]
+  },
+  "limitations": [
+    "Application UI enforcement of the non-removable bow is not implemented; the asset structure and manifest preserve it outside the hair system.",
+    "Rig is rigid, without anatomical elbow/knee bending; seat integration and runtime multi-instance colors NOT_RUN.",
+    "Only the documented body/head pose domain is checked; scalp contact is intentional."
+  ]
+}

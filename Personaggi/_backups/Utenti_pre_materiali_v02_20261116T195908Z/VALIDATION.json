@@ -1,0 +1,34 @@
+{
+  "contract": "AOP_CHAR_RIGID_1",
+  "profile": "human",
+  "asset_id": "human_base",
+  "design_revision": "human_base_voxel_v01",
+  "status": "NOT_RUN",
+  "purpose": "First visual iteration for Juri review, no software integration",
+  "blender_version": "5.3.0",
+  "instance_scale": 1.0,
+  "checks": {
+    "glb_contract": "PASS",
+    "reimport_blender": "PASS",
+    "rotation_and_visibility": "PASS",
+    "manual_geometry": "PASS",
+    "manual_all_poses": "PASS",
+    "runtime_application": "NOT_RUN",
+    "artistic_approval": "PASS",
+    "kit_integrity": "PASS",
+    "portable_rebuild": "PASS"
+  },
+  "limitations": [
+    "Only human_base is created; agent and first-person hands are not included.",
+    "Procedural rigid controls are retained; no skinning, armature, clips or root motion.",
+    "No reception placement and no 1.15 multiplier. Render-stage ground/cameras/lights are excluded from the GLB."
+  ],
+  "manual_review_scope": "Reviewed final GLB reimport renders: front, side, back, three-quarter, face close-up, visibility and eight poses. Rigid toy-like articulation; no anatomical elbow/knee deformation. Application and artistic acceptance not tested.",
+  "artistic_approval_evidence": {
+    "date": "2026-11-16",
+    "by": "Juri",
+    "quote": "Bene, mi piace",
+    "scope": "Appearance of human_base_voxel_v01, approved for this delivery; future revisions remain possible."
+  },
+  "overall_status_reason": "Local checks and visual acceptance PASS; application runtime QA remains NOT_RUN."
+}

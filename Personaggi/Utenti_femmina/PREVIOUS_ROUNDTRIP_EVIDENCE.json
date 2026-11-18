@@ -1,0 +1,100 @@
+{
+  "static_original_validator": {
+    "status": "FAIL",
+    "profile": "human",
+    "errors": [
+      "Budget exceeded: primitives",
+      "Budget exceeded: materials",
+      "Manifest deviations require separate review; not an in-contract PASS"
+    ],
+    "metrics": {
+      "triangles": 973,
+      "mesh_instances": 15,
+      "primitives": 27,
+      "materials": 13,
+      "bytes": 68440,
+      "bounds_min": [
+        -0.4399999976158142,
+        0.0,
+        -0.4300000071525574
+      ],
+      "bounds_max": [
+        0.4399999976158142,
+        1.7654999494552612,
+        0.38600000739097595
+      ]
+    },
+    "mesh_nodes": [
+      "char_arm_negx_visual",
+      "char_hand_negx_visual",
+      "char_arm_posx_visual",
+      "char_hand_posx_visual",
+      "char_accent_visual",
+      "char_bow_visual",
+      "char_eye_negx_visual",
+      "char_eye_posx_visual",
+      "char_eyebrows_visual",
+      "char_hair_visual",
+      "char_head_visual",
+      "char_mouth_visual",
+      "char_leg_negx_visual",
+      "char_leg_posx_visual",
+      "char_torso_visual"
+    ],
+    "scope": "static contract; no manual/Blender/runtime certification"
+  },
+  "draft_checks": {
+    "control_hierarchy_and_local_matrices": "PASS",
+    "scale_1_origin_feet": "PASS",
+    "unchanged_overall_bounds": "PASS",
+    "preserved_body_head_hair_limbs_geometry": {
+      "char_arm_negx_visual": "PASS",
+      "char_arm_posx_visual": "PASS",
+      "char_bow_visual": "PASS",
+      "char_eye_negx_visual": "PASS",
+      "char_eye_posx_visual": "PASS",
+      "char_hair_visual": "PASS",
+      "char_hand_negx_visual": "PASS",
+      "char_hand_posx_visual": "PASS",
+      "char_head_visual": "PASS",
+      "char_leg_negx_visual": "PASS",
+      "char_leg_posx_visual": "PASS",
+      "char_mouth_visual": "PASS"
+    },
+    "independent_material_edits": {
+      "char_mat_accent": "PASS",
+      "char_mat_bow": "PASS",
+      "char_mat_clothing": "PASS",
+      "char_mat_dark": "PASS",
+      "char_mat_eyebrows": "PASS",
+      "char_mat_hair": "PASS",
+      "char_mat_iris": "PASS",
+      "char_mat_pants": "PASS",
+      "char_mat_shirt": "PASS",
+      "char_mat_shoes": "PASS",
+      "char_mat_skin": "PASS",
+      "char_mat_tie": "PASS",
+      "char_mat_white": "PASS"
+    },
+    "eyebrows_outside_hair": "PASS",
+    "replaceable_hair": "PASS",
+    "fixed_bow_outside_hair": "PASS",
+    "temple_accent_independent": "PASS",
+    "first_person_branch_separation": "PASS",
+    "eight_pose_finite_transforms": {
+      "rest": "PASS",
+      "walk_a": "PASS",
+      "walk_b": "PASS",
+      "sit": "PASS",
+      "hold": "PASS",
+      "paper_book": "PASS",
+      "ladder": "PASS",
+      "pole": "PASS"
+    },
+    "head_rotation_parentage": "PASS",
+    "height_m": 1.7654999494552612,
+    "application_QA": "NOT_RUN",
+    "all_modular_hair_and_pose_intersections": "NOT_RUN",
+    "artistic_approval": "PASS"
+  }
+}

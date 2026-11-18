@@ -1,0 +1,754 @@
+{
+  "status": "PASS",
+  "tested_head_angles_degrees": {
+    "neutral": [
+      0,
+      0,
+      0
+    ],
+    "yaw_neg": [
+      0,
+      0,
+      -25
+    ],
+    "yaw_pos": [
+      0,
+      0,
+      25
+    ],
+    "pitch_neg": [
+      -15,
+      0,
+      0
+    ],
+    "pitch_pos": [
+      15,
+      0,
+      0
+    ],
+    "roll_neg": [
+      0,
+      -10,
+      0
+    ],
+    "roll_pos": [
+      0,
+      10,
+      0
+    ],
+    "yaw_neg_pitch_neg": [
+      -15,
+      0,
+      -25
+    ],
+    "yaw_pos_pitch_pos": [
+      15,
+      0,
+      25
+    ]
+  },
+  "scope": "Eight body poses crossed with nine head states for every base/style; original scalp contact excluded; application NOT_RUN.",
+  "rendered": true,
+  "assemblies": {
+    "male_short": {
+      "status": "PASS",
+      "source_sha256": "6d1023a0e97712b0ba80fd36368190e05c8145e4f2da7d6ec039d0f6f9f630b0",
+      "rig_roundtrip_errors": [],
+      "color_channels": {
+        "skin": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "hair": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "eyebrows": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "iris": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "clothing": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "shirt": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "tie": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "pants": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "shoes": {
+          "status": "PASS",
+          "visible_geometry": true
+        }
+      },
+      "first_person_visibility": "PASS",
+      "head_and_brows_without_hair": "PASS",
+      "face_intersection_pairs": 0,
+      "nose_intersection_pairs": 0,
+      "pose_head_cases": 72,
+      "hair_body_intersections": [],
+      "scalp_contact": "Intentional shared attachment, excluded from collision test; visible eyes/brows/mouth/nose are tested separately."
+    },
+    "male_long": {
+      "status": "PASS",
+      "source_sha256": "7d6dbb8f0328cc4db152b3ecee9e0d876fc3c6bdf8734855e03b4126728c771f",
+      "rig_roundtrip_errors": [],
+      "color_channels": {
+        "skin": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "hair": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "eyebrows": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "iris": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "clothing": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "shirt": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "tie": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "pants": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "shoes": {
+          "status": "PASS",
+          "visible_geometry": true
+        }
+      },
+      "first_person_visibility": "PASS",
+      "head_and_brows_without_hair": "PASS",
+      "face_intersection_pairs": 0,
+      "nose_intersection_pairs": 0,
+      "pose_head_cases": 72,
+      "hair_body_intersections": [],
+      "scalp_contact": "Intentional shared attachment, excluded from collision test; visible eyes/brows/mouth/nose are tested separately."
+    },
+    "male_bun": {
+      "status": "PASS",
+      "source_sha256": "5fba35ab5c051ac754e2010a752094cc6b25109b15a8e9515e18f7de02eaf815",
+      "rig_roundtrip_errors": [],
+      "color_channels": {
+        "skin": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "hair": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "eyebrows": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "iris": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "clothing": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "shirt": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "tie": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "pants": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "shoes": {
+          "status": "PASS",
+          "visible_geometry": true
+        }
+      },
+      "first_person_visibility": "PASS",
+      "head_and_brows_without_hair": "PASS",
+      "face_intersection_pairs": 0,
+      "nose_intersection_pairs": 0,
+      "pose_head_cases": 72,
+      "hair_body_intersections": [],
+      "scalp_contact": "Intentional shared attachment, excluded from collision test; visible eyes/brows/mouth/nose are tested separately."
+    },
+    "male_spiky": {
+      "status": "PASS",
+      "source_sha256": "6e4d8adb3256a727bab1d5749c48e9161103f5f9231ddb6de2fbf120d79a17bd",
+      "rig_roundtrip_errors": [],
+      "color_channels": {
+        "skin": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "hair": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "eyebrows": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "iris": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "clothing": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "shirt": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "tie": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "pants": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "shoes": {
+          "status": "PASS",
+          "visible_geometry": true
+        }
+      },
+      "first_person_visibility": "PASS",
+      "head_and_brows_without_hair": "PASS",
+      "face_intersection_pairs": 0,
+      "nose_intersection_pairs": 0,
+      "pose_head_cases": 72,
+      "hair_body_intersections": [],
+      "scalp_contact": "Intentional shared attachment, excluded from collision test; visible eyes/brows/mouth/nose are tested separately."
+    },
+    "male_curly": {
+      "status": "PASS",
+      "source_sha256": "0347f38fdf910caa4072a502da2c6d25ec9919eb8192baf4e9c93d4629f1faa2",
+      "rig_roundtrip_errors": [],
+      "color_channels": {
+        "skin": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "hair": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "eyebrows": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "iris": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "clothing": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "shirt": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "tie": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "pants": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "shoes": {
+          "status": "PASS",
+          "visible_geometry": true
+        }
+      },
+      "first_person_visibility": "PASS",
+      "head_and_brows_without_hair": "PASS",
+      "face_intersection_pairs": 0,
+      "nose_intersection_pairs": 0,
+      "pose_head_cases": 72,
+      "hair_body_intersections": [],
+      "scalp_contact": "Intentional shared attachment, excluded from collision test; visible eyes/brows/mouth/nose are tested separately."
+    },
+    "male_ponytail": {
+      "status": "PASS",
+      "source_sha256": "4763fb18b1a1266f9a434b93b6437aead437e43e32b6d45f61d9f6a7f4840c73",
+      "rig_roundtrip_errors": [],
+      "color_channels": {
+        "skin": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "hair": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "eyebrows": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "iris": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "clothing": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "shirt": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "tie": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "pants": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "shoes": {
+          "status": "PASS",
+          "visible_geometry": true
+        }
+      },
+      "first_person_visibility": "PASS",
+      "head_and_brows_without_hair": "PASS",
+      "face_intersection_pairs": 0,
+      "nose_intersection_pairs": 0,
+      "pose_head_cases": 72,
+      "hair_body_intersections": [],
+      "scalp_contact": "Intentional shared attachment, excluded from collision test; visible eyes/brows/mouth/nose are tested separately."
+    },
+    "male_bald": {
+      "status": "PASS",
+      "source_sha256": "b4ff6c13d67d9eb45fb4ea948eced9bc9e6d33f07496cb190febfbb0a11d3472",
+      "rig_roundtrip_errors": [],
+      "color_channels": {
+        "skin": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "hair": {
+          "status": "PASS",
+          "visible_geometry": false
+        },
+        "eyebrows": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "iris": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "clothing": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "shirt": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "tie": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "pants": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "shoes": {
+          "status": "PASS",
+          "visible_geometry": true
+        }
+      },
+      "first_person_visibility": "PASS",
+      "head_and_brows_without_hair": "PASS",
+      "face_intersection_pairs": 0,
+      "nose_intersection_pairs": 0,
+      "pose_head_cases": 72,
+      "hair_body_intersections": [],
+      "scalp_contact": "Intentional shared attachment, excluded from collision test; visible eyes/brows/mouth/nose are tested separately."
+    },
+    "female_short": {
+      "status": "PASS",
+      "source_sha256": "e107c66402fbec414b3cfb03bb173ab98cd0ff816bc3ffe93153dde68bc5443d",
+      "rig_roundtrip_errors": [],
+      "color_channels": {
+        "skin": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "hair": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "eyebrows": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "iris": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "clothing": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "shirt": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "tie": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "pants": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "shoes": {
+          "status": "PASS",
+          "visible_geometry": true
+        }
+      },
+      "first_person_visibility": "PASS",
+      "head_and_brows_without_hair": "PASS",
+      "face_intersection_pairs": 0,
+      "nose_intersection_pairs": 0,
+      "pose_head_cases": 72,
+      "hair_body_intersections": [],
+      "scalp_contact": "Intentional shared attachment, excluded from collision test; visible eyes/brows/mouth/nose are tested separately."
+    },
+    "female_long": {
+      "status": "PASS",
+      "source_sha256": "75ea7a3e7a0af0ce851390c7873797802b1d29352667b2cf2ce6d430741778e3",
+      "rig_roundtrip_errors": [],
+      "color_channels": {
+        "skin": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "hair": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "eyebrows": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "iris": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "clothing": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "shirt": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "tie": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "pants": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "shoes": {
+          "status": "PASS",
+          "visible_geometry": true
+        }
+      },
+      "first_person_visibility": "PASS",
+      "head_and_brows_without_hair": "PASS",
+      "face_intersection_pairs": 0,
+      "nose_intersection_pairs": 0,
+      "pose_head_cases": 72,
+      "hair_body_intersections": [],
+      "scalp_contact": "Intentional shared attachment, excluded from collision test; visible eyes/brows/mouth/nose are tested separately."
+    },
+    "female_bun": {
+      "status": "PASS",
+      "source_sha256": "484fd1d27b4acdc4a17cb8466ccd870c7b17bdfbf0325cb21721922b68a067cc",
+      "rig_roundtrip_errors": [],
+      "color_channels": {
+        "skin": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "hair": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "eyebrows": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "iris": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "clothing": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "shirt": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "tie": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "pants": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "shoes": {
+          "status": "PASS",
+          "visible_geometry": true
+        }
+      },
+      "first_person_visibility": "PASS",
+      "head_and_brows_without_hair": "PASS",
+      "face_intersection_pairs": 0,
+      "nose_intersection_pairs": 0,
+      "pose_head_cases": 72,
+      "hair_body_intersections": [],
+      "scalp_contact": "Intentional shared attachment, excluded from collision test; visible eyes/brows/mouth/nose are tested separately."
+    },
+    "female_spiky": {
+      "status": "PASS",
+      "source_sha256": "7111b64d70e797e5575d7f02c7de0e064665914594bbca48efe944ddd7ff1637",
+      "rig_roundtrip_errors": [],
+      "color_channels": {
+        "skin": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "hair": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "eyebrows": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "iris": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "clothing": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "shirt": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "tie": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "pants": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "shoes": {
+          "status": "PASS",
+          "visible_geometry": true
+        }
+      },
+      "first_person_visibility": "PASS",
+      "head_and_brows_without_hair": "PASS",
+      "face_intersection_pairs": 0,
+      "nose_intersection_pairs": 0,
+      "pose_head_cases": 72,
+      "hair_body_intersections": [],
+      "scalp_contact": "Intentional shared attachment, excluded from collision test; visible eyes/brows/mouth/nose are tested separately."
+    },
+    "female_curly": {
+      "status": "PASS",
+      "source_sha256": "c1f5c1be108229620b642943890a81a980466ec359f5a1e73f879a7325b305ca",
+      "rig_roundtrip_errors": [],
+      "color_channels": {
+        "skin": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "hair": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "eyebrows": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "iris": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "clothing": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "shirt": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "tie": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "pants": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "shoes": {
+          "status": "PASS",
+          "visible_geometry": true
+        }
+      },
+      "first_person_visibility": "PASS",
+      "head_and_brows_without_hair": "PASS",
+      "face_intersection_pairs": 0,
+      "nose_intersection_pairs": 0,
+      "pose_head_cases": 72,
+      "hair_body_intersections": [],
+      "scalp_contact": "Intentional shared attachment, excluded from collision test; visible eyes/brows/mouth/nose are tested separately."
+    },
+    "female_ponytail": {
+      "status": "PASS",
+      "source_sha256": "0c78bb4bc628b5d0df22260011b092f199b0bdeab60d3f2fc6319dbb9fe38336",
+      "rig_roundtrip_errors": [],
+      "color_channels": {
+        "skin": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "hair": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "eyebrows": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "iris": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "clothing": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "shirt": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "tie": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "pants": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "shoes": {
+          "status": "PASS",
+          "visible_geometry": true
+        }
+      },
+      "first_person_visibility": "PASS",
+      "head_and_brows_without_hair": "PASS",
+      "face_intersection_pairs": 0,
+      "nose_intersection_pairs": 0,
+      "pose_head_cases": 72,
+      "hair_body_intersections": [],
+      "scalp_contact": "Intentional shared attachment, excluded from collision test; visible eyes/brows/mouth/nose are tested separately."
+    },
+    "female_bald": {
+      "status": "PASS",
+      "source_sha256": "b8b4591e50d0184f2970460d7c3198b4fd466b1e3da64ed9ae769ac5cb8b4d0d",
+      "rig_roundtrip_errors": [],
+      "color_channels": {
+        "skin": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "hair": {
+          "status": "PASS",
+          "visible_geometry": false
+        },
+        "eyebrows": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "iris": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "clothing": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "shirt": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "tie": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "pants": {
+          "status": "PASS",
+          "visible_geometry": true
+        },
+        "shoes": {
+          "status": "PASS",
+          "visible_geometry": true
+        }
+      },
+      "first_person_visibility": "PASS",
+      "head_and_brows_without_hair": "PASS",
+      "face_intersection_pairs": 0,
+      "nose_intersection_pairs": 0,
+      "pose_head_cases": 72,
+      "hair_body_intersections": [],
+      "scalp_contact": "Intentional shared attachment, excluded from collision test; visible eyes/brows/mouth/nose are tested separately."
+    }
+  }
+}

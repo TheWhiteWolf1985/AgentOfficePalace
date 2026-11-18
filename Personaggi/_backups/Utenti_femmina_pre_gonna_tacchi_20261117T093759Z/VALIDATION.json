@@ -1,0 +1,103 @@
+{
+  "status": "PASS",
+  "scope": "Current requested asset checks, 11 materials / 25 primitives; not application acceptance",
+  "date": "2026-11-17",
+  "contract": "AOP_CHAR_RIGID_1",
+  "profile": "human",
+  "blender_version": "5.3.0",
+  "checks": {
+    "female_rig_and_local_transforms": "PASS",
+    "feet_origin_unit_scale_and_forward": "PASS",
+    "rest_bounds_including_hair": "PASS",
+    "component_structure_and_blender_roundtrip": "PASS",
+    "fourteen_assemblies": "PASS",
+    "all_nine_colors": "PASS",
+    "complete_head_and_independent_eyebrows": "PASS",
+    "first_person_visibility": "PASS",
+    "body_pose_head_cross_cases": "PASS",
+    "hair_face_clothes_intersection_domain": "PASS",
+    "male_original_package_preserved": "PASS",
+    "short_matches_male_reference": "PASS",
+    "manual_style_and_pose_render_review": "PASS",
+    "requested_budget_11_materials_25_primitives": "PASS",
+    "original_legacy_validator": "FAIL",
+    "portable_rebuild": "PASS",
+    "runtime_application": "NOT_RUN",
+    "runtime_seats_and_multi_instance_colors": "NOT_RUN",
+    "assembler_cli": "PASS"
+  },
+  "counts": {
+    "bases_tested": 2,
+    "styles": 7,
+    "complete_avatars": 14,
+    "body_poses": 8,
+    "head_states": 9,
+    "intersection_cases": 1008
+  },
+  "maximum_metrics": {
+    "triangles": 834,
+    "mesh_instances": 13,
+    "primitives": 25,
+    "materials": 11,
+    "bytes": 59700
+  },
+  "requested_budget": {
+    "materials": 11,
+    "primitives": 25,
+    "other_limits": "unchanged original human profile"
+  },
+  "legacy_validator_note": "Unmodified original files still enforce 8 materials/24 primitives; their FAIL results and declared deviations are retained separately.",
+  "head_angles_degrees": {
+    "neutral": [
+      0,
+      0,
+      0
+    ],
+    "yaw_neg": [
+      0,
+      0,
+      -25
+    ],
+    "yaw_pos": [
+      0,
+      0,
+      25
+    ],
+    "pitch_neg": [
+      -15,
+      0,
+      0
+    ],
+    "pitch_pos": [
+      15,
+      0,
+      0
+    ],
+    "roll_neg": [
+      0,
+      -10,
+      0
+    ],
+    "roll_pos": [
+      0,
+      10,
+      0
+    ],
+    "yaw_neg_pitch_neg": [
+      -15,
+      0,
+      -25
+    ],
+    "yaw_pos_pitch_pos": [
+      15,
+      0,
+      25
+    ]
+  },
+  "limitations": [
+    "Hair/scalp attachment contact is intentional and excluded from hair/body collision rejection; eyes, eyebrows, mouth and nose tested separately.",
+    "Collision QA is within the documented angles and eight poses, not every arbitrary head rotation.",
+    "Rigid limbs do not bend anatomically at elbows or knees; real seat placement and the application controller remain NOT_RUN.",
+    "Bald has zero hair geometry; its retained hair material/channel is inactive until a hairstyle is selected."
+  ]
+}

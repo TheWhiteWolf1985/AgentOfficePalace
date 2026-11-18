@@ -1,6 +1,14 @@
 {
   "status": "PASS",
-  "original_sha256": "3340be53a3178dcdce048f33fe380a662ec1cc5675163ca922efeaa3ff2ee57f",
-  "rebuilt_sha256": "3340be53a3178dcdce048f33fe380a662ec1cc5675163ca922efeaa3ff2ee57f",
-  "scope": "Distributed build_scene.py and included modules/resources generated a byte-identical GLB from the separate delivery directory. Geometry-only rebuild; final render and reimport evidence are recorded separately."
+  "scope": "Independent reconstruction from copied code/resources in a separate directory, no original avatar GLB input",
+  "byte_identical_glbs": {
+    "human_base.glb": "PASS",
+    "hair/hair_short.glb": "PASS",
+    "hair/hair_long.glb": "PASS",
+    "hair/hair_bun.glb": "PASS",
+    "hair/hair_spiky.glb": "PASS",
+    "hair/hair_curly.glb": "PASS",
+    "hair/hair_ponytail.glb": "PASS",
+    "hair/hair_bald.glb": "PASS"
+  }
 }

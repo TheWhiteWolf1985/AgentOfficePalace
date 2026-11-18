@@ -1,0 +1,6 @@
+{
+  "status": "PASS",
+  "style_tested": "ponytail",
+  "body_unchanged": true,
+  "scope": "actual background Blender invocation of assemble.py"
+}

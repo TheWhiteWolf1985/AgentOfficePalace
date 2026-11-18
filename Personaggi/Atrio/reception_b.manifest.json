@@ -2,9 +2,9 @@
   "contract": "AOP_CHAR_RIGID_1",
   "contract_version": "1.0.0",
   "profile": "human",
-  "asset_id": "reception_b",
+  "asset_id": "reception_b_concept02_v01",
   "file": "reception_b.glb",
-  "sha256": "3956080d749b0313bbd62840ba19d61f02e1a48ee8f7c461812bbbae9ddb00b0",
+  "sha256": "f881303ba6001c44065029a4a1ecffc5326865f74f617643ddae40cee4079a84",
   "blender_version": "5.3.0",
   "root": "char_root",
   "units": "meters",
@@ -355,8 +355,18 @@
   },
   "material_roles": {
     "skin": "char_mat_skin",
+    "hair": "char_mat_hair",
+    "eyebrows": "char_mat_eyebrows",
+    "iris": "char_mat_iris",
     "clothing": "char_mat_clothing",
-    "hair": "char_mat_hair"
+    "shirt": "char_mat_shirt",
+    "tie": "char_mat_tie",
+    "pants": "char_mat_pants",
+    "shoes": "char_mat_shoes",
+    "accent": "char_mat_accent",
+    "facial_dark": "char_mat_dark",
+    "eye_and_teeth_white": "char_mat_white",
+    "headband": "char_mat_headband"
   },
   "body_mesh_nodes": [
     "char_arm_negx_visual",
@@ -365,8 +375,10 @@
     "char_hand_posx_visual",
     "char_eye_negx_visual",
     "char_eye_posx_visual",
+    "char_eyebrows_visual",
     "char_hair_visual",
     "char_head_visual",
+    "char_headband_visual",
     "char_mouth_visual",
     "char_leg_negx_visual",
     "char_leg_posx_visual",
@@ -390,29 +402,77 @@
     ]
   },
   "animations": [],
-  "license": "Original generated geometry for Juri; scaffold MIT, copyright 2026 AgentSystemLabs",
+  "license": "Original design for Juri; scaffold/tools MIT, copyright 2026 AgentSystemLabs",
   "third_party_assets": [],
-  "deviations": [],
-  "design_revision": "voxel_women_v01",
-  "appearance": "Woman, brown bob, skirt and block heels",
-  "provenance": [
+  "deviations": [
     {
-      "kind": "scaffold",
-      "file": "resources/starter_human.glb",
-      "license": "MIT"
-    },
-    {
-      "kind": "original_design",
-      "file": "build_scene.py",
-      "note": "Original cuboid geometry, no third party skins or textures. User image used only as visual inspiration; not distributed."
+      "field": "materials/primitives",
+      "reason": "Independent color roles, cobalt trim, separate facial materials and head accessory; original budgets unchanged",
+      "approval": "NOT_RUN"
     }
   ],
+  "design_revision": "reception_concept02_v01",
+  "mesh_parents": {
+    "char_arm_negx_visual": "char_arm_negx",
+    "char_hand_negx_visual": "char_hand_negx",
+    "char_arm_posx_visual": "char_arm_posx",
+    "char_hand_posx_visual": "char_hand_posx",
+    "char_eye_negx_visual": "char_eye_negx",
+    "char_eye_posx_visual": "char_eye_posx",
+    "char_eyebrows_visual": "char_head",
+    "char_hair_visual": "char_hair",
+    "char_head_visual": "char_head",
+    "char_headband_visual": "char_head",
+    "char_mouth_visual": "char_mouth",
+    "char_leg_negx_visual": "char_leg_negx",
+    "char_leg_posx_visual": "char_leg_posx",
+    "char_torso_visual": "char_torso"
+  },
+  "appearance": "Warm peach porcelain face/hands/legs; ivory fitted jacket, dark blouse, cobalt trim, charcoal skirt, heels; brunette bob with independently colored headband",
+  "intended_use": {
+    "role": "decorative_reception_npc",
+    "profile": "human",
+    "pose": "standing_fixed",
+    "tasks": null,
+    "ai": null,
+    "movement": false,
+    "connected_person": false
+  },
+  "placement": {
+    "file": "reception.placements.json",
+    "asset_local_origin": [
+      0,
+      0,
+      0
+    ],
+    "asset_scale": [
+      1,
+      1,
+      1
+    ],
+    "instance_scale_only": 1.15,
+    "scale_not_baked": true
+  },
+  "customization": {
+    "clothing": "ivory jacket only",
+    "shirt": "dark inner blouse and cuffs",
+    "tie": "small collar clasp",
+    "pants": "skirt",
+    "shoes": "heels, independent from face",
+    "accent": "cobalt jacket piping",
+    "hair": "one replaceable mesh under char_hair",
+    "eyebrows": "separate under char_head",
+    "facial_dark": "pupils, outlines, smile and fine decorative cheek seam",
+    "head_accessory": {
+      "node": "char_headband_visual",
+      "parent": "char_head",
+      "outside_hair": true,
+      "independent_color": true
+    }
+  },
   "checks": {
-    "runtime_application": "NOT_RUN",
-    "artistic_approval": "NOT_RUN",
-    "glb_contract": "PASS",
-    "reimport_blender": "PASS",
-    "rotation_and_visibility": "PASS",
-    "manual_render_review": "PASS"
+    "artistic_approval": "PASS",
+    "approval_source": "Juri: Perfetto, 17 novembre 2026",
+    "application_QA": "NOT_RUN"
   }
 }

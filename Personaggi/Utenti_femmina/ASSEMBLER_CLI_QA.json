@@ -1,5 +1,6 @@
 {
   "status": "PASS",
-  "case": "female_base + long component",
-  "geometry_normals_and_colors_match_tested_assembly": true
+  "style_tested": "bald",
+  "body_unchanged": true,
+  "scope": "actual background Blender invocation of assemble.py"
 }

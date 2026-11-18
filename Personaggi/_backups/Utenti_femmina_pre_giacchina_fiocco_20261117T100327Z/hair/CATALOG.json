@@ -1,0 +1,19 @@
+{
+  "styles": [
+    "short",
+    "long",
+    "bun",
+    "spiky",
+    "curly",
+    "ponytail",
+    "bald"
+  ],
+  "default": "short",
+  "one_active_only": true,
+  "shared_bases": [
+    "human_base_v02",
+    "female_base_v02"
+  ],
+  "attachment": "char_hair at local identity",
+  "bald": "empty component; remove all existing hair mesh children; head and eyebrows remain visible"
+}

@@ -1,65 +1,45 @@
-# Human base maschile — revisione 02, materiali indipendenti
+# Utenti maschio — Concept 01 approvato
 
-Revisione del 16 novembre 2026, limitata alla base maschile e alla sua acconciatura attuale. Conserva design, proporzioni, colori iniziali e geometria della versione approvata. Il confronto dei GLB prima/dopo, a riposo e nelle otto pose, confronta tutti i triangoli, le normali e le proprietà iniziali dei materiali ignorandone soltanto il nome. Tolleranza di confronto delle coordinate: 0,000001 m. Risultato: nessun triangolo mancante o aggiunto, 522 triangoli in entrambi i file.
+Modello approvato da Juri con «Perfetti», 17 novembre 2026. Nuova visuale navy/avorio/verde petrolio. Profilo human AOP_CHAR_RIGID_1, scala 1:1, origine ai piedi, GLB +Y alto/+Z avanti, altezza circa 1,7655 m. La selezione estetica non costituisce approvazione delle deroghe tecniche.
 
-## Rig conservato e deroga al budget
+## File principali
 
-Profilo `human`, contratto `AOP_CHAR_RIGID_1` 1.0.0. Scala 1:1, origin al suolo sotto il centro, root identità, GLB Y-up/fronte +Z. Nomi, genitori, posizioni locali, rotazioni, scale e pivot di tutti i controlli richiesti coincidono con la versione originale. Nessuna armatura, skin, morph, clip o root motion. Nessun fattore 1,15, nessun placement reception o modello di agente/mano in prima persona.
+- human_base.blend: sorgente singolo, senza arredi/camere/luci, nomi contrattuali e root locali.
+- human_base.glb: avatar autosufficiente con una sola acconciatura iniziale (short).
+- human_base.manifest.json: controlli, gerarchie, ruoli materiali, sostituzione capelli e provenienza.
+- human_base.reimport.blend: verifica in file separato del GLB effettivamente esportato.
+- hair/: sette componenti GLB e relativi sorgenti Blender, short/long/bun/spiky/curly/ponytail/bald; CATALOG.json con ID stabili, hash, compatibilita tra entrambe le nuove basi e agganci. Bald e senza geometria.
+- views/: render reali del modello approvato dopo reimportazione, viste senza capelli, prima persona, sei pose e confronto uomo/donna. Il confronto contiene entrambi solo come immagine; in questo pacchetto e presente soltanto la base maschio.
+- build_scene.py, character_design.py, concept_style.py, support.py, delivery_runtime.py, resources/: ricostruzione completa da geometria procedurale e scaffold incluso, senza download, moduli esterni o percorsi assoluti al PC autore.
+- assemble.py: sostituzione di una sola acconciatura; conserva le normali della base approvata.
+- verify_package.py, geometry_reader.py, APPROVED_GEOMETRY.json: controlli sulla geometria approvata nelle otto pose, GLB, componenti e inventario.
+- VALIDATION.json, BUILD_REPORT.json, MODULAR_QA.json, ASSEMBLER_CLI_QA.json, PORTABILITY.json: prove e limiti. PREVIOUS_ROUNDTRIP_EVIDENCE.json conserva i confronti con la precedente base eseguiti nella fase di design, senza includere vecchi avatar.
+- checksums.json: SHA-256 di tutti gli altri file del pacchetto. Non include se stesso; il suo hash e nella ricevuta di pubblicazione esterna.
 
-**Il controllo rigoroso del contratto originale è FAIL:** questa revisione richiede **11 materiali e 25 primitive**, contro i limiti originali di 8 e 24. I triangoli sono 522 e le mesh 13, entro gli altri limiti. `resources/constraints.json` e `resources/inspect_character.py` sono gli originali invariati. I superamenti e la relativa dichiarazione di deroga compaiono in `human_base.check.json`, nel manifest e in `DEVIATIONS.json`. L'accettazione della deroga di budget e l'adattamento applicativo non sono dichiarati eseguiti. I controlli delle modifiche richieste e del rig hanno esito separato PASS.
+## Personalizzazione e parti rigide
 
-## Materiali e parti
+Nove canali invariati: skin→char_mat_skin, hair→char_mat_hair, eyebrows→char_mat_eyebrows, iris→char_mat_iris, clothing→char_mat_clothing, shirt→char_mat_shirt, tie→char_mat_tie, pants→char_mat_pants, shoes→char_mat_shoes. Clothing e solo la giacca con revers/tasche/bottone; pants comprende i pantaloni superiori sul torso maschile oppure la gonna femminile. Scarpe separate dai materiali facciali char_mat_dark/char_mat_white. Accent→char_mat_accent colora soltanto i segni alla tempia, indipendentemente da occhi e cravatta. 
 
-| Ruolo | Materiale | Ambito |
-|---|---|---|
-| Pelle | `char_mat_skin` | Testa completa, collo, orecchie, naso e mani |
-| Capelli | `char_mat_hair` | Solo acconciatura corrente sotto `char_hair` |
-| Sopracciglia | `char_mat_eyebrows` | Mesh `char_eyebrows_visual`, direttamente sotto `char_head` |
-| Iridi | `char_mat_iris` | Entrambi gli occhi |
-| Giacca | `char_mat_clothing` | Giacca, maniche e risvolti; nessun pantalone |
-| Camicia | `char_mat_shirt` | Camicia, colletto e polsini |
-| Cravatta | `char_mat_tie` | Nodo e parte lunga |
-| Pantaloni | `char_mat_pants` | Parte superiore sotto il torso e parti inferiori sotto le due gambe |
-| Scarpe | `char_mat_shoes` | Solo scarpe |
+Capelli sostituibili sotto char_hair, sopracciglia sotto char_head. Una mesh e un solo materiale per ciascuno stile; agganciare il componente con posizione/rotazione locali nulle e scala1. Rimuovere prima la geometria capelli precedente. Bald lascia intatti testa, occhi, sopracciglia e fiocco femminile. I due pacchetti contengono gli stessi componenti capelli. Non nascondere char_head per cambiare acconciatura.
 
-I due materiali facciali accessori restano `char_mat_dark` (pupille, contorni degli occhi e interno del sorriso) e `char_mat_white` (sclera, riflessi e denti), come nella versione precedente. Le scarpe non condividono più il materiale scuro del volto. Le nove categorie richieste hanno nove materiali distinti, con i colori iniziali identici ai precedenti. Nessuna texture incorpora i colori.
+Testa/occhi/bocca, torso, braccia/mani e gambe restano separati secondo il contratto. Nascondere ricorsivamente char_head e le due braccia preserva torso e gambe. Niente armature, skin, morph, clip o root motion. Le funzioni applicative saranno adattate separatamente.
 
-Le sopracciglia seguono la testa anche quando `char_hair` è nascosto o quando la mesh dei capelli è scollegata dal suo gruppo. La testa completa sottostante è invariata e chiusa. Nessuna acconciatura alternativa è stata aggiunta.
-
-## Contenuti e riproduzione
-
-`human_base.blend` è il sorgente modificabile con un solo personaggio. Camere, luci e piano fotografico sono esclusi dal GLB. `human_base.glb` è autosufficiente; `human_base.reimport.blend` e `human_base.review.blend` provengono dalla reimportazione in un file vuoto. Il manifest elenca tutti i controlli, i genitori delle mesh e i ruoli dei materiali.
-
-`build_scene.py`, `voxel_support.py` e `resources/` ricostruiscono il design completo. `qa_glb.py` confronta gli asset e controlla le assegnazioni; `qa_blender.py` esegue le prove reali di ricolorazione, visibilità, scollegamento capelli, rotazione della testa e pose. Il GLB originale preservato per i confronti è `resources/baseline_human_base.glb`; il relativo manifest ne conserva SHA-256 e provenienza.
-
-Da questa cartella, con Blender disponibile nel PATH:
+## Comandi riproducibili
 
 ```text
 blender --background --factory-startup --python build_scene.py -- --out rebuilt
-blender --background --factory-startup --python qa_blender.py -- --out rebuilt
-python -B verify_asset.py
+blender --background --factory-startup --python assemble.py -- --style ponytail --out assembled.glb --blend
+python -B verify_package.py
 ```
 
-Nessuna dipendenza Python aggiuntiva, download o percorso assoluto d'autore è necessario. Collaudo con Blender 5.3.0. `verify_asset.py` restituisce exit 0 per i controlli della revisione richiesta e dell'inventario, stampando separatamente il FAIL del contratto originale: exit 0 non significa piena conformità al budget. Per ripetere il validatore originale (exit 1 atteso per i limiti dichiarati):
+Il primo comando ricostruisce la nuova figura e i sette componenti in una cartella separata. La ricostruzione isolata ha prodotto otto GLB byte-identici. L'assemblatore usa solo il pacchetto e accetta anche --base per un'altra base compatibile. La verifica restituisce 0 se integrita e controlli funzionali passano; il JSON continua a riportare FAIL per il budget, senza confonderlo con conformita tecnica completa.
 
-```text
-python -B resources/inspect_character.py human_base.glb --profile human --manifest human_base.manifest.json --contract resources/constraints.json
-```
+## Esiti effettivi
 
-## Immagini ed evidenze
+PASS: geometria/materiali del risultato approvato invariati nelle otto pose, GLB autonomo, gerarchie/pivot/TRS e scala, reimportazione in file separato, modifica indipendente dei materiali, separazione prima persona, sette acconciature assemblate/esportate/reimportate su questa base, agganci locali identita, corpo invariato durante la sostituzione capelli, CLI e ricostruzione isolata. Le prove di posa verificano trasformazioni finite; non certificano tutte le intersezioni.
 
-- `views/comparison_front.png`, `comparison_side.png`, `comparison_back.png`, `comparison_three_quarter.png`, `comparison_face.png`: originale a sinistra, revisione a destra, colori iniziali.
-- `views/comparison_hair_hidden.png`: originale a sinistra con sopracciglia che scomparivano insieme ai capelli; revisione a destra con testa e sopracciglia visibili.
-- `views/color_channels.png`: prova temporanea in magenta. Ordine da sinistra a destra e dall'alto in basso: pelle, capelli, sopracciglia, iridi, giacca, camicia, cravatta, pantaloni, scarpe. Le prove individuali sono in `color_*.png`; i primi piani di sopracciglia e iridi sono aggiunti per leggibilità.
-- `views/hair_hidden_head_turn.png`: sopracciglia che seguono la testa ruotata, con capelli nascosti.
-- `views/poses.png`: riposo, due fasi cammino, seduta, presa, carta/libro, scala e palo. Nessuna nuova funzione o animazione è implementata.
+FAIL: budget originale 8 materiali/24 primitive e precedente riferimento 11/25. Questa base completa iniziale usa 12 materiali, 26 primitive e 653 triangoli. Gli altri controlli statici del kit passano. Deroga tecnica: NOT_RUN/non dichiarata approvata; validatori originali invariati.
 
-Il magenta è soltanto un colore di prova nei render. I .blend sorgente e il GLB finale mantengono la palette originale. `BLENDER_QA.json`, `GEOMETRY_COMPARISON.json`, `BUILD_REPORT.json`, `PORTABILITY.json`, `VALIDATION.json` e `DEVIATIONS.json` distinguono esecuzione delle prove, invarianti conservati e limiti.
+NOT_RUN: QA applicativa e matrice visiva completa di tutte le intersezioni capelli/vestiti nelle pose e nelle rotazioni della testa. Nessuna integrazione o installazione applicativa inclusa. L'approvazione artistica del modello iniziale e PASS.
 
-## Ambito dell'accettazione
-
-PASS: geometria/normali/colori iniziali invariati, rig e pivot invariati, scala/origin/fronte, nove materiali indipendenti, pantaloni superiori/inferiori correttamente assegnati, scarpe separate dal volto, sopracciglia indipendenti dai capelli, testa chiusa, roundtrip Blender e pose.
-
-FAIL: conformità completa ai budget originali, per i due superamenti dichiarati. NOT_RUN: adattatore e renderer dell'applicazione, ricolorazione e comportamento di più istanze nel runtime, approvazione della deroga di budget. Non è stata modificata l'applicazione e non sono stati eseguiti commit, push, merge o deploy.
-
-Originali preservati in una cartella separata prima della revisione e in un backup separato della destinazione prima della pubblicazione. `checksums.json` contiene SHA-256 di tutti gli altri file del pacchetto; esclude soltanto sé stesso e le cache Python generate durante l'esecuzione. Scaffold e strumenti derivati dal kit mantengono la licenza MIT in `resources/LICENSE_SOURCE.txt`; nessuna skin o texture di terzi è inclusa.
+Risorse scaffold/strumenti MIT: resources/LICENSE_SOURCE.txt. Design originale per Juri. Le vecchie versioni sono escluse da questa cartella attiva e preservate separatamente fuori da essa prima della sostituzione.

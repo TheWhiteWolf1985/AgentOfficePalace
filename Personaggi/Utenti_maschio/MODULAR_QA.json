@@ -1,0 +1,93 @@
+{
+  "status": "PASS",
+  "source_sha256": "9b5f80f5ce9afef51b70b4cebbd6f5d867b43fdec46fc7f23063b2e51c09607b",
+  "assemblies": {
+    "short": {
+      "roundtrip": {
+        "status": "PASS",
+        "errors": [],
+        "source_sha256": "a1b0fc018867d742ff10a5a6ab11e51b7914584909df3f8194f09df1ab7f54aa",
+        "scope": "rig/rest TRS, independent material edits, branch separation, eight finite poses; not full collision QA"
+      },
+      "body_geometry_materials_unchanged": "PASS",
+      "one_active_style": "PASS",
+      "hair_local_identity": "PASS",
+      "bald_head_brows_bow": "PASS"
+    },
+    "long": {
+      "roundtrip": {
+        "status": "PASS",
+        "errors": [],
+        "source_sha256": "01673903c8a7220e4cf74151b73d92b164ff2aa33537b9d42f109d8a4c37ba54",
+        "scope": "rig/rest TRS, independent material edits, branch separation, eight finite poses; not full collision QA"
+      },
+      "body_geometry_materials_unchanged": "PASS",
+      "one_active_style": "PASS",
+      "hair_local_identity": "PASS",
+      "bald_head_brows_bow": "PASS"
+    },
+    "bun": {
+      "roundtrip": {
+        "status": "PASS",
+        "errors": [],
+        "source_sha256": "d9434a72d020cf6cede9855f6cfd8627574717ec40fd4ec4312f372132da3b8a",
+        "scope": "rig/rest TRS, independent material edits, branch separation, eight finite poses; not full collision QA"
+      },
+      "body_geometry_materials_unchanged": "PASS",
+      "one_active_style": "PASS",
+      "hair_local_identity": "PASS",
+      "bald_head_brows_bow": "PASS"
+    },
+    "spiky": {
+      "roundtrip": {
+        "status": "PASS",
+        "errors": [],
+        "source_sha256": "5c4864ccfb14b2680b928c3a6c78838b774d12cb6ce8622ef7c7c40d19f6a406",
+        "scope": "rig/rest TRS, independent material edits, branch separation, eight finite poses; not full collision QA"
+      },
+      "body_geometry_materials_unchanged": "PASS",
+      "one_active_style": "PASS",
+      "hair_local_identity": "PASS",
+      "bald_head_brows_bow": "PASS"
+    },
+    "curly": {
+      "roundtrip": {
+        "status": "PASS",
+        "errors": [],
+        "source_sha256": "570561ac94011156005b406efe4f8c0fdb2eb752847c2cbd4ebfd8bf3b5ca482",
+        "scope": "rig/rest TRS, independent material edits, branch separation, eight finite poses; not full collision QA"
+      },
+      "body_geometry_materials_unchanged": "PASS",
+      "one_active_style": "PASS",
+      "hair_local_identity": "PASS",
+      "bald_head_brows_bow": "PASS"
+    },
+    "ponytail": {
+      "roundtrip": {
+        "status": "PASS",
+        "errors": [],
+        "source_sha256": "8c71b393d4fbf722e210a013a303e35c409f341e69a333fc63080181e21fda13",
+        "scope": "rig/rest TRS, independent material edits, branch separation, eight finite poses; not full collision QA"
+      },
+      "body_geometry_materials_unchanged": "PASS",
+      "one_active_style": "PASS",
+      "hair_local_identity": "PASS",
+      "bald_head_brows_bow": "PASS"
+    },
+    "bald": {
+      "roundtrip": {
+        "status": "PASS",
+        "errors": [],
+        "source_sha256": "36cdf6f69b51860fa575f5e3134cbe24ed995e3008e3e74b6b8ae0fe651cca84",
+        "scope": "rig/rest TRS, independent material edits, branch separation, eight finite poses; not full collision QA"
+      },
+      "body_geometry_materials_unchanged": "PASS",
+      "one_active_style": "PASS",
+      "hair_local_identity": "PASS",
+      "bald_head_brows_bow": "PASS"
+    }
+  },
+  "scope": "all hairstyles on this base: exported/reimported, parentage, identity attachment, one style, unchanged non-hair geometry/materials; poses checked for finite transforms",
+  "all_pose_intersections": "NOT_RUN",
+  "application_QA": "NOT_RUN"
+}

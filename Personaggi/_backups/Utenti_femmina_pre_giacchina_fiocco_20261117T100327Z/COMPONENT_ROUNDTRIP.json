@@ -1,0 +1,47 @@
+{
+  "status": "PASS",
+  "components": {
+    "short": {
+      "status": "PASS",
+      "errors": [],
+      "meshes": 1,
+      "sha256": "ea60896444743e6233346c45c5787b8d149efb310e7d96d3ce7ec964fbe024eb"
+    },
+    "long": {
+      "status": "PASS",
+      "errors": [],
+      "meshes": 1,
+      "sha256": "4d2f1093138d33fc764cd9f239054c721f43a0b18f0ba7018a721f67b9eb23b7"
+    },
+    "bun": {
+      "status": "PASS",
+      "errors": [],
+      "meshes": 1,
+      "sha256": "2d77e16c051597e51d9d53202624f1d295a156fb573105d2a780170d6a5e49af"
+    },
+    "spiky": {
+      "status": "PASS",
+      "errors": [],
+      "meshes": 1,
+      "sha256": "299f24276a572f9506d2387b06723e506ed4f7f370b2b3ea53f3fb06826f9d65"
+    },
+    "curly": {
+      "status": "PASS",
+      "errors": [],
+      "meshes": 1,
+      "sha256": "2c8f5021865c9d8df629c64258f9a2018bc38d703530d5cec06fe38221a42306"
+    },
+    "ponytail": {
+      "status": "PASS",
+      "errors": [],
+      "meshes": 1,
+      "sha256": "f7836f2a58df09077e5c12ed362bc3b720941028ed48add73523e31aa738297c"
+    },
+    "bald": {
+      "status": "PASS",
+      "errors": [],
+      "meshes": 0,
+      "sha256": "480afbca6b61d7986f919550053e14fdd4434e73cc0214d48844eee0989e0e7e"
+    }
+  }
+}

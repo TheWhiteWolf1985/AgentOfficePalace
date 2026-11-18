@@ -1,0 +1,84 @@
+{
+  "contract": {
+    "status": "PASS",
+    "profile": "human",
+    "errors": [],
+    "metrics": {
+      "triangles": 522,
+      "mesh_instances": 12,
+      "primitives": 23,
+      "materials": 8,
+      "bytes": 41132,
+      "bounds_min": [
+        -0.45500001311302185,
+        0.0,
+        -0.3034999966621399
+      ],
+      "bounds_max": [
+        0.45500001311302185,
+        1.7654999494552612,
+        0.335999995470047
+      ]
+    },
+    "mesh_nodes": [
+      "char_arm_negx_visual",
+      "char_hand_negx_visual",
+      "char_arm_posx_visual",
+      "char_hand_posx_visual",
+      "char_eye_negx_visual",
+      "char_eye_posx_visual",
+      "char_hair_visual",
+      "char_head_visual",
+      "char_mouth_visual",
+      "char_leg_negx_visual",
+      "char_leg_posx_visual",
+      "char_torso_visual"
+    ],
+    "scope": "static contract; no manual/Blender/runtime certification"
+  },
+  "instance_scale": 1.0,
+  "rig_profile": "human",
+  "roundtrip": {
+    "status": "PASS",
+    "errors": [],
+    "visibility_descendants": {
+      "char_head": [
+        "char_eye_negx_visual",
+        "char_eye_posx_visual",
+        "char_hair_visual",
+        "char_head_visual",
+        "char_mouth_visual"
+      ],
+      "char_arm_negx": [
+        "char_arm_negx_visual",
+        "char_hand_negx_visual"
+      ],
+      "char_arm_posx": [
+        "char_arm_posx_visual",
+        "char_hand_posx_visual"
+      ]
+    },
+    "pose_execution": {
+      "rest": "PASS",
+      "walk_a": "PASS",
+      "walk_b": "PASS",
+      "sit": "PASS",
+      "hold": "PASS",
+      "paper_book": "PASS",
+      "ladder": "PASS",
+      "pole": "PASS"
+    },
+    "scope": "Roundtrip local transforms, inheritance and render execution; manual anatomy review is separate."
+  },
+  "automated_qa": {
+    "unit_scale": "PASS",
+    "pose_walk_a": "PASS",
+    "pose_walk_b": "PASS",
+    "pose_sit": "PASS",
+    "pose_hold": "PASS",
+    "pose_paper_book": "PASS",
+    "pose_ladder": "PASS",
+    "pose_pole": "PASS",
+    "hide_head_and_arms": "PASS"
+  }
+}

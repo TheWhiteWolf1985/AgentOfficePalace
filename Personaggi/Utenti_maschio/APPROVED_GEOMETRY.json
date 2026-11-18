@@ -1,0 +1,52 @@
+{
+  "approval": "Juri: Perfetti, 2026-11-17",
+  "source_sha256": "f3957a454a328413f31498cae6b2c650fe93130c8001f533135cc0820d42c2db",
+  "poses": {
+    "rest": {},
+    "walk_a": {
+      "char_arm_negx": 0.7,
+      "char_arm_posx": -0.7,
+      "char_leg_negx": -0.7,
+      "char_leg_posx": 0.7
+    },
+    "walk_b": {
+      "char_arm_negx": -0.7,
+      "char_arm_posx": 0.7,
+      "char_leg_negx": 0.7,
+      "char_leg_posx": -0.7
+    },
+    "sit": {
+      "char_leg_negx": -1.35,
+      "char_leg_posx": -1.35,
+      "char_arm_negx": -0.55,
+      "char_arm_posx": -0.55
+    },
+    "hold": {
+      "char_arm_negx": -1.65
+    },
+    "paper_book": {
+      "char_arm_negx": -1.2,
+      "char_arm_posx": -1.2
+    },
+    "ladder": {
+      "char_arm_negx": -2.8,
+      "char_arm_posx": -2.8,
+      "char_leg_negx": -0.7
+    },
+    "pole": {
+      "char_arm_negx": -2.4,
+      "char_arm_posx": -2.8,
+      "char_leg_posx": -0.7
+    }
+  },
+  "signatures": {
+    "rest": "74e1b140882e7ad07b72ee86328b2f80402a4274468c5d86ca0ea759f5730d05",
+    "walk_a": "fcbb6f2dfaedcd9bc7c99d687d17cf8a1ab11566707fb3c23a7f6eabcf1c3a99",
+    "walk_b": "67b0b55c56fc4ce30eba266f444f79a2bc85e1b7da90ffa9e4258e48ec90343d",
+    "sit": "112383bd0bccc0b94fcdd87eb483ba191d37794b61d61a691d52e4a8f72675f1",
+    "hold": "529ef27b10e871ce7c76fe9b0381f032b746320cb5c10244c3068f8ff51dc04c",
+    "paper_book": "c4d347d7db1fedbf58067e4419e09cf397af9c033c49371a2615a470d61b4a63",
+    "ladder": "c6a2d6e5ca6f6981c6fd50d94256e78816aa0cb394cc9a3c2bd51b34476a0c39",
+    "pole": "5db74cf183943507da8c6abfe0de70fb4d315704bc8932c722c4abbc80a95a90"
+  }
+}

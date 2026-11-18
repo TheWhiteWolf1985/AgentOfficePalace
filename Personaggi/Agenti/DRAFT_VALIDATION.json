@@ -1,0 +1,173 @@
+{
+  "agent_male_base": {
+    "original_agent_profile": {
+      "status": "FAIL",
+      "profile": "agent",
+      "errors": [
+        "Wrong translation: char_arm_negx",
+        "Wrong translation: char_arm_posx",
+        "Missing control: char_foot_negx",
+        "Missing control: char_foot_posx",
+        "Wrong parent: char_eye_negx",
+        "Wrong translation: char_eye_negx",
+        "Wrong parent: char_eye_posx",
+        "Wrong translation: char_eye_posx",
+        "Wrong parent: char_pupil_negx",
+        "Wrong translation: char_pupil_negx",
+        "Wrong parent: char_pupil_posx",
+        "Wrong translation: char_pupil_posx",
+        "Wrong parent: char_status",
+        "Wrong translation: char_status",
+        "Wrong translation: char_hand_negx",
+        "Wrong translation: char_hand_posx",
+        "Wrong translation: char_socket_label",
+        "Wrong translation: char_socket_bubble",
+        "Missing control: char_socket_task",
+        "Rest bounds exceed profile on axis 0",
+        "Rest bounds exceed profile on axis 1",
+        "Budget exceeded: primitives",
+        "Budget exceeded: materials",
+        "Manifest deviations require separate review; not an in-contract PASS"
+      ],
+      "metrics": {
+        "triangles": 566,
+        "mesh_instances": 16,
+        "primitives": 32,
+        "materials": 14,
+        "bytes": 49476,
+        "bounds_min": [
+          -0.45500001311302185,
+          0.0,
+          -0.3034999966621399
+        ],
+        "bounds_max": [
+          0.45500001311302185,
+          1.7654999494552612,
+          0.335999995470047
+        ]
+      },
+      "mesh_nodes": [
+        "char_arm_negx_visual",
+        "char_hand_negx_visual",
+        "char_arm_posx_visual",
+        "char_hand_posx_visual",
+        "char_eye_negx_visual",
+        "char_pupil_negx_visual",
+        "char_eye_posx_visual",
+        "char_pupil_posx_visual",
+        "char_eyebrows_visual",
+        "char_hair_visual",
+        "char_head_visual",
+        "char_mouth_visual",
+        "char_leg_negx_visual",
+        "char_leg_posx_visual",
+        "char_status_visual",
+        "char_torso_visual"
+      ],
+      "scope": "static contract; no manual/Blender/runtime certification"
+    },
+    "draft_checks": {
+      "functional_draft_status": "PASS",
+      "errors": [],
+      "profile": "PROPOSED_NOT_APPROVED",
+      "source_sha256": "ca7079b1ed9c5efd22e915c03ebbd51d14060b4dba620044ee1af7d4f812ba85",
+      "rig_and_material_checks": "PASS",
+      "first_person_remaining": [
+        "char_leg_negx_visual",
+        "char_leg_posx_visual",
+        "char_status_visual",
+        "char_torso_visual"
+      ],
+      "body_pose_finite_tests": 8,
+      "agent_pose_finite_tests": 8,
+      "all_pose_intersections": "NOT_RUN",
+      "application_QA": "NOT_RUN"
+    }
+  },
+  "agent_female_base": {
+    "original_agent_profile": {
+      "status": "FAIL",
+      "profile": "agent",
+      "errors": [
+        "Wrong translation: char_arm_negx",
+        "Wrong translation: char_arm_posx",
+        "Missing control: char_foot_negx",
+        "Missing control: char_foot_posx",
+        "Wrong parent: char_eye_negx",
+        "Wrong translation: char_eye_negx",
+        "Wrong parent: char_eye_posx",
+        "Wrong translation: char_eye_posx",
+        "Wrong parent: char_pupil_negx",
+        "Wrong translation: char_pupil_negx",
+        "Wrong parent: char_pupil_posx",
+        "Wrong translation: char_pupil_posx",
+        "Wrong parent: char_status",
+        "Wrong translation: char_status",
+        "Wrong translation: char_hand_negx",
+        "Wrong translation: char_hand_posx",
+        "Wrong translation: char_socket_label",
+        "Wrong translation: char_socket_bubble",
+        "Missing control: char_socket_task",
+        "Rest bounds exceed profile on axis 1",
+        "Rest bounds exceed profile on axis 2",
+        "Budget exceeded: primitives",
+        "Budget exceeded: materials",
+        "Manifest deviations require separate review; not an in-contract PASS"
+      ],
+      "metrics": {
+        "triangles": 854,
+        "mesh_instances": 17,
+        "primitives": 33,
+        "materials": 15,
+        "bytes": 65360,
+        "bounds_min": [
+          -0.4399999976158142,
+          0.0,
+          -0.4300000071525574
+        ],
+        "bounds_max": [
+          0.4399999976158142,
+          1.7654999494552612,
+          0.38600000739097595
+        ]
+      },
+      "mesh_nodes": [
+        "char_arm_negx_visual",
+        "char_hand_negx_visual",
+        "char_arm_posx_visual",
+        "char_hand_posx_visual",
+        "char_bow_visual",
+        "char_eye_negx_visual",
+        "char_pupil_negx_visual",
+        "char_eye_posx_visual",
+        "char_pupil_posx_visual",
+        "char_eyebrows_visual",
+        "char_hair_visual",
+        "char_head_visual",
+        "char_mouth_visual",
+        "char_leg_negx_visual",
+        "char_leg_posx_visual",
+        "char_status_visual",
+        "char_torso_visual"
+      ],
+      "scope": "static contract; no manual/Blender/runtime certification"
+    },
+    "draft_checks": {
+      "functional_draft_status": "PASS",
+      "errors": [],
+      "profile": "PROPOSED_NOT_APPROVED",
+      "source_sha256": "eed0f024acbbc6e44a90ed8692aee45c02d26d2a7d3792096139989797bfc0be",
+      "rig_and_material_checks": "PASS",
+      "first_person_remaining": [
+        "char_leg_negx_visual",
+        "char_leg_posx_visual",
+        "char_status_visual",
+        "char_torso_visual"
+      ],
+      "body_pose_finite_tests": 8,
+      "agent_pose_finite_tests": 8,
+      "all_pose_intersections": "NOT_RUN",
+      "application_QA": "NOT_RUN"
+    }
+  }
+}

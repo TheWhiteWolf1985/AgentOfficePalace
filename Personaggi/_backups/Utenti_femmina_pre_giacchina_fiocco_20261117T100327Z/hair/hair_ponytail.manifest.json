@@ -1,0 +1,37 @@
+{
+  "asset_id": "hair_ponytail",
+  "type": "modular_hair_component",
+  "style_id": "ponytail",
+  "file": "hair_ponytail.glb",
+  "sha256": "f7836f2a58df09077e5c12ed362bc3b720941028ed48add73523e31aa738297c",
+  "attach_to": "char_hair",
+  "local_translation": [
+    0,
+    0,
+    0
+  ],
+  "local_rotation": [
+    0,
+    0,
+    0,
+    1
+  ],
+  "local_scale": [
+    1,
+    1,
+    1
+  ],
+  "units": "meters",
+  "up": "+Y",
+  "forward": "+Z",
+  "mesh_count": 1,
+  "material": "char_mat_hair",
+  "empty_configuration": false,
+  "compatible_bases": [
+    "human_base_v02",
+    "female_base_v02"
+  ],
+  "baseline_head_pivot_height_m": 1.32,
+  "license": "Original voxel geometry for Juri; short derived without visible changes from male revision02",
+  "validation_scope": "Component only; the full human rig validator does not apply to a hair component"
+}

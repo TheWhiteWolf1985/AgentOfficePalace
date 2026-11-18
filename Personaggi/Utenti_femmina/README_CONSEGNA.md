@@ -1,50 +1,45 @@
-# Base femminile v03 — giacchina, capelli lunghi e fiocco fisso
+# Utenti femmina — Concept 01 approvato
 
-Revisione del 17 novembre 2026 richiesta da Juri: giacchina corta e sagomata, maniche rastremate, colletto da blusa, piccolo nastro al collo e fascia chiara in vita. Restano gonna, gambe scoperte e tacchi a blocco. Lo stile iniziale è **long**, con lunghezza posteriore estesa. Stile voxel, volto sorridente e occhi umanizzati sono conservati.
+Modello approvato da Juri con «Perfetti», 17 novembre 2026. Nuova visuale navy/avorio/verde petrolio. Profilo human AOP_CHAR_RIGID_1, scala 1:1, origine ai piedi, GLB +Y alto/+Z avanti, altezza circa 1,7655 m. La selezione estetica non costituisce approvazione delle deroghe tecniche.
 
-## Fiocco permanente e colori
+## File principali
 
-Il fiocco è `char_bow_visual`, sotto `char_head` ed esterno a `char_hair`. È parte fissa della base, non un accessorio del catalogo capelli: sostituire o rimuovere l'acconciatura non lo rimuove. Resta anche con bald. Il manifest dichiara `removable=false` ed `editable_property=color_only`.
+- female_base.blend: sorgente singolo, senza arredi/camere/luci, nomi contrattuali e root locali.
+- female_base.glb: avatar autosufficiente con una sola acconciatura iniziale (long).
+- female_base.manifest.json: controlli, gerarchie, ruoli materiali, sostituzione capelli e provenienza.
+- female_base.reimport.blend: verifica in file separato del GLB effettivamente esportato.
+- hair/: sette componenti GLB e relativi sorgenti Blender, short/long/bun/spiky/curly/ponytail/bald; CATALOG.json con ID stabili, hash, compatibilita tra entrambe le nuove basi e agganci. Bald e senza geometria.
+- views/: render reali del modello approvato dopo reimportazione, viste senza capelli, prima persona, sei pose e confronto uomo/donna. Il confronto contiene entrambi solo come immagine; in questo pacchetto e presente soltanto la base femmina.
+- build_scene.py, character_design.py, concept_style.py, support.py, delivery_runtime.py, resources/: ricostruzione completa da geometria procedurale e scaffold incluso, senza download, moduli esterni o percorsi assoluti al PC autore.
+- assemble.py: sostituzione di una sola acconciatura; conserva le normali della base approvata.
+- verify_package.py, geometry_reader.py, APPROVED_GEOMETRY.json: controlli sulla geometria approvata nelle otto pose, GLB, componenti e inventario.
+- VALIDATION.json, BUILD_REPORT.json, MODULAR_QA.json, ASSEMBLER_CLI_QA.json, PORTABILITY.json: prove e limiti. PREVIOUS_ROUNDTRIP_EVIDENCE.json conserva i confronti con la precedente base eseguiti nella fase di design, senza includere vecchi avatar.
+- checksums.json: SHA-256 di tutti gli altri file del pacchetto. Non include se stesso; il suo hash e nella ricevuta di pubblicazione esterna.
 
-Nuovo canale indipendente **bow → char_mat_bow**, inizialmente rosso. Il nastro al collo continua a usare `tie → char_mat_tie`: cambiare il fiocco in testa non cambia quello al collo. Non è stata implementata l'UI: il futuro adattatore dovrà rispettare il vincolo non rimovibile.
+## Personalizzazione e parti rigide
 
-I nove canali precedenti mantengono i nomi esatti: skin/char_mat_skin, hair/char_mat_hair, eyebrows/char_mat_eyebrows, iris/char_mat_iris, clothing/char_mat_clothing, shirt/char_mat_shirt, tie/char_mat_tie, pants/char_mat_pants, shoes/char_mat_shoes. Sulla femminile pants colora la gonna, skin anche le gambe e shoes i tacchi. char_mat_dark e char_mat_white restano i materiali accessori del volto. Colori uniformi PBR, nessuna texture incorpora le tinte personalizzabili.
+Nove canali invariati: skin→char_mat_skin, hair→char_mat_hair, eyebrows→char_mat_eyebrows, iris→char_mat_iris, clothing→char_mat_clothing, shirt→char_mat_shirt, tie→char_mat_tie, pants→char_mat_pants, shoes→char_mat_shoes. Clothing e solo la giacca con revers/tasche/bottone; pants comprende i pantaloni superiori sul torso maschile oppure la gonna femminile. Scarpe separate dai materiali facciali char_mat_dark/char_mat_white. Accent→char_mat_accent colora soltanto i segni alla tempia, indipendentemente da occhi e cravatta. Bow→char_mat_bow e il fiocco fisso femminile: colore indipendente, sotto char_head e fuori dai capelli.
 
-## Rig, capelli e prima persona
+Capelli sostituibili sotto char_hair, sopracciglia sotto char_head. Una mesh e un solo materiale per ciascuno stile; agganciare il componente con posizione/rotazione locali nulle e scala1. Rimuovere prima la geometria capelli precedente. Bald lascia intatti testa, occhi, sopracciglia e fiocco femminile. I due pacchetti contengono gli stessi componenti capelli. Non nascondere char_head per cambiare acconciatura.
 
-Profilo human / AOP_CHAR_RIGID_1: stessi controlli, parentela, trasformazioni locali, pivot e socket. Scala1:1, metri, origin ai piedi, GLB +Y alto/+Z avanti. Altezza con long circa1,7655m, ingombri a riposo entro il kit. Nessuna armatura, skin, morph, clip o root motion.
+Testa/occhi/bocca, torso, braccia/mani e gambe restano separati secondo il contratto. Nascondere ricorsivamente char_head e le due braccia preserva torso e gambe. Niente armature, skin, morph, clip o root motion. Le funzioni applicative saranno adattate separatamente.
 
-Testa completa, sopracciglia sotto char_head, capelli separati e sostituibili. Nascondendo ricorsivamente testa e braccia restano torso e gambe; in prima persona anche il fiocco si nasconde insieme alla testa.
-
-Sette ID stabili: short, long, bun, spiky, curly, ponytail, bald. Ogni componente non vuoto in hair/ contiene una mesh e il solo materiale char_mat_hair. Aggancio a char_hair con posizione/rotazione locali nulle e scala1. Rimuovere la vecchia mesh prima di caricare il nuovo stile. Bald elimina soltanto la geometria capelli. La superficie superiore comune della testa resta compatibile con il maschile. Il maschile originale rimane invariato e senza fiocco.
-
-## Superamento del budget dichiarato
-
-Il fiocco con colore indipendente aggiunge un materiale e una primitive: **12 materiali e 26 primitive** sulla femminile con capelli, contro il precedente limite11/25. Con bald:12materiali e25primitive. Il controllo di quel budget è **FAIL**. La deroga non è dichiarata approvata; è esplicita nei manifest, nei check e in BUDGET_DEVIATIONS.json.
-
-Il validatore originale continua a dare FAIL per i vecchi limiti8/24, senza modifiche a contratto o validatori. Le verifiche funzionali sono separate: rig, visibilità, colori, fiocco, geometria e pose. Tutti gli altri limiti restano invariati e verificati. `verify_package.py` restituisce exit0 quando funzionalità/evidenze/inventario passano, stampando separatamente i FAIL del budget; exit0 non significa conformità completa.
-
-## File e ricostruzione
-
-female_base.blend e female_base.glb: base completa con long e fiocco. female_base.review.blend include il set fotografico, escluso dal GLB. hair/ contiene componenti/sorgenti/manifest; assemblies/ contiene le14 combinazioni di prova. I generatori e tutti i moduli sono inclusi, senza percorsi d'autore o pacchetti Python aggiuntivi.
+## Comandi riproducibili
 
 ```text
 blender --background --factory-startup --python build_scene.py -- --out rebuilt
-blender --background --factory-startup --python qa_components.py -- --out rebuilt
-blender --background --factory-startup --python qa_assemblies.py -- --out rebuilt --render
-blender --background --factory-startup --python presentation.py -- --out rebuilt
-python -B verify_assets.py rebuilt
+blender --background --factory-startup --python assemble.py -- --style ponytail --out assembled.glb --blend
 python -B verify_package.py
 ```
 
-`verify_assets.py` conserva exit1 se il budget fallisce e un distinto `functional_status`. Collaudo Blender5.3.0. Scaffold e strumenti derivati mantengono la licenza MIT in resources/LICENSE_SOURCE.txt; nessuna skin o texture di terzi.
+Il primo comando ricostruisce la nuova figura e i sette componenti in una cartella separata. La ricostruzione isolata ha prodotto otto GLB byte-identici. L'assemblatore usa solo il pacchetto e accetta anche --base per un'altra base compatibile. La verifica restituisce 0 se integrita e controlli funzionali passano; il JSON continua a riportare FAIL per il budget, senza confonderlo con conformita tecnica completa.
 
-## Verifiche e immagini
+## Esiti effettivi
 
-Le14 combinazioni sono provate in8pose corporee e9stati della testa:1.008casi. Test testa: yaw±25°, pitch±15°, roll±10° e due combinazioni. Contatto con lo scalpo intenzionale; viso/naso e intersezioni capelli-corpo controllati separatamente. Il dominio non copre ogni rotazione arbitraria. Le pose sono a parti rigide, senza deformazioni anatomiche di gomiti o ginocchia.
+PASS: geometria/materiali del risultato approvato invariati nelle otto pose, GLB autonomo, gerarchie/pivot/TRS e scala, reimportazione in file separato, modifica indipendente dei materiali, separazione prima persona, sette acconciature assemblate/esportate/reimportate su questa base, agganci locali identita, corpo invariato durante la sostituzione capelli, CLI e ricostruzione isolata. Le prove di posa verificano trasformazioni finite; non certificano tutte le intersezioni.
 
-I nove colori precedenti e bow sono verificati separatamente. `bow_color_test.png` mostra il fiocco in testa blu e il nastro al collo ancora rosso; i file finali conservano il rosso. `fixed_bow_without_hair.png` dimostra che il fiocco resta senza capelli. `three_quarter.png`, `side.png`, `back.png` e `female_face.png` mostrano il modello finale. Le gallerie stili hanno riga maschile sopra, femminile sotto; colonne short/long/bun/spiky/curly/ponytail/bald. Tutte le pose sono in views/poses/.
+FAIL: budget originale 8 materiali/24 primitive e precedente riferimento 11/25. Questa base completa iniziale usa 13 materiali, 27 primitive e 973 triangoli. Gli altri controlli statici del kit passano. Deroga tecnica: NOT_RUN/non dichiarata approvata; validatori originali invariati.
 
-Rapporti: VALIDATION.json, STRUCTURAL_QA.json, ASSEMBLY_QA.json, COMPONENT_ROUNDTRIP.json, BUDGET_DEVIATIONS.json, MALE_REFERENCE_PROTECTION.json e PORTABILITY.json. checksums.json copre tutti gli altri file, escluso sé stesso e le cache generate.
+NOT_RUN: QA applicativa e matrice visiva completa di tutte le intersezioni capelli/vestiti nelle pose e nelle rotazioni della testa. Nessuna integrazione o installazione applicativa inclusa. L'approvazione artistica del modello iniziale e PASS.
 
-**QA applicativa NOT_RUN:** adattatore, selettore acconciature, blocco rimozione fiocco nell'UI, renderer toon, materiali per istanza e sedute. Nessuna modifica all'app, installazione, commit, push, merge o deploy. Versioni precedenti preservate in cartelle separate e in backup prima di aggiornare la consegna attiva.
+Risorse scaffold/strumenti MIT: resources/LICENSE_SOURCE.txt. Design originale per Juri. Le vecchie versioni sono escluse da questa cartella attiva e preservate separatamente fuori da essa prima della sostituzione.

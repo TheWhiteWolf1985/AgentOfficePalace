@@ -1,0 +1,23 @@
+{
+  "status": "PASS",
+  "scope": "Code/resources copied to an independent directory; all15base/component/sample GLBs byte-identical",
+  "glbs": {
+    "assets/agent_male_base.glb": "PASS",
+    "assets/agent_female_base.glb": "PASS",
+    "hair/hair_short.glb": "PASS",
+    "hair/hair_long.glb": "PASS",
+    "hair/hair_bun.glb": "PASS",
+    "hair/hair_spiky.glb": "PASS",
+    "hair/hair_curly.glb": "PASS",
+    "hair/hair_ponytail.glb": "PASS",
+    "hair/hair_bald.glb": "PASS",
+    "assets/sample_0.glb": "PASS",
+    "assets/sample_1.glb": "PASS",
+    "assets/sample_2.glb": "PASS",
+    "assets/sample_3.glb": "PASS",
+    "assets/sample_4.glb": "PASS",
+    "assets/sample_5.glb": "PASS"
+  },
+  "author_machine_paths_required": false,
+  "external_python_modules_required": false
+}

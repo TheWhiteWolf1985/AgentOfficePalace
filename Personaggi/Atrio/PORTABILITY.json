@@ -1,16 +1,10 @@
 {
   "status": "PASS",
-  "scope": "Rebuilt GLBs with the distributed script/resources in a relocated directory, without the original kit. Byte-identical GLB output. Views skipped in this relocation check; final views were separately rendered from final GLB reimports.",
-  "assets": {
-    "reception_a": {
-      "status": "PASS",
-      "delivered_sha256": "5f1159b78735218145a75d5a71937e6cba5a9776c90af558d557ce30c0883800",
-      "rebuilt_sha256": "5f1159b78735218145a75d5a71937e6cba5a9776c90af558d557ce30c0883800"
-    },
-    "reception_b": {
-      "status": "PASS",
-      "delivered_sha256": "3956080d749b0313bbd62840ba19d61f02e1a48ee8f7c461812bbbae9ddb00b0",
-      "rebuilt_sha256": "3956080d749b0313bbd62840ba19d61f02e1a48ee8f7c461812bbbae9ddb00b0"
-    }
-  }
+  "scope": "Code and resources copied into a separate directory; both GLBs rebuilt byte-identically",
+  "byte_identical_glbs": {
+    "reception_a": "PASS",
+    "reception_b": "PASS"
+  },
+  "author_machine_paths_required": false,
+  "external_python_modules_required": false
 }

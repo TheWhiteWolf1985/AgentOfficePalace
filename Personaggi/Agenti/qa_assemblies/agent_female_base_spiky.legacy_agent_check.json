@@ -1,0 +1,66 @@
+{
+  "status": "FAIL",
+  "profile": "agent",
+  "errors": [
+    "Wrong translation: char_arm_negx",
+    "Wrong translation: char_arm_posx",
+    "Missing control: char_foot_negx",
+    "Missing control: char_foot_posx",
+    "Wrong parent: char_eye_negx",
+    "Wrong translation: char_eye_negx",
+    "Wrong parent: char_eye_posx",
+    "Wrong translation: char_eye_posx",
+    "Wrong parent: char_pupil_negx",
+    "Wrong translation: char_pupil_negx",
+    "Wrong parent: char_pupil_posx",
+    "Wrong translation: char_pupil_posx",
+    "Wrong parent: char_status",
+    "Wrong translation: char_status",
+    "Wrong translation: char_hand_negx",
+    "Wrong translation: char_hand_posx",
+    "Wrong translation: char_socket_label",
+    "Wrong translation: char_socket_bubble",
+    "Missing control: char_socket_task",
+    "Rest bounds exceed profile on axis 1",
+    "Budget exceeded: primitives",
+    "Budget exceeded: materials",
+    "Manifest deviations require separate review; not an in-contract PASS"
+  ],
+  "metrics": {
+    "triangles": 818,
+    "mesh_instances": 17,
+    "primitives": 33,
+    "materials": 15,
+    "bytes": 64108,
+    "bounds_min": [
+      -0.4399999976158142,
+      0.0,
+      -0.3034999966621399
+    ],
+    "bounds_max": [
+      0.4399999976158142,
+      1.840000033378601,
+      0.38600000739097595
+    ]
+  },
+  "mesh_nodes": [
+    "char_arm_negx_visual",
+    "char_hand_negx_visual",
+    "char_arm_posx_visual",
+    "char_hand_posx_visual",
+    "char_bow_visual",
+    "char_eye_negx_visual",
+    "char_pupil_negx_visual",
+    "char_eye_posx_visual",
+    "char_pupil_posx_visual",
+    "char_eyebrows_visual",
+    "char_hair_visual",
+    "char_head_visual",
+    "char_mouth_visual",
+    "char_leg_negx_visual",
+    "char_leg_posx_visual",
+    "char_status_visual",
+    "char_torso_visual"
+  ],
+  "scope": "static contract; no manual/Blender/runtime certification"
+}

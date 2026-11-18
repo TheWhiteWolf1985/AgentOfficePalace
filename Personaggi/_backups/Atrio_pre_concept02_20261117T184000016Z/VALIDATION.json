@@ -1,0 +1,55 @@
+{
+  "contract": "AOP_CHAR_RIGID_1",
+  "status": "NOT_RUN",
+  "local_asset_review": "PASS",
+  "overall_status_reason": "Complete acceptance includes future runtime QA and Juri artistic review; these have not run.",
+  "design_revision": "voxel_women_v01_smiling",
+  "date": "2026-11-16",
+  "blender_version": "5.3.0",
+  "ready_for_application": false,
+  "artistic_approval": "NOT_RUN",
+  "checks": {
+    "kit_integrity": "PASS",
+    "blend_scene": "PASS",
+    "glb_contract": "PASS",
+    "reimport_blender": "PASS",
+    "manual_geometry": "PASS",
+    "manual_reception_fit": "PASS",
+    "manual_all_poses": "PASS",
+    "rotation_and_visibility": "PASS",
+    "blender_two_instance_isolation": "PASS",
+    "portable_rebuild": "PASS",
+    "runtime_application": "NOT_RUN"
+  },
+  "evidence_files": [
+    "BUILD_REPORT.json",
+    "BLENDER_QA.json",
+    "RECEPTION_FIT.json",
+    "reception_a.check.json",
+    "reception_b.check.json",
+    "views/front.png",
+    "views/side.png",
+    "views/back.png",
+    "views/poses.png",
+    "views/faces_closeup.png",
+    "views/reception_from_visitor.png",
+    "PORTABILITY.json"
+  ],
+  "commands": [
+    "python -B scripts/verify_kit.py (original kit; 63 immutable files PASS)",
+    "blender --background --factory-startup --python build_scene.py -- --out OUTPUT --atrium ORIGINAL_REFERENCE_GLB",
+    "blender --background --factory-startup --python qa_scene.py -- --out OUTPUT",
+    "python -B verify_delivery.py"
+  ],
+  "manual_review_scope": {
+    "geometry": "Reviewed front, side, back, three-quarter and visibility render evidence for both exported/reimported models. No visible severe defects or z-fighting in these views.",
+    "poses": "Reviewed rest, walk +/-0.70, sit legs -1.35/arms -0.55, hold -1.65, paper/book, ladder and pole for both; intentionally rigid stylized limbs, no anatomical elbow/knee deformation.",
+    "reception": "Reviewed visitor camera at 1.40 m. Both faces, eyes and smiles visible above unchanged counter. Static furniture-envelope check passed. Local height 1.7655 m, instanced height about 2.0303 m, below panel base 2.65 m."
+  },
+  "limitations": [
+    "First visual iteration, appearance remains subject to Juri revisions.",
+    "No application adapter, navigation or installed runtime has been modified or tested.",
+    "Blender PBR previews do not certify toon rendering, per-instance materials or permanent NPC presence in the application.",
+    "Complete 360-degree and arbitrary-angle inspection is outside the listed render evidence."
+  ]
+}

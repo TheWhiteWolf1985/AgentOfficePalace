@@ -1,0 +1,138 @@
+{
+  "functional_draft_status": "PASS",
+  "assets": {
+    "agent_male_base": {
+      "functional_draft_status": "PASS",
+      "bounds": [
+        [
+          -0.455,
+          0.0,
+          -0.3035
+        ],
+        [
+          0.455,
+          1.7655,
+          0.336
+        ]
+      ],
+      "source_sha256": "ca7079b1ed9c5efd22e915c03ebbd51d14060b4dba620044ee1af7d4f812ba85",
+      "legacy_agent_contract": "FAIL",
+      "legacy_metrics": {
+        "triangles": 566,
+        "mesh_instances": 16,
+        "primitives": 32,
+        "materials": 14,
+        "bytes": 49476,
+        "bounds_min": [
+          -0.45500001311302185,
+          0.0,
+          -0.3034999966621399
+        ],
+        "bounds_max": [
+          0.45500001311302185,
+          1.7654999494552612,
+          0.335999995470047
+        ]
+      },
+      "new_profile_approval": "NOT_RUN",
+      "application_QA": "NOT_RUN"
+    },
+    "agent_female_base": {
+      "functional_draft_status": "PASS",
+      "bounds": [
+        [
+          -0.44,
+          0.0,
+          -0.43
+        ],
+        [
+          0.44,
+          1.7655,
+          0.386
+        ]
+      ],
+      "source_sha256": "eed0f024acbbc6e44a90ed8692aee45c02d26d2a7d3792096139989797bfc0be",
+      "legacy_agent_contract": "FAIL",
+      "legacy_metrics": {
+        "triangles": 854,
+        "mesh_instances": 17,
+        "primitives": 33,
+        "materials": 15,
+        "bytes": 65360,
+        "bounds_min": [
+          -0.4399999976158142,
+          0.0,
+          -0.4300000071525574
+        ],
+        "bounds_max": [
+          0.4399999976158142,
+          1.7654999494552612,
+          0.38600000739097595
+        ]
+      },
+      "new_profile_approval": "NOT_RUN",
+      "application_QA": "NOT_RUN"
+    }
+  },
+  "geometry_from_users": {
+    "agent_male_base": {
+      "status": "PASS",
+      "scope": "Head shell/neck, arms/hands, legs/shoes and initial hair geometry/normals; excludes redesigned torso/face colors and graphics"
+    },
+    "agent_female_base": {
+      "status": "PASS",
+      "scope": "Head shell/neck, arms/hands, legs/shoes and initial hair geometry/normals; excludes redesigned torso/face colors and graphics"
+    }
+  },
+  "sample_checks": {
+    "0": {
+      "status": "PASS",
+      "seed": "office-agent-0-0",
+      "hairstyle": "short",
+      "source_sha256": "eff39d1af0cb88df1d5191abc0fbe26c044e638115f11f6359cd13c94fb436a1"
+    },
+    "1": {
+      "status": "PASS",
+      "seed": "office-agent-1-0",
+      "hairstyle": "long",
+      "source_sha256": "e2fd0450037c2e18657d641c7cdd12b44fe12562e4d93d3cc901f1017f7a9614"
+    },
+    "2": {
+      "status": "PASS",
+      "seed": "office-agent-2-2",
+      "hairstyle": "bun",
+      "source_sha256": "34d7d0a7da8ce63a4c3350ffb33c7d45e6b2b52cda17fbf8f41f4aa101764fc7"
+    },
+    "3": {
+      "status": "PASS",
+      "seed": "office-agent-3-0",
+      "hairstyle": "curly",
+      "source_sha256": "98f093a1ad33d44f22a0d85b9e70986a90d9707b470c42984947bb2a3b8b8acc"
+    },
+    "4": {
+      "status": "PASS",
+      "seed": "office-agent-4-2",
+      "hairstyle": "ponytail",
+      "source_sha256": "993c3f5604a2f17ec4b788e2a9e07649f684685f34452139593691961e789cea"
+    },
+    "5": {
+      "status": "PASS",
+      "seed": "office-agent-5-19",
+      "hairstyle": "bald",
+      "source_sha256": "9138e76fac6c2de63c87346818c58605a608b29b747c1ad4242d1d2c2645260f"
+    }
+  },
+  "modular_combinations": 14,
+  "seed_cases": 512,
+  "variant_checks": "PASS",
+  "legacy_agent_contract": "FAIL",
+  "original_budget": "FAIL",
+  "new_technical_profile_approval": "NOT_RUN",
+  "artistic_approval": "PASS",
+  "all_pose_intersections": "NOT_RUN",
+  "independent_rebuild": "PASS",
+  "runtime_randomization": "NOT_RUN",
+  "application_QA": "NOT_RUN",
+  "publication": "See external publication receipt",
+  "approval_source": "Juri: Bene, 17 novembre 2026; base design and shown samples"
+}

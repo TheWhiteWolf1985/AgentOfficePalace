@@ -1,0 +1,20 @@
+{
+  "status": "PASS",
+  "files": {
+    "hair/hair_bald.glb": true,
+    "hair/hair_bun.glb": true,
+    "hair/hair_curly.glb": true,
+    "hair/hair_long.glb": true,
+    "hair/hair_ponytail.glb": true,
+    "hair/hair_short.glb": true,
+    "hair/hair_spiky.glb": true,
+    "assemblies/male_bald.glb": true,
+    "assemblies/male_bun.glb": true,
+    "assemblies/male_curly.glb": true,
+    "assemblies/male_long.glb": true,
+    "assemblies/male_ponytail.glb": true,
+    "assemblies/male_short.glb": true,
+    "assemblies/male_spiky.glb": true
+  },
+  "note": "Seven hairstyles and seven male assemblies are byte-identical to previous female package."
+}

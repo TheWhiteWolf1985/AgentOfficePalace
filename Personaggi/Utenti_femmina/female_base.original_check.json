@@ -7,11 +7,11 @@
     "Manifest deviations require separate review; not an in-contract PASS"
   ],
   "metrics": {
-    "triangles": 814,
-    "mesh_instances": 14,
-    "primitives": 26,
-    "materials": 12,
-    "bytes": 59084,
+    "triangles": 973,
+    "mesh_instances": 15,
+    "primitives": 27,
+    "materials": 13,
+    "bytes": 68436,
     "bounds_min": [
       -0.4399999976158142,
       0.0,
@@ -28,6 +28,7 @@
     "char_hand_negx_visual",
     "char_arm_posx_visual",
     "char_hand_posx_visual",
+    "char_accent_visual",
     "char_bow_visual",
     "char_eye_negx_visual",
     "char_eye_posx_visual",

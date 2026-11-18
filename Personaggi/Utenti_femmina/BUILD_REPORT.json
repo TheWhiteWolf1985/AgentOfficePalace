@@ -1,460 +1,56 @@
 {
-  "status": "FAIL",
-  "functional_status": "PASS",
-  "assemblies": {
-    "male_short": {
-      "status": "PASS",
-      "functional_status": "PASS",
-      "budget_status": "PASS",
-      "errors": [],
-      "budget_errors": [],
-      "metrics": {
-        "triangles": 522,
-        "mesh_instances": 13,
-        "primitives": 25,
-        "materials": 11,
-        "bytes": 43144,
-        "bounds_min": [
-          -0.45500001311302185,
-          0.0,
-          -0.3034999966621399
-        ],
-        "bounds_max": [
-          0.45500001311302185,
-          1.7654999494552612,
-          0.335999995470047
-        ]
-      },
-      "original_validator_status": "FAIL",
-      "original_validator_errors": [
-        "Budget exceeded: primitives",
-        "Budget exceeded: materials",
-        "Manifest deviations require separate review; not an in-contract PASS"
-      ],
-      "scope": "Current request 11 materials/25 primitives; all other original checks preserved"
-    },
-    "male_long": {
-      "status": "PASS",
-      "functional_status": "PASS",
-      "budget_status": "PASS",
-      "errors": [],
-      "budget_errors": [],
-      "metrics": {
-        "triangles": 594,
-        "mesh_instances": 13,
-        "primitives": 25,
-        "materials": 11,
-        "bytes": 47036,
-        "bounds_min": [
-          -0.45500001311302185,
-          0.0,
-          -0.4300000071525574
-        ],
-        "bounds_max": [
-          0.45500001311302185,
-          1.7654999494552612,
-          0.335999995470047
-        ]
-      },
-      "original_validator_status": "FAIL",
-      "original_validator_errors": [
-        "Budget exceeded: primitives",
-        "Budget exceeded: materials",
-        "Manifest deviations require separate review; not an in-contract PASS"
-      ],
-      "scope": "Current request 11 materials/25 primitives; all other original checks preserved"
-    },
-    "male_bun": {
-      "status": "PASS",
-      "functional_status": "PASS",
-      "budget_status": "PASS",
-      "errors": [],
-      "budget_errors": [],
-      "metrics": {
-        "triangles": 546,
-        "mesh_instances": 13,
-        "primitives": 25,
-        "materials": 11,
-        "bytes": 44440,
-        "bounds_min": [
-          -0.45500001311302185,
-          0.0,
-          -0.4569999873638153
-        ],
-        "bounds_max": [
-          0.45500001311302185,
-          1.8300000429153442,
-          0.335999995470047
-        ]
-      },
-      "original_validator_status": "FAIL",
-      "original_validator_errors": [
-        "Budget exceeded: primitives",
-        "Budget exceeded: materials",
-        "Manifest deviations require separate review; not an in-contract PASS"
-      ],
-      "scope": "Current request 11 materials/25 primitives; all other original checks preserved"
-    },
-    "male_spiky": {
-      "status": "PASS",
-      "functional_status": "PASS",
-      "budget_status": "PASS",
-      "errors": [],
-      "budget_errors": [],
-      "metrics": {
-        "triangles": 558,
-        "mesh_instances": 13,
-        "primitives": 25,
-        "materials": 11,
-        "bytes": 45664,
-        "bounds_min": [
-          -0.45500001311302185,
-          0.0,
-          -0.3034999966621399
-        ],
-        "bounds_max": [
-          0.45500001311302185,
-          1.840000033378601,
-          0.335999995470047
-        ]
-      },
-      "original_validator_status": "FAIL",
-      "original_validator_errors": [
-        "Budget exceeded: primitives",
-        "Budget exceeded: materials",
-        "Manifest deviations require separate review; not an in-contract PASS"
-      ],
-      "scope": "Current request 11 materials/25 primitives; all other original checks preserved"
-    },
-    "male_curly": {
-      "status": "PASS",
-      "functional_status": "PASS",
-      "budget_status": "PASS",
-      "errors": [],
-      "budget_errors": [],
-      "metrics": {
-        "triangles": 810,
-        "mesh_instances": 13,
-        "primitives": 25,
-        "materials": 11,
-        "bytes": 58700,
-        "bounds_min": [
-          -0.45500001311302185,
-          0.0,
-          -0.3034999966621399
-        ],
-        "bounds_max": [
-          0.45500001311302185,
-          1.815000057220459,
-          0.34450000524520874
-        ]
-      },
-      "original_validator_status": "FAIL",
-      "original_validator_errors": [
-        "Budget exceeded: primitives",
-        "Budget exceeded: materials",
-        "Manifest deviations require separate review; not an in-contract PASS"
-      ],
-      "scope": "Current request 11 materials/25 primitives; all other original checks preserved"
-    },
-    "male_ponytail": {
-      "status": "PASS",
-      "functional_status": "PASS",
-      "budget_status": "PASS",
-      "errors": [],
-      "budget_errors": [],
-      "metrics": {
-        "triangles": 558,
-        "mesh_instances": 13,
-        "primitives": 25,
-        "materials": 11,
-        "bytes": 45088,
-        "bounds_min": [
-          -0.45500001311302185,
-          0.0,
-          -0.4480000138282776
-        ],
-        "bounds_max": [
-          0.45500001311302185,
-          1.7654999494552612,
-          0.335999995470047
-        ]
-      },
-      "original_validator_status": "FAIL",
-      "original_validator_errors": [
-        "Budget exceeded: primitives",
-        "Budget exceeded: materials",
-        "Manifest deviations require separate review; not an in-contract PASS"
-      ],
-      "scope": "Current request 11 materials/25 primitives; all other original checks preserved"
-    },
-    "male_bald": {
-      "status": "PASS",
-      "functional_status": "PASS",
-      "budget_status": "PASS",
-      "errors": [],
-      "budget_errors": [],
-      "metrics": {
-        "triangles": 402,
-        "mesh_instances": 12,
-        "primitives": 24,
-        "materials": 11,
-        "bytes": 35884,
-        "bounds_min": [
-          -0.45500001311302185,
-          0.0,
-          -0.27000001072883606
-        ],
-        "bounds_max": [
-          0.45500001311302185,
-          1.7200000286102295,
-          0.335999995470047
-        ]
-      },
-      "original_validator_status": "FAIL",
-      "original_validator_errors": [
-        "Budget exceeded: materials",
-        "Manifest deviations require separate review; not an in-contract PASS"
-      ],
-      "scope": "Current request 11 materials/25 primitives; all other original checks preserved"
-    },
-    "female_short": {
-      "status": "FAIL",
-      "functional_status": "PASS",
-      "budget_status": "FAIL",
-      "errors": [],
-      "budget_errors": [
-        "Requested material budget exceeded",
-        "Requested primitive budget exceeded"
-      ],
-      "metrics": {
-        "triangles": 742,
-        "mesh_instances": 14,
-        "primitives": 26,
-        "materials": 12,
-        "bytes": 55336,
-        "bounds_min": [
-          -0.4399999976158142,
-          0.0,
-          -0.3034999966621399
-        ],
-        "bounds_max": [
-          0.4399999976158142,
-          1.7654999494552612,
-          0.38600000739097595
-        ]
-      },
-      "original_validator_status": "FAIL",
-      "original_validator_errors": [
-        "Budget exceeded: primitives",
-        "Budget exceeded: materials",
-        "Manifest deviations require separate review; not an in-contract PASS"
-      ],
-      "scope": "Current request 11 materials/25 primitives; all other original checks preserved"
-    },
-    "female_long": {
-      "status": "FAIL",
-      "functional_status": "PASS",
-      "budget_status": "FAIL",
-      "errors": [],
-      "budget_errors": [
-        "Requested material budget exceeded",
-        "Requested primitive budget exceeded"
-      ],
-      "metrics": {
-        "triangles": 814,
-        "mesh_instances": 14,
-        "primitives": 26,
-        "materials": 12,
-        "bytes": 59228,
-        "bounds_min": [
-          -0.4399999976158142,
-          0.0,
-          -0.4300000071525574
-        ],
-        "bounds_max": [
-          0.4399999976158142,
-          1.7654999494552612,
-          0.38600000739097595
-        ]
-      },
-      "original_validator_status": "FAIL",
-      "original_validator_errors": [
-        "Budget exceeded: primitives",
-        "Budget exceeded: materials",
-        "Manifest deviations require separate review; not an in-contract PASS"
-      ],
-      "scope": "Current request 11 materials/25 primitives; all other original checks preserved"
-    },
-    "female_bun": {
-      "status": "FAIL",
-      "functional_status": "PASS",
-      "budget_status": "FAIL",
-      "errors": [],
-      "budget_errors": [
-        "Requested material budget exceeded",
-        "Requested primitive budget exceeded"
-      ],
-      "metrics": {
-        "triangles": 766,
-        "mesh_instances": 14,
-        "primitives": 26,
-        "materials": 12,
-        "bytes": 56632,
-        "bounds_min": [
-          -0.4399999976158142,
-          0.0,
-          -0.4569999873638153
-        ],
-        "bounds_max": [
-          0.4399999976158142,
-          1.8300000429153442,
-          0.38600000739097595
-        ]
-      },
-      "original_validator_status": "FAIL",
-      "original_validator_errors": [
-        "Budget exceeded: primitives",
-        "Budget exceeded: materials",
-        "Manifest deviations require separate review; not an in-contract PASS"
-      ],
-      "scope": "Current request 11 materials/25 primitives; all other original checks preserved"
-    },
-    "female_spiky": {
-      "status": "FAIL",
-      "functional_status": "PASS",
-      "budget_status": "FAIL",
-      "errors": [],
-      "budget_errors": [
-        "Requested material budget exceeded",
-        "Requested primitive budget exceeded"
-      ],
-      "metrics": {
-        "triangles": 778,
-        "mesh_instances": 14,
-        "primitives": 26,
-        "materials": 12,
-        "bytes": 57856,
-        "bounds_min": [
-          -0.4399999976158142,
-          0.0,
-          -0.3034999966621399
-        ],
-        "bounds_max": [
-          0.4399999976158142,
-          1.840000033378601,
-          0.38600000739097595
-        ]
-      },
-      "original_validator_status": "FAIL",
-      "original_validator_errors": [
-        "Budget exceeded: primitives",
-        "Budget exceeded: materials",
-        "Manifest deviations require separate review; not an in-contract PASS"
-      ],
-      "scope": "Current request 11 materials/25 primitives; all other original checks preserved"
-    },
-    "female_curly": {
-      "status": "FAIL",
-      "functional_status": "PASS",
-      "budget_status": "FAIL",
-      "errors": [],
-      "budget_errors": [
-        "Requested material budget exceeded",
-        "Requested primitive budget exceeded"
-      ],
-      "metrics": {
-        "triangles": 1030,
-        "mesh_instances": 14,
-        "primitives": 26,
-        "materials": 12,
-        "bytes": 70892,
-        "bounds_min": [
-          -0.4399999976158142,
-          0.0,
-          -0.3034999966621399
-        ],
-        "bounds_max": [
-          0.4399999976158142,
-          1.815000057220459,
-          0.38600000739097595
-        ]
-      },
-      "original_validator_status": "FAIL",
-      "original_validator_errors": [
-        "Budget exceeded: primitives",
-        "Budget exceeded: materials",
-        "Manifest deviations require separate review; not an in-contract PASS"
-      ],
-      "scope": "Current request 11 materials/25 primitives; all other original checks preserved"
-    },
-    "female_ponytail": {
-      "status": "FAIL",
-      "functional_status": "PASS",
-      "budget_status": "FAIL",
-      "errors": [],
-      "budget_errors": [
-        "Requested material budget exceeded",
-        "Requested primitive budget exceeded"
-      ],
-      "metrics": {
-        "triangles": 778,
-        "mesh_instances": 14,
-        "primitives": 26,
-        "materials": 12,
-        "bytes": 57280,
-        "bounds_min": [
-          -0.4399999976158142,
-          0.0,
-          -0.4480000138282776
-        ],
-        "bounds_max": [
-          0.4399999976158142,
-          1.7654999494552612,
-          0.38600000739097595
-        ]
-      },
-      "original_validator_status": "FAIL",
-      "original_validator_errors": [
-        "Budget exceeded: primitives",
-        "Budget exceeded: materials",
-        "Manifest deviations require separate review; not an in-contract PASS"
-      ],
-      "scope": "Current request 11 materials/25 primitives; all other original checks preserved"
-    },
-    "female_bald": {
-      "status": "FAIL",
-      "functional_status": "PASS",
-      "budget_status": "FAIL",
-      "errors": [],
-      "budget_errors": [
-        "Requested material budget exceeded"
-      ],
-      "metrics": {
-        "triangles": 622,
-        "mesh_instances": 13,
-        "primitives": 25,
-        "materials": 12,
-        "bytes": 48080,
-        "bounds_min": [
-          -0.4399999976158142,
-          0.0,
-          -0.27000001072883606
-        ],
-        "bounds_max": [
-          0.4399999976158142,
-          1.7350000143051147,
-          0.38600000739097595
-        ]
-      },
-      "original_validator_status": "FAIL",
-      "original_validator_errors": [
-        "Budget exceeded: primitives",
-        "Budget exceeded: materials",
-        "Manifest deviations require separate review; not an in-contract PASS"
-      ],
-      "scope": "Current request 11 materials/25 primitives; all other original checks preserved"
-    }
+  "asset": "female_base",
+  "roundtrip": {
+    "status": "PASS",
+    "errors": [],
+    "source_sha256": "e855eedebebc147d786140bba3123e1f65f0a3d66e552422da9807d4d2f630bd",
+    "scope": "rig/rest TRS, independent material edits, branch separation, eight finite poses; not full collision QA"
   },
-  "male_reference_sha256": "3340be53a3178dcdce048f33fe380a662ec1cc5675163ca922efeaa3ff2ee57f"
+  "original_validator": {
+    "status": "FAIL",
+    "profile": "human",
+    "errors": [
+      "Budget exceeded: primitives",
+      "Budget exceeded: materials",
+      "Manifest deviations require separate review; not an in-contract PASS"
+    ],
+    "metrics": {
+      "triangles": 973,
+      "mesh_instances": 15,
+      "primitives": 27,
+      "materials": 13,
+      "bytes": 68436,
+      "bounds_min": [
+        -0.4399999976158142,
+        0.0,
+        -0.4300000071525574
+      ],
+      "bounds_max": [
+        0.4399999976158142,
+        1.7654999494552612,
+        0.38600000739097595
+      ]
+    },
+    "mesh_nodes": [
+      "char_arm_negx_visual",
+      "char_hand_negx_visual",
+      "char_arm_posx_visual",
+      "char_hand_posx_visual",
+      "char_accent_visual",
+      "char_bow_visual",
+      "char_eye_negx_visual",
+      "char_eye_posx_visual",
+      "char_eyebrows_visual",
+      "char_hair_visual",
+      "char_head_visual",
+      "char_mouth_visual",
+      "char_leg_negx_visual",
+      "char_leg_posx_visual",
+      "char_torso_visual"
+    ],
+    "scope": "static contract; no manual/Blender/runtime certification"
+  },
+  "artistic_approval": "PASS",
+  "technical_budget_approval": "NOT_RUN",
+  "application_QA": "NOT_RUN"
 }

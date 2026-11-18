@@ -1,0 +1,449 @@
+{
+  "contract": "AOP_CHAR_RIGID_1",
+  "contract_version": "1.0.0",
+  "profile": "human",
+  "asset_id": "female_long",
+  "file": "female_long.glb",
+  "sha256": "116a3f782d8f37c194b44028a564949ebf33786ba5f82157e73ed5cf3dbdb0df",
+  "blender_version": "5.3.0",
+  "root": "char_root",
+  "units": "meters",
+  "forward": "+Z",
+  "nodes": {
+    "char_root": {
+      "parent": null,
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_body": {
+      "parent": "char_root",
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_torso": {
+      "parent": "char_body",
+      "translation": [
+        0,
+        0.72,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_head": {
+      "parent": "char_body",
+      "translation": [
+        0,
+        1.32,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_hair": {
+      "parent": "char_head",
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_eye_negx": {
+      "parent": "char_head",
+      "translation": [
+        -0.12,
+        0.02,
+        0.3
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_eye_posx": {
+      "parent": "char_head",
+      "translation": [
+        0.12,
+        0.02,
+        0.3
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_mouth": {
+      "parent": "char_head",
+      "translation": [
+        0,
+        -0.1,
+        0.32
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_arm_negx": {
+      "parent": "char_body",
+      "translation": [
+        -0.33,
+        0.9,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_arm_posx": {
+      "parent": "char_body",
+      "translation": [
+        0.33,
+        0.9,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_leg_negx": {
+      "parent": "char_body",
+      "translation": [
+        -0.12,
+        0.42,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_leg_posx": {
+      "parent": "char_body",
+      "translation": [
+        0.12,
+        0.42,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_hand_negx": {
+      "parent": "char_arm_negx",
+      "translation": [
+        0,
+        -0.38,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_hand_posx": {
+      "parent": "char_arm_posx",
+      "translation": [
+        0,
+        -0.38,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_socket_label": {
+      "parent": "char_root",
+      "translation": [
+        0,
+        2,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_socket_voice": {
+      "parent": "char_root",
+      "translation": [
+        0,
+        2.25,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_socket_bubble": {
+      "parent": "char_root",
+      "translation": [
+        0,
+        2.45,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "char_socket_card": {
+      "parent": "char_body",
+      "translation": [
+        0,
+        0.8,
+        0.36
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  "material_roles": {
+    "skin": "char_mat_skin",
+    "hair": "char_mat_hair",
+    "eyebrows": "char_mat_eyebrows",
+    "iris": "char_mat_iris",
+    "clothing": "char_mat_clothing",
+    "shirt": "char_mat_shirt",
+    "tie": "char_mat_tie",
+    "pants": "char_mat_pants",
+    "shoes": "char_mat_shoes",
+    "facial_dark": "char_mat_dark",
+    "eye_and_teeth_white": "char_mat_white"
+  },
+  "body_mesh_nodes": [
+    "char_arm_negx_visual",
+    "char_hand_negx_visual",
+    "char_arm_posx_visual",
+    "char_hand_posx_visual",
+    "char_eye_negx_visual",
+    "char_eye_posx_visual",
+    "char_eyebrows_visual",
+    "char_hair_visual",
+    "char_head_visual",
+    "char_mouth_visual",
+    "char_leg_negx_visual",
+    "char_leg_posx_visual",
+    "char_torso_visual"
+  ],
+  "first_person_hide_nodes": [
+    "char_head",
+    "char_arm_negx",
+    "char_arm_posx"
+  ],
+  "modular_hair": {
+    "strategy": "One shared component, one hairstyle active; eyebrows under char_head",
+    "head_attachment_surface": "upper head x +/-0.27, Blender y [-0.30,+0.27], top z=1.72; attachment origin z=1.32",
+    "inactive_hair_material": false
+  },
+  "animations": [],
+  "license": "Original designs for Juri; MIT scaffold/tools, copyright 2026 AgentSystemLabs",
+  "third_party_assets": [],
+  "deviations": [
+    {
+      "field": "materials",
+      "legacy_limit": 8,
+      "requested_limit": 11
+    },
+    {
+      "field": "primitives",
+      "legacy_limit": 24,
+      "requested_limit": 25
+    }
+  ],
+  "hairstyle": {
+    "active_style": "long",
+    "attach_control": "char_hair",
+    "component_local_translation": [
+      0,
+      0,
+      0
+    ],
+    "component_local_rotation": [
+      0,
+      0,
+      0,
+      1
+    ],
+    "component_local_scale": [
+      1,
+      1,
+      1
+    ],
+    "replace": "Remove existing hair mesh children, attach exactly one component at identity; bald removes all hair geometry.",
+    "compatible_styles": [
+      "short",
+      "long",
+      "bun",
+      "spiky",
+      "curly",
+      "ponytail",
+      "bald"
+    ]
+  },
+  "requested_budget": {
+    "materials": 11,
+    "primitives": 25,
+    "other_limits": "unchanged original human profile"
+  },
+  "runtime_application": "NOT_RUN",
+  "assembly_normal_preservation": {
+    "restored_normal_vertices": 6,
+    "scope": "Non-hair normals restored exactly from the base when Blender recalculates them; positions and topology unchanged."
+  }
+}

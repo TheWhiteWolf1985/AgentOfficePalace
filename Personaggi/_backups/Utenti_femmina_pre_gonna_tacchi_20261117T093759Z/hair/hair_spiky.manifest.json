@@ -1,0 +1,37 @@
+{
+  "asset_id": "hair_spiky",
+  "type": "modular_hair_component",
+  "style_id": "spiky",
+  "file": "hair_spiky.glb",
+  "sha256": "299f24276a572f9506d2387b06723e506ed4f7f370b2b3ea53f3fb06826f9d65",
+  "attach_to": "char_hair",
+  "local_translation": [
+    0,
+    0,
+    0
+  ],
+  "local_rotation": [
+    0,
+    0,
+    0,
+    1
+  ],
+  "local_scale": [
+    1,
+    1,
+    1
+  ],
+  "units": "meters",
+  "up": "+Y",
+  "forward": "+Z",
+  "mesh_count": 1,
+  "material": "char_mat_hair",
+  "empty_configuration": false,
+  "compatible_bases": [
+    "human_base_v02",
+    "female_base_v01"
+  ],
+  "baseline_head_pivot_height_m": 1.32,
+  "license": "Original voxel geometry for Juri; short derived without visible changes from male revision02",
+  "validation_scope": "Component only; the full human rig validator does not apply to a hair component"
+}
