@@ -83,7 +83,10 @@ test('tower floor/wing rebuilds retain cached shell buffers and glazing without 
     if (index < count) {
       assert.ok(room); assert.equal(room.position.y, (count - 1 - index) * STOREY + WALL_HEIGHT + SLAB);
       room.traverse(n => { if (n instanceof THREE.Mesh) assert.ok(geos.has(n.geometry), 'only cached shell geometry, never re-merged'); });
-      assert.deepEqual(Object.keys((room.getObjectByName('window_south_0') as THREE.Mesh).geometry.attributes), Object.keys((source.getObjectByName('window_south_0') as THREE.Mesh).geometry.attributes));
+      let pane: THREE.Mesh | undefined;
+      room.traverse(n => { if (n instanceof THREE.Mesh && (n.name === 'window_south_0' || n.userData.exteriorGlazingSources?.includes('window_south_0'))) pane = n; });
+      assert.ok(pane);
+      assert.deepEqual(Object.keys(pane.geometry.attributes), Object.keys((source.getObjectByName('window_south_0') as THREE.Mesh).geometry.attributes));
     } else assert.equal(room, undefined);
     assert.equal(disposed, 0); assert.equal(night.windows.length, 3);
     assert.ok(colliders.length < 30, 'rebuild replaces owned colliders');

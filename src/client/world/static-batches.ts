@@ -2,13 +2,13 @@ import * as THREE from 'three';
 import { deinterleaveGeometry, mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
 /** Merge only opaque static leaves; bindings, animation and transparent sorting stay independent. */
-export function batchStaticMeshes(root: THREE.Object3D, protectedNames: ReadonlySet<string> = new Set()) {
+export function batchStaticMeshes(root: THREE.Object3D, protectedNames: ReadonlySet<string> = new Set(), options: { batchFloors?: boolean } = {}) {
   root.updateWorldMatrix(true, true);
   const inverse = root.matrixWorld.clone().invert();
   const groups = new Map<string, THREE.Mesh[]>();
   const protectedNode = (node: THREE.Object3D) => {
     for (let n: THREE.Object3D | null = node; n && n !== root; n = n.parent) {
-      if (protectedNames.has(n.name) || n.userData.interact || /door|pivot|anchor|seat_|floor|rug/i.test(n.name)) return true;
+      if (protectedNames.has(n.name) || n.userData.interact || /door|pivot|anchor|seat_|rug/i.test(n.name) || (!options.batchFloors && /floor/i.test(n.name))) return true;
     }
     return false;
   };

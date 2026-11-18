@@ -15,6 +15,7 @@ interface Conn {
   screenSender?: RTCRtpSender;
   level: number;
   analyser?: AnalyserNode;
+  audioSource?: MediaStreamAudioSourceNode;
 }
 
 type Signal = { description?: RTCSessionDescriptionInit; candidate?: RTCIceCandidateInit | null };
@@ -29,6 +30,10 @@ export class Voice {
   private screen: MediaStream | null = null;
   private audioCtx: AudioContext | null = null;
   private localAnalyser: AnalyserNode | null = null;
+  private localSource: MediaStreamAudioSourceNode | null = null;
+  private levelTimer: ReturnType<typeof setInterval> | null = null;
+  private watchingLevels = false;
+  private readonly updateLevelSampling = () => this.syncLevelSampling();
   private listeners = new Set<() => void>();
   private failListeners = new Set<(peerId: string) => void>();
   /** Asking for the mic, so a second join waits for the first instead of asking again. */
@@ -38,10 +43,7 @@ export class Voice {
   muted = false;
   localLevel = 0;
 
-  constructor(private net: Net) {
-    // Often enough for mouths to keep up with syllables.
-    setInterval(() => this.sampleLevels(), 40);
-  }
+  constructor(private net: Net) {}
 
   get inVoice() {
     return !!this.mic;
@@ -102,13 +104,20 @@ export class Voice {
     this.mic.getAudioTracks().forEach((t) => (t.enabled = !muted));
     this.ensureAudioCtx();
     if (this.audioCtx) {
-      const src = this.audioCtx.createMediaStreamSource(this.mic);
+      this.localSource = this.audioCtx.createMediaStreamSource(this.mic);
       this.localAnalyser = this.audioCtx.createAnalyser();
       this.localAnalyser.fftSize = 1024;
-      src.connect(this.localAnalyser);
+      this.localSource.connect(this.localAnalyser);
+    }
+    const stream = this.mic;
+    for (const audio of stream.getAudioTracks()) {
+      audio.addEventListener('mute', this.updateLevelSampling);
+      audio.addEventListener('unmute', this.updateLevelSampling);
+      audio.addEventListener('ended', () => { if (this.mic === stream) this.leaveVoice(); });
     }
     const track = this.mic.getAudioTracks()[0];
     for (const c of this.conns.values()) c.micSender = c.pc.addTrack(track, this.mic);
+    this.syncLevelSampling();
     this.changed();
     return null;
   }
@@ -127,9 +136,12 @@ export class Voice {
     }
     this.mic.getTracks().forEach((t) => t.stop());
     this.mic = null;
+    this.localSource?.disconnect();
+    this.localSource = null;
     this.localAnalyser = null;
     this.localLevel = 0;
     this.talking = false;
+    this.syncLevelSampling();
     this.changed();
   }
 
@@ -143,6 +155,7 @@ export class Voice {
     if (muted === this.muted) return;
     this.muted = muted;
     this.mic.getAudioTracks().forEach((t) => (t.enabled = !muted));
+    this.syncLevelSampling();
     this.changed();
   }
 
@@ -196,6 +209,7 @@ export class Voice {
     for (const [id, p] of store.peers) if (id !== store.you && !p.lite && !this.conns.has(id)) this.connect(id);
     for (const id of [...this.conns.keys()]) if (!store.peers.has(id) || store.peers.get(id)!.lite) this.drop(id);
     this.syncScreenSenders();
+    this.syncLevelSampling();
   }
 
   /** A shared screen is sent only to people in the present space, including after either side moves. */
@@ -250,6 +264,7 @@ export class Voice {
     if (!this.audioCtx) {
       try {
         this.audioCtx = new AudioContext();
+        this.audioCtx.addEventListener('statechange', this.updateLevelSampling);
       } catch {
         this.audioCtx = null;
       }
@@ -285,6 +300,10 @@ export class Voice {
     pc.ontrack = ({ track, streams }) => {
       const stream = streams[0] ?? new MediaStream([track]);
       if (track.kind === 'audio') {
+        c.audioSource?.disconnect();
+        c.audioSource = undefined;
+        c.analyser = undefined;
+        c.level = 0;
         c.audioStream = stream;
         audio.srcObject = stream;
         void audio.play().catch(() => {
@@ -294,14 +313,22 @@ export class Voice {
         this.ensureAudioCtx();
         if (this.audioCtx) {
           try {
-            const src = this.audioCtx.createMediaStreamSource(stream);
+            c.audioSource = this.audioCtx.createMediaStreamSource(stream);
             c.analyser = this.audioCtx.createAnalyser();
             c.analyser.fftSize = 1024;
-            src.connect(c.analyser);
+            c.audioSource.connect(c.analyser);
           } catch {
             // analyser is optional
           }
         }
+        for (const event of ['mute', 'unmute', 'ended']) track.addEventListener(event, () => {
+          if (this.conns.get(id) !== c || c.audioStream !== stream) return;
+          if (!stream.getAudioTracks().some(t => t.readyState === 'live')) {
+            c.audioSource?.disconnect(); c.audioSource = undefined; c.analyser = undefined;
+          }
+          this.syncLevelSampling();
+        });
+        this.syncLevelSampling();
       } else {
         c.screen = stream;
         track.addEventListener('unmute', () => this.listeners.forEach((fn) => fn()));
@@ -320,12 +347,51 @@ export class Voice {
     const c = this.conns.get(id);
     if (!c) return;
     c.pc.close();
+    c.audioSource?.disconnect();
     c.audio.srcObject = null;
     this.conns.delete(id);
+    this.syncLevelSampling();
     this.listeners.forEach((fn) => fn());
   }
 
   private readonly levelBuf = new Uint8Array(1024);
+
+  private liveAudio(stream: MediaStream | null | undefined) {
+    return !!stream?.getAudioTracks().some(t => t.readyState === 'live' && !t.muted && t.enabled);
+  }
+
+  private remoteLevelActive(id: string, c: Conn) {
+    const peer = store.peers.get(id);
+    return !!c.analyser && this.liveAudio(c.audioStream) && (!peer || (peer.voice && !peer.muted));
+  }
+
+  /** Sampling animates visible mouths only; media transport/playback continues independently. */
+  syncLevelSampling() {
+    const local = !!this.localAnalyser && !this.muted && this.liveAudio(this.mic);
+    let remote = false, analysers = !!this.localAnalyser;
+    if (!local) this.localLevel = 0;
+    for (const [id, c] of this.conns) {
+      analysers ||= !!c.analyser;
+      if (this.remoteLevelActive(id, c)) remote = true;
+      else c.level = 0;
+    }
+    if (analysers !== this.watchingLevels) {
+      this.watchingLevels = analysers;
+      if (analysers) document.addEventListener('visibilitychange', this.updateLevelSampling);
+      else document.removeEventListener('visibilitychange', this.updateLevelSampling);
+    }
+    const active = (local || remote) && this.audioCtx?.state === 'running' && !document.hidden;
+    if (active && this.levelTimer === null) {
+      this.sampleLevels();
+      // Often enough for mouths to keep up with syllables, while there is something to sample.
+      this.levelTimer = setInterval(() => this.sampleLevels(), 40);
+    } else if (!active) {
+      if (this.levelTimer !== null) clearInterval(this.levelTimer);
+      this.levelTimer = null;
+      this.localLevel = 0;
+      for (const c of this.conns.values()) c.level = 0;
+    }
+  }
 
   private sampleLevels() {
     const buf = this.levelBuf;
@@ -335,7 +401,7 @@ export class Voice {
       for (const v of buf) s += ((v - 128) / 128) ** 2;
       return Math.sqrt(s / buf.length);
     };
-    this.localLevel = this.localAnalyser && !this.muted ? rms(this.localAnalyser) : 0;
-    for (const c of this.conns.values()) c.level = c.analyser ? rms(c.analyser) : 0;
+    this.localLevel = this.localAnalyser && !this.muted && this.liveAudio(this.mic) ? rms(this.localAnalyser) : 0;
+    for (const [id, c] of this.conns) c.level = this.remoteLevelActive(id, c) ? rms(c.analyser!) : 0;
   }
 }

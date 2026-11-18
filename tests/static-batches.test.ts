@@ -13,6 +13,17 @@ function metrics(root: THREE.Object3D) {
   return { meshes, triangles, bounds: new THREE.Box3().setFromObject(root, true) };
 }
 
+test('decorative exterior floors can opt in to batching without changing walkable floor nodes or bindings', () => {
+  const source = new THREE.Group(), material = new THREE.MeshToonMaterial(), geometry = new THREE.BoxGeometry(1, .1, 1);
+  for (const x of [1, 3]) { const m = new THREE.Mesh(geometry, material); m.name = `floor_board_${x}`; m.position.x = x; source.add(m); }
+  assert.equal(batchStaticMeshes(source).meshesSaved, 0);
+  const copy = source.clone(true);
+  assert.equal(batchStaticMeshes(copy, new Set(), { batchFloors: true }).meshesSaved, 1);
+  assert.equal(source.children.length, 2); assert.ok(source.getObjectByName('floor_board_1'));
+  const bound = new THREE.Mesh(geometry, material); bound.name = 'floor_bound'; bound.userData.interact = { type: 'floor' }; copy.add(bound);
+  batchStaticMeshes(copy, new Set(), { batchFloors: true }); assert.equal(bound.parent, copy);
+});
+
 test('batching preserves transformed positions, normals, UVs and source geometry without changing dynamic meshes', () => {
   const root = new THREE.Group(), material = new THREE.MeshToonMaterial(), geometry = new THREE.BoxGeometry(1, 1, 1);
   const nodes = [0, 1, 2].map(i => { const m = new THREE.Mesh(geometry, material); m.position.set(i + 0.123, .3, .7); m.rotation.y = i * .2; m.scale.set(1, 1.2, .8); root.add(m); return m; });

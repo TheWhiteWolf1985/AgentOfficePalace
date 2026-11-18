@@ -134,7 +134,7 @@ export function installVoice(ctx: Ctx, deps: VoiceDeps) {
   ctx.messages.on('peer.join', () => voice.syncPeers());
   ctx.messages.on('peer.leave', () => voice.syncPeers());
   store.on('floor', () => { voice.syncScreenSenders(); refreshShares(); });
-  store.on('peers', () => { voice.syncScreenSenders(); refreshShares(); });
+  store.on('peers', () => { voice.syncScreenSenders(); voice.syncLevelSampling(); refreshShares(); });
   ctx.messages.on('rtc', (msg) => void voice.handleSignal(msg.from, msg.data as never));
 
   return { toggleVoice, toggleShare, currentShares, refreshShares, watchShare };

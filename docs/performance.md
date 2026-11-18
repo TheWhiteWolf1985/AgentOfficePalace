@@ -48,3 +48,13 @@ Compare CPU/frame traces with the same graphics preference, viewport, camera, we
 L'editor del personaggio usa il profilo grafico del dispositivo, con un limite di30fotogrammi/s per Alta/Bilanciata e20per Risparmio, anche con frequenza principale illimitata. DPR massimo1,5/1,25/1 rispettivamente; ombre1024/512/disabilitate e contorni disabilitati in Risparmio. Le ombre animate si aggiornano fino a15volte/s e una modifica del personaggio le invalida per il disegno successivo.
 
 L'anteprima sospende il proprio RAF con scheda nascosta, canvas fuori vista o finestra coperta da un'altra modale. Al ritorno mostra lo stato attuale senza recuperare il tempo trascorso. Rotazione, animazioni, selezione di modello/acconciatura e colori restano attive alla cadenza prevista. Chiusura e annullamento scollegano osservatori, listener, ciclo e risorse del renderer. Questi limiti riguardano l'editor dell'utente.
+
+## Livelli audio e vetri esterni
+
+Il campionamento dei livelli per animare le bocche si attiva a25Hz soltanto con un microfono locale utilizzabile oppure audio ricevuto da un partecipante in voce e non silenziato. Si ferma con tutti i microfoni silenziati, tracce terminate, scheda nascosta o contesto audio sospeso, e riprende quando serve. Connessioni WebRTC, riproduzione audio e condivisione schermo continuano indipendentemente. Una sessione senza audio e la sola condivisione video non creano il timer dei livelli.
+
+Le sole copie esterne derivate di Atrio e Sala riunioni raggruppano i pannelli trasparenti disgiunti della stessa facciata, materiale e profondità. Facciate, riflessi e piani differenti restano separati; superfici sovrapposte o con callback proprie mantengono i loro oggetti. Vertici, normali, UV e materiali sono conservati, senza alterare i GLB o i vetri degli ambienti percorribili. La Sala esterna passa da40oggetti vetro/riflesso a6, l'Atrio esterno da18vetri a3. Le risorse derivate restano condivise attraverso visite e ricostruzioni dei piani.
+
+Anche i pavimenti decorativi delle sole copie esterne possono essere accorpati per materiale. I pavimenti degli ambienti percorribili, i tappeti e le superfici con interazioni mantengono le loro protezioni e i loro riferimenti.
+
+Per confrontare questa modifica, misurare le drawcall dalla stessa camera e con lo stesso numero di uffici/ali, profilo grafico e ora del giorno. Provare angoli opposti, luce diurna/notturna e vista attraverso le finestre. La diminuzione delle drawcall non quantifica da sola un guadagno FPS su un altro dispositivo.

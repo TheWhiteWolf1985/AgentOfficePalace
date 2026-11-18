@@ -3,6 +3,7 @@ import { prepareAtrium } from './atrium-materials';
 import { applyConferenceGlazing } from './conference-glazing';
 import { model } from './models';
 import { batchStaticMeshes } from './static-batches';
+import { batchExteriorGlazing } from './exterior-glazing';
 
 type ExteriorName = 'atrium' | 'conference_room';
 const envelope = {
@@ -40,7 +41,9 @@ export function createExteriorCache(
       if (!source) return null; // A later model load must remain retryable.
       template = selectExterior(source, name);
       prepare(name, template);
-      batchStaticMeshes(template, new Set(['atrio_company_logo_surface']));
+      // These copies have no walkable floor bindings; the original rooms keep their floor nodes.
+      batchStaticMeshes(template, new Set(['atrio_company_logo_surface']), { batchFloors: true });
+      batchExteriorGlazing(template);
       template.traverse(node => {
         if (!(node instanceof THREE.Mesh)) return;
         node.userData.sharedImportedGeometry = true;
