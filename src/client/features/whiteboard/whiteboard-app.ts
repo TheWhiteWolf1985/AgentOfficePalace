@@ -39,11 +39,11 @@ const asExcalidraw = (els: readonly WbElement[]) => restoreElements(els as unkno
  * The drawing as a picture for the board in the office, as big as fits in `maxW` × `maxH` pixels
  * (small drawings are scaled up, but not blown up past 3×). Null when nothing is drawn.
  */
-export async function renderPreview(elements: readonly WbElement[], maxW: number, maxH: number, scope: WhiteboardScope): Promise<HTMLCanvasElement | null> {
+export async function renderPreview(elements: readonly WbElement[], maxW: number, maxH: number, scope: WhiteboardScope, current = () => true): Promise<HTMLCanvasElement | null> {
   const live = asExcalidraw(elements.filter((el) => !el.isDeleted));
   if (!live.length) return null;
   await scope.files.load(live);
-  if (!scope.active()) return null;
+  if (!scope.active() || !current()) return null;
   return exportToCanvas({
     elements: live,
     files: scope.files.snapshot(),

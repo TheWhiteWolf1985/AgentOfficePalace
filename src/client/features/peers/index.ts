@@ -36,7 +36,7 @@ export interface RemotePeer {
   grip: Grip | null;
 }
 
-export function installPeers(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'worlds' | 'walking' | 'talk' | 'hud'>) {
+export function installPeers(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'worlds' | 'walking' | 'hud'>) {
   const { scene, voice, sound, player, office } = ctx;
   const { plan, inOffice } = parts.worlds;
   const remotes = new Map<string, RemotePeer>();
@@ -91,7 +91,6 @@ export function installPeers(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'worl
       }
     }
     renderPeople(voice, editProfile, walkTo);
-    parts.talk.refreshShares();
   }
   store.on('peers', syncPeers);
   // Into a car or out of one: sitting in it, or back on their feet.

@@ -1,4 +1,5 @@
 import { t as uiText } from '../../../shared/i18n';
+import type { ScreenShare } from '../voice/shares';
 
 import { seatPlace, type SeatDef, type SeatPlace } from '../../../shared/layout';
 import type { Ctx } from '../../core/context';
@@ -16,7 +17,7 @@ declare module '../../world/types' {
 
 export interface SeatingDeps {
   /** The screens shared on this floor, by who's sharing them (see features/voice). */
-  shares(): [string, MediaStream][];
+  shares(): ScreenShare[];
   /** Watches what's on the TV full screen (see features/voice). */
   watchShare(): void;
   /** What you can use where you are, and what's in the way of looking at it (see usable in input/pointer.ts). */
@@ -44,7 +45,7 @@ export function installSeating(ctx: Ctx, deps: SeatingDeps) {
 
   /** Someone else's screen is up on the TV. */
   function tvShowing(): boolean {
-    return deps.shares().some(([who]) => who !== 'You');
+    return deps.shares().some(share => !share.local);
   }
 
   /** E at a seat: sit down on it. Sitting there already, get up, or on the couch facing the TV, watch it. */

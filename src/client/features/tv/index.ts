@@ -3,6 +3,7 @@ import { lazyResource } from '../../lazy-resource';
 import { spaceCapabilities } from '../../../shared/space-capabilities';
 import { store } from '../../state';
 import { t as uiText } from '../../../shared/i18n';
+import type { ScreenShare } from '../voice/shares';
 /**
  * The office TV: the screen someone on the floor is sharing, or its idle card while nobody is. What's
  * shared, and watching it full screen, is features/voice's.
@@ -20,7 +21,7 @@ declare module '../../world/types' {
 
 export interface TvDeps {
   /** The screens shared on this floor, by who's sharing them (see features/voice). */
-  shares(): [string, MediaStream][];
+  shares(): ScreenShare[];
   /** Watches what's on the TV full screen, or shares your screen when nobody's sharing (see features/voice). */
   watch(): void;
 }

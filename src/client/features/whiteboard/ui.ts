@@ -12,6 +12,7 @@ import { h, openModal, toast, type Modal } from '../../ui/dom';
 import type { WhiteboardApp } from './whiteboard-app';
 import { WhiteboardScope } from './files';
 import type { WhiteboardDisplay } from './surface';
+import { PreviewScheduler } from './preview';
 
 declare const __EXCALIDRAW_ASSETS__: string;
 
@@ -97,6 +98,7 @@ export function openWhiteboard(net: Net) {
     }),
   };
   open = board;
+  redrawBoard();
   window.addEventListener('keydown', onKey, true);
   close.addEventListener('click', () => board.modal.close());
   net.send({ t: 'wb.open', board: floor });
@@ -144,46 +146,30 @@ export function routeWhiteboardMessage(msg: ServerMsg, net: Net) {
 }
 
 /**
- * Keeps the whiteboard in the office showing the drawing: redrawn a moment after it changes, and not
- * more than a few times a second while someone draws, or once you close the window if you have it
- * open (it hides the board anyway). `width` × `height` is the room for it, in pixels.
+ * Retains changes while the editor, a presentation, or a hidden tab covers the board. Only the latest
+ * drawing is exported when the surface returns; late work cannot paint another floor or visit.
  */
 export function mirrorWhiteboard(target: () => WhiteboardDisplay | undefined) {
-  let generation = 0;
-  let timer = 0;
-  let busy = false;
-  let again = false;
-  const draw = async () => {
-    timer = 0;
-    if (busy) {
-      again = true;
-      return;
-    }
+  const visible = () => !open && !document.hidden && hasWhiteboard() &&
+    !(store.floor === ROOF && store.presentation.mode === 'presentation') && !!target();
+  const preview = new PreviewScheduler(visible, async isCurrent => {
     const surface = target();
     const scope = currentScope();
     if (!surface || !scope) return;
-    busy = true;
-    const version = generation;
-    try {
-      const elements = [...store.whiteboard.values()].sort(byIndex);
-      const drawing = elements.some((el) => !el.isDeleted) ? await (await excalidraw()).renderPreview(elements, surface.fit.width, surface.fit.height, scope) : null;
-      // Rode the elevator meanwhile: this floor's drawing is on its way.
-      if (scope.active() && currentScope() === scope && generation === version && target() === surface) surface.show(drawing);
-    } catch {
-      // keep whatever the board shows
+    const current = () => isCurrent() && scope.active() && currentScope() === scope && target() === surface;
+    const elements = [...store.whiteboard.values()].sort(byIndex);
+    let drawing: HTMLCanvasElement | null = null;
+    if (elements.some(el => !el.isDeleted)) {
+      const app = await excalidraw();
+      if (!current()) return;
+      drawing = await app.renderPreview(elements, surface.fit.width, surface.fit.height, scope, current);
     }
-    busy = false;
-    if (again) {
-      again = false;
-      soon(300);
-    }
-  };
-  const soon = (ms: number) => {
-    if (!open) timer ||= window.setTimeout(() => void draw(), ms);
-  };
-  redrawBoard = () => { generation++; currentScope(); soon(300); };
+    if (current()) surface.show(drawing);
+  });
+  redrawBoard = () => { currentScope(); preview.invalidate(); };
   store.on('whiteboard', redrawBoard);
   store.on('floor', () => { currentScope(); target()?.show(null); redrawBoard(); });
-  // Arriving: after the office has loaded, since drawing it means loading Excalidraw.
-  soon(1500);
+  store.on('presentation', redrawBoard);
+  document.addEventListener('visibilitychange', redrawBoard);
+  redrawBoard();
 }

@@ -5,7 +5,8 @@ import { t as uiText } from '../../../shared/i18n';
  */
 import type { Ctx } from '../../core/context';
 import { store } from '../../state';
-import { $, h, openModal, toast } from '../../ui/dom';
+import { $, h, openModal, setDoing, toast, type Modal } from '../../ui/dom';
+import { preferredShare, ShareThumbnails, showVideo, type ScreenShare } from './shares';
 
 export interface VoiceDeps {
   /** The office TV, which shows a screen someone's sharing (see features/tv). */
@@ -56,53 +57,66 @@ export function installVoice(ctx: Ctx, deps: VoiceDeps) {
     }
   }
 
-  function currentShares(): [string, MediaStream][] {
-    const out: [string, MediaStream][] = [];
+  function currentShares(): ScreenShare[] {
+    const out: ScreenShare[] = [];
     const local = voice.localScreen;
-    if (local) out.push([uiText('You'), local]);
+    if (local) out.push({ id: store.you, name: uiText('You'), stream: local, local: true });
     for (const [id, s] of voice.remoteScreens()) {
       const peer = store.peers.get(id);
       // A screen shared on another floor is on that floor's TV.
-      if (peer && !store.onMyFloor(peer)) continue;
-      out.push([peer?.name ?? uiText('Someone'), s]);
+      if (!peer || !store.onMyFloor(peer)) continue;
+      out.push({ id, name: peer.name, stream: s, local: false });
     }
     return out;
   }
 
+  const thumbnails = new ShareThumbnails($('shares'), id => watchShare(id), () => uiText('Watch full screen'));
+  let viewer: { id: string; video: HTMLVideoElement; title: HTMLElement; modal: Modal } | undefined;
+  let refreshQueued = false;
   function refreshShares() {
+    if (refreshQueued) return;
+    refreshQueued = true;
+    queueMicrotask(() => { refreshQueued = false; syncShares(); });
+  }
+
+  function syncShares() {
     const shares = currentShares();
     // Remote shares win the TV; your own share is what others see anyway.
-    const pick = shares.find(([who]) => who !== 'You') ?? shares[0];
-    const stream = pick?.[1] ?? null;
-    deps.tv.show(stream);
-    const box = $('shares');
-    box.replaceChildren(
-      ...shares
-        .filter(([who]) => who !== 'You')
-        .map(([who, s]) => {
-          const v = h('video', { autoplay: true, playsinline: true, muted: true }) as HTMLVideoElement;
-          v.srcObject = s;
-          return h('div.share-thumb', { onclick: () => watchShare(), title: uiText('Watch full screen') }, v, h('span.who', {}, `🖥️ ${who}`));
-        }),
-    );
+    deps.tv.show(preferredShare(shares)?.stream ?? null);
+    thumbnails.sync(shares);
+    if (viewer) {
+      const share = shares.find(s => s.id === viewer!.id);
+      if (!share) viewer.modal.close();
+      else updateViewer(share);
+    }
     ctx.hint.invalidate();
   }
 
   /** Someone's shared screen, full screen: someone else's before your own. With nobody sharing, you share yours. */
-  function watchShare() {
+  function watchShare(id?: string) {
     const streams = currentShares();
-    if (!streams.length) {
+    const share = id ? streams.find(s => s.id === id) : preferredShare(streams);
+    if (!share) {
+      if (id) return;
       void toggleShare();
       return;
     }
+    if (viewer) { viewer.id = share.id; updateViewer(share); return; }
     const video = h('video', { autoplay: true, playsinline: true, muted: true }) as HTMLVideoElement;
-    // What's on the TV: someone else's screen before your own.
-    const [who, stream] = streams.find(([name]) => name !== 'You') ?? streams[0];
-    video.srcObject = stream;
+    const title = h('h2');
     const close = h('button.btn.close', { 'aria-label': uiText('Close') }, '✕');
-    const el = h('div.modal.viewer', { role: 'dialog', 'aria-label': uiText('Screen share') }, h('header', {}, h('h2', {}, uiText`🖥️ ${who}'s screen`), close), video);
-    const modal = openModal(el, { doing: uiText`🖥️ watching ${who}'s screen`, onClose: () => (video.srcObject = null) });
+    const el = h('div.modal.viewer', { role: 'dialog', 'aria-label': uiText('Screen share') }, h('header', {}, title, close), video);
+    const modal = openModal(el, { onClose: () => { showVideo(video, null); viewer = undefined; } });
+    viewer = { id: share.id, video, title, modal };
+    updateViewer(share);
     close.addEventListener('click', () => modal.close());
+  }
+
+  function updateViewer(share: ScreenShare) {
+    if (!viewer) return;
+    showVideo(viewer.video, share.stream);
+    viewer.title.textContent = uiText`🖥️ ${share.name}'s screen`;
+    setDoing(viewer.modal, uiText`🖥️ watching ${share.name}'s screen`);
   }
 
   voice.onChange(() => {
