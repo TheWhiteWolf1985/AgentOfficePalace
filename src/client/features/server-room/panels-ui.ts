@@ -51,7 +51,7 @@ export async function openServerPanel(id:ServerPanelId,feed:ServerPanelFeed) {
       search.value=filter;
       const table=h('table.server-containers'),rows=h('tbody');
       table.append(h('thead',{},h('tr',{},...['Container',uiText("Project / Service"),uiText("State"),uiText("Health"),uiText("Image"),uiText("Activity")].map(t=>h('th',{},t)))),rows);
-      const render=()=>{const filter=search.value.toLowerCase();rows.replaceChildren(...d.containers.filter(c=>`${c.name} ${c.project??''} ${c.service??''}`.toLowerCase().includes(filter)).map(c=>h('tr',{},h('td',{},c.name),h('td',{},[c.project,c.service].filter(Boolean).join(' / ')||'—'),h('td',{},c.state),h('td',{},c.health??uiText("Not configured")),h('td',{},c.image),h('td',{},c.status))));};
+      const render=()=>{const filter=search.value.toLowerCase();rows.replaceChildren(...d.containers.filter(c=>`${c.name} ${c.project??''} ${c.service??''}`.toLowerCase().includes(filter)).map(c=>h('tr',{},h('td',{},c.name),h('td',{},[c.project,c.service].filter(Boolean).join(' / ')||'—'),h('td',{},c.state),h('td',{},c.health??uiText("Not reported")),h('td',{},c.image),h('td',{},c.status))));};
       search.oninput=()=>{filter=search.value;render();};render();body.append(search,table);if(restoreSearch)search.focus();
     }
   };

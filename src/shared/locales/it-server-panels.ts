@@ -33,6 +33,7 @@ export const italianServerPanels: Readonly<Record<string,string>> = {
   "Image": "Immagine",
   "Activity": "Attività",
   "Not configured": "Non configurato",
+  "Not reported": "Non indicata",
   "Serial console of the VM. Sign in with a Debian account. One person at a time can use it. Press Enter if the prompt is not visible.": "Console seriale della VM. Accedi con un account Debian. Una persona alla volta può utilizzarla. Premi Invio se il prompt non è visibile.",
   "Connect": "Connetti",
   "Disconnect": "Disconnetti",
