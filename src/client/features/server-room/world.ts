@@ -9,6 +9,7 @@ import { prepareServerRoom } from '../../world/server-room-materials';
 import { batchStaticMeshes } from '../../world/static-batches';
 import type { NightParts } from '../../world/outside';
 import type { Collider, Interactable } from '../../world/types';
+import { createServerPanels } from './panels';
 
 export function buildServerRoom(night: NightParts) {
   const room = model('server_room');
@@ -22,12 +23,14 @@ export function buildServerRoom(night: NightParts) {
     ...['01_01','01_02','02_01','02_02','03_01','03_02'].map(id => `server_v12_extractor_${id}_rotor`)]);
   batchStaticMeshes(room.scene, preserved, { staticDoors: true });
   group.add(room.scene);
+  room.scene.updateMatrixWorld(true);
+  const panels = createServerPanels(room.scene);
   const colliders: Collider[] = SERVER_ROOM_COLLIDERS.map(c => ({ ...c }));
   colliders.push({ minX: ELEVATOR.x-ELEVATOR.width/2, maxX: ELEVATOR.x+ELEVATOR.width/2,
     minZ: FLOOR.minZ, maxZ: FLOOR.minZ+ELEVATOR.depth, bottom: -.3, top: 0 });
   const elevator = buildElevator(SERVER_ROOM_DATA.height); elevator.setSign(SERVER_ROOM_NAME);
   group.add(elevator.group); colliders.push(...elevator.colliders);
-  const interactables: Interactable[] = [elevator.interactable], targets = new THREE.Group();
+  const interactables: Interactable[] = [elevator.interactable,...panels.interactables], targets = new THREE.Group();
   for (const seat of SERVER_ROOM_SEATING) {
     const interaction: Interactable = { kind: 'seat', seatId: seat.id, x: seat.x, y: 0, z: seat.z, radius: 1.5 };
     interactables.push(interaction);
@@ -50,5 +53,5 @@ export function buildServerRoom(night: NightParts) {
     if (door) door.rotation.y = open*SERVER_ROOM_DATA.door.angle;
     passage.top = open > .8 ? -10 : closedTop;
   };
-  return { group, colliders, interactables, elevator, exterior, update, pickables: [room.scene, elevator.group, targets] };
+  return { group, colliders, interactables, elevator, exterior, panels, update, pickables: [room.scene, elevator.group, targets] };
 }

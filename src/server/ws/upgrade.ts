@@ -6,6 +6,7 @@ import { relayUpgrade, tunneledService } from '../relay.js';
 import { sameOrigin } from '../http/util.js';
 import type { Ctx } from '../office/context.js';
 import { onConnection } from './connection.js';
+import { serverRoomServices } from '../http/routes/server-room.js';
 
 function refuseUpgrade(socket: Duplex) {
   socket.write('HTTP/1.1 401 Unauthorized\r\nConnection: close\r\n\r\n');
@@ -32,6 +33,12 @@ export function acceptWebSockets(ctx: Ctx, server: http.Server | https.Server) {
     } catch {
       socket.destroy();
       return;
+    }
+    if (url.pathname === '/ws/server-console') {
+      const session = sameOrigin(req,cfg) ? auth.fromRequest(req) : undefined;
+      if (!session || !ctx.meOf(session.account?.id).admin) return refuseUpgrade(socket);
+      const authorized = () => !!auth.fromRequest(req) && ctx.meOf(session.account?.id).admin;
+      return wss.handleUpgrade(req,socket,head,ws => void serverRoomServices(ctx).console.attach(ws,authorized));
     }
     const session = url.pathname === '/ws' && sameOrigin(req, cfg) ? auth.fromRequest(req) : undefined;
     if (!session) return refuseUpgrade(socket);

@@ -221,6 +221,27 @@ test('signs in with the office password', async () => {
   cookie = set.split(';')[0];
 });
 
+test('server dashboards require a session and admin, and the console rejects foreign origins and members', async () => {
+  assert.equal((await get('/api/server-room/status')).status,401);
+  const status=await get('/api/server-room/status',{cookie});assert.equal(status.status,200);
+  const state=await status.json();assert.ok(state.machine.memTotal>0);assert.ok(state.machine.disk);assert.equal(state.console.active,false);
+  assert.equal((await post('/api/server-room/status',{}, {cookie,origin:base})).status,405);
+  const invite=office.accounts.invite('test','member','Server Monitor Member');assert.notEqual(typeof invite,'string');
+  const member=await office.accounts.join((invite as {token:string}).token,'Server Monitor Member','member-console-password');assert.notEqual(typeof member,'string');
+  const memberId=(member as {id:string}).id;
+  try {
+    const login=await post('/api/login',{name:'Server Monitor Member',password:'member-console-password'});
+    const memberCookie=login.headers.get('set-cookie')!.split(';')[0];
+    assert.equal((await get('/api/server-room/status',{cookie:memberCookie})).status,403);
+    const refused=(headers:Record<string,string>)=>new Promise<number>((resolve,reject)=> {
+      const ws=new WebSocket(base.replace('http','ws')+'/ws/server-console',{headers});ws.once('unexpected-response',(_req,res)=>{res.resume();resolve(res.statusCode!);});ws.once('open',()=>{ws.close();reject(new Error('Unauthorized console opened'));});ws.once('error',reject);
+    });
+    assert.equal(await refused({origin:base}),401);
+    assert.equal(await refused({cookie,origin:'http://elsewhere.invalid'}),401);
+    assert.equal(await refused({cookie:memberCookie,origin:base}),401);
+  } finally {office.accounts.revoke(memberId);}
+});
+
 test('answers the signed-in routes', async () => {
   const me = { cookie };
   assert.deepEqual(await (await get('/api/whoami', me)).json(), { ok: true, me: { admin: true } });
