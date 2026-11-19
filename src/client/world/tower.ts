@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { BALCONY, BALCONY_DOOR, ELEVATOR, ELEVATOR_FRONT, EXIT_DOOR, FLOOR, SLAB, STOREY, STREET_Y, WALL_HEIGHT, WALL_T, WINDOWS, WING, wingMinZ, wingRowZ, type Opening, type Side } from '../../shared/layout';
+import { BALCONY, BALCONY_DOOR, ELEVATOR, ELEVATOR_FRONT, EXIT_DOOR, FLOOR, SLAB, STOREY, SERVER_ROOM_STOREY, STREET_Y, WALL_HEIGHT, WALL_T, WINDOWS, WING, wingMinZ, wingRowZ, type Opening, type Side } from '../../shared/layout';
 import type { Collider } from './types';
 import type { Fixture } from './office/fixture';
 import { exteriorModel } from './exterior-models';
@@ -254,11 +254,12 @@ export function buildTower(colliders: Collider[], night: NightParts, roomModel =
     mine = [];
     seed = 20260927;
 
+    const reference = index === count+1 ? count*STOREY+SERVER_ROOM_STOREY : index*STOREY;
     const parts = new THREE.Group();
     for (let k = 0; k < count; k++) {
       const r = k - index;
       if (r === 0) continue;
-      const y0 = r * STOREY;
+      const y0 = k*STOREY-reference;
       for (const side of Object.keys(FACES) as Side[]) {
         const holes: Opening[] = WINDOWS.filter((o) => o.wall === side);
         if (side === 'south') holes.push(BALCONY_DOOR);
@@ -282,7 +283,13 @@ export function buildTower(colliders: Collider[], night: NightParts, roomModel =
     if (index < count) {
       const top = (count - 1 - index) * STOREY + WALL_HEIGHT;
       crown(parts, top);
-      roofTop(parts, top + SLAB);
+    }
+    if (index !== count) {
+      const server = roomModel('server_room');
+      if (server) { server.position.y = count*STOREY-reference; parts.add(server); }
+    }
+    if (index !== count+1) {
+      roofTop(parts, count*STOREY+SERVER_ROOM_STOREY-reference);
     }
     // Down in the garage (the elevator goes there), the bottom floor's slab over it, seen from
     // underneath: on that floor it's world/stack.ts's.
@@ -291,12 +298,12 @@ export function buildTower(colliders: Collider[], night: NightParts, roomModel =
       parts.add(mesh(under, concrete, (B.minX + B.maxX) / 2, -index * STOREY - SLAB, (B.minZ + B.maxZ) / 2, false));
     }
     // The back offices stand on posts down to the street: each row's, from under the lowest floor it's built on.
-    const street = STREET_Y - index * STOREY;
+    const street = STREET_Y-reference;
     const posts: Collider[] = [];
     for (let row = 1; row <= WING.rows; row++) {
       const lowest = wings.findIndex((w) => w >= row);
       if (lowest < 0 || lowest >= count) continue;
-      const top = (lowest - index) * STOREY - SLAB;
+      const top = lowest*STOREY-reference-SLAB;
       for (const p of wingPosts(row)) {
         parts.add(mesh(new THREE.CylinderGeometry(0.14, 0.14, top - street, 10), concrete, p.x, (top + street) / 2, p.z, false));
         posts.push({ minX: p.x - 0.16, maxX: p.x + 0.16, minZ: p.z - 0.16, maxZ: p.z + 0.16, bottom: street, top });

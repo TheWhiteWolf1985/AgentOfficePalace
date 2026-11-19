@@ -713,3 +713,31 @@ test('retired host deployment controls are inert while application accounts rema
     assert.ok((await browser.take('accounts')).state);
   } finally { browser.ws.close(); }
 });
+
+test('permanent server room accepts visits and restores positions without offices, scopes seats and exposes no project or board', async () => {
+  assert.equal(office.floors().length, 0);
+  const a = await Browser.open('?name=ServerA&floor=%40server-room&x=15&y=0&z=8&rotY=1');
+  const b = await Browser.open('?name=ServerB&floor=%40lobby');
+  try {
+    const welcome = await a.take('welcome'); await b.take('welcome');
+    assert.equal(welcome.floor, '@server-room'); assert.equal(welcome.project, null);
+    assert.deepEqual(welcome.workers, []); assert.equal(welcome.peers.find(p=>p.id===welcome.you)?.x, 15);
+    a.send({ t:'sit', seat:'server_v12_ops_seat_001:0' }); a.send({t:'ping',at:771}); await a.take('pong');
+    b.send({ t:'floor.go', floor:'@server-room' }); const joined = await b.take('floor.enter');
+    assert.equal(joined.floor, '@server-room'); assert.equal(joined.project, null);
+    assert.equal(joined.peers.find(p=>p.id===welcome.you)?.seat,'server_v12_ops_seat_001:0');
+    b.send({t:'sit',seat:'server_v12_ops_seat_001:0'}); assert.equal((await b.take('sit.refused')).seat,'server_v12_ops_seat_001:0');
+    b.send({t:'sit',seat:'seat_001:0'}); b.send({t:'wb.open',board:'@server-room'});
+    b.send({t:'floor.remove',floor:'@server-room'});b.send({t:'ping',at:772}); await b.take('pong');
+    const back = await Browser.open('?name=ServerRestore&floor=%40server-room&x=-5&y=0&z=3&rotY=0');
+    try {
+      const state = await back.take('welcome');assert.equal(state.floor,'@server-room');
+      assert.equal(state.peers.find(p=>p.id===state.you)?.x,-5);
+      assert.equal(state.peers.find(p=>p.id===joined.peers.find(p=>p.name==='ServerB')?.id)?.seat,undefined);
+      assert.deepEqual(state.whiteboard.elements,[]);assert.equal(state.floors.length,0);
+    } finally { await back.close(); }
+    for(const floor of ['@roof','@lobby','@server-room']) {
+      a.send({t:'floor.go',floor});assert.equal((await a.take('floor.enter')).floor,floor);
+    }
+  } finally { await a.close();await b.close(); }
+});

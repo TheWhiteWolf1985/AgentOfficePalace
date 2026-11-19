@@ -5,7 +5,7 @@ import './ui.css';
 
 import type { ServerMsg } from '../../../shared/protocol';
 import { byIndex } from '../../../shared/whiteboard';
-import { LOBBY, ROOF } from '../../../shared/rooftop';
+import { LOBBY, ROOF, SERVER_ROOM } from '../../../shared/rooftop';
 import type { Net } from '../../net';
 import { store } from '../../state';
 import { h, openModal, toast, type Modal } from '../../ui/dom';
@@ -39,7 +39,7 @@ interface OpenBoard {
 
 let open: OpenBoard | null = null;
 let scope: WhiteboardScope | null = null;
-export const hasWhiteboard = () => !!store.floor && store.floor !== LOBBY;
+export const hasWhiteboard = () => !!store.floor && store.floor !== LOBBY && store.floor !== SERVER_ROOM;
 function currentScope() {
   const board = hasWhiteboard() ? store.floor : null;
   if (scope?.board !== board) {

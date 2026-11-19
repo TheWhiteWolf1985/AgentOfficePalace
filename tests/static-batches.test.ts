@@ -69,3 +69,12 @@ test('real room assets lose static draw objects while preserving bounds, triangl
     console.log(`${name}: ${before.meshes} -> ${after.meshes} mesh objects, ${result.batches} static batches`);
   }
 });
+
+test('explicit static cabinet doors can batch while a real moving door pivot remains intact', () => {
+  const root=new THREE.Group(), geo=new THREE.BoxGeometry(1,1,1), mat=new THREE.MeshToonMaterial();
+  const fixed=[1,2].map(i=>{const n=new THREE.Mesh(geo,mat);n.name=`rack_${i}_door_frame`;root.add(n);return n;});
+  const pivot=new THREE.Group();pivot.name='access_door_pivot';const leaf=new THREE.Mesh(geo,mat);pivot.add(leaf);root.add(pivot);
+  assert.equal(batchStaticMeshes(root).meshesSaved,0);
+  assert.equal(batchStaticMeshes(root,new Set(['access_door_pivot']),{staticDoors:true}).meshesSaved,1);
+  assert.ok(fixed.every(n=>!n.parent));assert.equal(leaf.parent,pivot);pivot.rotation.y=1;assert.equal(leaf.parent,pivot);
+});

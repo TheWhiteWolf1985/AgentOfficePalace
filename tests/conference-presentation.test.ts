@@ -5,12 +5,12 @@ import { presentationHandlers, presentationHooks } from '../src/server/ws/handle
 import { presenceHandlers } from '../src/server/ws/handlers/presence.js';
 import { presentationFit } from '../src/shared/presentation-fit.js';
 import { spaceActionAvailable, spaceCapabilities, spacePanelAvailable, sameMediaSpace } from '../src/shared/space-capabilities.js';
-import { ROOF, LOBBY } from '../src/shared/rooftop.js';
+import { ROOF, LOBBY, SERVER_ROOM } from '../src/shared/rooftop.js';
 import type { Ctx } from '../src/server/office/context.js';
 import type { Client } from '../src/server/office/client.js';
 
 test('common spaces expose only usable commands and retain project controls inside an office', () => {
-  for (const floor of [null, LOBBY, ROOF]) {
+  for (const floor of [null, LOBBY, SERVER_ROOM, ROOF]) {
     const c = spaceCapabilities(floor, true);
     for (const action of ['issues', 'pulls', 'queue', 'services', 'meeting', 'decor', 'search']) assert.equal(spaceActionAvailable(action, c), false);
     for (const action of ['settings', 'elevator', 'voice', 'share', 'accounts']) assert.equal(spaceActionAvailable(action, c), true);

@@ -1,11 +1,11 @@
 import type { Floor } from '../floor.js';
 import { elevatorSpot } from '../../shared/layout.js';
-import { LOBBY, ROOF } from '../../shared/rooftop.js';
+import { LOBBY, ROOF, SERVER_ROOM } from '../../shared/rooftop.js';
 import { features } from '../ws/handlers/index.js';
 import type { Ctx, Navigation } from './context.js';
 import type { Client } from './client.js';
 import type { Spot } from './input.js';
-import { floorView, lobbyView, roofView, screensOf } from './views.js';
+import { floorView, lobbyView, roofView, serverRoomView, screensOf } from './views.js';
 
 /** Taking people between the floors, the roof and the lobby. */
 export function navigation(ctx: Ctx): Navigation {
@@ -63,5 +63,11 @@ export function navigation(ctx: Ctx): Navigation {
     for (const then of after) then();
   };
 
-  return { goToFloor, goToRoof, toLobby };
+  const goToServerRoom = (c: Client) => {
+    if (c.peer.floor === SERVER_ROOM) return;
+    const left = leave(c); c.peer.floor = SERVER_ROOM;
+    ctx.sendTo(c, { t: 'floor.enter', peers: [...ctx.clients.values()].map(o => o.peer), ...serverRoomView(ctx) });
+    arrived(c, left); ctx.floorsChanged();
+  };
+  return { goToFloor, goToRoof, toLobby, goToServerRoom };
 }

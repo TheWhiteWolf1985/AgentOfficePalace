@@ -1,0 +1,138 @@
+{
+  "asset": "sala_server",
+  "version": "v12",
+  "date": "2026-11-19",
+  "payload_file_count": 25,
+  "self_exclusions": [
+    "PACKAGE_MANIFEST.json",
+    "COPY_VERIFICATION.json"
+  ],
+  "receipt_verification": "Manifest and receipt are compared byte-for-byte separately after copying.",
+  "files": [
+    {
+      "path": "delivery/build_operations.py",
+      "bytes": 14461,
+      "sha256": "5f5b252f881f20ee3977f3e1c935b846855434dcba9c04ca298b68c00bcf2441"
+    },
+    {
+      "path": "delivery/build_partition.py",
+      "bytes": 9335,
+      "sha256": "b3a083faf95896442a711a9b2a2506da45268aa8ad3a8a636d1446d2e222ecc1"
+    },
+    {
+      "path": "delivery/build_racks.py",
+      "bytes": 12260,
+      "sha256": "fbbb97c95079027201ab2eed7417c912645ded32f5d7572af84309643665a4f5"
+    },
+    {
+      "path": "delivery/build_scene.py",
+      "bytes": 17603,
+      "sha256": "f0fbf8dad0dada0327bd9e405e089ccac5cf42fe18f9a2da63b196050b872bfe"
+    },
+    {
+      "path": "delivery/build_ventilation.py",
+      "bytes": 6482,
+      "sha256": "483172c41a43ccf0f3ad367a916058ae4c29785fde2e5f9b50baa4694957dc9c"
+    },
+    {
+      "path": "delivery/check_and_preview.py",
+      "bytes": 18418,
+      "sha256": "2993bf47088ec4bcaa78ffe06563dee0b149f3b61a71ba88d928304492791792"
+    },
+    {
+      "path": "delivery/DRAFT_CHECKS.json",
+      "bytes": 3274,
+      "sha256": "3ca1dd3b73fe519414539b319772c1582f86277bffd716b695dc04696520978f"
+    },
+    {
+      "path": "delivery/render_corner_views.py",
+      "bytes": 533,
+      "sha256": "c89bb54b5733e926ff1dbf825546cb35bdab6a0d38c2baeff3452e8010073c7f"
+    },
+    {
+      "path": "delivery/server_room.blend",
+      "bytes": 999068,
+      "sha256": "55222e005010133ebef07913f8c7127dce6ff3e0552494c77ef4c6ac107f13de"
+    },
+    {
+      "path": "delivery/server_room.glb",
+      "bytes": 3524740,
+      "sha256": "f1b2e0f3a59a79a671e18ee10c367e0efe2700916bb8ba30929c33c64446b1ea"
+    },
+    {
+      "path": "delivery/server_room.manifest.json",
+      "bytes": 150026,
+      "sha256": "65e147595f48932a29bc5385d8661613e857d10ae096e25e595364cfec6811ba"
+    },
+    {
+      "path": "delivery/VALIDATION.json",
+      "bytes": 1334,
+      "sha256": "2f72b61db51dbaa0866072734234404205530f8706905ca1e8f850095f880365"
+    },
+    {
+      "path": "delivery/views/corner_south_east.png",
+      "bytes": 1437327,
+      "sha256": "39b105e20672f61b9ea040a24ab93c8439a8cbcc73b0ff759093b44d1a2eb900"
+    },
+    {
+      "path": "delivery/views/corner_south_west.png",
+      "bytes": 1472945,
+      "sha256": "0fea3f7516c3b7cb6d40cf92fc2300843d80326353b913de658bddb10fe3d166"
+    },
+    {
+      "path": "delivery/views/junction.png",
+      "bytes": 1288347,
+      "sha256": "a15b289a0ca2e5565d8bc5ae8d8d2798f315dee2f4f2f0a64ce15904edbb33c0"
+    },
+    {
+      "path": "delivery/views/maintenance.png",
+      "bytes": 1444585,
+      "sha256": "d5289dd2788f49ba08a52d495230039632eab23e0a82a08ce0a0b2bda3ec538e"
+    },
+    {
+      "path": "delivery/views/operations.png",
+      "bytes": 1647924,
+      "sha256": "932c0de112cdfa1f0faaf712a1129d00bb9198e727c769a5f7691522fc60555c"
+    },
+    {
+      "path": "delivery/views/overview.png",
+      "bytes": 1606697,
+      "sha256": "a40b2873aeb0e11374b9a049b6bb44a18c0add9d20a92777371813a305cc076c"
+    },
+    {
+      "path": "README_CONSEGNA.md",
+      "bytes": 5340,
+      "sha256": "de090ed32d7494b6aaa218bdd1e8d5d6641b4502035c3f122a2a992f4ef46bc1"
+    },
+    {
+      "path": "verification/APPROVED_LIVE_FINGERPRINT.json",
+      "bytes": 1878385,
+      "sha256": "7e3c344978ebdb346e7de9051bb53efdae4c76034b34624640e1b3e1b92c3a4f"
+    },
+    {
+      "path": "verification/DELIVERY_FINGERPRINT.json",
+      "bytes": 1878385,
+      "sha256": "7e3c344978ebdb346e7de9051bb53efdae4c76034b34624640e1b3e1b92c3a4f"
+    },
+    {
+      "path": "verification/geometry_fingerprint.py",
+      "bytes": 4161,
+      "sha256": "39264a4bb8e3ebc72097a16fd5e4d41e0a38eb1b1e690ff0c6ae56d3f641a0c2"
+    },
+    {
+      "path": "verification/REBUILD_COMPARISON.json",
+      "bytes": 918,
+      "sha256": "3c1853848a31a715189c6d9c1a5b28d5ebf829fd4d5afdc9031c40a525ae6eee"
+    },
+    {
+      "path": "verification/REBUILD_FINGERPRINT.json",
+      "bytes": 1878385,
+      "sha256": "7e3c344978ebdb346e7de9051bb53efdae4c76034b34624640e1b3e1b92c3a4f"
+    },
+    {
+      "path": "verify_delivery.py",
+      "bytes": 3258,
+      "sha256": "6829359565beeea44778e97bc11cd4ff9ab090d772cd18eceb1eb18c9d4c63a1"
+    }
+  ]
+}

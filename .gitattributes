@@ -1,8 +1,8 @@
-# The deploy scripts run under bash, and provision.sh is piped to a Linux server: CRLF breaks both
-# (Git for Windows checks text files out with CRLF by default).
+# Shell scripts run on Debian with LF line endings.
 *.sh text eol=lf
 
 # Preserve the original Blender package and its SHA-256 manifests.
 sala_riunioni/** -text -whitespace
 sala_atrio/** -text -whitespace
 Personaggi/** -text -whitespace
+sala_server/** -text -whitespace

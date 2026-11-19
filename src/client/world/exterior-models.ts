@@ -1,12 +1,14 @@
 import * as THREE from 'three';
+import { prepareServerRoom } from './server-room-materials';
 import { prepareAtrium } from './atrium-materials';
 import { applyConferenceGlazing } from './conference-glazing';
 import { model } from './models';
 import { batchStaticMeshes } from './static-batches';
 import { batchExteriorGlazing } from './exterior-glazing';
 
-type ExteriorName = 'atrium' | 'conference_room';
+type ExteriorName = 'atrium' | 'conference_room' | 'server_room';
 const envelope = {
+  server_room: /^server_v12_(wall_|window_|floor_support_|ceiling_)/,
   atrium: /^atrio_(wall_|window_|entrance_post_|floor_|ceiling_slab_|company_logo_surface$|logo_backing$)/,
   conference_room: /^(wall_|window_|floor_|ceiling_)/,
 };
@@ -55,7 +57,8 @@ export function createExteriorCache(
   };
 }
 
-export const exteriorModel = createExteriorCache(name => model(name)?.scene ?? null, (name, root) => {
+export const exteriorModel = createExteriorCache(name => model(name === 'server_room' ? 'server_room_exterior' : name)?.scene ?? null, (name, root) => {
   if (name === 'atrium') prepareAtrium(root);
+  else if (name === 'server_room') prepareServerRoom(root);
   else applyConferenceGlazing(root);
 });

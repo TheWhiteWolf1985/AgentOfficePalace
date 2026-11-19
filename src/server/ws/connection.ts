@@ -5,11 +5,11 @@ import type { ClientMsg } from '../../shared/protocol.js';
 import { elevatorSpot } from '../../shared/layout.js';
 import { lookFromSeed, sanitizeLook } from '../../shared/avatar.js';
 import { avatarColorsFromQuery } from '../../shared/avatar-colors.js';
-import { LOBBY, ROOF } from '../../shared/rooftop.js';
+import { LOBBY, ROOF, SERVER_ROOM, isFixedFloor } from '../../shared/rooftop.js';
 import type { Ctx } from '../office/context.js';
 import { newClient } from '../office/client.js';
 import { COLOR_RE, spotFrom, str } from '../office/input.js';
-import { floorView, lobbyView, roofView, screensOf } from '../office/views.js';
+import { floorView, lobbyView, roofView, serverRoomView, screensOf } from '../office/views.js';
 import { dispatch } from './dispatch.js';
 import { features } from './handlers/index.js';
 
@@ -24,13 +24,14 @@ export function onConnection(ctx: Ctx, ws: WebSocket, url: URL, session: Session
   // Back on the floor they were on before a reload, a restart or closing the tab, else the first floor.
   const wanted = url.searchParams.get('floor');
   // Their floor's gone since (taken off the building, or its checkout deleted): up to the roof instead.
-  const gone = !!wanted && wanted !== ROOF && wanted !== LOBBY && !floors.has(wanted);
+  const gone = !!wanted && !isFixedFloor(wanted) && !floors.has(wanted);
   // Up on the roof, as long as there's a building under it.
   const onRoof = wanted === ROOF || gone;
-  const floor = onRoof || wanted === LOBBY ? undefined : arrivalFloor(wanted);
-  const inLobby = !onRoof && !floor;
+  const onServer = wanted === SERVER_ROOM;
+  const floor = onRoof || onServer || wanted === LOBBY ? undefined : arrivalFloor(wanted);
+  const inLobby = !onRoof && !onServer && !floor;
   // Back where they were standing on it too; anywhere else, they arrive by elevator.
-  const back = !gone && wanted !== null && (onRoof || (inLobby && wanted === LOBBY) || floor?.id === wanted);
+  const back = !gone && wanted !== null && (onRoof || onServer || (inLobby && wanted === LOBBY) || floor?.id === wanted);
   const spot = (back && spotFrom(url.searchParams)) || { ...elevatorSpot(), y: 0, rotY: 0 };
   const account = session.account;
   // An account's name is its own; on the shared password people pick one.
@@ -54,7 +55,7 @@ export function onConnection(ctx: Ctx, ws: WebSocket, url: URL, session: Session
     sharing: false,
     ...(account ? { account: true } : {}),
     ...(url.searchParams.get('lite') === '1' ? { lite: true } : {}),
-    floor: onRoof ? ROOF : floor?.id ?? LOBBY,
+    floor: onServer ? SERVER_ROOM : onRoof ? ROOF : floor?.id ?? LOBBY,
   });
   clients.set(id, client);
   if (account) accounts.seen(account.id);
@@ -77,7 +78,7 @@ export function onConnection(ctx: Ctx, ws: WebSocket, url: URL, session: Session
     sky: sky.state,
     prompts: prompts.state(),
     leaveOnMerge: leaveOnMerge.state(),
-    ...(onRoof ? roofView(ctx) : inLobby ? lobbyView(ctx) : floorView(ctx, floor)),
+    ...(onServer ? serverRoomView(ctx) : onRoof ? roofView(ctx) : inLobby ? lobbyView(ctx) : floorView(ctx, floor)),
   });
   screensOf(ctx, client, floor);
   broadcast({ t: 'peer.join', peer: client.peer }, id);

@@ -1,5 +1,5 @@
 import { spaceCapabilities } from '../../../shared/space-capabilities';
-import { LOBBY, ROOF } from '../../../shared/rooftop';
+import { LOBBY, ROOF, SERVER_ROOM } from '../../../shared/rooftop';
 import { t as uiText } from '../../../shared/i18n';
 /**
  * The command palette (Ctrl+K, ⌘K on a Mac): the workers, the office's actions, its boards, the pull
@@ -24,7 +24,7 @@ import { IS_MAC } from '../../ui/termkeys';
 import { hasWhiteboard, openWhiteboard } from '../whiteboard/ui';
 import type { InteractKind, Interactable } from '../../world/types';
 
-export type PaletteParts = Pick<Parts, 'walking' | 'waiting' | 'actions' | 'hud' | 'hanging' | 'meeting' | 'rooftop' | 'travel' | 'presentation'>;
+export type PaletteParts = Pick<Parts, 'walking' | 'waiting' | 'actions' | 'hud' | 'hanging' | 'meeting' | 'rooftop' | 'serverRoom' | 'atrium' | 'travel' | 'presentation'>;
 
 /** Listens for Ctrl+K (⌘K) on the window. */
 export function installPalette(ctx: Ctx, parts: PaletteParts) {
@@ -35,6 +35,8 @@ export function installPalette(ctx: Ctx, parts: PaletteParts) {
 
   /** Where you stand to use something of this kind on this floor, like the Issues board. */
   function spotOf(kind: InteractKind): Interactable | undefined {
+    if (store.floor === SERVER_ROOM) return parts.serverRoom.serverRoom()?.interactables.find(it => it.kind === kind && !it.off);
+    if (store.floor === LOBBY) return parts.atrium.atrium()?.interactables.find(it => it.kind === kind && !it.off);
     if (ctx.upTop()) return parts.rooftop.roof()?.interactables.find((it) => it.kind === kind && !it.off);
     return office.interactables.find((it) => it.kind === kind && !it.off);
   }
@@ -152,6 +154,7 @@ export function installPalette(ctx: Ctx, parts: PaletteParts) {
       // As clicking them under "In the office" does: over to them, by elevator if need be.
       out.push({ icon: '🙂', kind: uiText('Teammate'), title: p.name, detail: floor, open: () => parts.walking.walkTo(p.id) });
     }
+    if (store.floor !== SERVER_ROOM) out.push({ icon: '🗄️', kind: uiText('Action'), title: uiText('Go to the server room'), open: () => parts.travel.ride(SERVER_ROOM) });
     if (store.floor !== LOBBY) out.push({ icon: '🏢', kind: uiText('Action'), title: uiText('Go to the atrium'), open: () => parts.travel.ride(LOBBY) });
     if (store.floor !== ROOF) out.push({ icon: '🤝', kind: uiText('Action'), title: uiText('Go to the shared meeting room'), open: () => parts.travel.ride(ROOF) });
     if (store.floor === ROOF) out.push({ icon: '📽️', kind: uiText('Action'), title: store.presentation.mode === 'presentation' ? uiText('Show whiteboard') : uiText('Present my screen'), open: () => void parts.presentation.toggle() });

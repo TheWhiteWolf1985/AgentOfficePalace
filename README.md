@@ -1,6 +1,6 @@
 # Agent Office Palace
 
-Applicazione collaborativa con frontend TypeScript/Three.js e backend Node.js. Comprende Atrio al piano terra, uffici per progetto e Sala riunioni all'ultimo piano, accessibili anche senza uffici configurati.
+Applicazione collaborativa con frontend TypeScript/Three.js e backend Node.js. Comprende Atrio al piano terra, uffici per progetto, Sala server al penultimo piano e Sala riunioni all'ultimo piano, accessibili anche senza uffici configurati.
 
 ## Funzioni applicative
 
@@ -39,7 +39,7 @@ Gli aggiornamenti sono gestiti dal deployment: pubblicazione del commit verifica
 - Forgejo: `ssh://git@192.168.1.8/Juri/AgentOfficePalace.git`.
 - GitHub: `git@github.com:TheWhiteWolf1985/AgentOfficePalace.git`.
 - [Struttura del codice](docs/code-layout.md), [funzionamento](docs/how-it-works.md), [funzioni](docs/features.md) e [comandi](docs/controls.md).
-- [Atrio](docs/atrium.md), [Sala riunioni](docs/conference-room.md), [avatar](docs/user-character.md), [prestazioni](docs/performance.md) e [connessioni](docs/connections.md).
+- [Atrio](docs/atrium.md), [Sala server](docs/server-room.md), [Sala riunioni](docs/conference-room.md), [avatar](docs/user-character.md), [prestazioni](docs/performance.md) e [connessioni](docs/connections.md).
 - `Personaggi/`, `sala_atrio/` e `sala_riunioni/` conservano le consegne Blender versionate. I modelli utilizzati dal browser sono in `src/client/models/`.
 
 Licenza [MIT](LICENSE). Provenienza e attribuzioni in [docs/UPSTREAM.md](docs/UPSTREAM.md).

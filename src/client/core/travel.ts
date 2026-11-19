@@ -5,9 +5,10 @@ import { t as uiText } from '../../shared/i18n';
  * down to the garage), straight to another floor from the floor list, through the ceiling up the
  * ladder or down a pole; and arriving, up on the roof or on a floor, with the doors opening onto it.
  */
-import { FLOOR, WALL_T, inElevator, roofDrop, streetBelow } from '../../shared/layout';
-import { LOBBY, ROOF } from '../../shared/rooftop';
+import { FLOOR, WALL_T, inElevator, roofDrop, serverDrop, streetBelow } from '../../shared/layout';
+import { LOBBY, ROOF, SERVER_ROOM, isFixedFloor } from '../../shared/rooftop';
 import type { Arrival, Grip } from '../features/climbing/controller';
+import { preloadModels } from '../world/models';
 import { lastSpot, store } from '../state';
 import { $, clip, closeAllModals, modalOpen, toast } from '../ui/dom';
 import { GARAGE, openElevator } from '../ui/elevator';
@@ -25,7 +26,7 @@ declare module '../world/types' {
   }
 }
 
-export type TravelParts = Pick<Parts, 'stage' | 'worlds' | 'place' | 'walking' | 'seating' | 'climbing' | 'rooftop' | 'atrium' | 'hanging' | 'floorStatus' | 'arrival'>;
+export type TravelParts = Pick<Parts, 'stage' | 'worlds' | 'place' | 'walking' | 'seating' | 'climbing' | 'rooftop' | 'atrium' | 'serverRoom' | 'hanging' | 'floorStatus' | 'arrival'>;
 
 /** Registers what follows the building's floors (store 'floors'). */
 export function installTravel(ctx: Ctx, core: CoreState, parts: TravelParts) {
@@ -40,8 +41,8 @@ export function installTravel(ctx: Ctx, core: CoreState, parts: TravelParts) {
    */
   function syncStack() {
     const floors = builtFloors();
-    if (core.upTop || core.atLobby) {
-      player.street = core.atLobby ? 0 : -roofDrop(floors.length);
+    if (core.upTop || core.atLobby || core.atServer) {
+      player.street = core.atLobby ? 0 : core.atServer ? -serverDrop(floors.length) : -roofDrop(floors.length);
       return;
     }
     if (!officeLoaded(office)) return;
@@ -97,6 +98,7 @@ export function installTravel(ctx: Ctx, core: CoreState, parts: TravelParts) {
 
   /** The elevator where you are: the office's, its stop down in the garage, or the one up on the roof. */
   function lift() {
+    if (core.atServer) return parts.serverRoom.serverRoom()?.elevator;
     if (core.atLobby) return parts.atrium.atrium()?.elevator;
     const roof = parts.rooftop.roof();
     return core.upTop && roof ? roof.elevator : downstairs() ? office.garageLift : office.elevator;
@@ -118,13 +120,15 @@ export function installTravel(ctx: Ctx, core: CoreState, parts: TravelParts) {
     stopForTrip();
     const inside = inElevator(player.pos.x, player.pos.z);
     const within = floorId === store.floor;
-    core.trip = { floor: floorId, how: 'elevator', garage, timer: window.setTimeout(tripFailed, 10_000) };
+    core.trip = { floor: floorId, how: 'elevator', garage, timer: window.setTimeout(tripFailed, floorId === SERVER_ROOM ? 60_000 : 10_000) };
     player.enabled = false;
     player.clearKeys();
     lift()?.setOpen(false);
     // Prepare only a destination the user has requested, while doors/fade cover it.
     const destination = floorId === ROOF ? parts.rooftop.theRoof().group : floorId === LOBBY ? parts.atrium.theAtrium().group : undefined;
-    const prepared = destination ? parts.stage.graphics.warmup.prepare(destination) : Promise.resolve();
+    const prepared = floorId === SERVER_ROOM
+      ? preloadModels(['server_room']).then(() => parts.stage.graphics.warmup.prepare(parts.serverRoom.theServerRoom().group))
+      : destination ? parts.stage.graphics.warmup.prepare(destination) : Promise.resolve();
     // Wait for the doors to shut on you, then dim the lights and go.
     setTimeout(
       () => {
@@ -167,7 +171,7 @@ export function installTravel(ctx: Ctx, core: CoreState, parts: TravelParts) {
 
   /** Straight to another floor from the floor list: a blink, and you're standing in the same spot there. */
   function switchFloor(floorId: string, keepWalking = false): void {
-    if (core.upTop || core.atLobby || floorId === ROOF || floorId === LOBBY) return ride(floorId);
+    if (core.upTop || core.atLobby || core.atServer || isFixedFloor(floorId)) return ride(floorId);
     if (core.trip || floorId === store.floor) return;
     // Outside, the same spot on another floor looks just like this one: the elevator brings you in
     // to that floor instead, into its car.
@@ -213,24 +217,28 @@ export function installTravel(ctx: Ctx, core: CoreState, parts: TravelParts) {
   function setPlace() {
     const up = store.floor === ROOF;
     const lobby = store.floor === LOBBY;
-    if (up === core.upTop && lobby === core.atLobby) return;
+    const server = store.floor === SERVER_ROOM;
+    if (up === core.upTop && lobby === core.atLobby && server === core.atServer) return;
     core.upTop = up;
     core.atLobby = lobby;
+    core.atServer = server;
     const { rooftop } = parts;
     const r = up ? rooftop.theRoof() : rooftop.roof();
     const world = ctx.world();
     const atrium = lobby ? parts.atrium.theAtrium() : parts.atrium.atrium();
-    world.group.visible = !up && !lobby;
+    const serverRoom = server ? parts.serverRoom.theServerRoom() : parts.serverRoom.serverRoom();
+    world.group.visible = !up && !lobby && !server;
+    if (serverRoom) serverRoom.group.visible = server;
     if (r) r.group.visible = up;
     if (atrium) atrium.group.visible = lobby;
-    player.colliders = up ? r!.colliders : lobby ? atrium!.colliders : world.colliders;
-    sky.setRoof(up || lobby, lobby ? 0 : roofDrop(rooftop.roofFloors()));
+    player.colliders = server ? serverRoom!.colliders : up ? r!.colliders : lobby ? atrium!.colliders : world.colliders;
+    sky.setRoof(up || lobby || server, lobby ? 0 : server ? serverDrop(rooftop.roofFloors()) : roofDrop(rooftop.roofFloors()));
     sound.setOutdoors(false);
-    player.room = { ...FLOOR, wall: WALL_T, enclosed: up || lobby };
+    player.room = { ...FLOOR, wall: WALL_T, enclosed: up || lobby || server };
     // Keep the company's own tower visible above/below the common rooms, including many offices.
-    camera.far = up || lobby ? 700 : FAR;
+    camera.far = up || lobby || server ? 700 : FAR;
     camera.updateProjectionMatrix();
-    void parts.stage.graphics.reveal(up ? r!.group : lobby ? atrium!.group : world.group);
+    void parts.stage.graphics.reveal(server ? serverRoom!.group : up ? r!.group : lobby ? atrium!.group : world.group);
     const { hanger } = parts.hanging;
     if (hanger.active) hanger.cancel();
     ctx.hint.invalidate();
@@ -265,7 +273,7 @@ export function installTravel(ctx: Ctx, core: CoreState, parts: TravelParts) {
       // The doors stand open, the way the last one out left them.
       lift()?.setOpen(true);
       player.enabled = !modalOpen();
-      if (!core.upTop && !core.atLobby) unstick();
+      if (!core.upTop && !core.atLobby && !core.atServer) unstick();
       return;
     }
     if (how !== 'elevator') {

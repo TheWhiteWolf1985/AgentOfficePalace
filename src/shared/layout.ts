@@ -1,5 +1,6 @@
+import { SERVER_ROOM_SEATING, SERVER_ROOM_DATA } from './server-room.js';
 import { ATRIUM_SEATING } from './atrium.js';
-import { LOBBY, ROOF } from './rooftop.js';
+import { LOBBY, ROOF, SERVER_ROOM } from './rooftop.js';
 import { CONFERENCE_SEATING } from './conference-room.js';
 import { t as uiText } from './i18n.js';
 // Static office layout shared by the server (validation) and client (rendering).
@@ -319,6 +320,8 @@ export const ROAD = { minZ: 23, maxZ: 31 } as const;
 export const SLAB = 0.3;
 /** From one floor of the building up to the next: the office's ceiling, and the slab over it. */
 export const STOREY = WALL_HEIGHT + SLAB;
+/** The delivered server room has a lower ceiling than a procedural office. */
+export const SERVER_ROOM_STOREY = SERVER_ROOM_DATA.height + SLAB;
 /** How thick the outside walls are. They stand just outside FLOOR. */
 export const WALL_T = 0.3;
 
@@ -386,8 +389,11 @@ export const PARACHUTE = { jump: { x: BALCONY_DOOR.u, z: BALCONY.maxZ - 0.45 }, 
  * How far below the roof the street is, with `floors` project offices and the permanent atrium under it.
  * The roof stands a STOREY over the top floor, where a floor above it would be.
  */
-export function roofDrop(floors: number): number {
+export function serverDrop(floors: number): number {
   return -streetBelow(Math.max(0, floors));
+}
+export function roofDrop(floors: number): number {
+  return serverDrop(floors) + SERVER_ROOM_STOREY;
 }
 /**
  * Something to sit on, standing at x, z on the floor at `y` (the loft's, for what's up there). You
@@ -415,6 +421,8 @@ export interface SeatDef {
   roof?: boolean;
   /** In the permanent ground-floor atrium. */
   lobby?: boolean;
+  /** In the permanent server room. */
+  server?: boolean;
   /** Explicit free standing anchor, supplied by a modeled room. */
   stand?: { x: number; y: number; z: number };
 }
@@ -438,6 +446,7 @@ export const SEATING: SeatDef[] = [
   { id: 'stool-2', label: uiText('🪑 Stool'), x: 1, y: 0, z: (BALCONY.minZ + BALCONY.maxZ) / 2 + 0.2, rotY: -Math.PI / 2, places: [0], hips: 0.5, depth: 0, out: -0.7 },
   ...CONFERENCE_SEATING,
   ...ATRIUM_SEATING,
+  ...SERVER_ROOM_SEATING,
 ];
 export const SEATING_BY_ID = new Map(SEATING.map((s) => [s.id, s]));
 
@@ -485,7 +494,7 @@ export function seatHere(key: string, space: boolean | string): SeatPlace | unde
   const place = seatAt(key);
   if (!place) return;
   const seat = SEATING_BY_ID.get(place.seatId)!;
-  const here = seat.lobby ? space === LOBBY : seat.roof ? (space === true || space === ROOF) : (space !== true && space !== ROOF && space !== LOBBY);
+  const here = seat.server ? space === SERVER_ROOM : seat.lobby ? space === LOBBY : seat.roof ? (space === true || space === ROOF) : (space !== true && space !== ROOF && space !== LOBBY && space !== SERVER_ROOM);
   return here ? place : undefined;
 }
 

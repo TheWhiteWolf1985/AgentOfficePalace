@@ -5,7 +5,7 @@ import { t as uiText } from '../../../shared/i18n';
  * and F to hang a picture; the project in the corner (click it for the floors); Settings, and your
  * character.
  */
-import { ROOF } from '../../../shared/rooftop';
+import { ROOF, SERVER_ROOM, SERVER_ROOM_NAME } from '../../../shared/rooftop';
 import type { Ctx } from '../../core/context';
 import type { CoreState } from '../../core/ctx';
 import { builtFloors } from '../../core/floors';
@@ -41,7 +41,7 @@ export function installHud(ctx: Ctx, core: CoreState, parts: HudParts) {
   // The project in the corner is the floor you're on; click it for the list of floors to go to.
   $('project').addEventListener('click', () => {
     if (!store.floor) return travel.showElevator();
-    toggleFloorMenu($('project'), { go: travel.switchFloor, indoors: () => (!inOffice() && !core.upTop) || parts.place.indoors(), elevator: travel.showElevator, roof: inOffice() ? () => travel.ride(ROOF) : null });
+    toggleFloorMenu($('project'), { go: travel.switchFloor, indoors: () => (!inOffice() && !core.upTop) || parts.place.indoors(), elevator: travel.showElevator, roof: () => travel.ride(ROOF) });
   });
 
   // ---- The HUD: a few buttons on the top bar, everything else in the ☰ menu ----------------------------
@@ -68,6 +68,7 @@ export function installHud(ctx: Ctx, core: CoreState, parts: HudParts) {
       { id: 'search', icon: '🔎', label: uiText('Search'), section: 'Open', key: '/', title: () => uiText('Search the chat and every terminal'), run: waiting.showSearch },
       { id: 'docs', icon: '📚', label: uiText('Docs'), section: 'Open', shown: () => spaceCapabilities(store.floor, !!store.project).project, title: () => uiText('Read the project’s docs'), run: parts.bookshelf.showBookshelf },
       { id: 'elevator', icon: '🛗', label: () => (inOffice() ? uiText('Elevator') : uiText('Floors')), section: 'Open', count: () => store.floors.reduce((n, f) => n + (f.id === store.floor ? 0 : f.waiting), 0), title: () => (inOffice() ? uiText('Ride to another project') : uiText('Go to another project, or add one')), run: travel.showElevator },
+      { id: 'server-room', icon: '🗄️', label: SERVER_ROOM_NAME, section: 'Open', shown: () => !core.atServer, run: () => travel.ride(SERVER_ROOM) },
       { id: 'roof', icon: '🤝', label: uiText('Meeting room'), section: 'Open', shown: () => !core.upTop, title: () => uiText('Visit the shared meeting room'), run: () => travel.ride(ROOF) },
       // In voice, V is push to talk, so leaving is only from here.
       { id: 'voice', icon: '🎙️', label: () => (voice.inVoice ? uiText('Leave voice') : uiText('Join voice')), section: 'Together', key: () => (voice.inVoice ? undefined : 'V'), on: () => voice.inVoice, blocked: noMedia, run: () => void talk.toggleVoice() },

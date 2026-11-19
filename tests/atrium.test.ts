@@ -5,7 +5,7 @@ import { readFileSync } from 'node:fs';
 import { Vector3 } from 'three';
 import { ATRIUM_DATA, ATRIUM_SEATING, ATRIUM_COLLIDERS } from '../src/shared/atrium.js';
 import { LOBBY, ROOF } from '../src/shared/rooftop.js';
-import { roofDrop, seatHere, STOREY, streetBelow } from '../src/shared/layout.js';
+import { roofDrop, serverDrop, seatHere, STOREY, SERVER_ROOM_STOREY, streetBelow } from '../src/shared/layout.js';
 import { atriumRoute } from '../src/shared/atrium-nav.js';
 import { blockerAt, groundAt } from '../src/client/player/collide.js';
 import { openModel } from './glb.js';
@@ -31,7 +31,7 @@ test('the atrium imports the original GLB and all ten lounge anchors without ano
 test('the ground floor is fixed below offices and the meeting room stays above them, including zero offices', () => {
   assert.equal(streetBelow(-1), 0);
   assert.equal(streetBelow(0), -STOREY);
-  for (const offices of [0, 1, 2, 5]) assert.ok(Math.abs(roofDrop(offices) - (offices + 1) * STOREY) < 1e-9);
+  for (const offices of [0, 1, 2, 5]) assert.ok(Math.abs(roofDrop(offices) - ((offices + 1) * STOREY + SERVER_ROOM_STOREY)) < 1e-9);
 });
 
 test('all lounge stand points are clear and reachable from the elevator using atrium furniture', () => {

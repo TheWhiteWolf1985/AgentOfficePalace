@@ -1,0 +1,14 @@
+{
+  "live_delivery_match": true,
+  "independent_rebuild_match": true,
+  "live_sha256": "1acb238cea1f9e1718f9a87985338e1545e125c8862044fe1ef5ddb3bfe92e34",
+  "delivery_sha256": "1acb238cea1f9e1718f9a87985338e1545e125c8862044fe1ef5ddb3bfe92e34",
+  "rebuild_sha256": "1acb238cea1f9e1718f9a87985338e1545e125c8862044fe1ef5ddb3bfe92e34",
+  "delivery_glb_sha256": "f1b2e0f3a59a79a671e18ee10c367e0efe2700916bb8ba30929c33c64446b1ea",
+  "rebuilt_glb_sha256": "be30d0d31f751208a51968349ccf3034d5b041b5f05fba9ef157209cafd82a8d",
+  "glb_byte_identical": false,
+  "node_count": 1822,
+  "mesh_count": 1710,
+  "scope": "geometry, normals, UV coordinates and layer names, materials/shaders, hierarchy, transforms and custom properties; 1e-6 numeric rounding",
+  "portability_fix": "Explicitly preserve approved text UV layer name Mappa UV across Blender interface languages. No vertex, UV-coordinate or visual change."
+}

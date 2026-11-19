@@ -25,6 +25,7 @@ export interface CoreState {
   /** Where you are now: up on the roof (true), or on a floor of the office. */
   upTop: boolean;
   atLobby: boolean;
+  atServer: boolean;
   /** A trip to another floor under way (see Trip, and core/travel.ts). */
   trip: Trip | null;
 }
@@ -34,7 +35,7 @@ export interface CoreState {
  * in `parts` by the time anything asks for them (see main.ts).
  */
 export function createCtx(parts: Parts): { ctx: Ctx; core: CoreState } {
-  const core: CoreState = { hintKey: '', thud: 0, carrying: null, upTop: false, atLobby: false, trip: null };
+  const core: CoreState = { hintKey: '', thud: 0, carrying: null, upTop: false, atLobby: false, atServer: false, trip: null };
   const ctx: Ctx = {
     get scene() {
       return parts.stage.scene;

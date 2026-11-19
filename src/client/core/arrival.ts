@@ -7,7 +7,7 @@ import { t as uiText } from '../../shared/i18n';
  * sign-ins a newcomer is greeted with.
  */
 import { SLAB, inElevator } from '../../shared/layout';
-import { LOBBY, LOBBY_NAME, ROOF, ROOF_NAME } from '../../shared/rooftop';
+import { LOBBY, LOBBY_NAME, ROOF, ROOF_NAME, SERVER_ROOM, SERVER_ROOM_NAME, isFixedFloor } from '../../shared/rooftop';
 import { renderTitle } from '../shared/title';
 import { lastFloor, lastSpot, store, type Spot } from '../state';
 import { routeAccountsMessage } from '../ui/accounts';
@@ -135,7 +135,13 @@ export function installArrival(ctx: Ctx, core: CoreState, parts: ArrivalParts) {
   function renderProject() {
     const p = store.project;
     renderTitle();
-    if (store.floor === ROOF) {
+    if (store.floor === SERVER_ROOM) {
+      $('project').classList.remove('hidden');
+      $('project-name').textContent = `🗄️ ${SERVER_ROOM_NAME}`;
+      $('project-meta').textContent = uiText('Server room · technical floor');
+      $('project-meta').classList.remove('lobby');
+      return;
+    } else if (store.floor === ROOF) {
       $('project-meta').classList.remove('lobby');
       $('project-name').textContent = `🤝 ${ROOF_NAME}`;
       $('project-meta').textContent = uiText('Shared meeting room · 19 seats');
@@ -163,7 +169,7 @@ export function installArrival(ctx: Ctx, core: CoreState, parts: ArrivalParts) {
 
   /** You asked to come back to floor `was`, and it's gone (taken off the building, or its checkout deleted): the office sent you up to the roof. */
   function floorWentWhileAway(was: string | null) {
-    if (!was || was === LOBBY || was === ROOF || store.floor !== ROOF || store.floors.some((f) => f.id === was)) return;
+    if (!was || isFixedFloor(was) || store.floor !== ROOF || store.floors.some((f) => f.id === was)) return;
     const saved = lastSpot();
     const name = saved?.floor === was && saved.name ? saved.name : uiText('Your floor');
     toast(uiText`🛗 ${name} isn't in the building any more, so the elevator brought you up to the roof`, 'warn');

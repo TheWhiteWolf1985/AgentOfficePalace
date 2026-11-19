@@ -17,7 +17,7 @@ import { modalOpen, toast } from '../ui/dom';
 import type { Interactable } from '../world/types';
 import { SceneRaycast } from './scene-raycast';
 
-export type PointerParts = Pick<Parts, 'worlds' | 'rooftop' | 'atrium' | 'place' | 'you' | 'boards' | 'cards' | 'seating' | 'hanging' | 'hintbar'>;
+export type PointerParts = Pick<Parts, 'worlds' | 'rooftop' | 'atrium' | 'serverRoom' | 'place' | 'you' | 'boards' | 'cards' | 'seating' | 'hanging' | 'hintbar'>;
 
 /** Listens for the mouse over the canvas, registers the aim tick ('aim'), and takes the player's clicks. */
 export function installPointer(ctx: Ctx, core: CoreState, parts: PointerParts) {
@@ -56,6 +56,7 @@ export function installPointer(ctx: Ctx, core: CoreState, parts: PointerParts) {
   /** What you can use where you are, and what's in the way of looking at it. */
   function usable(): (readonly Interactable[])[] {
     const roof = parts.rooftop.roof();
+    if (core.atServer) return [parts.serverRoom.serverRoom()?.interactables ?? []];
     if (core.atLobby) return [parts.atrium.atrium()?.interactables ?? []];
     if (core.upTop && roof) return [roof.interactables];
     return [office.interactables, ...ctx.usables.lists()];
@@ -94,7 +95,7 @@ export function installPointer(ctx: Ctx, core: CoreState, parts: PointerParts) {
     // Any point within reach of the eyes lies within this distance along the camera ray.
     const far = distant ? Infinity : camera.getWorldPosition(cameraAt).distanceTo(eye) + ctx.interactions.maxReach + slack;
     const roof = parts.rooftop.roof();
-    const pickables = core.atLobby ? (parts.atrium.atrium()?.pickables ?? []) : core.upTop && roof ? roof.pickables : [office.group, ...ctx.usables.pickables()];
+    const pickables = core.atServer ? (parts.serverRoom.serverRoom()?.pickables ?? []) : core.atLobby ? (parts.atrium.atrium()?.pickables ?? []) : core.upTop && roof ? roof.pickables : [office.group, ...ctx.usables.pickables()];
     for (const hit of raycast.intersect(camera, ndc, pickables, far)) {
       let it: Interactable | undefined;
       let shown = true;

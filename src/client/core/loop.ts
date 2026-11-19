@@ -147,7 +147,7 @@ export function installLoop(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'stage
     const { player, office, camera } = ctx;
     const { remotes } = parts.peers;
     const { departures, arrivals } = parts.views;
-    if (!core.upTop && !core.atLobby) {
+    if (!core.upTop && !core.atLobby && !core.atServer) {
       ctx.world().update(t, dt, [player.pos, ...[...remotes.values()].map((r) => r.person.root.position), ...departures.positions(), ...arrivals.positions()]);
       if (ctx.inOffice()) {
         office.stack.update(dt, [{ x: player.pos.x, y: player.pos.y, z: player.pos.z, grip: ctx.view.grip() }, ...[...remotes.values()].map((r) => ({ x: r.person.root.position.x, y: r.person.root.position.y, z: r.person.root.position.z, grip: r.grip }))], camera.position);

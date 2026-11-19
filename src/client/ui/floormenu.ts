@@ -1,7 +1,7 @@
 import { t as uiText } from '../../shared/i18n';
 import './floormenu.css';
 import { cloneLabel, floorPalette } from '../../shared/floors';
-import { LOBBY, LOBBY_NAME, ROOF, ROOF_NAME } from '../../shared/rooftop';
+import { LOBBY, LOBBY_NAME, ROOF, ROOF_NAME, SERVER_ROOM, SERVER_ROOM_NAME } from '../../shared/rooftop';
 import type { FloorInfo } from '../../shared/protocol';
 import { store } from '../state';
 import { h } from './dom';
@@ -93,8 +93,13 @@ export function toggleFloorMenu(anchor: HTMLElement, opts: FloorMenuOptions): vo
       h('span.floor-no', { style: 'background:#2b2d42' }, '0'),
       h('span.floor-text', {}, h('span.floor-name', {}, LOBBY_NAME), h('span.floor-sub', {}, inLobby ? uiText('you are here') : uiText('Ground floor · reception and lounge'))));
     lobby.addEventListener('click', () => { if (!inLobby) { close(); opts.go(LOBBY); } });
-    const count = floors.length + 2;
-    el.replaceChildren(h('div.floor-menu-head', {}, uiText`🏢 ${count} floor${count === 1 ? '' : 's'}`), ...(opts.roof ? [roof] : []), ...items, lobby, add);
+    const inServer = store.floor === SERVER_ROOM;
+    const server = h('button.floor-item', { type: 'button', role: 'menuitem', 'data-floor': SERVER_ROOM, class: inServer ? 'here' : '', disabled: inServer },
+      h('span.floor-no', { style: 'background:#2b2d42' }, '🗄️'),
+      h('span.floor-text', {}, h('span.floor-name', {}, SERVER_ROOM_NAME), h('span.floor-sub', {}, inServer ? uiText('you are here') : uiText('Server room · technical floor'))));
+    server.addEventListener('click', () => { if (!inServer) { close(); opts.go(SERVER_ROOM); } });
+    const count = floors.length + 3;
+    el.replaceChildren(h('div.floor-menu-head', {}, uiText`🏢 ${count} floor${count === 1 ? '' : 's'}`), ...(opts.roof ? [roof] : []), server, ...items, lobby, add);
   };
 
   const place = () => {

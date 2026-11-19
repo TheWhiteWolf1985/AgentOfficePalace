@@ -1,6 +1,6 @@
 /** Where you arrive and where you stand, to restore your place on a later visit. */
 import { ELEVATOR, ELEVATOR_CAR, FLOOR, POLE, SLAB, STOREY, WALL_HEIGHT, inElevator, inWing } from '../../shared/layout';
-import { LOBBY, LOBBY_NAME, ROOF, ROOF_NAME } from '../../shared/rooftop';
+import { LOBBY, LOBBY_NAME, ROOF, ROOF_NAME, SERVER_ROOM, SERVER_ROOM_NAME } from '../../shared/rooftop';
 import type { Arrival } from '../features/climbing/controller';
 import { rememberSpot, store, type Spot } from '../state';
 import type { Ctx } from './context';
@@ -19,7 +19,7 @@ export function installPlace(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'worl
 
   /** Down in the garage (or out on the street) under the floor you're on. */
   function downstairs(): boolean {
-    return !core.upTop && !core.atLobby && player.pos.y < -SLAB - 1;
+    return !core.upTop && !core.atLobby && !core.atServer && player.pos.y < -SLAB - 1;
   }
 
   /**
@@ -28,7 +28,7 @@ export function installPlace(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'worl
    */
   function indoors(): boolean {
     const p = player.pos;
-    if (core.upTop || core.atLobby || p.y < -1 || p.y > WALL_HEIGHT) return false;
+    if (core.upTop || core.atLobby || core.atServer || p.y < -1 || p.y > WALL_HEIGHT) return false;
     return (p.x > FLOOR.minX && p.x < FLOOR.maxX && p.z > FLOOR.minZ && p.z < FLOOR.maxZ) || inWing(p.x, p.z, parts.worlds.officeWing());
   }
 
@@ -48,7 +48,7 @@ export function installPlace(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'worl
     if (!store.floor || core.trip || parts.climbing.climber.active) return null;
     // Sitting, it's where you'd get up to; in a car, where you'd get out.
     const at = player.standingSpot() ?? player.pos;
-    const name = store.floor === LOBBY ? LOBBY_NAME : store.floor === ROOF ? ROOF_NAME : (store.currentFloor()?.name ?? '');
+    const name = store.floor === SERVER_ROOM ? SERVER_ROOM_NAME : store.floor === LOBBY ? LOBBY_NAME : store.floor === ROOF ? ROOF_NAME : (store.currentFloor()?.name ?? '');
     return { floor: store.floor, name, x: at.x, y: at.y, z: at.z, facing: player.facing };
   }
 

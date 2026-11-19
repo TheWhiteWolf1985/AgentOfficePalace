@@ -24,6 +24,7 @@ import type { installHud } from '../features/hud';
 import type { installMeeting } from '../features/meeting';
 import type { installNeedsYou } from '../features/needsyou';
 import type { installPeers } from '../features/peers';
+import type { installServerRoom } from '../features/server-room';
 import type { installAtrium } from '../features/atrium';
 import type { installRooftop } from '../features/rooftop';
 import type { installPresentation } from '../features/presentation';
@@ -86,6 +87,7 @@ export interface Parts {
   rooftop: Made<typeof installRooftop>;
   presentation: Made<typeof installPresentation>;
   atrium: Made<typeof installAtrium>;
+  serverRoom: Made<typeof installServerRoom>;
   hanging: Made<typeof installHanging>;
   climbing: Made<typeof installClimbing>;
   peers: Made<typeof installPeers>;

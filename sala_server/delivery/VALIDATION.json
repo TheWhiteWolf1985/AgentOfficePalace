@@ -1,0 +1,41 @@
+{
+  "asset": "sala_server",
+  "version": "v12",
+  "delivery_date": "2026-11-19",
+  "blender_version": "5.3.0",
+  "artistic_approval": {
+    "status": "PASS",
+    "source": "Explicit user request: Benissimo, esporta tutto quello che serve nella cartella: V:\\agent_office_palace\\sala_server",
+    "date": "2026-11-19"
+  },
+  "geometry_and_export_checks": {
+    "status": "PASS",
+    "report": "DRAFT_CHECKS.json"
+  },
+  "live_scene_matches_delivered_asset": {
+    "status": "PASS",
+    "report": "../verification/REBUILD_COMPARISON.json"
+  },
+  "independent_rebuild": {
+    "status": "PASS",
+    "report": "../verification/REBUILD_COMPARISON.json",
+    "numeric_precision": 1e-06,
+    "glb_byte_identical": false
+  },
+  "source_blend_scene_count": 1,
+  "ready_for_asset_handoff": true,
+  "runtime_verified": false,
+  "not_run": [
+    "application integration",
+    "navigation and runtime collisions",
+    "door/PIN authentication and synchronization",
+    "dynamic monitoring content",
+    "fan animation and airflow/thermal sizing"
+  ],
+  "visible_asset_root": "server_v12_root",
+  "exported_nodes": 1822,
+  "mesh_objects": 1710,
+  "glb_sha256": "f1b2e0f3a59a79a671e18ee10c367e0efe2700916bb8ba30929c33c64446b1ea",
+  "original_draft_report_preserved": true,
+  "deployment_performed": false
+}

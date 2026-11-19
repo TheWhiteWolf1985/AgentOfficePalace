@@ -6,7 +6,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { selectExterior, createExteriorCache } from '../src/client/world/exterior-models.js';
 import { applyConferenceGlazing } from '../src/client/world/conference-glazing.js';
 import { buildTower } from '../src/client/world/tower.js';
-import { SLAB, STOREY, WALL_HEIGHT } from '../src/shared/layout.js';
+import { SLAB, STOREY, SERVER_ROOM_STOREY, WALL_HEIGHT } from '../src/shared/layout.js';
 import type { NightParts } from '../src/client/world/outside.js';
 import type { Collider } from '../src/client/world/types.js';
 
@@ -80,8 +80,8 @@ test('tower floor/wing rebuilds retain cached shell buffers and glazing without 
   for (const [index,count,wings] of [[-1,0,[]],[-1,3,[1,2,0]],[0,3,[1,2,0]],[1,3,[1,2,0]],[3,3,[1,2,0]],[0,1,[0]],[-1,3,[1,2,0]]] as const) {
     tower.set(index,count,wings);
     const room = tower.group.getObjectByName('exterior-conference_room');
-    if (index < count) {
-      assert.ok(room); assert.equal(room.position.y, (count - 1 - index) * STOREY + WALL_HEIGHT + SLAB);
+    if (index !== count+1) {
+      assert.ok(room); assert.ok(Math.abs(room.position.y-((count-index)*STOREY+SERVER_ROOM_STOREY))<1e-9);
       room.traverse(n => { if (n instanceof THREE.Mesh) assert.ok(geos.has(n.geometry), 'only cached shell geometry, never re-merged'); });
       let pane: THREE.Mesh | undefined;
       room.traverse(n => { if (n instanceof THREE.Mesh && (n.name === 'window_south_0' || n.userData.exteriorGlazingSources?.includes('window_south_0'))) pane = n; });

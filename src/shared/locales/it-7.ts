@@ -205,4 +205,9 @@ export default {
   "Use what you look at: hire a worker, open its terminal, read a board, call a meeting in the meeting room, watch the TV, sit on a couch, a beanbag, a chair or the balcony bench (walk off to get up)": "Usa ciò che guardi: assumi un agente, apri il suo terminale, leggi una lavagna, convoca una riunione, guarda la TV o siediti su divano, pouf, sedia o panca del balcone (muoviti per alzarti)",
   "File an issue: the project board does not refresh": "Apri una segnalazione: la lavagna del progetto non si aggiorna",
   "The question to settle, or the task to do: e.g. “How should we organize this project?”": "La questione da risolvere o il compito da svolgere: ad esempio «Come organizziamo questo progetto?»",
+  "Server room": "Sala server",
+  "Server room · technical floor": "Sala server · piano tecnico",
+  "Go to the server room": "Vai alla Sala server",
+  "🗄️ in the server room": "🗄️ nella Sala server",
+  "🪑 Operator seat": "🪑 Postazione operatore",
 };

@@ -1,0 +1,12 @@
+{
+  "status": "COPIED_AND_VERIFIED",
+  "requested_destination": "V:/agent_office_palace/sala_server",
+  "date": "2026-11-19",
+  "files": 27,
+  "payload_files": 25,
+  "all_payload_sha256_match": true,
+  "manifest_sha256": "4aa06acf1e670d6087af263528e949dceb5eb5dd3af493c106f1876ddc1d0c6f",
+  "manifest_and_receipt_compared_separately": true,
+  "no_missing_or_extra_files": true,
+  "glb_sha256": "f1b2e0f3a59a79a671e18ee10c367e0efe2700916bb8ba30929c33c64446b1ea"
+}

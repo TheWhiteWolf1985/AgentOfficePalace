@@ -2,7 +2,7 @@ import { t as uiText } from '../../shared/i18n';
 import './elevator.css';
 import type { CloneProgress, FloorInfo, RepoChoice, ServerMsg } from '../../shared/protocol';
 import { cloneLabel, cloneStep, floorPalette, normalizeRepo, sameRepo } from '../../shared/floors';
-import { LOBBY, LOBBY_NAME, ROOF, ROOF_NAME } from '../../shared/rooftop';
+import { LOBBY, LOBBY_NAME, ROOF, ROOF_NAME, SERVER_ROOM, SERVER_ROOM_NAME } from '../../shared/rooftop';
 import type { Net } from '../net';
 import { store } from '../state';
 import { h, openModal, timeAgo, toast, type Modal } from './dom';
@@ -208,9 +208,21 @@ export function openElevator(opts: ElevatorOptions): void {
     return btn;
   };
 
+  const serverButton = () => {
+    const here = store.floor === SERVER_ROOM;
+    const people = [...store.peers.values()].filter(p => p.floor === SERVER_ROOM).length;
+    const btn = h('button.floor-btn', { type: 'button', 'data-floor': SERVER_ROOM, class: here ? 'here' : '', disabled: here },
+      h('span.floor-no', { style: 'background:#2b2d42' }, '🗄️'),
+      h('span.floor-text', {}, h('span.floor-name', {}, SERVER_ROOM_NAME, here ? h('span.here-tag', {}, uiText('you are here')) : null),
+        h('span.floor-sub', {}, uiText('Server room · technical floor'))),
+      h('span.floor-stats', {}, people ? `🧑 ${people}` : ''));
+    btn.addEventListener('click', () => { if (!here) { modal.close(); opts.ride(SERVER_ROOM); } });
+    return btn;
+  };
+
   const renderFloors = () => {
     const floors = store.floors;
-    floorsEl.replaceChildren(roofButton(), ...floors.map(floorRow).reverse(), lobbyButton());
+    floorsEl.replaceChildren(roofButton(), serverButton(), ...floors.map(floorRow).reverse(), lobbyButton());
   };
 
   const repoRow = (r: RepoChoice) => {

@@ -1,7 +1,7 @@
-import { LOBBY, ROOF } from './rooftop.js';
+import { isFixedFloor, ROOF } from './rooftop.js';
 
 export function spaceCapabilities(floor: string | null | undefined, project: boolean) {
-  const office = !!floor && floor !== LOBBY && floor !== ROOF && project;
+  const office = !!floor && !isFixedFloor(floor) && project;
   return { project: office, whiteboard: office || floor === ROOF, presentation: floor === ROOF };
 }
 const PROJECT_ACTIONS = new Set(['issues', 'pulls', 'queue', 'services', 'meeting', 'search', 'docs', 'decor', 'waiting']);

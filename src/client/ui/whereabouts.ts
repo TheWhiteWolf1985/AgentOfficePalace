@@ -1,7 +1,7 @@
 import { t as uiText } from '../../shared/i18n';
 import { BALCONY, FLOOR, LOFT, MEETING_ROOM, SEATING_BY_ID, WING, inWing, seatAt } from '../../shared/layout';
 import type { PeerInfo } from '../../shared/protocol';
-import { ROOF } from '../../shared/rooftop';
+import { ROOF, SERVER_ROOM } from '../../shared/rooftop';
 
 /**
  * What a teammate is up to, for the line under their name tag and in the sidebar: whatever they have
@@ -21,6 +21,7 @@ export function whereabouts(p: PeerInfo): string | undefined {
     return uiText`${icon} on the ${name.join(' ').toLowerCase()}`;
   }
   // The roof is the office's size, but none of its rooms are up there.
+  if (p.floor === SERVER_ROOM) return uiText('🗄️ in the server room');
   if (p.floor === ROOF) return uiText('🤝 in the meeting room');
   // Through the north wall in the back office: nobody gets there unless the floor's built out.
   if (p.y > -1 && inWing(p.x, p.z, WING.rows)) return uiText('🏗️ in the back office');

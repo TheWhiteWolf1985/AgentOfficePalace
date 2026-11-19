@@ -14,7 +14,7 @@ import { Net } from './net';
 import { AVATAR_COLORS, loadProfile, loadSettings, saveProfile, store } from './state';
 import { randomLook } from '../shared/avatar';
 import { cloneLabel } from '../shared/floors';
-import { LOBBY, LOBBY_NAME, ROOF, ROOF_NAME } from '../shared/rooftop';
+import { LOBBY, LOBBY_NAME, ROOF, ROOF_NAME, SERVER_ROOM, SERVER_ROOM_NAME } from '../shared/rooftop';
 import { DESK_BY_ID, nextFreeSeat } from '../shared/layout';
 import { isAsleep } from '../shared/status';
 import type { AgentEffort, AgentProvider, FloorInfo, WorkerInfo } from '../shared/protocol';
@@ -91,7 +91,7 @@ const floorLabel = (f: FloorInfo) => `${f.name}${f.cloning ? ` (${cloneLabel(f.c
 
 function renderFloors() {
   const options = store.floors.map((f) => h('option', { value: f.id, disabled: !!f.cloning }, floorLabel(f)));
-  options.unshift(h('option', { value: ROOF }, ROOF_NAME));
+  options.unshift(h('option', { value: ROOF }, ROOF_NAME), h('option', { value: SERVER_ROOM }, SERVER_ROOM_NAME));
   options.push(h('option', { value: LOBBY }, LOBBY_NAME));
   floorSelect.replaceChildren(...options);
   floorSelect.value = store.floor ?? '';

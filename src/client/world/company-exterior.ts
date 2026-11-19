@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { roofDrop } from '../../shared/layout';
+import { roofDrop, serverDrop } from '../../shared/layout';
 import { exteriorModel } from './exterior-models';
 import { buildCompanyClouds, buildCompanyGround, type NightParts } from './outside';
 import { buildTower } from './tower';
@@ -10,7 +10,9 @@ export interface CompanyExterior {
 }
 
 /** Only our building and its small lot. In the real atrium, do not build another hidden atrium. */
-export function buildCompanyExterior(night: NightParts, groundFloor = false): CompanyExterior {
+export function buildCompanyExterior(night: NightParts, level: boolean | 'server' = false): CompanyExterior {
+  const groundFloor = level === true;
+  const serverFloor = level === 'server';
   const group = new THREE.Group();
   group.name = 'company-exterior';
   const ground = buildCompanyGround().group;
@@ -31,8 +33,8 @@ export function buildCompanyExterior(night: NightParts, groundFloor = false): Co
       if (floors === floorsNow && key === wingsNow) return;
       floorsNow = floors;
       wingsNow = key;
-      ground.position.y = groundFloor ? 0 : -roofDrop(floors);
-      building.set(groundFloor ? -1 : floors, floors, wings);
+      ground.position.y = groundFloor ? 0 : serverFloor ? -serverDrop(floors) : -roofDrop(floors);
+      building.set(groundFloor ? -1 : serverFloor ? floors : floors+1, floors, wings);
     },
   };
 }

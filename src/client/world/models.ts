@@ -3,6 +3,8 @@ import { avatarModel, avatarHairstyle } from '../../shared/avatar-variants';
 import * as THREE from 'three';
 import { GLTFLoader, type GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { clone } from 'three/examples/jsm/utils/SkeletonUtils.js';
+import serverRoomUrl from '../models/server_room.glb?url';
+import serverRoomExteriorUrl from '../models/server_room_exterior.glb?url';
 import atriumUrl from '../models/atrium.glb?url';
 import conferenceRoomUrl from '../models/conference_room.glb?url';
 import deskPropsUrl from '../models/desk_props.glb?url';
@@ -29,6 +31,8 @@ import { toon } from './toon';
 
 const MODELS = {
   atrium: { url: atriumUrl },
+  server_room: { url: serverRoomUrl },
+  server_room_exterior: { url: serverRoomExteriorUrl },
   conference_room: { url: conferenceRoomUrl },
   desk_props: { url: deskPropsUrl },
   kitchen: { url: kitchenUrl },
@@ -120,7 +124,7 @@ export async function loadModel(name: ModelName): Promise<Model> {
 }
 
 /** Shared spaces need their own geometry and the meeting-room exterior visible on the tower. */
-export const COMMON_MODELS: readonly ModelName[] = ['atrium', 'conference_room', 'reception_a', 'reception_b'];
+export const COMMON_MODELS: readonly ModelName[] = ['atrium', 'conference_room', 'server_room_exterior', 'reception_a', 'reception_b'];
 export const OFFICE_MODELS: readonly ModelName[] = [...COMMON_MODELS, 'desk_props', 'kitchen', 'lounge', 'plants'];
 export function avatarModels(look: Look): ModelName[] {
   const hair = avatarHairstyle(look);

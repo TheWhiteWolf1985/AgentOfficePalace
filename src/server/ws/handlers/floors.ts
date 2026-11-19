@@ -1,7 +1,7 @@
 // The building's floors: riding the elevator between them and up to the roof, and adding and taking
 // off floors.
 import type { FloorClientMsg } from '../../../shared/protocol.js';
-import { LOBBY, ROOF } from '../../../shared/rooftop.js';
+import { LOBBY, ROOF, SERVER_ROOM } from '../../../shared/rooftop.js';
 import { arrivalSpot, str } from '../../office/input.js';
 import type { HandlerMap, ViewPieces } from './types.js';
 
@@ -9,6 +9,7 @@ export const projectView: ViewPieces['project'] = (_ctx, floor) => floor?.projec
 
 export const floorHandlers = {
   'floor.go'(ctx, c, msg) {
+    if (msg.floor === SERVER_ROOM) return ctx.goToServerRoom(c);
     if (msg.floor === LOBBY) return ctx.toLobby(c);
     if (msg.floor === ROOF) {
       ctx.goToRoof(c);

@@ -44,6 +44,7 @@ import { installNeedsYou } from './features/needsyou';
 import { installPalette } from './features/palette';
 import { installPeers } from './features/peers';
 import { installReceptionSign } from './features/reception-sign';
+import { installServerRoom } from './features/server-room';
 import { installAtrium } from './features/atrium';
 import { installRooftop } from './features/rooftop';
 import { installSeating } from './features/seating';
@@ -104,6 +105,7 @@ ctx.scene.add(parts.confetti.mesh);
 parts.tv = installTv(ctx, { shares: () => parts.talk.currentShares(), watch: () => parts.talk.watchShare() });
 parts.rooftop = installRooftop(ctx);
 parts.atrium = installAtrium(ctx);
+parts.serverRoom = installServerRoom(ctx);
 installReceptionSign(ctx);
 
 // You, and how you talk to the office.
@@ -211,7 +213,7 @@ void Promise.resolve().then(() => {
 
 // Debug handle for quick checks from the console / headless screenshots.
 const { worlds, views, rooftop, hanging, climbing } = parts;
-(window as any).__office = { world: () => worlds.world(), plan: worlds.plan, roof: rooftop.roof, atrium: parts.atrium.atrium, store, player: parts.player, camera: ctx.camera, workerViews: views.workerViews, departures: views.departures, arrivals: views.arrivals, scene: ctx.scene, net: parts.net, voice: parts.voice, renderer: ctx.renderer, hands: parts.hands, me: parts.me, remotes: parts.peers.remotes, settings: parts.settings, gallery: parts.gallery, hanger: hanging.hanger, office: ctx.office, ride: parts.travel.ride, switchFloor: parts.travel.switchFloor, climber: climbing.climber, elevatorPanelOpen, confetti: parts.confetti, sky: ctx.sky, carried: () => core.carrying };
+(window as any).__office = { world: () => worlds.world(), plan: worlds.plan, roof: rooftop.roof, atrium: parts.atrium.atrium, serverRoom: parts.serverRoom.serverRoom, store, player: parts.player, camera: ctx.camera, workerViews: views.workerViews, departures: views.departures, arrivals: views.arrivals, scene: ctx.scene, net: parts.net, voice: parts.voice, renderer: ctx.renderer, hands: parts.hands, me: parts.me, remotes: parts.peers.remotes, settings: parts.settings, gallery: parts.gallery, hanger: hanging.hanger, office: ctx.office, ride: parts.travel.ride, switchFloor: parts.travel.switchFloor, climber: climbing.climber, elevatorPanelOpen, confetti: parts.confetti, sky: ctx.sky, carried: () => core.carrying };
 (window as any).__voice = parts.voice;
 (window as any).__sound = parts.sound;
 (window as any).__notify = parts.notifier;

@@ -1,5 +1,5 @@
 import { t as uiText } from '../../shared/i18n';
-import { ROOF, ROOF_NAME } from '../../shared/rooftop';
+import { ROOF, ROOF_NAME, SERVER_ROOM, SERVER_ROOM_NAME } from '../../shared/rooftop';
 import { store } from '../state';
 import type { Voice } from '../voice';
 import { $, h } from './dom';
@@ -31,8 +31,10 @@ export function renderPeople(voice: Voice, onEditProfile: () => void, onWalkTo: 
       you ? h('span.you', {}, uiText('(you)')) : null,
       // Somewhere else in the building: which floor.
       !you && !store.onMyFloor(p)
-        ? p.floor === ROOF
-          ? h('span.where', { title: uiText('Up on the roof') }, `🍸 ${ROOF_NAME}`)
+        ? p.floor === SERVER_ROOM
+          ? h('span.where', {}, `🗄️ ${SERVER_ROOM_NAME}`)
+          : p.floor === ROOF
+          ? h('span.where', { title: uiText('Up on the roof') }, `🤝 ${ROOF_NAME}`)
           : h('span.where', { title: uiText('On another floor') }, `🛗 ${store.floors.find((f) => f.id === p.floor)?.name ?? 'lobby'}`)
         : null,
       p.sharing ? h('span', { title: uiText('Sharing screen') }, '🖥️') : null,

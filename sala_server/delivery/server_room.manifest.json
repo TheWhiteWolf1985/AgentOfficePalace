@@ -1,0 +1,5627 @@
+{
+  "stage": "architectural_draft",
+  "name": "sala_server",
+  "blender_version": "5.3.0",
+  "root_node": "server_v12_root",
+  "units": "meters",
+  "interior_xy_m": [
+    -18,
+    18,
+    -13,
+    13
+  ],
+  "ceiling_height_m": 5.2,
+  "provisional_choices": [
+    "altezza 5,2m",
+    "palette degli ambienti precedenti"
+  ],
+  "elevator_reserved_blender_m": {
+    "min": [
+      7.2,
+      10.6,
+      -0.3
+    ],
+    "max": [
+      9.8,
+      13.3,
+      5.38
+    ]
+  },
+  "elevator_runtime": "generated_by_application_no_cabin_door_or_backdrop_in_asset",
+  "architecture": {
+    "floor_nodes": [
+      "server_v12_floor_support_main",
+      "server_v12_floor_support_north_west",
+      "server_v12_floor_support_north_east",
+      "server_v12_floor_tiles_60x60"
+    ],
+    "ceiling_group": "server_v12_ceiling"
+  },
+  "architectural_junctions": {
+    "south_corner_nodes": [
+      "server_v12_wall_corner_south_west",
+      "server_v12_wall_corner_south_east"
+    ],
+    "partition_south": {
+      "window_node": "server_v12_window_south_05",
+      "window_stile": "server_v12_wall_south_partition_window_stile",
+      "inner_post": "server_v12_wall_south_partition_inner_post",
+      "axis_x_m": 6.1,
+      "glass_gap_x_m": [
+        6.04,
+        6.16
+      ],
+      "inside_post_face_y_m": -12.95
+    }
+  },
+  "floor_finish": {
+    "type": "tiles",
+    "nominal_module_m": [
+      0.6,
+      0.6
+    ],
+    "grout_m": 0.004,
+    "palette": "uniform_light_gray",
+    "tile_color_srgb": [
+      0.87,
+      0.89,
+      0.9
+    ],
+    "node": "server_v12_floor_tiles_60x60",
+    "pieces": 2775,
+    "grid_origin_xy_m": [
+      -18,
+      -13
+    ]
+  },
+  "windows": [
+    {
+      "node": "server_v12_window_west_00",
+      "side": "west"
+    },
+    {
+      "node": "server_v12_window_west_01",
+      "side": "west"
+    },
+    {
+      "node": "server_v12_window_west_02",
+      "side": "west"
+    },
+    {
+      "node": "server_v12_window_west_03",
+      "side": "west"
+    },
+    {
+      "node": "server_v12_window_west_04",
+      "side": "west"
+    },
+    {
+      "node": "server_v12_window_west_05",
+      "side": "west"
+    },
+    {
+      "node": "server_v12_window_east_00",
+      "side": "east"
+    },
+    {
+      "node": "server_v12_window_east_01",
+      "side": "east"
+    },
+    {
+      "node": "server_v12_window_east_02",
+      "side": "east"
+    },
+    {
+      "node": "server_v12_window_east_03",
+      "side": "east"
+    },
+    {
+      "node": "server_v12_window_east_04",
+      "side": "east"
+    },
+    {
+      "node": "server_v12_window_east_05",
+      "side": "east"
+    },
+    {
+      "node": "server_v12_window_south_00",
+      "side": "south"
+    },
+    {
+      "node": "server_v12_window_south_01",
+      "side": "south"
+    },
+    {
+      "node": "server_v12_window_south_02",
+      "side": "south"
+    },
+    {
+      "node": "server_v12_window_south_03",
+      "side": "south"
+    },
+    {
+      "node": "server_v12_window_south_04",
+      "side": "south"
+    },
+    {
+      "node": "server_v12_window_south_05",
+      "side": "south"
+    },
+    {
+      "node": "server_v12_window_south_06",
+      "side": "south"
+    },
+    {
+      "node": "server_v12_window_south_07",
+      "side": "south"
+    }
+  ],
+  "collider_reference_boxes": [
+    {
+      "node": "server_v12_floor_support_main",
+      "min_blender_m": [
+        -18.3,
+        -13.3,
+        -0.2
+      ],
+      "max_blender_m": [
+        18.3,
+        10.6,
+        0
+      ]
+    },
+    {
+      "node": "server_v12_ceiling_main",
+      "min_blender_m": [
+        -18.3,
+        -13.3,
+        5.2
+      ],
+      "max_blender_m": [
+        18.3,
+        10.6,
+        5.38
+      ]
+    },
+    {
+      "node": "server_v12_floor_support_north_west",
+      "min_blender_m": [
+        -18.3,
+        10.6,
+        -0.2
+      ],
+      "max_blender_m": [
+        7.2,
+        13.3,
+        0
+      ]
+    },
+    {
+      "node": "server_v12_ceiling_north_west",
+      "min_blender_m": [
+        -18.3,
+        10.6,
+        5.2
+      ],
+      "max_blender_m": [
+        7.2,
+        13.3,
+        5.38
+      ]
+    },
+    {
+      "node": "server_v12_floor_support_north_east",
+      "min_blender_m": [
+        9.8,
+        10.6,
+        -0.2
+      ],
+      "max_blender_m": [
+        18.3,
+        13.3,
+        0
+      ]
+    },
+    {
+      "node": "server_v12_ceiling_north_east",
+      "min_blender_m": [
+        9.8,
+        10.6,
+        5.2
+      ],
+      "max_blender_m": [
+        18.3,
+        13.3,
+        5.38
+      ]
+    },
+    {
+      "node": "server_v12_wall_north_west",
+      "min_blender_m": [
+        -18.3,
+        13,
+        0
+      ],
+      "max_blender_m": [
+        7.2,
+        13.3,
+        5.2
+      ]
+    },
+    {
+      "node": "server_v12_wall_north_east",
+      "min_blender_m": [
+        9.8,
+        13,
+        0
+      ],
+      "max_blender_m": [
+        18.3,
+        13.3,
+        5.2
+      ]
+    },
+    {
+      "node": "server_v12_wall_corner_south_west",
+      "min_blender_m": [
+        -18.3,
+        -13.3,
+        0
+      ],
+      "max_blender_m": [
+        -18.0,
+        -13,
+        5.2
+      ]
+    },
+    {
+      "node": "server_v12_wall_corner_south_east",
+      "min_blender_m": [
+        18.0,
+        -13.3,
+        0
+      ],
+      "max_blender_m": [
+        18.3,
+        -13,
+        5.2
+      ]
+    },
+    {
+      "node": "server_v12_wall_west_base",
+      "min_blender_m": [
+        -18.3,
+        -13,
+        0
+      ],
+      "max_blender_m": [
+        -18.0,
+        13,
+        1.05
+      ]
+    },
+    {
+      "node": "server_v12_wall_west_header",
+      "min_blender_m": [
+        -18.3,
+        -13,
+        4.55
+      ],
+      "max_blender_m": [
+        -18.0,
+        13,
+        5.2
+      ]
+    },
+    {
+      "node": "server_v12_wall_west_pier_00",
+      "min_blender_m": [
+        -18.3,
+        -13.0,
+        1.05
+      ],
+      "max_blender_m": [
+        -18.0,
+        -12.7,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_window_west_00",
+      "min_blender_m": [
+        -18.3,
+        -12.7,
+        1.05
+      ],
+      "max_blender_m": [
+        -18.0,
+        -8.666666666666668,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_wall_west_pier_01",
+      "min_blender_m": [
+        -18.3,
+        -8.666666666666668,
+        1.05
+      ],
+      "max_blender_m": [
+        -18.0,
+        -8.366666666666667,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_window_west_01",
+      "min_blender_m": [
+        -18.3,
+        -8.366666666666667,
+        1.05
+      ],
+      "max_blender_m": [
+        -18.0,
+        -4.333333333333335,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_wall_west_pier_02",
+      "min_blender_m": [
+        -18.3,
+        -4.333333333333334,
+        1.05
+      ],
+      "max_blender_m": [
+        -18.0,
+        -4.033333333333334,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_window_west_02",
+      "min_blender_m": [
+        -18.3,
+        -4.033333333333334,
+        1.05
+      ],
+      "max_blender_m": [
+        -18.0,
+        -8.881784197001252e-16,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_wall_west_pier_03",
+      "min_blender_m": [
+        -18.3,
+        0.0,
+        1.05
+      ],
+      "max_blender_m": [
+        -18.0,
+        0.3,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_window_west_03",
+      "min_blender_m": [
+        -18.3,
+        0.3,
+        1.05
+      ],
+      "max_blender_m": [
+        -18.0,
+        4.333333333333333,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_wall_west_pier_04",
+      "min_blender_m": [
+        -18.3,
+        4.333333333333332,
+        1.05
+      ],
+      "max_blender_m": [
+        -18.0,
+        4.633333333333332,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_window_west_04",
+      "min_blender_m": [
+        -18.3,
+        4.633333333333332,
+        1.05
+      ],
+      "max_blender_m": [
+        -18.0,
+        8.666666666666664,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_wall_west_pier_05",
+      "min_blender_m": [
+        -18.3,
+        8.666666666666664,
+        1.05
+      ],
+      "max_blender_m": [
+        -18.0,
+        8.966666666666665,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_window_west_05",
+      "min_blender_m": [
+        -18.3,
+        8.966666666666665,
+        1.05
+      ],
+      "max_blender_m": [
+        -18.0,
+        12.999999999999996,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_wall_east_base",
+      "min_blender_m": [
+        18.0,
+        -13,
+        0
+      ],
+      "max_blender_m": [
+        18.3,
+        13,
+        1.05
+      ]
+    },
+    {
+      "node": "server_v12_wall_east_header",
+      "min_blender_m": [
+        18.0,
+        -13,
+        4.55
+      ],
+      "max_blender_m": [
+        18.3,
+        13,
+        5.2
+      ]
+    },
+    {
+      "node": "server_v12_wall_east_pier_00",
+      "min_blender_m": [
+        18.0,
+        -13.0,
+        1.05
+      ],
+      "max_blender_m": [
+        18.3,
+        -12.7,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_window_east_00",
+      "min_blender_m": [
+        18.0,
+        -12.7,
+        1.05
+      ],
+      "max_blender_m": [
+        18.3,
+        -8.666666666666668,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_wall_east_pier_01",
+      "min_blender_m": [
+        18.0,
+        -8.666666666666668,
+        1.05
+      ],
+      "max_blender_m": [
+        18.3,
+        -8.366666666666667,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_window_east_01",
+      "min_blender_m": [
+        18.0,
+        -8.366666666666667,
+        1.05
+      ],
+      "max_blender_m": [
+        18.3,
+        -4.333333333333335,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_wall_east_pier_02",
+      "min_blender_m": [
+        18.0,
+        -4.333333333333334,
+        1.05
+      ],
+      "max_blender_m": [
+        18.3,
+        -4.033333333333334,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_window_east_02",
+      "min_blender_m": [
+        18.0,
+        -4.033333333333334,
+        1.05
+      ],
+      "max_blender_m": [
+        18.3,
+        -8.881784197001252e-16,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_wall_east_pier_03",
+      "min_blender_m": [
+        18.0,
+        0.0,
+        1.05
+      ],
+      "max_blender_m": [
+        18.3,
+        0.3,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_window_east_03",
+      "min_blender_m": [
+        18.0,
+        0.3,
+        1.05
+      ],
+      "max_blender_m": [
+        18.3,
+        4.333333333333333,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_wall_east_pier_04",
+      "min_blender_m": [
+        18.0,
+        4.333333333333332,
+        1.05
+      ],
+      "max_blender_m": [
+        18.3,
+        4.633333333333332,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_window_east_04",
+      "min_blender_m": [
+        18.0,
+        4.633333333333332,
+        1.05
+      ],
+      "max_blender_m": [
+        18.3,
+        8.666666666666664,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_wall_east_pier_05",
+      "min_blender_m": [
+        18.0,
+        8.666666666666664,
+        1.05
+      ],
+      "max_blender_m": [
+        18.3,
+        8.966666666666665,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_window_east_05",
+      "min_blender_m": [
+        18.0,
+        8.966666666666665,
+        1.05
+      ],
+      "max_blender_m": [
+        18.3,
+        12.999999999999996,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_wall_south_base",
+      "min_blender_m": [
+        -18,
+        -13.3,
+        0
+      ],
+      "max_blender_m": [
+        18,
+        -13.0,
+        1.05
+      ]
+    },
+    {
+      "node": "server_v12_wall_south_header",
+      "min_blender_m": [
+        -18,
+        -13.3,
+        4.55
+      ],
+      "max_blender_m": [
+        18,
+        -13.0,
+        5.2
+      ]
+    },
+    {
+      "node": "server_v12_wall_south_pier_00",
+      "min_blender_m": [
+        -18.0,
+        -13.3,
+        1.05
+      ],
+      "max_blender_m": [
+        -17.7,
+        -13.0,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_window_south_00",
+      "min_blender_m": [
+        -17.7,
+        -13.3,
+        1.05
+      ],
+      "max_blender_m": [
+        -13.5,
+        -13.0,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_wall_south_pier_01",
+      "min_blender_m": [
+        -13.5,
+        -13.3,
+        1.05
+      ],
+      "max_blender_m": [
+        -13.2,
+        -13.0,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_window_south_01",
+      "min_blender_m": [
+        -13.2,
+        -13.3,
+        1.05
+      ],
+      "max_blender_m": [
+        -9.0,
+        -13.0,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_wall_south_pier_02",
+      "min_blender_m": [
+        -9.0,
+        -13.3,
+        1.05
+      ],
+      "max_blender_m": [
+        -8.7,
+        -13.0,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_window_south_02",
+      "min_blender_m": [
+        -8.7,
+        -13.3,
+        1.05
+      ],
+      "max_blender_m": [
+        -4.5,
+        -13.0,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_wall_south_pier_03",
+      "min_blender_m": [
+        -4.5,
+        -13.3,
+        1.05
+      ],
+      "max_blender_m": [
+        -4.2,
+        -13.0,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_window_south_03",
+      "min_blender_m": [
+        -4.2,
+        -13.3,
+        1.05
+      ],
+      "max_blender_m": [
+        0.0,
+        -13.0,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_wall_south_pier_04",
+      "min_blender_m": [
+        0.0,
+        -13.3,
+        1.05
+      ],
+      "max_blender_m": [
+        0.3,
+        -13.0,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_window_south_04",
+      "min_blender_m": [
+        0.3,
+        -13.3,
+        1.05
+      ],
+      "max_blender_m": [
+        4.5,
+        -13.0,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_wall_south_pier_05",
+      "min_blender_m": [
+        4.5,
+        -13.3,
+        1.05
+      ],
+      "max_blender_m": [
+        4.8,
+        -13.0,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_window_south_05",
+      "min_blender_m": [
+        4.8,
+        -13.3,
+        1.05
+      ],
+      "max_blender_m": [
+        9.0,
+        -13.0,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_wall_south_partition_window_stile",
+      "min_blender_m": [
+        6.04,
+        -13.3,
+        1.05
+      ],
+      "max_blender_m": [
+        6.16,
+        -13,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_wall_south_partition_inner_post",
+      "min_blender_m": [
+        6.04,
+        -13,
+        0
+      ],
+      "max_blender_m": [
+        6.16,
+        -12.95,
+        5.2
+      ]
+    },
+    {
+      "node": "server_v12_wall_south_pier_06",
+      "min_blender_m": [
+        9.0,
+        -13.3,
+        1.05
+      ],
+      "max_blender_m": [
+        9.3,
+        -13.0,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_window_south_06",
+      "min_blender_m": [
+        9.3,
+        -13.3,
+        1.05
+      ],
+      "max_blender_m": [
+        13.5,
+        -13.0,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_wall_south_pier_07",
+      "min_blender_m": [
+        13.5,
+        -13.3,
+        1.05
+      ],
+      "max_blender_m": [
+        13.8,
+        -13.0,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_window_south_07",
+      "min_blender_m": [
+        13.8,
+        -13.3,
+        1.05
+      ],
+      "max_blender_m": [
+        18.0,
+        -13.0,
+        4.55
+      ]
+    },
+    {
+      "node": "server_v12_rack_01_01",
+      "min_blender_m": [
+        -13.85,
+        -9.124,
+        0
+      ],
+      "max_blender_m": [
+        -13.049999999999999,
+        -7.876,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_01_02",
+      "min_blender_m": [
+        -13.0,
+        -9.124,
+        0
+      ],
+      "max_blender_m": [
+        -12.2,
+        -7.876,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_01_03",
+      "min_blender_m": [
+        -12.15,
+        -9.124,
+        0
+      ],
+      "max_blender_m": [
+        -11.35,
+        -7.876,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_01_04",
+      "min_blender_m": [
+        -11.299999999999999,
+        -9.124,
+        0
+      ],
+      "max_blender_m": [
+        -10.499999999999998,
+        -7.876,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_01_05",
+      "min_blender_m": [
+        -10.45,
+        -9.124,
+        0
+      ],
+      "max_blender_m": [
+        -9.649999999999999,
+        -7.876,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_01_06",
+      "min_blender_m": [
+        -9.6,
+        -9.124,
+        0
+      ],
+      "max_blender_m": [
+        -8.799999999999999,
+        -7.876,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_01_07",
+      "min_blender_m": [
+        -8.75,
+        -9.124,
+        0
+      ],
+      "max_blender_m": [
+        -7.949999999999999,
+        -7.876,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_01_08",
+      "min_blender_m": [
+        -7.8999999999999995,
+        -9.124,
+        0
+      ],
+      "max_blender_m": [
+        -7.099999999999999,
+        -7.876,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_01_09",
+      "min_blender_m": [
+        -7.05,
+        -9.124,
+        0
+      ],
+      "max_blender_m": [
+        -6.249999999999999,
+        -7.876,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_01_10",
+      "min_blender_m": [
+        -6.2,
+        -9.124,
+        0
+      ],
+      "max_blender_m": [
+        -5.3999999999999995,
+        -7.876,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_01_11",
+      "min_blender_m": [
+        -5.35,
+        -9.124,
+        0
+      ],
+      "max_blender_m": [
+        -4.549999999999999,
+        -7.876,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_01_12",
+      "min_blender_m": [
+        -4.5,
+        -9.124,
+        0
+      ],
+      "max_blender_m": [
+        -3.6999999999999997,
+        -7.876,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_01_13",
+      "min_blender_m": [
+        -3.65,
+        -9.124,
+        0
+      ],
+      "max_blender_m": [
+        -2.85,
+        -7.876,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_01_14",
+      "min_blender_m": [
+        -2.8000000000000003,
+        -9.124,
+        0
+      ],
+      "max_blender_m": [
+        -2.0000000000000004,
+        -7.876,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_01_15",
+      "min_blender_m": [
+        -1.9499999999999988,
+        -9.124,
+        0
+      ],
+      "max_blender_m": [
+        -1.149999999999999,
+        -7.876,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_01_16",
+      "min_blender_m": [
+        -1.0999999999999992,
+        -9.124,
+        0
+      ],
+      "max_blender_m": [
+        -0.29999999999999927,
+        -7.876,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_01_17",
+      "min_blender_m": [
+        -0.24999999999999967,
+        -9.124,
+        0
+      ],
+      "max_blender_m": [
+        0.5500000000000004,
+        -7.876,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_01_18",
+      "min_blender_m": [
+        0.6,
+        -9.124,
+        0
+      ],
+      "max_blender_m": [
+        1.4,
+        -7.876,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_01_19",
+      "min_blender_m": [
+        1.4499999999999997,
+        -9.124,
+        0
+      ],
+      "max_blender_m": [
+        2.2499999999999996,
+        -7.876,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_01_20",
+      "min_blender_m": [
+        2.2999999999999994,
+        -9.124,
+        0
+      ],
+      "max_blender_m": [
+        3.099999999999999,
+        -7.876,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_02_01",
+      "min_blender_m": [
+        -13.85,
+        -1.624,
+        0
+      ],
+      "max_blender_m": [
+        -13.049999999999999,
+        -0.376,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_02_02",
+      "min_blender_m": [
+        -13.0,
+        -1.624,
+        0
+      ],
+      "max_blender_m": [
+        -12.2,
+        -0.376,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_02_03",
+      "min_blender_m": [
+        -12.15,
+        -1.624,
+        0
+      ],
+      "max_blender_m": [
+        -11.35,
+        -0.376,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_02_04",
+      "min_blender_m": [
+        -11.299999999999999,
+        -1.624,
+        0
+      ],
+      "max_blender_m": [
+        -10.499999999999998,
+        -0.376,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_02_05",
+      "min_blender_m": [
+        -10.45,
+        -1.624,
+        0
+      ],
+      "max_blender_m": [
+        -9.649999999999999,
+        -0.376,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_02_06",
+      "min_blender_m": [
+        -9.6,
+        -1.624,
+        0
+      ],
+      "max_blender_m": [
+        -8.799999999999999,
+        -0.376,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_02_07",
+      "min_blender_m": [
+        -8.75,
+        -1.624,
+        0
+      ],
+      "max_blender_m": [
+        -7.949999999999999,
+        -0.376,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_02_08",
+      "min_blender_m": [
+        -7.8999999999999995,
+        -1.624,
+        0
+      ],
+      "max_blender_m": [
+        -7.099999999999999,
+        -0.376,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_02_09",
+      "min_blender_m": [
+        -7.05,
+        -1.624,
+        0
+      ],
+      "max_blender_m": [
+        -6.249999999999999,
+        -0.376,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_02_10",
+      "min_blender_m": [
+        -6.2,
+        -1.624,
+        0
+      ],
+      "max_blender_m": [
+        -5.3999999999999995,
+        -0.376,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_02_11",
+      "min_blender_m": [
+        -5.35,
+        -1.624,
+        0
+      ],
+      "max_blender_m": [
+        -4.549999999999999,
+        -0.376,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_02_12",
+      "min_blender_m": [
+        -4.5,
+        -1.624,
+        0
+      ],
+      "max_blender_m": [
+        -3.6999999999999997,
+        -0.376,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_02_13",
+      "min_blender_m": [
+        -3.65,
+        -1.624,
+        0
+      ],
+      "max_blender_m": [
+        -2.85,
+        -0.376,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_02_14",
+      "min_blender_m": [
+        -2.8000000000000003,
+        -1.624,
+        0
+      ],
+      "max_blender_m": [
+        -2.0000000000000004,
+        -0.376,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_02_15",
+      "min_blender_m": [
+        -1.9499999999999988,
+        -1.624,
+        0
+      ],
+      "max_blender_m": [
+        -1.149999999999999,
+        -0.376,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_02_16",
+      "min_blender_m": [
+        -1.0999999999999992,
+        -1.624,
+        0
+      ],
+      "max_blender_m": [
+        -0.29999999999999927,
+        -0.376,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_02_17",
+      "min_blender_m": [
+        -0.24999999999999967,
+        -1.624,
+        0
+      ],
+      "max_blender_m": [
+        0.5500000000000004,
+        -0.376,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_02_18",
+      "min_blender_m": [
+        0.6,
+        -1.624,
+        0
+      ],
+      "max_blender_m": [
+        1.4,
+        -0.376,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_02_19",
+      "min_blender_m": [
+        1.4499999999999997,
+        -1.624,
+        0
+      ],
+      "max_blender_m": [
+        2.2499999999999996,
+        -0.376,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_02_20",
+      "min_blender_m": [
+        2.2999999999999994,
+        -1.624,
+        0
+      ],
+      "max_blender_m": [
+        3.099999999999999,
+        -0.376,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_03_01",
+      "min_blender_m": [
+        -13.85,
+        5.876,
+        0
+      ],
+      "max_blender_m": [
+        -13.049999999999999,
+        7.124,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_03_02",
+      "min_blender_m": [
+        -13.0,
+        5.876,
+        0
+      ],
+      "max_blender_m": [
+        -12.2,
+        7.124,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_03_03",
+      "min_blender_m": [
+        -12.15,
+        5.876,
+        0
+      ],
+      "max_blender_m": [
+        -11.35,
+        7.124,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_03_04",
+      "min_blender_m": [
+        -11.299999999999999,
+        5.876,
+        0
+      ],
+      "max_blender_m": [
+        -10.499999999999998,
+        7.124,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_03_05",
+      "min_blender_m": [
+        -10.45,
+        5.876,
+        0
+      ],
+      "max_blender_m": [
+        -9.649999999999999,
+        7.124,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_03_06",
+      "min_blender_m": [
+        -9.6,
+        5.876,
+        0
+      ],
+      "max_blender_m": [
+        -8.799999999999999,
+        7.124,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_03_07",
+      "min_blender_m": [
+        -8.75,
+        5.876,
+        0
+      ],
+      "max_blender_m": [
+        -7.949999999999999,
+        7.124,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_03_08",
+      "min_blender_m": [
+        -7.8999999999999995,
+        5.876,
+        0
+      ],
+      "max_blender_m": [
+        -7.099999999999999,
+        7.124,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_03_09",
+      "min_blender_m": [
+        -7.05,
+        5.876,
+        0
+      ],
+      "max_blender_m": [
+        -6.249999999999999,
+        7.124,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_03_10",
+      "min_blender_m": [
+        -6.2,
+        5.876,
+        0
+      ],
+      "max_blender_m": [
+        -5.3999999999999995,
+        7.124,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_03_11",
+      "min_blender_m": [
+        -5.35,
+        5.876,
+        0
+      ],
+      "max_blender_m": [
+        -4.549999999999999,
+        7.124,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_03_12",
+      "min_blender_m": [
+        -4.5,
+        5.876,
+        0
+      ],
+      "max_blender_m": [
+        -3.6999999999999997,
+        7.124,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_03_13",
+      "min_blender_m": [
+        -3.65,
+        5.876,
+        0
+      ],
+      "max_blender_m": [
+        -2.85,
+        7.124,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_03_14",
+      "min_blender_m": [
+        -2.8000000000000003,
+        5.876,
+        0
+      ],
+      "max_blender_m": [
+        -2.0000000000000004,
+        7.124,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_03_15",
+      "min_blender_m": [
+        -1.9499999999999988,
+        5.876,
+        0
+      ],
+      "max_blender_m": [
+        -1.149999999999999,
+        7.124,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_03_16",
+      "min_blender_m": [
+        -1.0999999999999992,
+        5.876,
+        0
+      ],
+      "max_blender_m": [
+        -0.29999999999999927,
+        7.124,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_03_17",
+      "min_blender_m": [
+        -0.24999999999999967,
+        5.876,
+        0
+      ],
+      "max_blender_m": [
+        0.5500000000000004,
+        7.124,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_03_18",
+      "min_blender_m": [
+        0.6,
+        5.876,
+        0
+      ],
+      "max_blender_m": [
+        1.4,
+        7.124,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_03_19",
+      "min_blender_m": [
+        1.4499999999999997,
+        5.876,
+        0
+      ],
+      "max_blender_m": [
+        2.2499999999999996,
+        7.124,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_rack_03_20",
+      "min_blender_m": [
+        2.2999999999999994,
+        5.876,
+        0
+      ],
+      "max_blender_m": [
+        3.099999999999999,
+        7.124,
+        2.2
+      ],
+      "role": "rack_reference_box"
+    },
+    {
+      "node": "server_v12_access_partition_fixed",
+      "min_blender_m": [
+        6.04,
+        -12.94,
+        0
+      ],
+      "max_blender_m": [
+        6.159999999999999,
+        -0.9,
+        5.2
+      ],
+      "role": "fixed_glass_partition"
+    },
+    {
+      "node": "server_v12_access_partition_fixed",
+      "min_blender_m": [
+        6.04,
+        0.9,
+        0
+      ],
+      "max_blender_m": [
+        6.159999999999999,
+        12.99,
+        5.2
+      ],
+      "role": "fixed_glass_partition"
+    },
+    {
+      "node": "server_v12_access_door_pivot",
+      "min_blender_m": [
+        6.06,
+        -0.8,
+        0.025
+      ],
+      "max_blender_m": [
+        6.14,
+        0.8,
+        2.7
+      ],
+      "role": "access_door",
+      "active_when": "door_closed"
+    },
+    {
+      "node": "server_v12_control_desk",
+      "min_blender_m": [
+        9.7,
+        -7.5,
+        0
+      ],
+      "max_blender_m": [
+        10.96,
+        -1.7,
+        0.79
+      ],
+      "role": "control_desk"
+    },
+    {
+      "node": "server_v12_ops_chair_01",
+      "min_blender_m": [
+        11.36,
+        -6.4799999999999995,
+        0
+      ],
+      "max_blender_m": [
+        12.22,
+        -5.62,
+        1.23
+      ],
+      "role": "operator_chair"
+    },
+    {
+      "node": "server_v12_ops_chair_02",
+      "min_blender_m": [
+        11.36,
+        -3.58,
+        0
+      ],
+      "max_blender_m": [
+        12.22,
+        -2.7199999999999998,
+        1.23
+      ],
+      "role": "operator_chair"
+    },
+    {
+      "node": "server_v12_technical_cabinet_01",
+      "min_blender_m": [
+        10.4,
+        12.08,
+        0
+      ],
+      "max_blender_m": [
+        11.7,
+        12.95,
+        2.16
+      ],
+      "role": "closed_parts_cabinet"
+    },
+    {
+      "node": "server_v12_technical_cabinet_02",
+      "min_blender_m": [
+        16.8,
+        12.08,
+        0
+      ],
+      "max_blender_m": [
+        17.9,
+        12.95,
+        2.16
+      ],
+      "role": "closed_parts_cabinet"
+    },
+    {
+      "node": "server_v12_maintenance_bench",
+      "min_blender_m": [
+        12,
+        11.875,
+        0
+      ],
+      "max_blender_m": [
+        16.5,
+        12.97,
+        2.22
+      ],
+      "role": "maintenance_bench_and_toolboard"
+    }
+  ],
+  "window_glazing": {
+    "material": "server_v12_access_mat_glass",
+    "same_as_access_partition": true,
+    "alpha": 0.12,
+    "transparent": true
+  },
+  "racks": [
+    {
+      "id": "rack_01_01",
+      "node": "server_v12_rack_01_01",
+      "row": 1,
+      "column": 1,
+      "position_blender_m": [
+        -13.45,
+        -8.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_01_01_door_front",
+        "server_v12_rack_01_01_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_01_01_ups_u00",
+        "server_v12_rack_01_01_storage_u04",
+        "server_v12_rack_01_01_compute_u08",
+        "server_v12_rack_01_01_compute_u10",
+        "server_v12_rack_01_01_compute_u12",
+        "server_v12_rack_01_01_compute_u14",
+        "server_v12_rack_01_01_compute_u16",
+        "server_v12_rack_01_01_compute_u18",
+        "server_v12_rack_01_01_compute_u20",
+        "server_v12_rack_01_01_compute_u22",
+        "server_v12_rack_01_01_compute_u24",
+        "server_v12_rack_01_01_compute_u26",
+        "server_v12_rack_01_01_compute_u28",
+        "server_v12_rack_01_01_compute_u30",
+        "server_v12_rack_01_01_compute_u32",
+        "server_v12_rack_01_01_compute_u34",
+        "server_v12_rack_01_01_blank_u36",
+        "server_v12_rack_01_01_patch_u40",
+        "server_v12_rack_01_01_switch_u41",
+        "server_v12_rack_01_01_switch_u42",
+        "server_v12_rack_01_01_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_01_02",
+      "node": "server_v12_rack_01_02",
+      "row": 1,
+      "column": 2,
+      "position_blender_m": [
+        -12.6,
+        -8.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_01_02_door_front",
+        "server_v12_rack_01_02_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_01_02_ups_u00",
+        "server_v12_rack_01_02_storage_u04",
+        "server_v12_rack_01_02_compute_u08",
+        "server_v12_rack_01_02_compute_u10",
+        "server_v12_rack_01_02_compute_u12",
+        "server_v12_rack_01_02_compute_u14",
+        "server_v12_rack_01_02_compute_u16",
+        "server_v12_rack_01_02_compute_u18",
+        "server_v12_rack_01_02_compute_u20",
+        "server_v12_rack_01_02_compute_u22",
+        "server_v12_rack_01_02_compute_u24",
+        "server_v12_rack_01_02_compute_u26",
+        "server_v12_rack_01_02_compute_u28",
+        "server_v12_rack_01_02_compute_u30",
+        "server_v12_rack_01_02_compute_u32",
+        "server_v12_rack_01_02_compute_u34",
+        "server_v12_rack_01_02_blank_u36",
+        "server_v12_rack_01_02_patch_u40",
+        "server_v12_rack_01_02_switch_u41",
+        "server_v12_rack_01_02_switch_u42",
+        "server_v12_rack_01_02_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_01_03",
+      "node": "server_v12_rack_01_03",
+      "row": 1,
+      "column": 3,
+      "position_blender_m": [
+        -11.75,
+        -8.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_01_03_door_front",
+        "server_v12_rack_01_03_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_01_03_ups_u00",
+        "server_v12_rack_01_03_storage_u04",
+        "server_v12_rack_01_03_compute_u08",
+        "server_v12_rack_01_03_compute_u10",
+        "server_v12_rack_01_03_compute_u12",
+        "server_v12_rack_01_03_compute_u14",
+        "server_v12_rack_01_03_compute_u16",
+        "server_v12_rack_01_03_compute_u18",
+        "server_v12_rack_01_03_compute_u20",
+        "server_v12_rack_01_03_compute_u22",
+        "server_v12_rack_01_03_compute_u24",
+        "server_v12_rack_01_03_compute_u26",
+        "server_v12_rack_01_03_compute_u28",
+        "server_v12_rack_01_03_compute_u30",
+        "server_v12_rack_01_03_compute_u32",
+        "server_v12_rack_01_03_compute_u34",
+        "server_v12_rack_01_03_blank_u36",
+        "server_v12_rack_01_03_patch_u40",
+        "server_v12_rack_01_03_switch_u41",
+        "server_v12_rack_01_03_switch_u42",
+        "server_v12_rack_01_03_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_01_04",
+      "node": "server_v12_rack_01_04",
+      "row": 1,
+      "column": 4,
+      "position_blender_m": [
+        -10.899999999999999,
+        -8.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_01_04_door_front",
+        "server_v12_rack_01_04_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_01_04_ups_u00",
+        "server_v12_rack_01_04_storage_u04",
+        "server_v12_rack_01_04_compute_u08",
+        "server_v12_rack_01_04_compute_u10",
+        "server_v12_rack_01_04_compute_u12",
+        "server_v12_rack_01_04_compute_u14",
+        "server_v12_rack_01_04_compute_u16",
+        "server_v12_rack_01_04_compute_u18",
+        "server_v12_rack_01_04_compute_u20",
+        "server_v12_rack_01_04_compute_u22",
+        "server_v12_rack_01_04_compute_u24",
+        "server_v12_rack_01_04_compute_u26",
+        "server_v12_rack_01_04_compute_u28",
+        "server_v12_rack_01_04_compute_u30",
+        "server_v12_rack_01_04_compute_u32",
+        "server_v12_rack_01_04_compute_u34",
+        "server_v12_rack_01_04_blank_u36",
+        "server_v12_rack_01_04_patch_u40",
+        "server_v12_rack_01_04_switch_u41",
+        "server_v12_rack_01_04_switch_u42",
+        "server_v12_rack_01_04_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_01_05",
+      "node": "server_v12_rack_01_05",
+      "row": 1,
+      "column": 5,
+      "position_blender_m": [
+        -10.049999999999999,
+        -8.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_01_05_door_front",
+        "server_v12_rack_01_05_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_01_05_ups_u00",
+        "server_v12_rack_01_05_storage_u04",
+        "server_v12_rack_01_05_compute_u08",
+        "server_v12_rack_01_05_compute_u10",
+        "server_v12_rack_01_05_compute_u12",
+        "server_v12_rack_01_05_compute_u14",
+        "server_v12_rack_01_05_compute_u16",
+        "server_v12_rack_01_05_compute_u18",
+        "server_v12_rack_01_05_compute_u20",
+        "server_v12_rack_01_05_compute_u22",
+        "server_v12_rack_01_05_compute_u24",
+        "server_v12_rack_01_05_compute_u26",
+        "server_v12_rack_01_05_compute_u28",
+        "server_v12_rack_01_05_compute_u30",
+        "server_v12_rack_01_05_compute_u32",
+        "server_v12_rack_01_05_compute_u34",
+        "server_v12_rack_01_05_blank_u36",
+        "server_v12_rack_01_05_patch_u40",
+        "server_v12_rack_01_05_switch_u41",
+        "server_v12_rack_01_05_switch_u42",
+        "server_v12_rack_01_05_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_01_06",
+      "node": "server_v12_rack_01_06",
+      "row": 1,
+      "column": 6,
+      "position_blender_m": [
+        -9.2,
+        -8.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_01_06_door_front",
+        "server_v12_rack_01_06_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_01_06_ups_u00",
+        "server_v12_rack_01_06_storage_u04",
+        "server_v12_rack_01_06_compute_u08",
+        "server_v12_rack_01_06_compute_u10",
+        "server_v12_rack_01_06_compute_u12",
+        "server_v12_rack_01_06_compute_u14",
+        "server_v12_rack_01_06_compute_u16",
+        "server_v12_rack_01_06_compute_u18",
+        "server_v12_rack_01_06_compute_u20",
+        "server_v12_rack_01_06_compute_u22",
+        "server_v12_rack_01_06_compute_u24",
+        "server_v12_rack_01_06_compute_u26",
+        "server_v12_rack_01_06_compute_u28",
+        "server_v12_rack_01_06_compute_u30",
+        "server_v12_rack_01_06_compute_u32",
+        "server_v12_rack_01_06_compute_u34",
+        "server_v12_rack_01_06_blank_u36",
+        "server_v12_rack_01_06_patch_u40",
+        "server_v12_rack_01_06_switch_u41",
+        "server_v12_rack_01_06_switch_u42",
+        "server_v12_rack_01_06_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_01_07",
+      "node": "server_v12_rack_01_07",
+      "row": 1,
+      "column": 7,
+      "position_blender_m": [
+        -8.35,
+        -8.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_01_07_door_front",
+        "server_v12_rack_01_07_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_01_07_ups_u00",
+        "server_v12_rack_01_07_storage_u04",
+        "server_v12_rack_01_07_compute_u08",
+        "server_v12_rack_01_07_compute_u10",
+        "server_v12_rack_01_07_compute_u12",
+        "server_v12_rack_01_07_compute_u14",
+        "server_v12_rack_01_07_compute_u16",
+        "server_v12_rack_01_07_compute_u18",
+        "server_v12_rack_01_07_compute_u20",
+        "server_v12_rack_01_07_compute_u22",
+        "server_v12_rack_01_07_compute_u24",
+        "server_v12_rack_01_07_compute_u26",
+        "server_v12_rack_01_07_compute_u28",
+        "server_v12_rack_01_07_compute_u30",
+        "server_v12_rack_01_07_compute_u32",
+        "server_v12_rack_01_07_compute_u34",
+        "server_v12_rack_01_07_blank_u36",
+        "server_v12_rack_01_07_patch_u40",
+        "server_v12_rack_01_07_switch_u41",
+        "server_v12_rack_01_07_switch_u42",
+        "server_v12_rack_01_07_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_01_08",
+      "node": "server_v12_rack_01_08",
+      "row": 1,
+      "column": 8,
+      "position_blender_m": [
+        -7.499999999999999,
+        -8.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_01_08_door_front",
+        "server_v12_rack_01_08_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_01_08_ups_u00",
+        "server_v12_rack_01_08_storage_u04",
+        "server_v12_rack_01_08_compute_u08",
+        "server_v12_rack_01_08_compute_u10",
+        "server_v12_rack_01_08_compute_u12",
+        "server_v12_rack_01_08_compute_u14",
+        "server_v12_rack_01_08_compute_u16",
+        "server_v12_rack_01_08_compute_u18",
+        "server_v12_rack_01_08_compute_u20",
+        "server_v12_rack_01_08_compute_u22",
+        "server_v12_rack_01_08_compute_u24",
+        "server_v12_rack_01_08_compute_u26",
+        "server_v12_rack_01_08_compute_u28",
+        "server_v12_rack_01_08_compute_u30",
+        "server_v12_rack_01_08_compute_u32",
+        "server_v12_rack_01_08_compute_u34",
+        "server_v12_rack_01_08_blank_u36",
+        "server_v12_rack_01_08_patch_u40",
+        "server_v12_rack_01_08_switch_u41",
+        "server_v12_rack_01_08_switch_u42",
+        "server_v12_rack_01_08_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_01_09",
+      "node": "server_v12_rack_01_09",
+      "row": 1,
+      "column": 9,
+      "position_blender_m": [
+        -6.6499999999999995,
+        -8.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_01_09_door_front",
+        "server_v12_rack_01_09_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_01_09_ups_u00",
+        "server_v12_rack_01_09_storage_u04",
+        "server_v12_rack_01_09_compute_u08",
+        "server_v12_rack_01_09_compute_u10",
+        "server_v12_rack_01_09_compute_u12",
+        "server_v12_rack_01_09_compute_u14",
+        "server_v12_rack_01_09_compute_u16",
+        "server_v12_rack_01_09_compute_u18",
+        "server_v12_rack_01_09_compute_u20",
+        "server_v12_rack_01_09_compute_u22",
+        "server_v12_rack_01_09_compute_u24",
+        "server_v12_rack_01_09_compute_u26",
+        "server_v12_rack_01_09_compute_u28",
+        "server_v12_rack_01_09_compute_u30",
+        "server_v12_rack_01_09_compute_u32",
+        "server_v12_rack_01_09_compute_u34",
+        "server_v12_rack_01_09_blank_u36",
+        "server_v12_rack_01_09_patch_u40",
+        "server_v12_rack_01_09_switch_u41",
+        "server_v12_rack_01_09_switch_u42",
+        "server_v12_rack_01_09_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_01_10",
+      "node": "server_v12_rack_01_10",
+      "row": 1,
+      "column": 10,
+      "position_blender_m": [
+        -5.8,
+        -8.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_01_10_door_front",
+        "server_v12_rack_01_10_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_01_10_ups_u00",
+        "server_v12_rack_01_10_storage_u04",
+        "server_v12_rack_01_10_compute_u08",
+        "server_v12_rack_01_10_compute_u10",
+        "server_v12_rack_01_10_compute_u12",
+        "server_v12_rack_01_10_compute_u14",
+        "server_v12_rack_01_10_compute_u16",
+        "server_v12_rack_01_10_compute_u18",
+        "server_v12_rack_01_10_compute_u20",
+        "server_v12_rack_01_10_compute_u22",
+        "server_v12_rack_01_10_compute_u24",
+        "server_v12_rack_01_10_compute_u26",
+        "server_v12_rack_01_10_compute_u28",
+        "server_v12_rack_01_10_compute_u30",
+        "server_v12_rack_01_10_compute_u32",
+        "server_v12_rack_01_10_compute_u34",
+        "server_v12_rack_01_10_blank_u36",
+        "server_v12_rack_01_10_patch_u40",
+        "server_v12_rack_01_10_switch_u41",
+        "server_v12_rack_01_10_switch_u42",
+        "server_v12_rack_01_10_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_01_11",
+      "node": "server_v12_rack_01_11",
+      "row": 1,
+      "column": 11,
+      "position_blender_m": [
+        -4.949999999999999,
+        -8.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_01_11_door_front",
+        "server_v12_rack_01_11_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_01_11_ups_u00",
+        "server_v12_rack_01_11_storage_u04",
+        "server_v12_rack_01_11_compute_u08",
+        "server_v12_rack_01_11_compute_u10",
+        "server_v12_rack_01_11_compute_u12",
+        "server_v12_rack_01_11_compute_u14",
+        "server_v12_rack_01_11_compute_u16",
+        "server_v12_rack_01_11_compute_u18",
+        "server_v12_rack_01_11_compute_u20",
+        "server_v12_rack_01_11_compute_u22",
+        "server_v12_rack_01_11_compute_u24",
+        "server_v12_rack_01_11_compute_u26",
+        "server_v12_rack_01_11_compute_u28",
+        "server_v12_rack_01_11_compute_u30",
+        "server_v12_rack_01_11_compute_u32",
+        "server_v12_rack_01_11_compute_u34",
+        "server_v12_rack_01_11_blank_u36",
+        "server_v12_rack_01_11_patch_u40",
+        "server_v12_rack_01_11_switch_u41",
+        "server_v12_rack_01_11_switch_u42",
+        "server_v12_rack_01_11_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_01_12",
+      "node": "server_v12_rack_01_12",
+      "row": 1,
+      "column": 12,
+      "position_blender_m": [
+        -4.1,
+        -8.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_01_12_door_front",
+        "server_v12_rack_01_12_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_01_12_ups_u00",
+        "server_v12_rack_01_12_storage_u04",
+        "server_v12_rack_01_12_compute_u08",
+        "server_v12_rack_01_12_compute_u10",
+        "server_v12_rack_01_12_compute_u12",
+        "server_v12_rack_01_12_compute_u14",
+        "server_v12_rack_01_12_compute_u16",
+        "server_v12_rack_01_12_compute_u18",
+        "server_v12_rack_01_12_compute_u20",
+        "server_v12_rack_01_12_compute_u22",
+        "server_v12_rack_01_12_compute_u24",
+        "server_v12_rack_01_12_compute_u26",
+        "server_v12_rack_01_12_compute_u28",
+        "server_v12_rack_01_12_compute_u30",
+        "server_v12_rack_01_12_compute_u32",
+        "server_v12_rack_01_12_compute_u34",
+        "server_v12_rack_01_12_blank_u36",
+        "server_v12_rack_01_12_patch_u40",
+        "server_v12_rack_01_12_switch_u41",
+        "server_v12_rack_01_12_switch_u42",
+        "server_v12_rack_01_12_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_01_13",
+      "node": "server_v12_rack_01_13",
+      "row": 1,
+      "column": 13,
+      "position_blender_m": [
+        -3.25,
+        -8.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_01_13_door_front",
+        "server_v12_rack_01_13_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_01_13_ups_u00",
+        "server_v12_rack_01_13_storage_u04",
+        "server_v12_rack_01_13_compute_u08",
+        "server_v12_rack_01_13_compute_u10",
+        "server_v12_rack_01_13_compute_u12",
+        "server_v12_rack_01_13_compute_u14",
+        "server_v12_rack_01_13_compute_u16",
+        "server_v12_rack_01_13_compute_u18",
+        "server_v12_rack_01_13_compute_u20",
+        "server_v12_rack_01_13_compute_u22",
+        "server_v12_rack_01_13_compute_u24",
+        "server_v12_rack_01_13_compute_u26",
+        "server_v12_rack_01_13_compute_u28",
+        "server_v12_rack_01_13_compute_u30",
+        "server_v12_rack_01_13_compute_u32",
+        "server_v12_rack_01_13_compute_u34",
+        "server_v12_rack_01_13_blank_u36",
+        "server_v12_rack_01_13_patch_u40",
+        "server_v12_rack_01_13_switch_u41",
+        "server_v12_rack_01_13_switch_u42",
+        "server_v12_rack_01_13_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_01_14",
+      "node": "server_v12_rack_01_14",
+      "row": 1,
+      "column": 14,
+      "position_blender_m": [
+        -2.4000000000000004,
+        -8.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_01_14_door_front",
+        "server_v12_rack_01_14_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_01_14_ups_u00",
+        "server_v12_rack_01_14_storage_u04",
+        "server_v12_rack_01_14_compute_u08",
+        "server_v12_rack_01_14_compute_u10",
+        "server_v12_rack_01_14_compute_u12",
+        "server_v12_rack_01_14_compute_u14",
+        "server_v12_rack_01_14_compute_u16",
+        "server_v12_rack_01_14_compute_u18",
+        "server_v12_rack_01_14_compute_u20",
+        "server_v12_rack_01_14_compute_u22",
+        "server_v12_rack_01_14_compute_u24",
+        "server_v12_rack_01_14_compute_u26",
+        "server_v12_rack_01_14_compute_u28",
+        "server_v12_rack_01_14_compute_u30",
+        "server_v12_rack_01_14_compute_u32",
+        "server_v12_rack_01_14_compute_u34",
+        "server_v12_rack_01_14_blank_u36",
+        "server_v12_rack_01_14_patch_u40",
+        "server_v12_rack_01_14_switch_u41",
+        "server_v12_rack_01_14_switch_u42",
+        "server_v12_rack_01_14_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_01_15",
+      "node": "server_v12_rack_01_15",
+      "row": 1,
+      "column": 15,
+      "position_blender_m": [
+        -1.549999999999999,
+        -8.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_01_15_door_front",
+        "server_v12_rack_01_15_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_01_15_ups_u00",
+        "server_v12_rack_01_15_storage_u04",
+        "server_v12_rack_01_15_compute_u08",
+        "server_v12_rack_01_15_compute_u10",
+        "server_v12_rack_01_15_compute_u12",
+        "server_v12_rack_01_15_compute_u14",
+        "server_v12_rack_01_15_compute_u16",
+        "server_v12_rack_01_15_compute_u18",
+        "server_v12_rack_01_15_compute_u20",
+        "server_v12_rack_01_15_compute_u22",
+        "server_v12_rack_01_15_compute_u24",
+        "server_v12_rack_01_15_compute_u26",
+        "server_v12_rack_01_15_compute_u28",
+        "server_v12_rack_01_15_compute_u30",
+        "server_v12_rack_01_15_compute_u32",
+        "server_v12_rack_01_15_compute_u34",
+        "server_v12_rack_01_15_blank_u36",
+        "server_v12_rack_01_15_patch_u40",
+        "server_v12_rack_01_15_switch_u41",
+        "server_v12_rack_01_15_switch_u42",
+        "server_v12_rack_01_15_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_01_16",
+      "node": "server_v12_rack_01_16",
+      "row": 1,
+      "column": 16,
+      "position_blender_m": [
+        -0.6999999999999993,
+        -8.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_01_16_door_front",
+        "server_v12_rack_01_16_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_01_16_ups_u00",
+        "server_v12_rack_01_16_storage_u04",
+        "server_v12_rack_01_16_compute_u08",
+        "server_v12_rack_01_16_compute_u10",
+        "server_v12_rack_01_16_compute_u12",
+        "server_v12_rack_01_16_compute_u14",
+        "server_v12_rack_01_16_compute_u16",
+        "server_v12_rack_01_16_compute_u18",
+        "server_v12_rack_01_16_compute_u20",
+        "server_v12_rack_01_16_compute_u22",
+        "server_v12_rack_01_16_compute_u24",
+        "server_v12_rack_01_16_compute_u26",
+        "server_v12_rack_01_16_compute_u28",
+        "server_v12_rack_01_16_compute_u30",
+        "server_v12_rack_01_16_compute_u32",
+        "server_v12_rack_01_16_compute_u34",
+        "server_v12_rack_01_16_blank_u36",
+        "server_v12_rack_01_16_patch_u40",
+        "server_v12_rack_01_16_switch_u41",
+        "server_v12_rack_01_16_switch_u42",
+        "server_v12_rack_01_16_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_01_17",
+      "node": "server_v12_rack_01_17",
+      "row": 1,
+      "column": 17,
+      "position_blender_m": [
+        0.15000000000000036,
+        -8.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_01_17_door_front",
+        "server_v12_rack_01_17_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_01_17_ups_u00",
+        "server_v12_rack_01_17_storage_u04",
+        "server_v12_rack_01_17_compute_u08",
+        "server_v12_rack_01_17_compute_u10",
+        "server_v12_rack_01_17_compute_u12",
+        "server_v12_rack_01_17_compute_u14",
+        "server_v12_rack_01_17_compute_u16",
+        "server_v12_rack_01_17_compute_u18",
+        "server_v12_rack_01_17_compute_u20",
+        "server_v12_rack_01_17_compute_u22",
+        "server_v12_rack_01_17_compute_u24",
+        "server_v12_rack_01_17_compute_u26",
+        "server_v12_rack_01_17_compute_u28",
+        "server_v12_rack_01_17_compute_u30",
+        "server_v12_rack_01_17_compute_u32",
+        "server_v12_rack_01_17_compute_u34",
+        "server_v12_rack_01_17_blank_u36",
+        "server_v12_rack_01_17_patch_u40",
+        "server_v12_rack_01_17_switch_u41",
+        "server_v12_rack_01_17_switch_u42",
+        "server_v12_rack_01_17_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_01_18",
+      "node": "server_v12_rack_01_18",
+      "row": 1,
+      "column": 18,
+      "position_blender_m": [
+        1.0,
+        -8.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_01_18_door_front",
+        "server_v12_rack_01_18_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_01_18_ups_u00",
+        "server_v12_rack_01_18_storage_u04",
+        "server_v12_rack_01_18_compute_u08",
+        "server_v12_rack_01_18_compute_u10",
+        "server_v12_rack_01_18_compute_u12",
+        "server_v12_rack_01_18_compute_u14",
+        "server_v12_rack_01_18_compute_u16",
+        "server_v12_rack_01_18_compute_u18",
+        "server_v12_rack_01_18_compute_u20",
+        "server_v12_rack_01_18_compute_u22",
+        "server_v12_rack_01_18_compute_u24",
+        "server_v12_rack_01_18_compute_u26",
+        "server_v12_rack_01_18_compute_u28",
+        "server_v12_rack_01_18_compute_u30",
+        "server_v12_rack_01_18_compute_u32",
+        "server_v12_rack_01_18_compute_u34",
+        "server_v12_rack_01_18_blank_u36",
+        "server_v12_rack_01_18_patch_u40",
+        "server_v12_rack_01_18_switch_u41",
+        "server_v12_rack_01_18_switch_u42",
+        "server_v12_rack_01_18_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_01_19",
+      "node": "server_v12_rack_01_19",
+      "row": 1,
+      "column": 19,
+      "position_blender_m": [
+        1.8499999999999996,
+        -8.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_01_19_door_front",
+        "server_v12_rack_01_19_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_01_19_ups_u00",
+        "server_v12_rack_01_19_storage_u04",
+        "server_v12_rack_01_19_compute_u08",
+        "server_v12_rack_01_19_compute_u10",
+        "server_v12_rack_01_19_compute_u12",
+        "server_v12_rack_01_19_compute_u14",
+        "server_v12_rack_01_19_compute_u16",
+        "server_v12_rack_01_19_compute_u18",
+        "server_v12_rack_01_19_compute_u20",
+        "server_v12_rack_01_19_compute_u22",
+        "server_v12_rack_01_19_compute_u24",
+        "server_v12_rack_01_19_compute_u26",
+        "server_v12_rack_01_19_compute_u28",
+        "server_v12_rack_01_19_compute_u30",
+        "server_v12_rack_01_19_compute_u32",
+        "server_v12_rack_01_19_compute_u34",
+        "server_v12_rack_01_19_blank_u36",
+        "server_v12_rack_01_19_patch_u40",
+        "server_v12_rack_01_19_switch_u41",
+        "server_v12_rack_01_19_switch_u42",
+        "server_v12_rack_01_19_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_01_20",
+      "node": "server_v12_rack_01_20",
+      "row": 1,
+      "column": 20,
+      "position_blender_m": [
+        2.6999999999999993,
+        -8.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_01_20_door_front",
+        "server_v12_rack_01_20_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_01_20_ups_u00",
+        "server_v12_rack_01_20_storage_u04",
+        "server_v12_rack_01_20_compute_u08",
+        "server_v12_rack_01_20_compute_u10",
+        "server_v12_rack_01_20_compute_u12",
+        "server_v12_rack_01_20_compute_u14",
+        "server_v12_rack_01_20_compute_u16",
+        "server_v12_rack_01_20_compute_u18",
+        "server_v12_rack_01_20_compute_u20",
+        "server_v12_rack_01_20_compute_u22",
+        "server_v12_rack_01_20_compute_u24",
+        "server_v12_rack_01_20_compute_u26",
+        "server_v12_rack_01_20_compute_u28",
+        "server_v12_rack_01_20_compute_u30",
+        "server_v12_rack_01_20_compute_u32",
+        "server_v12_rack_01_20_compute_u34",
+        "server_v12_rack_01_20_blank_u36",
+        "server_v12_rack_01_20_patch_u40",
+        "server_v12_rack_01_20_switch_u41",
+        "server_v12_rack_01_20_switch_u42",
+        "server_v12_rack_01_20_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_02_01",
+      "node": "server_v12_rack_02_01",
+      "row": 2,
+      "column": 1,
+      "position_blender_m": [
+        -13.45,
+        -1.0,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "+Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_02_01_door_front",
+        "server_v12_rack_02_01_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_02_01_ups_u00",
+        "server_v12_rack_02_01_storage_u04",
+        "server_v12_rack_02_01_compute_u08",
+        "server_v12_rack_02_01_compute_u10",
+        "server_v12_rack_02_01_compute_u12",
+        "server_v12_rack_02_01_compute_u14",
+        "server_v12_rack_02_01_compute_u16",
+        "server_v12_rack_02_01_compute_u18",
+        "server_v12_rack_02_01_compute_u20",
+        "server_v12_rack_02_01_compute_u22",
+        "server_v12_rack_02_01_compute_u24",
+        "server_v12_rack_02_01_compute_u26",
+        "server_v12_rack_02_01_compute_u28",
+        "server_v12_rack_02_01_compute_u30",
+        "server_v12_rack_02_01_compute_u32",
+        "server_v12_rack_02_01_compute_u34",
+        "server_v12_rack_02_01_blank_u36",
+        "server_v12_rack_02_01_patch_u40",
+        "server_v12_rack_02_01_switch_u41",
+        "server_v12_rack_02_01_switch_u42",
+        "server_v12_rack_02_01_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_02_02",
+      "node": "server_v12_rack_02_02",
+      "row": 2,
+      "column": 2,
+      "position_blender_m": [
+        -12.6,
+        -1.0,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "+Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_02_02_door_front",
+        "server_v12_rack_02_02_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_02_02_ups_u00",
+        "server_v12_rack_02_02_storage_u04",
+        "server_v12_rack_02_02_compute_u08",
+        "server_v12_rack_02_02_compute_u10",
+        "server_v12_rack_02_02_compute_u12",
+        "server_v12_rack_02_02_compute_u14",
+        "server_v12_rack_02_02_compute_u16",
+        "server_v12_rack_02_02_compute_u18",
+        "server_v12_rack_02_02_compute_u20",
+        "server_v12_rack_02_02_compute_u22",
+        "server_v12_rack_02_02_compute_u24",
+        "server_v12_rack_02_02_compute_u26",
+        "server_v12_rack_02_02_compute_u28",
+        "server_v12_rack_02_02_compute_u30",
+        "server_v12_rack_02_02_compute_u32",
+        "server_v12_rack_02_02_compute_u34",
+        "server_v12_rack_02_02_blank_u36",
+        "server_v12_rack_02_02_patch_u40",
+        "server_v12_rack_02_02_switch_u41",
+        "server_v12_rack_02_02_switch_u42",
+        "server_v12_rack_02_02_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_02_03",
+      "node": "server_v12_rack_02_03",
+      "row": 2,
+      "column": 3,
+      "position_blender_m": [
+        -11.75,
+        -1.0,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "+Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_02_03_door_front",
+        "server_v12_rack_02_03_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_02_03_ups_u00",
+        "server_v12_rack_02_03_storage_u04",
+        "server_v12_rack_02_03_compute_u08",
+        "server_v12_rack_02_03_compute_u10",
+        "server_v12_rack_02_03_compute_u12",
+        "server_v12_rack_02_03_compute_u14",
+        "server_v12_rack_02_03_compute_u16",
+        "server_v12_rack_02_03_compute_u18",
+        "server_v12_rack_02_03_compute_u20",
+        "server_v12_rack_02_03_compute_u22",
+        "server_v12_rack_02_03_compute_u24",
+        "server_v12_rack_02_03_compute_u26",
+        "server_v12_rack_02_03_compute_u28",
+        "server_v12_rack_02_03_compute_u30",
+        "server_v12_rack_02_03_compute_u32",
+        "server_v12_rack_02_03_compute_u34",
+        "server_v12_rack_02_03_blank_u36",
+        "server_v12_rack_02_03_patch_u40",
+        "server_v12_rack_02_03_switch_u41",
+        "server_v12_rack_02_03_switch_u42",
+        "server_v12_rack_02_03_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_02_04",
+      "node": "server_v12_rack_02_04",
+      "row": 2,
+      "column": 4,
+      "position_blender_m": [
+        -10.899999999999999,
+        -1.0,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "+Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_02_04_door_front",
+        "server_v12_rack_02_04_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_02_04_ups_u00",
+        "server_v12_rack_02_04_storage_u04",
+        "server_v12_rack_02_04_compute_u08",
+        "server_v12_rack_02_04_compute_u10",
+        "server_v12_rack_02_04_compute_u12",
+        "server_v12_rack_02_04_compute_u14",
+        "server_v12_rack_02_04_compute_u16",
+        "server_v12_rack_02_04_compute_u18",
+        "server_v12_rack_02_04_compute_u20",
+        "server_v12_rack_02_04_compute_u22",
+        "server_v12_rack_02_04_compute_u24",
+        "server_v12_rack_02_04_compute_u26",
+        "server_v12_rack_02_04_compute_u28",
+        "server_v12_rack_02_04_compute_u30",
+        "server_v12_rack_02_04_compute_u32",
+        "server_v12_rack_02_04_compute_u34",
+        "server_v12_rack_02_04_blank_u36",
+        "server_v12_rack_02_04_patch_u40",
+        "server_v12_rack_02_04_switch_u41",
+        "server_v12_rack_02_04_switch_u42",
+        "server_v12_rack_02_04_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_02_05",
+      "node": "server_v12_rack_02_05",
+      "row": 2,
+      "column": 5,
+      "position_blender_m": [
+        -10.049999999999999,
+        -1.0,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "+Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_02_05_door_front",
+        "server_v12_rack_02_05_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_02_05_ups_u00",
+        "server_v12_rack_02_05_storage_u04",
+        "server_v12_rack_02_05_compute_u08",
+        "server_v12_rack_02_05_compute_u10",
+        "server_v12_rack_02_05_compute_u12",
+        "server_v12_rack_02_05_compute_u14",
+        "server_v12_rack_02_05_compute_u16",
+        "server_v12_rack_02_05_compute_u18",
+        "server_v12_rack_02_05_compute_u20",
+        "server_v12_rack_02_05_compute_u22",
+        "server_v12_rack_02_05_compute_u24",
+        "server_v12_rack_02_05_compute_u26",
+        "server_v12_rack_02_05_compute_u28",
+        "server_v12_rack_02_05_compute_u30",
+        "server_v12_rack_02_05_compute_u32",
+        "server_v12_rack_02_05_compute_u34",
+        "server_v12_rack_02_05_blank_u36",
+        "server_v12_rack_02_05_patch_u40",
+        "server_v12_rack_02_05_switch_u41",
+        "server_v12_rack_02_05_switch_u42",
+        "server_v12_rack_02_05_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_02_06",
+      "node": "server_v12_rack_02_06",
+      "row": 2,
+      "column": 6,
+      "position_blender_m": [
+        -9.2,
+        -1.0,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "+Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_02_06_door_front",
+        "server_v12_rack_02_06_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_02_06_ups_u00",
+        "server_v12_rack_02_06_storage_u04",
+        "server_v12_rack_02_06_compute_u08",
+        "server_v12_rack_02_06_compute_u10",
+        "server_v12_rack_02_06_compute_u12",
+        "server_v12_rack_02_06_compute_u14",
+        "server_v12_rack_02_06_compute_u16",
+        "server_v12_rack_02_06_compute_u18",
+        "server_v12_rack_02_06_compute_u20",
+        "server_v12_rack_02_06_compute_u22",
+        "server_v12_rack_02_06_compute_u24",
+        "server_v12_rack_02_06_compute_u26",
+        "server_v12_rack_02_06_compute_u28",
+        "server_v12_rack_02_06_compute_u30",
+        "server_v12_rack_02_06_compute_u32",
+        "server_v12_rack_02_06_compute_u34",
+        "server_v12_rack_02_06_blank_u36",
+        "server_v12_rack_02_06_patch_u40",
+        "server_v12_rack_02_06_switch_u41",
+        "server_v12_rack_02_06_switch_u42",
+        "server_v12_rack_02_06_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_02_07",
+      "node": "server_v12_rack_02_07",
+      "row": 2,
+      "column": 7,
+      "position_blender_m": [
+        -8.35,
+        -1.0,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "+Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_02_07_door_front",
+        "server_v12_rack_02_07_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_02_07_ups_u00",
+        "server_v12_rack_02_07_storage_u04",
+        "server_v12_rack_02_07_compute_u08",
+        "server_v12_rack_02_07_compute_u10",
+        "server_v12_rack_02_07_compute_u12",
+        "server_v12_rack_02_07_compute_u14",
+        "server_v12_rack_02_07_compute_u16",
+        "server_v12_rack_02_07_compute_u18",
+        "server_v12_rack_02_07_compute_u20",
+        "server_v12_rack_02_07_compute_u22",
+        "server_v12_rack_02_07_compute_u24",
+        "server_v12_rack_02_07_compute_u26",
+        "server_v12_rack_02_07_compute_u28",
+        "server_v12_rack_02_07_compute_u30",
+        "server_v12_rack_02_07_compute_u32",
+        "server_v12_rack_02_07_compute_u34",
+        "server_v12_rack_02_07_blank_u36",
+        "server_v12_rack_02_07_patch_u40",
+        "server_v12_rack_02_07_switch_u41",
+        "server_v12_rack_02_07_switch_u42",
+        "server_v12_rack_02_07_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_02_08",
+      "node": "server_v12_rack_02_08",
+      "row": 2,
+      "column": 8,
+      "position_blender_m": [
+        -7.499999999999999,
+        -1.0,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "+Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_02_08_door_front",
+        "server_v12_rack_02_08_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_02_08_ups_u00",
+        "server_v12_rack_02_08_storage_u04",
+        "server_v12_rack_02_08_compute_u08",
+        "server_v12_rack_02_08_compute_u10",
+        "server_v12_rack_02_08_compute_u12",
+        "server_v12_rack_02_08_compute_u14",
+        "server_v12_rack_02_08_compute_u16",
+        "server_v12_rack_02_08_compute_u18",
+        "server_v12_rack_02_08_compute_u20",
+        "server_v12_rack_02_08_compute_u22",
+        "server_v12_rack_02_08_compute_u24",
+        "server_v12_rack_02_08_compute_u26",
+        "server_v12_rack_02_08_compute_u28",
+        "server_v12_rack_02_08_compute_u30",
+        "server_v12_rack_02_08_compute_u32",
+        "server_v12_rack_02_08_compute_u34",
+        "server_v12_rack_02_08_blank_u36",
+        "server_v12_rack_02_08_patch_u40",
+        "server_v12_rack_02_08_switch_u41",
+        "server_v12_rack_02_08_switch_u42",
+        "server_v12_rack_02_08_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_02_09",
+      "node": "server_v12_rack_02_09",
+      "row": 2,
+      "column": 9,
+      "position_blender_m": [
+        -6.6499999999999995,
+        -1.0,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "+Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_02_09_door_front",
+        "server_v12_rack_02_09_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_02_09_ups_u00",
+        "server_v12_rack_02_09_storage_u04",
+        "server_v12_rack_02_09_compute_u08",
+        "server_v12_rack_02_09_compute_u10",
+        "server_v12_rack_02_09_compute_u12",
+        "server_v12_rack_02_09_compute_u14",
+        "server_v12_rack_02_09_compute_u16",
+        "server_v12_rack_02_09_compute_u18",
+        "server_v12_rack_02_09_compute_u20",
+        "server_v12_rack_02_09_compute_u22",
+        "server_v12_rack_02_09_compute_u24",
+        "server_v12_rack_02_09_compute_u26",
+        "server_v12_rack_02_09_compute_u28",
+        "server_v12_rack_02_09_compute_u30",
+        "server_v12_rack_02_09_compute_u32",
+        "server_v12_rack_02_09_compute_u34",
+        "server_v12_rack_02_09_blank_u36",
+        "server_v12_rack_02_09_patch_u40",
+        "server_v12_rack_02_09_switch_u41",
+        "server_v12_rack_02_09_switch_u42",
+        "server_v12_rack_02_09_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_02_10",
+      "node": "server_v12_rack_02_10",
+      "row": 2,
+      "column": 10,
+      "position_blender_m": [
+        -5.8,
+        -1.0,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "+Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_02_10_door_front",
+        "server_v12_rack_02_10_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_02_10_ups_u00",
+        "server_v12_rack_02_10_storage_u04",
+        "server_v12_rack_02_10_compute_u08",
+        "server_v12_rack_02_10_compute_u10",
+        "server_v12_rack_02_10_compute_u12",
+        "server_v12_rack_02_10_compute_u14",
+        "server_v12_rack_02_10_compute_u16",
+        "server_v12_rack_02_10_compute_u18",
+        "server_v12_rack_02_10_compute_u20",
+        "server_v12_rack_02_10_compute_u22",
+        "server_v12_rack_02_10_compute_u24",
+        "server_v12_rack_02_10_compute_u26",
+        "server_v12_rack_02_10_compute_u28",
+        "server_v12_rack_02_10_compute_u30",
+        "server_v12_rack_02_10_compute_u32",
+        "server_v12_rack_02_10_compute_u34",
+        "server_v12_rack_02_10_blank_u36",
+        "server_v12_rack_02_10_patch_u40",
+        "server_v12_rack_02_10_switch_u41",
+        "server_v12_rack_02_10_switch_u42",
+        "server_v12_rack_02_10_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_02_11",
+      "node": "server_v12_rack_02_11",
+      "row": 2,
+      "column": 11,
+      "position_blender_m": [
+        -4.949999999999999,
+        -1.0,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "+Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_02_11_door_front",
+        "server_v12_rack_02_11_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_02_11_ups_u00",
+        "server_v12_rack_02_11_storage_u04",
+        "server_v12_rack_02_11_compute_u08",
+        "server_v12_rack_02_11_compute_u10",
+        "server_v12_rack_02_11_compute_u12",
+        "server_v12_rack_02_11_compute_u14",
+        "server_v12_rack_02_11_compute_u16",
+        "server_v12_rack_02_11_compute_u18",
+        "server_v12_rack_02_11_compute_u20",
+        "server_v12_rack_02_11_compute_u22",
+        "server_v12_rack_02_11_compute_u24",
+        "server_v12_rack_02_11_compute_u26",
+        "server_v12_rack_02_11_compute_u28",
+        "server_v12_rack_02_11_compute_u30",
+        "server_v12_rack_02_11_compute_u32",
+        "server_v12_rack_02_11_compute_u34",
+        "server_v12_rack_02_11_blank_u36",
+        "server_v12_rack_02_11_patch_u40",
+        "server_v12_rack_02_11_switch_u41",
+        "server_v12_rack_02_11_switch_u42",
+        "server_v12_rack_02_11_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_02_12",
+      "node": "server_v12_rack_02_12",
+      "row": 2,
+      "column": 12,
+      "position_blender_m": [
+        -4.1,
+        -1.0,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "+Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_02_12_door_front",
+        "server_v12_rack_02_12_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_02_12_ups_u00",
+        "server_v12_rack_02_12_storage_u04",
+        "server_v12_rack_02_12_compute_u08",
+        "server_v12_rack_02_12_compute_u10",
+        "server_v12_rack_02_12_compute_u12",
+        "server_v12_rack_02_12_compute_u14",
+        "server_v12_rack_02_12_compute_u16",
+        "server_v12_rack_02_12_compute_u18",
+        "server_v12_rack_02_12_compute_u20",
+        "server_v12_rack_02_12_compute_u22",
+        "server_v12_rack_02_12_compute_u24",
+        "server_v12_rack_02_12_compute_u26",
+        "server_v12_rack_02_12_compute_u28",
+        "server_v12_rack_02_12_compute_u30",
+        "server_v12_rack_02_12_compute_u32",
+        "server_v12_rack_02_12_compute_u34",
+        "server_v12_rack_02_12_blank_u36",
+        "server_v12_rack_02_12_patch_u40",
+        "server_v12_rack_02_12_switch_u41",
+        "server_v12_rack_02_12_switch_u42",
+        "server_v12_rack_02_12_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_02_13",
+      "node": "server_v12_rack_02_13",
+      "row": 2,
+      "column": 13,
+      "position_blender_m": [
+        -3.25,
+        -1.0,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "+Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_02_13_door_front",
+        "server_v12_rack_02_13_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_02_13_ups_u00",
+        "server_v12_rack_02_13_storage_u04",
+        "server_v12_rack_02_13_compute_u08",
+        "server_v12_rack_02_13_compute_u10",
+        "server_v12_rack_02_13_compute_u12",
+        "server_v12_rack_02_13_compute_u14",
+        "server_v12_rack_02_13_compute_u16",
+        "server_v12_rack_02_13_compute_u18",
+        "server_v12_rack_02_13_compute_u20",
+        "server_v12_rack_02_13_compute_u22",
+        "server_v12_rack_02_13_compute_u24",
+        "server_v12_rack_02_13_compute_u26",
+        "server_v12_rack_02_13_compute_u28",
+        "server_v12_rack_02_13_compute_u30",
+        "server_v12_rack_02_13_compute_u32",
+        "server_v12_rack_02_13_compute_u34",
+        "server_v12_rack_02_13_blank_u36",
+        "server_v12_rack_02_13_patch_u40",
+        "server_v12_rack_02_13_switch_u41",
+        "server_v12_rack_02_13_switch_u42",
+        "server_v12_rack_02_13_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_02_14",
+      "node": "server_v12_rack_02_14",
+      "row": 2,
+      "column": 14,
+      "position_blender_m": [
+        -2.4000000000000004,
+        -1.0,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "+Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_02_14_door_front",
+        "server_v12_rack_02_14_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_02_14_ups_u00",
+        "server_v12_rack_02_14_storage_u04",
+        "server_v12_rack_02_14_compute_u08",
+        "server_v12_rack_02_14_compute_u10",
+        "server_v12_rack_02_14_compute_u12",
+        "server_v12_rack_02_14_compute_u14",
+        "server_v12_rack_02_14_compute_u16",
+        "server_v12_rack_02_14_compute_u18",
+        "server_v12_rack_02_14_compute_u20",
+        "server_v12_rack_02_14_compute_u22",
+        "server_v12_rack_02_14_compute_u24",
+        "server_v12_rack_02_14_compute_u26",
+        "server_v12_rack_02_14_compute_u28",
+        "server_v12_rack_02_14_compute_u30",
+        "server_v12_rack_02_14_compute_u32",
+        "server_v12_rack_02_14_compute_u34",
+        "server_v12_rack_02_14_blank_u36",
+        "server_v12_rack_02_14_patch_u40",
+        "server_v12_rack_02_14_switch_u41",
+        "server_v12_rack_02_14_switch_u42",
+        "server_v12_rack_02_14_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_02_15",
+      "node": "server_v12_rack_02_15",
+      "row": 2,
+      "column": 15,
+      "position_blender_m": [
+        -1.549999999999999,
+        -1.0,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "+Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_02_15_door_front",
+        "server_v12_rack_02_15_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_02_15_ups_u00",
+        "server_v12_rack_02_15_storage_u04",
+        "server_v12_rack_02_15_compute_u08",
+        "server_v12_rack_02_15_compute_u10",
+        "server_v12_rack_02_15_compute_u12",
+        "server_v12_rack_02_15_compute_u14",
+        "server_v12_rack_02_15_compute_u16",
+        "server_v12_rack_02_15_compute_u18",
+        "server_v12_rack_02_15_compute_u20",
+        "server_v12_rack_02_15_compute_u22",
+        "server_v12_rack_02_15_compute_u24",
+        "server_v12_rack_02_15_compute_u26",
+        "server_v12_rack_02_15_compute_u28",
+        "server_v12_rack_02_15_compute_u30",
+        "server_v12_rack_02_15_compute_u32",
+        "server_v12_rack_02_15_compute_u34",
+        "server_v12_rack_02_15_blank_u36",
+        "server_v12_rack_02_15_patch_u40",
+        "server_v12_rack_02_15_switch_u41",
+        "server_v12_rack_02_15_switch_u42",
+        "server_v12_rack_02_15_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_02_16",
+      "node": "server_v12_rack_02_16",
+      "row": 2,
+      "column": 16,
+      "position_blender_m": [
+        -0.6999999999999993,
+        -1.0,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "+Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_02_16_door_front",
+        "server_v12_rack_02_16_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_02_16_ups_u00",
+        "server_v12_rack_02_16_storage_u04",
+        "server_v12_rack_02_16_compute_u08",
+        "server_v12_rack_02_16_compute_u10",
+        "server_v12_rack_02_16_compute_u12",
+        "server_v12_rack_02_16_compute_u14",
+        "server_v12_rack_02_16_compute_u16",
+        "server_v12_rack_02_16_compute_u18",
+        "server_v12_rack_02_16_compute_u20",
+        "server_v12_rack_02_16_compute_u22",
+        "server_v12_rack_02_16_compute_u24",
+        "server_v12_rack_02_16_compute_u26",
+        "server_v12_rack_02_16_compute_u28",
+        "server_v12_rack_02_16_compute_u30",
+        "server_v12_rack_02_16_compute_u32",
+        "server_v12_rack_02_16_compute_u34",
+        "server_v12_rack_02_16_blank_u36",
+        "server_v12_rack_02_16_patch_u40",
+        "server_v12_rack_02_16_switch_u41",
+        "server_v12_rack_02_16_switch_u42",
+        "server_v12_rack_02_16_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_02_17",
+      "node": "server_v12_rack_02_17",
+      "row": 2,
+      "column": 17,
+      "position_blender_m": [
+        0.15000000000000036,
+        -1.0,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "+Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_02_17_door_front",
+        "server_v12_rack_02_17_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_02_17_ups_u00",
+        "server_v12_rack_02_17_storage_u04",
+        "server_v12_rack_02_17_compute_u08",
+        "server_v12_rack_02_17_compute_u10",
+        "server_v12_rack_02_17_compute_u12",
+        "server_v12_rack_02_17_compute_u14",
+        "server_v12_rack_02_17_compute_u16",
+        "server_v12_rack_02_17_compute_u18",
+        "server_v12_rack_02_17_compute_u20",
+        "server_v12_rack_02_17_compute_u22",
+        "server_v12_rack_02_17_compute_u24",
+        "server_v12_rack_02_17_compute_u26",
+        "server_v12_rack_02_17_compute_u28",
+        "server_v12_rack_02_17_compute_u30",
+        "server_v12_rack_02_17_compute_u32",
+        "server_v12_rack_02_17_compute_u34",
+        "server_v12_rack_02_17_blank_u36",
+        "server_v12_rack_02_17_patch_u40",
+        "server_v12_rack_02_17_switch_u41",
+        "server_v12_rack_02_17_switch_u42",
+        "server_v12_rack_02_17_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_02_18",
+      "node": "server_v12_rack_02_18",
+      "row": 2,
+      "column": 18,
+      "position_blender_m": [
+        1.0,
+        -1.0,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "+Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_02_18_door_front",
+        "server_v12_rack_02_18_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_02_18_ups_u00",
+        "server_v12_rack_02_18_storage_u04",
+        "server_v12_rack_02_18_compute_u08",
+        "server_v12_rack_02_18_compute_u10",
+        "server_v12_rack_02_18_compute_u12",
+        "server_v12_rack_02_18_compute_u14",
+        "server_v12_rack_02_18_compute_u16",
+        "server_v12_rack_02_18_compute_u18",
+        "server_v12_rack_02_18_compute_u20",
+        "server_v12_rack_02_18_compute_u22",
+        "server_v12_rack_02_18_compute_u24",
+        "server_v12_rack_02_18_compute_u26",
+        "server_v12_rack_02_18_compute_u28",
+        "server_v12_rack_02_18_compute_u30",
+        "server_v12_rack_02_18_compute_u32",
+        "server_v12_rack_02_18_compute_u34",
+        "server_v12_rack_02_18_blank_u36",
+        "server_v12_rack_02_18_patch_u40",
+        "server_v12_rack_02_18_switch_u41",
+        "server_v12_rack_02_18_switch_u42",
+        "server_v12_rack_02_18_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_02_19",
+      "node": "server_v12_rack_02_19",
+      "row": 2,
+      "column": 19,
+      "position_blender_m": [
+        1.8499999999999996,
+        -1.0,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "+Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_02_19_door_front",
+        "server_v12_rack_02_19_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_02_19_ups_u00",
+        "server_v12_rack_02_19_storage_u04",
+        "server_v12_rack_02_19_compute_u08",
+        "server_v12_rack_02_19_compute_u10",
+        "server_v12_rack_02_19_compute_u12",
+        "server_v12_rack_02_19_compute_u14",
+        "server_v12_rack_02_19_compute_u16",
+        "server_v12_rack_02_19_compute_u18",
+        "server_v12_rack_02_19_compute_u20",
+        "server_v12_rack_02_19_compute_u22",
+        "server_v12_rack_02_19_compute_u24",
+        "server_v12_rack_02_19_compute_u26",
+        "server_v12_rack_02_19_compute_u28",
+        "server_v12_rack_02_19_compute_u30",
+        "server_v12_rack_02_19_compute_u32",
+        "server_v12_rack_02_19_compute_u34",
+        "server_v12_rack_02_19_blank_u36",
+        "server_v12_rack_02_19_patch_u40",
+        "server_v12_rack_02_19_switch_u41",
+        "server_v12_rack_02_19_switch_u42",
+        "server_v12_rack_02_19_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_02_20",
+      "node": "server_v12_rack_02_20",
+      "row": 2,
+      "column": 20,
+      "position_blender_m": [
+        2.6999999999999993,
+        -1.0,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "+Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_02_20_door_front",
+        "server_v12_rack_02_20_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_02_20_ups_u00",
+        "server_v12_rack_02_20_storage_u04",
+        "server_v12_rack_02_20_compute_u08",
+        "server_v12_rack_02_20_compute_u10",
+        "server_v12_rack_02_20_compute_u12",
+        "server_v12_rack_02_20_compute_u14",
+        "server_v12_rack_02_20_compute_u16",
+        "server_v12_rack_02_20_compute_u18",
+        "server_v12_rack_02_20_compute_u20",
+        "server_v12_rack_02_20_compute_u22",
+        "server_v12_rack_02_20_compute_u24",
+        "server_v12_rack_02_20_compute_u26",
+        "server_v12_rack_02_20_compute_u28",
+        "server_v12_rack_02_20_compute_u30",
+        "server_v12_rack_02_20_compute_u32",
+        "server_v12_rack_02_20_compute_u34",
+        "server_v12_rack_02_20_blank_u36",
+        "server_v12_rack_02_20_patch_u40",
+        "server_v12_rack_02_20_switch_u41",
+        "server_v12_rack_02_20_switch_u42",
+        "server_v12_rack_02_20_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_03_01",
+      "node": "server_v12_rack_03_01",
+      "row": 3,
+      "column": 1,
+      "position_blender_m": [
+        -13.45,
+        6.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_03_01_door_front",
+        "server_v12_rack_03_01_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_03_01_ups_u00",
+        "server_v12_rack_03_01_storage_u04",
+        "server_v12_rack_03_01_compute_u08",
+        "server_v12_rack_03_01_compute_u10",
+        "server_v12_rack_03_01_compute_u12",
+        "server_v12_rack_03_01_compute_u14",
+        "server_v12_rack_03_01_compute_u16",
+        "server_v12_rack_03_01_compute_u18",
+        "server_v12_rack_03_01_compute_u20",
+        "server_v12_rack_03_01_compute_u22",
+        "server_v12_rack_03_01_compute_u24",
+        "server_v12_rack_03_01_compute_u26",
+        "server_v12_rack_03_01_compute_u28",
+        "server_v12_rack_03_01_compute_u30",
+        "server_v12_rack_03_01_compute_u32",
+        "server_v12_rack_03_01_compute_u34",
+        "server_v12_rack_03_01_blank_u36",
+        "server_v12_rack_03_01_patch_u40",
+        "server_v12_rack_03_01_switch_u41",
+        "server_v12_rack_03_01_switch_u42",
+        "server_v12_rack_03_01_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_03_02",
+      "node": "server_v12_rack_03_02",
+      "row": 3,
+      "column": 2,
+      "position_blender_m": [
+        -12.6,
+        6.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_03_02_door_front",
+        "server_v12_rack_03_02_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_03_02_ups_u00",
+        "server_v12_rack_03_02_storage_u04",
+        "server_v12_rack_03_02_compute_u08",
+        "server_v12_rack_03_02_compute_u10",
+        "server_v12_rack_03_02_compute_u12",
+        "server_v12_rack_03_02_compute_u14",
+        "server_v12_rack_03_02_compute_u16",
+        "server_v12_rack_03_02_compute_u18",
+        "server_v12_rack_03_02_compute_u20",
+        "server_v12_rack_03_02_compute_u22",
+        "server_v12_rack_03_02_compute_u24",
+        "server_v12_rack_03_02_compute_u26",
+        "server_v12_rack_03_02_compute_u28",
+        "server_v12_rack_03_02_compute_u30",
+        "server_v12_rack_03_02_compute_u32",
+        "server_v12_rack_03_02_compute_u34",
+        "server_v12_rack_03_02_blank_u36",
+        "server_v12_rack_03_02_patch_u40",
+        "server_v12_rack_03_02_switch_u41",
+        "server_v12_rack_03_02_switch_u42",
+        "server_v12_rack_03_02_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_03_03",
+      "node": "server_v12_rack_03_03",
+      "row": 3,
+      "column": 3,
+      "position_blender_m": [
+        -11.75,
+        6.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_03_03_door_front",
+        "server_v12_rack_03_03_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_03_03_ups_u00",
+        "server_v12_rack_03_03_storage_u04",
+        "server_v12_rack_03_03_compute_u08",
+        "server_v12_rack_03_03_compute_u10",
+        "server_v12_rack_03_03_compute_u12",
+        "server_v12_rack_03_03_compute_u14",
+        "server_v12_rack_03_03_compute_u16",
+        "server_v12_rack_03_03_compute_u18",
+        "server_v12_rack_03_03_compute_u20",
+        "server_v12_rack_03_03_compute_u22",
+        "server_v12_rack_03_03_compute_u24",
+        "server_v12_rack_03_03_compute_u26",
+        "server_v12_rack_03_03_compute_u28",
+        "server_v12_rack_03_03_compute_u30",
+        "server_v12_rack_03_03_compute_u32",
+        "server_v12_rack_03_03_compute_u34",
+        "server_v12_rack_03_03_blank_u36",
+        "server_v12_rack_03_03_patch_u40",
+        "server_v12_rack_03_03_switch_u41",
+        "server_v12_rack_03_03_switch_u42",
+        "server_v12_rack_03_03_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_03_04",
+      "node": "server_v12_rack_03_04",
+      "row": 3,
+      "column": 4,
+      "position_blender_m": [
+        -10.899999999999999,
+        6.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_03_04_door_front",
+        "server_v12_rack_03_04_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_03_04_ups_u00",
+        "server_v12_rack_03_04_storage_u04",
+        "server_v12_rack_03_04_compute_u08",
+        "server_v12_rack_03_04_compute_u10",
+        "server_v12_rack_03_04_compute_u12",
+        "server_v12_rack_03_04_compute_u14",
+        "server_v12_rack_03_04_compute_u16",
+        "server_v12_rack_03_04_compute_u18",
+        "server_v12_rack_03_04_compute_u20",
+        "server_v12_rack_03_04_compute_u22",
+        "server_v12_rack_03_04_compute_u24",
+        "server_v12_rack_03_04_compute_u26",
+        "server_v12_rack_03_04_compute_u28",
+        "server_v12_rack_03_04_compute_u30",
+        "server_v12_rack_03_04_compute_u32",
+        "server_v12_rack_03_04_compute_u34",
+        "server_v12_rack_03_04_blank_u36",
+        "server_v12_rack_03_04_patch_u40",
+        "server_v12_rack_03_04_switch_u41",
+        "server_v12_rack_03_04_switch_u42",
+        "server_v12_rack_03_04_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_03_05",
+      "node": "server_v12_rack_03_05",
+      "row": 3,
+      "column": 5,
+      "position_blender_m": [
+        -10.049999999999999,
+        6.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_03_05_door_front",
+        "server_v12_rack_03_05_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_03_05_ups_u00",
+        "server_v12_rack_03_05_storage_u04",
+        "server_v12_rack_03_05_compute_u08",
+        "server_v12_rack_03_05_compute_u10",
+        "server_v12_rack_03_05_compute_u12",
+        "server_v12_rack_03_05_compute_u14",
+        "server_v12_rack_03_05_compute_u16",
+        "server_v12_rack_03_05_compute_u18",
+        "server_v12_rack_03_05_compute_u20",
+        "server_v12_rack_03_05_compute_u22",
+        "server_v12_rack_03_05_compute_u24",
+        "server_v12_rack_03_05_compute_u26",
+        "server_v12_rack_03_05_compute_u28",
+        "server_v12_rack_03_05_compute_u30",
+        "server_v12_rack_03_05_compute_u32",
+        "server_v12_rack_03_05_compute_u34",
+        "server_v12_rack_03_05_blank_u36",
+        "server_v12_rack_03_05_patch_u40",
+        "server_v12_rack_03_05_switch_u41",
+        "server_v12_rack_03_05_switch_u42",
+        "server_v12_rack_03_05_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_03_06",
+      "node": "server_v12_rack_03_06",
+      "row": 3,
+      "column": 6,
+      "position_blender_m": [
+        -9.2,
+        6.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_03_06_door_front",
+        "server_v12_rack_03_06_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_03_06_ups_u00",
+        "server_v12_rack_03_06_storage_u04",
+        "server_v12_rack_03_06_compute_u08",
+        "server_v12_rack_03_06_compute_u10",
+        "server_v12_rack_03_06_compute_u12",
+        "server_v12_rack_03_06_compute_u14",
+        "server_v12_rack_03_06_compute_u16",
+        "server_v12_rack_03_06_compute_u18",
+        "server_v12_rack_03_06_compute_u20",
+        "server_v12_rack_03_06_compute_u22",
+        "server_v12_rack_03_06_compute_u24",
+        "server_v12_rack_03_06_compute_u26",
+        "server_v12_rack_03_06_compute_u28",
+        "server_v12_rack_03_06_compute_u30",
+        "server_v12_rack_03_06_compute_u32",
+        "server_v12_rack_03_06_compute_u34",
+        "server_v12_rack_03_06_blank_u36",
+        "server_v12_rack_03_06_patch_u40",
+        "server_v12_rack_03_06_switch_u41",
+        "server_v12_rack_03_06_switch_u42",
+        "server_v12_rack_03_06_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_03_07",
+      "node": "server_v12_rack_03_07",
+      "row": 3,
+      "column": 7,
+      "position_blender_m": [
+        -8.35,
+        6.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_03_07_door_front",
+        "server_v12_rack_03_07_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_03_07_ups_u00",
+        "server_v12_rack_03_07_storage_u04",
+        "server_v12_rack_03_07_compute_u08",
+        "server_v12_rack_03_07_compute_u10",
+        "server_v12_rack_03_07_compute_u12",
+        "server_v12_rack_03_07_compute_u14",
+        "server_v12_rack_03_07_compute_u16",
+        "server_v12_rack_03_07_compute_u18",
+        "server_v12_rack_03_07_compute_u20",
+        "server_v12_rack_03_07_compute_u22",
+        "server_v12_rack_03_07_compute_u24",
+        "server_v12_rack_03_07_compute_u26",
+        "server_v12_rack_03_07_compute_u28",
+        "server_v12_rack_03_07_compute_u30",
+        "server_v12_rack_03_07_compute_u32",
+        "server_v12_rack_03_07_compute_u34",
+        "server_v12_rack_03_07_blank_u36",
+        "server_v12_rack_03_07_patch_u40",
+        "server_v12_rack_03_07_switch_u41",
+        "server_v12_rack_03_07_switch_u42",
+        "server_v12_rack_03_07_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_03_08",
+      "node": "server_v12_rack_03_08",
+      "row": 3,
+      "column": 8,
+      "position_blender_m": [
+        -7.499999999999999,
+        6.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_03_08_door_front",
+        "server_v12_rack_03_08_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_03_08_ups_u00",
+        "server_v12_rack_03_08_storage_u04",
+        "server_v12_rack_03_08_compute_u08",
+        "server_v12_rack_03_08_compute_u10",
+        "server_v12_rack_03_08_compute_u12",
+        "server_v12_rack_03_08_compute_u14",
+        "server_v12_rack_03_08_compute_u16",
+        "server_v12_rack_03_08_compute_u18",
+        "server_v12_rack_03_08_compute_u20",
+        "server_v12_rack_03_08_compute_u22",
+        "server_v12_rack_03_08_compute_u24",
+        "server_v12_rack_03_08_compute_u26",
+        "server_v12_rack_03_08_compute_u28",
+        "server_v12_rack_03_08_compute_u30",
+        "server_v12_rack_03_08_compute_u32",
+        "server_v12_rack_03_08_compute_u34",
+        "server_v12_rack_03_08_blank_u36",
+        "server_v12_rack_03_08_patch_u40",
+        "server_v12_rack_03_08_switch_u41",
+        "server_v12_rack_03_08_switch_u42",
+        "server_v12_rack_03_08_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_03_09",
+      "node": "server_v12_rack_03_09",
+      "row": 3,
+      "column": 9,
+      "position_blender_m": [
+        -6.6499999999999995,
+        6.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_03_09_door_front",
+        "server_v12_rack_03_09_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_03_09_ups_u00",
+        "server_v12_rack_03_09_storage_u04",
+        "server_v12_rack_03_09_compute_u08",
+        "server_v12_rack_03_09_compute_u10",
+        "server_v12_rack_03_09_compute_u12",
+        "server_v12_rack_03_09_compute_u14",
+        "server_v12_rack_03_09_compute_u16",
+        "server_v12_rack_03_09_compute_u18",
+        "server_v12_rack_03_09_compute_u20",
+        "server_v12_rack_03_09_compute_u22",
+        "server_v12_rack_03_09_compute_u24",
+        "server_v12_rack_03_09_compute_u26",
+        "server_v12_rack_03_09_compute_u28",
+        "server_v12_rack_03_09_compute_u30",
+        "server_v12_rack_03_09_compute_u32",
+        "server_v12_rack_03_09_compute_u34",
+        "server_v12_rack_03_09_blank_u36",
+        "server_v12_rack_03_09_patch_u40",
+        "server_v12_rack_03_09_switch_u41",
+        "server_v12_rack_03_09_switch_u42",
+        "server_v12_rack_03_09_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_03_10",
+      "node": "server_v12_rack_03_10",
+      "row": 3,
+      "column": 10,
+      "position_blender_m": [
+        -5.8,
+        6.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_03_10_door_front",
+        "server_v12_rack_03_10_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_03_10_ups_u00",
+        "server_v12_rack_03_10_storage_u04",
+        "server_v12_rack_03_10_compute_u08",
+        "server_v12_rack_03_10_compute_u10",
+        "server_v12_rack_03_10_compute_u12",
+        "server_v12_rack_03_10_compute_u14",
+        "server_v12_rack_03_10_compute_u16",
+        "server_v12_rack_03_10_compute_u18",
+        "server_v12_rack_03_10_compute_u20",
+        "server_v12_rack_03_10_compute_u22",
+        "server_v12_rack_03_10_compute_u24",
+        "server_v12_rack_03_10_compute_u26",
+        "server_v12_rack_03_10_compute_u28",
+        "server_v12_rack_03_10_compute_u30",
+        "server_v12_rack_03_10_compute_u32",
+        "server_v12_rack_03_10_compute_u34",
+        "server_v12_rack_03_10_blank_u36",
+        "server_v12_rack_03_10_patch_u40",
+        "server_v12_rack_03_10_switch_u41",
+        "server_v12_rack_03_10_switch_u42",
+        "server_v12_rack_03_10_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_03_11",
+      "node": "server_v12_rack_03_11",
+      "row": 3,
+      "column": 11,
+      "position_blender_m": [
+        -4.949999999999999,
+        6.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_03_11_door_front",
+        "server_v12_rack_03_11_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_03_11_ups_u00",
+        "server_v12_rack_03_11_storage_u04",
+        "server_v12_rack_03_11_compute_u08",
+        "server_v12_rack_03_11_compute_u10",
+        "server_v12_rack_03_11_compute_u12",
+        "server_v12_rack_03_11_compute_u14",
+        "server_v12_rack_03_11_compute_u16",
+        "server_v12_rack_03_11_compute_u18",
+        "server_v12_rack_03_11_compute_u20",
+        "server_v12_rack_03_11_compute_u22",
+        "server_v12_rack_03_11_compute_u24",
+        "server_v12_rack_03_11_compute_u26",
+        "server_v12_rack_03_11_compute_u28",
+        "server_v12_rack_03_11_compute_u30",
+        "server_v12_rack_03_11_compute_u32",
+        "server_v12_rack_03_11_compute_u34",
+        "server_v12_rack_03_11_blank_u36",
+        "server_v12_rack_03_11_patch_u40",
+        "server_v12_rack_03_11_switch_u41",
+        "server_v12_rack_03_11_switch_u42",
+        "server_v12_rack_03_11_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_03_12",
+      "node": "server_v12_rack_03_12",
+      "row": 3,
+      "column": 12,
+      "position_blender_m": [
+        -4.1,
+        6.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_03_12_door_front",
+        "server_v12_rack_03_12_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_03_12_ups_u00",
+        "server_v12_rack_03_12_storage_u04",
+        "server_v12_rack_03_12_compute_u08",
+        "server_v12_rack_03_12_compute_u10",
+        "server_v12_rack_03_12_compute_u12",
+        "server_v12_rack_03_12_compute_u14",
+        "server_v12_rack_03_12_compute_u16",
+        "server_v12_rack_03_12_compute_u18",
+        "server_v12_rack_03_12_compute_u20",
+        "server_v12_rack_03_12_compute_u22",
+        "server_v12_rack_03_12_compute_u24",
+        "server_v12_rack_03_12_compute_u26",
+        "server_v12_rack_03_12_compute_u28",
+        "server_v12_rack_03_12_compute_u30",
+        "server_v12_rack_03_12_compute_u32",
+        "server_v12_rack_03_12_compute_u34",
+        "server_v12_rack_03_12_blank_u36",
+        "server_v12_rack_03_12_patch_u40",
+        "server_v12_rack_03_12_switch_u41",
+        "server_v12_rack_03_12_switch_u42",
+        "server_v12_rack_03_12_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_03_13",
+      "node": "server_v12_rack_03_13",
+      "row": 3,
+      "column": 13,
+      "position_blender_m": [
+        -3.25,
+        6.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_03_13_door_front",
+        "server_v12_rack_03_13_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_03_13_ups_u00",
+        "server_v12_rack_03_13_storage_u04",
+        "server_v12_rack_03_13_compute_u08",
+        "server_v12_rack_03_13_compute_u10",
+        "server_v12_rack_03_13_compute_u12",
+        "server_v12_rack_03_13_compute_u14",
+        "server_v12_rack_03_13_compute_u16",
+        "server_v12_rack_03_13_compute_u18",
+        "server_v12_rack_03_13_compute_u20",
+        "server_v12_rack_03_13_compute_u22",
+        "server_v12_rack_03_13_compute_u24",
+        "server_v12_rack_03_13_compute_u26",
+        "server_v12_rack_03_13_compute_u28",
+        "server_v12_rack_03_13_compute_u30",
+        "server_v12_rack_03_13_compute_u32",
+        "server_v12_rack_03_13_compute_u34",
+        "server_v12_rack_03_13_blank_u36",
+        "server_v12_rack_03_13_patch_u40",
+        "server_v12_rack_03_13_switch_u41",
+        "server_v12_rack_03_13_switch_u42",
+        "server_v12_rack_03_13_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_03_14",
+      "node": "server_v12_rack_03_14",
+      "row": 3,
+      "column": 14,
+      "position_blender_m": [
+        -2.4000000000000004,
+        6.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_03_14_door_front",
+        "server_v12_rack_03_14_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_03_14_ups_u00",
+        "server_v12_rack_03_14_storage_u04",
+        "server_v12_rack_03_14_compute_u08",
+        "server_v12_rack_03_14_compute_u10",
+        "server_v12_rack_03_14_compute_u12",
+        "server_v12_rack_03_14_compute_u14",
+        "server_v12_rack_03_14_compute_u16",
+        "server_v12_rack_03_14_compute_u18",
+        "server_v12_rack_03_14_compute_u20",
+        "server_v12_rack_03_14_compute_u22",
+        "server_v12_rack_03_14_compute_u24",
+        "server_v12_rack_03_14_compute_u26",
+        "server_v12_rack_03_14_compute_u28",
+        "server_v12_rack_03_14_compute_u30",
+        "server_v12_rack_03_14_compute_u32",
+        "server_v12_rack_03_14_compute_u34",
+        "server_v12_rack_03_14_blank_u36",
+        "server_v12_rack_03_14_patch_u40",
+        "server_v12_rack_03_14_switch_u41",
+        "server_v12_rack_03_14_switch_u42",
+        "server_v12_rack_03_14_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_03_15",
+      "node": "server_v12_rack_03_15",
+      "row": 3,
+      "column": 15,
+      "position_blender_m": [
+        -1.549999999999999,
+        6.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_03_15_door_front",
+        "server_v12_rack_03_15_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_03_15_ups_u00",
+        "server_v12_rack_03_15_storage_u04",
+        "server_v12_rack_03_15_compute_u08",
+        "server_v12_rack_03_15_compute_u10",
+        "server_v12_rack_03_15_compute_u12",
+        "server_v12_rack_03_15_compute_u14",
+        "server_v12_rack_03_15_compute_u16",
+        "server_v12_rack_03_15_compute_u18",
+        "server_v12_rack_03_15_compute_u20",
+        "server_v12_rack_03_15_compute_u22",
+        "server_v12_rack_03_15_compute_u24",
+        "server_v12_rack_03_15_compute_u26",
+        "server_v12_rack_03_15_compute_u28",
+        "server_v12_rack_03_15_compute_u30",
+        "server_v12_rack_03_15_compute_u32",
+        "server_v12_rack_03_15_compute_u34",
+        "server_v12_rack_03_15_blank_u36",
+        "server_v12_rack_03_15_patch_u40",
+        "server_v12_rack_03_15_switch_u41",
+        "server_v12_rack_03_15_switch_u42",
+        "server_v12_rack_03_15_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_03_16",
+      "node": "server_v12_rack_03_16",
+      "row": 3,
+      "column": 16,
+      "position_blender_m": [
+        -0.6999999999999993,
+        6.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_03_16_door_front",
+        "server_v12_rack_03_16_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_03_16_ups_u00",
+        "server_v12_rack_03_16_storage_u04",
+        "server_v12_rack_03_16_compute_u08",
+        "server_v12_rack_03_16_compute_u10",
+        "server_v12_rack_03_16_compute_u12",
+        "server_v12_rack_03_16_compute_u14",
+        "server_v12_rack_03_16_compute_u16",
+        "server_v12_rack_03_16_compute_u18",
+        "server_v12_rack_03_16_compute_u20",
+        "server_v12_rack_03_16_compute_u22",
+        "server_v12_rack_03_16_compute_u24",
+        "server_v12_rack_03_16_compute_u26",
+        "server_v12_rack_03_16_compute_u28",
+        "server_v12_rack_03_16_compute_u30",
+        "server_v12_rack_03_16_compute_u32",
+        "server_v12_rack_03_16_compute_u34",
+        "server_v12_rack_03_16_blank_u36",
+        "server_v12_rack_03_16_patch_u40",
+        "server_v12_rack_03_16_switch_u41",
+        "server_v12_rack_03_16_switch_u42",
+        "server_v12_rack_03_16_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_03_17",
+      "node": "server_v12_rack_03_17",
+      "row": 3,
+      "column": 17,
+      "position_blender_m": [
+        0.15000000000000036,
+        6.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_03_17_door_front",
+        "server_v12_rack_03_17_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_03_17_ups_u00",
+        "server_v12_rack_03_17_storage_u04",
+        "server_v12_rack_03_17_compute_u08",
+        "server_v12_rack_03_17_compute_u10",
+        "server_v12_rack_03_17_compute_u12",
+        "server_v12_rack_03_17_compute_u14",
+        "server_v12_rack_03_17_compute_u16",
+        "server_v12_rack_03_17_compute_u18",
+        "server_v12_rack_03_17_compute_u20",
+        "server_v12_rack_03_17_compute_u22",
+        "server_v12_rack_03_17_compute_u24",
+        "server_v12_rack_03_17_compute_u26",
+        "server_v12_rack_03_17_compute_u28",
+        "server_v12_rack_03_17_compute_u30",
+        "server_v12_rack_03_17_compute_u32",
+        "server_v12_rack_03_17_compute_u34",
+        "server_v12_rack_03_17_blank_u36",
+        "server_v12_rack_03_17_patch_u40",
+        "server_v12_rack_03_17_switch_u41",
+        "server_v12_rack_03_17_switch_u42",
+        "server_v12_rack_03_17_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_03_18",
+      "node": "server_v12_rack_03_18",
+      "row": 3,
+      "column": 18,
+      "position_blender_m": [
+        1.0,
+        6.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_03_18_door_front",
+        "server_v12_rack_03_18_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_03_18_ups_u00",
+        "server_v12_rack_03_18_storage_u04",
+        "server_v12_rack_03_18_compute_u08",
+        "server_v12_rack_03_18_compute_u10",
+        "server_v12_rack_03_18_compute_u12",
+        "server_v12_rack_03_18_compute_u14",
+        "server_v12_rack_03_18_compute_u16",
+        "server_v12_rack_03_18_compute_u18",
+        "server_v12_rack_03_18_compute_u20",
+        "server_v12_rack_03_18_compute_u22",
+        "server_v12_rack_03_18_compute_u24",
+        "server_v12_rack_03_18_compute_u26",
+        "server_v12_rack_03_18_compute_u28",
+        "server_v12_rack_03_18_compute_u30",
+        "server_v12_rack_03_18_compute_u32",
+        "server_v12_rack_03_18_compute_u34",
+        "server_v12_rack_03_18_blank_u36",
+        "server_v12_rack_03_18_patch_u40",
+        "server_v12_rack_03_18_switch_u41",
+        "server_v12_rack_03_18_switch_u42",
+        "server_v12_rack_03_18_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_03_19",
+      "node": "server_v12_rack_03_19",
+      "row": 3,
+      "column": 19,
+      "position_blender_m": [
+        1.8499999999999996,
+        6.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_03_19_door_front",
+        "server_v12_rack_03_19_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_03_19_ups_u00",
+        "server_v12_rack_03_19_storage_u04",
+        "server_v12_rack_03_19_compute_u08",
+        "server_v12_rack_03_19_compute_u10",
+        "server_v12_rack_03_19_compute_u12",
+        "server_v12_rack_03_19_compute_u14",
+        "server_v12_rack_03_19_compute_u16",
+        "server_v12_rack_03_19_compute_u18",
+        "server_v12_rack_03_19_compute_u20",
+        "server_v12_rack_03_19_compute_u22",
+        "server_v12_rack_03_19_compute_u24",
+        "server_v12_rack_03_19_compute_u26",
+        "server_v12_rack_03_19_compute_u28",
+        "server_v12_rack_03_19_compute_u30",
+        "server_v12_rack_03_19_compute_u32",
+        "server_v12_rack_03_19_compute_u34",
+        "server_v12_rack_03_19_blank_u36",
+        "server_v12_rack_03_19_patch_u40",
+        "server_v12_rack_03_19_switch_u41",
+        "server_v12_rack_03_19_switch_u42",
+        "server_v12_rack_03_19_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    },
+    {
+      "id": "rack_03_20",
+      "node": "server_v12_rack_03_20",
+      "row": 3,
+      "column": 20,
+      "position_blender_m": [
+        2.6999999999999993,
+        6.5,
+        0
+      ],
+      "height_m": 2.2,
+      "width_m": 0.8,
+      "depth_m": 1.2,
+      "front_axis": "-Y",
+      "rack_units": 47,
+      "doors": [
+        "server_v12_rack_03_20_door_front",
+        "server_v12_rack_03_20_door_rear"
+      ],
+      "door_style": "framed_clear_glass",
+      "equipment_nodes": [
+        "server_v12_rack_03_20_ups_u00",
+        "server_v12_rack_03_20_storage_u04",
+        "server_v12_rack_03_20_compute_u08",
+        "server_v12_rack_03_20_compute_u10",
+        "server_v12_rack_03_20_compute_u12",
+        "server_v12_rack_03_20_compute_u14",
+        "server_v12_rack_03_20_compute_u16",
+        "server_v12_rack_03_20_compute_u18",
+        "server_v12_rack_03_20_compute_u20",
+        "server_v12_rack_03_20_compute_u22",
+        "server_v12_rack_03_20_compute_u24",
+        "server_v12_rack_03_20_compute_u26",
+        "server_v12_rack_03_20_compute_u28",
+        "server_v12_rack_03_20_compute_u30",
+        "server_v12_rack_03_20_compute_u32",
+        "server_v12_rack_03_20_compute_u34",
+        "server_v12_rack_03_20_blank_u36",
+        "server_v12_rack_03_20_patch_u40",
+        "server_v12_rack_03_20_switch_u41",
+        "server_v12_rack_03_20_switch_u42",
+        "server_v12_rack_03_20_blank_u43"
+      ],
+      "compute_servers": 14,
+      "storage_servers": 1,
+      "switches": 2,
+      "ups": 1,
+      "patch_panels": 1
+    }
+  ],
+  "rack_layout": {
+    "rows": 3,
+    "racks_per_row": 20,
+    "total_racks": 60,
+    "row_axis": "X",
+    "row_y_m": [
+      -8.5,
+      -1.0,
+      6.5
+    ],
+    "row_x_centers_m": [
+      -13.45,
+      2.7
+    ],
+    "bay_pitch_m": 0.85,
+    "door_style": "framed_clear_glass",
+    "clear_aisle_between_rows_m": 6.252,
+    "nominal_cabinet_m": [
+      0.8,
+      1.2,
+      2.2
+    ],
+    "right_edge_blender_x_m": 3.1,
+    "aligned_to": "inside_latest_annotated_rectangle",
+    "requested_floor_rectangle_m": {
+      "min": [
+        -16.0,
+        -9.8,
+        0.0
+      ],
+      "max": [
+        3.3,
+        7.3,
+        2.2
+      ]
+    },
+    "rectangle_source": "previous image rectangle translated -2m in X by explicit request",
+    "translation_from_v08_m": [
+      -2,
+      0,
+      0
+    ],
+    "description": "Twenty cabinets per row, shifted two meters toward the west short wall. Equipment is visual only."
+  },
+  "rack_material_palette_srgb": {
+    "cabinet": [
+      0.15,
+      0.18,
+      0.21
+    ],
+    "edge": [
+      0.25,
+      0.29,
+      0.32
+    ],
+    "black": [
+      0.055,
+      0.07,
+      0.08
+    ],
+    "server": [
+      0.43,
+      0.48,
+      0.52
+    ],
+    "silver": [
+      0.64,
+      0.69,
+      0.72
+    ],
+    "drive": [
+      0.2,
+      0.24,
+      0.27
+    ],
+    "green": [
+      0.26,
+      0.88,
+      0.42
+    ],
+    "cyan": [
+      0.22,
+      0.69,
+      0.86
+    ],
+    "amber": [
+      0.96,
+      0.64,
+      0.18
+    ],
+    "blue_cable": [
+      0.16,
+      0.43,
+      0.67
+    ],
+    "power_cable": [
+      0.12,
+      0.13,
+      0.15
+    ],
+    "label": [
+      0.82,
+      0.87,
+      0.89
+    ],
+    "glass": [
+      0.65,
+      0.78,
+      0.82
+    ]
+  },
+  "ventilation": {
+    "modules": [
+      {
+        "id": "extractor_01_01",
+        "node": "server_v12_extractor_01_01",
+        "row": 1,
+        "position_blender_m": [
+          -10.0,
+          -8.5,
+          4.55
+        ],
+        "nodes": {
+          "housing": "server_v12_extractor_01_01_housing",
+          "rotor": "server_v12_extractor_01_01_rotor",
+          "guard": "server_v12_extractor_01_01_guard"
+        },
+        "rotor_diameter_m": 1.6,
+        "flange_size_m": [
+          2.1,
+          2.1
+        ],
+        "bottom_z_m": 4.55,
+        "ceiling_connection_z_m": 5.2,
+        "airflow_visual_direction": "+Z",
+        "simulation": "not_implemented"
+      },
+      {
+        "id": "extractor_01_02",
+        "node": "server_v12_extractor_01_02",
+        "row": 1,
+        "position_blender_m": [
+          -1.0,
+          -8.5,
+          4.55
+        ],
+        "nodes": {
+          "housing": "server_v12_extractor_01_02_housing",
+          "rotor": "server_v12_extractor_01_02_rotor",
+          "guard": "server_v12_extractor_01_02_guard"
+        },
+        "rotor_diameter_m": 1.6,
+        "flange_size_m": [
+          2.1,
+          2.1
+        ],
+        "bottom_z_m": 4.55,
+        "ceiling_connection_z_m": 5.2,
+        "airflow_visual_direction": "+Z",
+        "simulation": "not_implemented"
+      },
+      {
+        "id": "extractor_02_01",
+        "node": "server_v12_extractor_02_01",
+        "row": 2,
+        "position_blender_m": [
+          -10.0,
+          -1.0,
+          4.55
+        ],
+        "nodes": {
+          "housing": "server_v12_extractor_02_01_housing",
+          "rotor": "server_v12_extractor_02_01_rotor",
+          "guard": "server_v12_extractor_02_01_guard"
+        },
+        "rotor_diameter_m": 1.6,
+        "flange_size_m": [
+          2.1,
+          2.1
+        ],
+        "bottom_z_m": 4.55,
+        "ceiling_connection_z_m": 5.2,
+        "airflow_visual_direction": "+Z",
+        "simulation": "not_implemented"
+      },
+      {
+        "id": "extractor_02_02",
+        "node": "server_v12_extractor_02_02",
+        "row": 2,
+        "position_blender_m": [
+          -1.0,
+          -1.0,
+          4.55
+        ],
+        "nodes": {
+          "housing": "server_v12_extractor_02_02_housing",
+          "rotor": "server_v12_extractor_02_02_rotor",
+          "guard": "server_v12_extractor_02_02_guard"
+        },
+        "rotor_diameter_m": 1.6,
+        "flange_size_m": [
+          2.1,
+          2.1
+        ],
+        "bottom_z_m": 4.55,
+        "ceiling_connection_z_m": 5.2,
+        "airflow_visual_direction": "+Z",
+        "simulation": "not_implemented"
+      },
+      {
+        "id": "extractor_03_01",
+        "node": "server_v12_extractor_03_01",
+        "row": 3,
+        "position_blender_m": [
+          -10.0,
+          6.5,
+          4.55
+        ],
+        "nodes": {
+          "housing": "server_v12_extractor_03_01_housing",
+          "rotor": "server_v12_extractor_03_01_rotor",
+          "guard": "server_v12_extractor_03_01_guard"
+        },
+        "rotor_diameter_m": 1.6,
+        "flange_size_m": [
+          2.1,
+          2.1
+        ],
+        "bottom_z_m": 4.55,
+        "ceiling_connection_z_m": 5.2,
+        "airflow_visual_direction": "+Z",
+        "simulation": "not_implemented"
+      },
+      {
+        "id": "extractor_03_02",
+        "node": "server_v12_extractor_03_02",
+        "row": 3,
+        "position_blender_m": [
+          -1.0,
+          6.5,
+          4.55
+        ],
+        "nodes": {
+          "housing": "server_v12_extractor_03_02_housing",
+          "rotor": "server_v12_extractor_03_02_rotor",
+          "guard": "server_v12_extractor_03_02_guard"
+        },
+        "rotor_diameter_m": 1.6,
+        "flange_size_m": [
+          2.1,
+          2.1
+        ],
+        "bottom_z_m": 4.55,
+        "ceiling_connection_z_m": 5.2,
+        "airflow_visual_direction": "+Z",
+        "simulation": "not_implemented"
+      }
+    ],
+    "palette_srgb": {
+      "housing": [
+        0.67,
+        0.72,
+        0.75
+      ],
+      "duct": [
+        0.47,
+        0.53,
+        0.57
+      ],
+      "blade": [
+        0.24,
+        0.3,
+        0.34
+      ],
+      "hub": [
+        0.59,
+        0.64,
+        0.67
+      ],
+      "guard": [
+        0.43,
+        0.49,
+        0.52
+      ],
+      "fastener": [
+        0.2,
+        0.24,
+        0.27
+      ]
+    },
+    "count": 6,
+    "type": "ceiling_industrial_axial_extractors",
+    "rotor_diameter_m": 1.6,
+    "mounting": "flush_to_ceiling_at_z_5.2",
+    "animated": false,
+    "engineering_sizing": "not_performed_visual_model_only"
+  },
+  "access_partition": {
+    "group": "server_v12_access_partition",
+    "fixed_group": "server_v12_access_partition_fixed",
+    "wall_x_m": 6.1,
+    "span_y_m": [
+      -12.94,
+      12.99
+    ],
+    "perimeter_inner_span_y_m": [
+      -13,
+      13
+    ],
+    "construction_joint_m": 0.01,
+    "south_junction": "aligned_to_perimeter_window_stile",
+    "height_m": 5.2,
+    "glass_nodes": [
+      "server_v12_partition_south_00_lower_glass",
+      "server_v12_partition_south_00_upper_glass",
+      "server_v12_partition_south_01_lower_glass",
+      "server_v12_partition_south_01_upper_glass",
+      "server_v12_partition_south_02_lower_glass",
+      "server_v12_partition_south_02_upper_glass",
+      "server_v12_partition_south_03_lower_glass",
+      "server_v12_partition_south_03_upper_glass",
+      "server_v12_partition_south_04_lower_glass",
+      "server_v12_partition_south_04_upper_glass",
+      "server_v12_partition_south_05_lower_glass",
+      "server_v12_partition_south_05_upper_glass",
+      "server_v12_partition_north_00_lower_glass",
+      "server_v12_partition_north_00_upper_glass",
+      "server_v12_partition_north_01_lower_glass",
+      "server_v12_partition_north_01_upper_glass",
+      "server_v12_partition_north_02_lower_glass",
+      "server_v12_partition_north_02_upper_glass",
+      "server_v12_partition_north_03_lower_glass",
+      "server_v12_partition_north_03_upper_glass",
+      "server_v12_partition_north_04_lower_glass",
+      "server_v12_partition_north_04_upper_glass",
+      "server_v12_partition_north_05_lower_glass",
+      "server_v12_partition_north_05_upper_glass"
+    ],
+    "door": {
+      "pivot": "server_v12_access_door_pivot",
+      "glass_node": "server_v12_access_door_glass",
+      "width_m": 1.59,
+      "height_m": 2.7,
+      "clear_width_m": 1.6,
+      "hinge_blender_m": [
+        6.1,
+        -0.795,
+        0
+      ],
+      "opens_inside_direction": "-X",
+      "open_angle_z_rad": 1.5707963267948966,
+      "preview_state": "closed"
+    },
+    "keypad": {
+      "node": "server_v12_access_keypad",
+      "display_node": "server_v12_keypad_display",
+      "buttons": [
+        {
+          "key": "1",
+          "node": "server_v12_keypad_key_1",
+          "hit_mesh": "server_v12_keypad_button_1"
+        },
+        {
+          "key": "2",
+          "node": "server_v12_keypad_key_2",
+          "hit_mesh": "server_v12_keypad_button_2"
+        },
+        {
+          "key": "3",
+          "node": "server_v12_keypad_key_3",
+          "hit_mesh": "server_v12_keypad_button_3"
+        },
+        {
+          "key": "4",
+          "node": "server_v12_keypad_key_4",
+          "hit_mesh": "server_v12_keypad_button_4"
+        },
+        {
+          "key": "5",
+          "node": "server_v12_keypad_key_5",
+          "hit_mesh": "server_v12_keypad_button_5"
+        },
+        {
+          "key": "6",
+          "node": "server_v12_keypad_key_6",
+          "hit_mesh": "server_v12_keypad_button_6"
+        },
+        {
+          "key": "7",
+          "node": "server_v12_keypad_key_7",
+          "hit_mesh": "server_v12_keypad_button_7"
+        },
+        {
+          "key": "8",
+          "node": "server_v12_keypad_key_8",
+          "hit_mesh": "server_v12_keypad_button_8"
+        },
+        {
+          "key": "9",
+          "node": "server_v12_keypad_key_9",
+          "hit_mesh": "server_v12_keypad_button_9"
+        },
+        {
+          "key": "*",
+          "node": "server_v12_keypad_key_clear",
+          "hit_mesh": "server_v12_keypad_button_clear"
+        },
+        {
+          "key": "0",
+          "node": "server_v12_keypad_key_0",
+          "hit_mesh": "server_v12_keypad_button_0"
+        },
+        {
+          "key": "#",
+          "node": "server_v12_keypad_key_confirm",
+          "hit_mesh": "server_v12_keypad_button_confirm"
+        }
+      ],
+      "position_blender_m": [
+        6.159999999999999,
+        1.2,
+        1.35
+      ],
+      "side": "right_of_door_when_viewed_from_outside_+X",
+      "normal_blender": [
+        1,
+        0,
+        0
+      ],
+      "access_logic": "pending_application"
+    },
+    "colliders": [
+      {
+        "node": "server_v12_access_partition_fixed",
+        "min_blender_m": [
+          6.04,
+          -12.94,
+          0
+        ],
+        "max_blender_m": [
+          6.159999999999999,
+          -0.9,
+          5.2
+        ],
+        "role": "fixed_glass_partition"
+      },
+      {
+        "node": "server_v12_access_partition_fixed",
+        "min_blender_m": [
+          6.04,
+          0.9,
+          0
+        ],
+        "max_blender_m": [
+          6.159999999999999,
+          12.99,
+          5.2
+        ],
+        "role": "fixed_glass_partition"
+      },
+      {
+        "node": "server_v12_access_door_pivot",
+        "min_blender_m": [
+          6.06,
+          -0.8,
+          0.025
+        ],
+        "max_blender_m": [
+          6.14,
+          0.8,
+          2.7
+        ],
+        "role": "access_door",
+        "active_when": "door_closed"
+      }
+    ],
+    "runtime_implemented": false
+  },
+  "operations": {
+    "group": "server_v12_operations_area",
+    "control_desk": "server_v12_control_desk",
+    "workstations": [
+      {
+        "node": "server_v12_workstation_01",
+        "operator_chair": "server_v12_ops_chair_01",
+        "faces": "-X"
+      },
+      {
+        "node": "server_v12_workstation_02",
+        "operator_chair": "server_v12_ops_chair_02",
+        "faces": "-X"
+      }
+    ],
+    "pc_screen_nodes": [
+      "server_v12_ops_screen_1_1",
+      "server_v12_ops_screen_1_2",
+      "server_v12_ops_screen_2_1",
+      "server_v12_ops_screen_2_2"
+    ],
+    "seats": [
+      {
+        "seat": "server_v12_ops_seat_001",
+        "stand": "server_v12_ops_stand_001",
+        "position_blender_m": [
+          11.8,
+          -6.05,
+          0.5
+        ],
+        "stand_blender_m": [
+          13.0,
+          -6.05,
+          0
+        ],
+        "forward_blender": [
+          -1,
+          0,
+          0
+        ]
+      },
+      {
+        "seat": "server_v12_ops_seat_002",
+        "stand": "server_v12_ops_stand_002",
+        "position_blender_m": [
+          11.8,
+          -3.15,
+          0.5
+        ],
+        "stand_blender_m": [
+          13.0,
+          -3.15,
+          0
+        ],
+        "forward_blender": [
+          -1,
+          0,
+          0
+        ]
+      }
+    ],
+    "maintenance_bench": "server_v12_maintenance_bench",
+    "open_server": "server_v12_maintenance_open_server",
+    "closed_cabinets": [
+      "server_v12_technical_cabinet_01",
+      "server_v12_technical_cabinet_02"
+    ],
+    "colliders": [
+      {
+        "node": "server_v12_control_desk",
+        "min_blender_m": [
+          9.7,
+          -7.5,
+          0
+        ],
+        "max_blender_m": [
+          10.96,
+          -1.7,
+          0.79
+        ],
+        "role": "control_desk"
+      },
+      {
+        "node": "server_v12_ops_chair_01",
+        "min_blender_m": [
+          11.36,
+          -6.4799999999999995,
+          0
+        ],
+        "max_blender_m": [
+          12.22,
+          -5.62,
+          1.23
+        ],
+        "role": "operator_chair"
+      },
+      {
+        "node": "server_v12_ops_chair_02",
+        "min_blender_m": [
+          11.36,
+          -3.58,
+          0
+        ],
+        "max_blender_m": [
+          12.22,
+          -2.7199999999999998,
+          1.23
+        ],
+        "role": "operator_chair"
+      },
+      {
+        "node": "server_v12_technical_cabinet_01",
+        "min_blender_m": [
+          10.4,
+          12.08,
+          0
+        ],
+        "max_blender_m": [
+          11.7,
+          12.95,
+          2.16
+        ],
+        "role": "closed_parts_cabinet"
+      },
+      {
+        "node": "server_v12_technical_cabinet_02",
+        "min_blender_m": [
+          16.8,
+          12.08,
+          0
+        ],
+        "max_blender_m": [
+          17.9,
+          12.95,
+          2.16
+        ],
+        "role": "closed_parts_cabinet"
+      },
+      {
+        "node": "server_v12_maintenance_bench",
+        "min_blender_m": [
+          12,
+          11.875,
+          0
+        ],
+        "max_blender_m": [
+          16.5,
+          12.97,
+          2.22
+        ],
+        "role": "maintenance_bench_and_toolboard"
+      }
+    ],
+    "central_door_route_clear_y_m": [
+      -1.3,
+      1.3
+    ],
+    "elevator_to_door_route_clear_x_m": [
+      7.0,
+      9.5
+    ],
+    "monitoring_panels": "three_existing_whiteboards_inside_server_zone",
+    "runtime_implemented": false
+  },
+  "whiteboards": [
+    {
+      "id": "whiteboard_001",
+      "group": "server_v12_whiteboard_001",
+      "surface_node": "server_v12_whiteboard_surface_001",
+      "intended_use": "server_and_agent_monitoring",
+      "material": "server_v12_mat_whiteboard_dynamic_001",
+      "size_m": [
+        6.4,
+        2.8
+      ],
+      "center_blender_m": [
+        -13.2,
+        12.82,
+        2.55
+      ],
+      "normal_blender": [
+        0,
+        -1,
+        0
+      ],
+      "uv_range": [
+        0,
+        1
+      ]
+    },
+    {
+      "id": "whiteboard_002",
+      "group": "server_v12_whiteboard_002",
+      "surface_node": "server_v12_whiteboard_surface_002",
+      "intended_use": "server_and_agent_monitoring",
+      "material": "server_v12_mat_whiteboard_dynamic_002",
+      "size_m": [
+        6.4,
+        2.8
+      ],
+      "center_blender_m": [
+        -5.4,
+        12.82,
+        2.55
+      ],
+      "normal_blender": [
+        0,
+        -1,
+        0
+      ],
+      "uv_range": [
+        0,
+        1
+      ]
+    },
+    {
+      "id": "whiteboard_003",
+      "group": "server_v12_whiteboard_003",
+      "surface_node": "server_v12_whiteboard_surface_003",
+      "intended_use": "server_and_agent_monitoring",
+      "material": "server_v12_mat_whiteboard_dynamic_003",
+      "size_m": [
+        6.4,
+        2.8
+      ],
+      "center_blender_m": [
+        2.4,
+        12.82,
+        2.55
+      ],
+      "normal_blender": [
+        0,
+        -1,
+        0
+      ],
+      "uv_range": [
+        0,
+        1
+      ]
+    }
+  ],
+  "whiteboard_layout": {
+    "surface_gap_m": 1.4,
+    "frame_gap_m": 1.2,
+    "aligned_wall": "north_left_of_elevator",
+    "dimensions_provisional": true,
+    "runtime_monitoring": "not_implemented"
+  },
+  "material_palette_srgb": {
+    "wall_cream": [
+      0.94,
+      0.85,
+      0.68
+    ],
+    "wall_sand": [
+      0.86,
+      0.69,
+      0.49
+    ],
+    "wood_light": [
+      0.94,
+      0.73,
+      0.44
+    ],
+    "wood_warm": [
+      0.89,
+      0.66,
+      0.38
+    ],
+    "wood_honey": [
+      0.87,
+      0.62,
+      0.34
+    ],
+    "wood_edge": [
+      0.67,
+      0.43,
+      0.24
+    ],
+    "frame_slate": [
+      0.4,
+      0.47,
+      0.46
+    ],
+    "glass_blue": [
+      0.26,
+      0.43,
+      0.51
+    ],
+    "glass_reflection": [
+      0.41,
+      0.6,
+      0.64
+    ],
+    "ceiling": [
+      0.91,
+      0.86,
+      0.73
+    ],
+    "tile_light_gray": [
+      0.87,
+      0.89,
+      0.9
+    ],
+    "grout_gray": [
+      0.64,
+      0.67,
+      0.69
+    ]
+  },
+  "gltf_from_blender": [
+    "x",
+    "z",
+    "-y"
+  ],
+  "not_implemented": [
+    "integrazione applicativa",
+    "alimentazione/rete/raffreddamento runtime"
+  ]
+}

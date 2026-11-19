@@ -2,8 +2,9 @@
 
 L'Atrio è il piano terra permanente (`@lobby`), accessibile dall'ascensore anche
 senza progetti. Gli uffici occupano i piani intermedi, dal primo in su, e la
-Sala riunioni (`@roof`) rimane sempre sopra l'ultimo ufficio. Con zero uffici
-l'edificio contiene comunque Atrio e Sala riunioni. Nessuno dei due spazi può
+Sala server (`@server-room`) occupa il penultimo piano fisso, seguita dalla
+Sala riunioni (`@roof`) sempre in cima. Con zero uffici l'edificio contiene comunque
+Atrio, Sala server e Sala riunioni. Nessuno dei tre spazi può
 essere rimosso come un progetto.
 
 La destinazione d'ingresso già esistente ora apre il modello in
