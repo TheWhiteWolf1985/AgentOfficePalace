@@ -1,5 +1,9 @@
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
+import { mkdtemp, mkdir, rmdir } from 'node:fs/promises';
+import { TLSSocket } from 'node:tls';
+import { deviceState, dockerRoot, loginContainer, serialWorker } from '../../workers/docker.js';
+import { DESKS } from '../../../shared/layout.js';
 import { connections, repositoryName, checkedId } from '../../connections/store.js';
 import { RemoteApi } from '../../connections/api.js';
 import { verifyGit, cloneRepository } from '../../connections/git.js';
@@ -26,7 +30,7 @@ export const connectionsRoute: Route = {
     try {
       if (req.method === 'GET') {
         if (url.searchParams.has('login')) return send(res, 200, await githubLoginState(checkedId(url.searchParams.get('login'))));
-        return send(res, 200, { ...store.snapshot(), admin: true, floors: [...ctx.floors.values()].map((f) => ({ id: f.id, name: f.def.name, dir: f.def.dir, project: { ...f.project, agentProviders: managedProviders(f.project.agentProviders) }, workers: f.workers.list() })) });
+        return send(res, 200, { ...store.snapshot(), admin: true, codexDocker: !!dockerRoot(), floors: [...ctx.floors.values()].map((f) => ({ id: f.id, name: f.def.name, dir: f.def.dir, project: { ...f.project, agentProviders: managedProviders(f.project.agentProviders) }, workers: f.workers.list() })) });
       }
       const body = JSON.parse(await readBody(req, 65536));
       switch (body.action) {
@@ -41,6 +45,56 @@ export const connectionsRoute: Route = {
         case 'git': return send(res, 200, await verifyGit(store, checkedId(body.accountId), repositoryName(body.repository)));
         case 'login': return send(res, 200, startGithubLogin(checkedId(body.serverId), String(body.name ?? '')));
         case 'cancel-login': cancelGithubLogin(checkedId(body.flow)); return send(res, 200, { ok: true });
+        case 'container-office': {
+          if (!dockerRoot()) throw Error('Docker non configurato');
+          const name = String(body.name ?? '').trim();
+          if (!name || name.length > 80 || /[\x00-\x1f]/.test(name)) throw Error('Nome ufficio non valido');
+          const root = ctx.building.projectsDir;
+          await mkdir(root, { recursive: true });
+          const dir = await mkdtemp(path.join(root, 'office-'));
+          let def;
+          try { def = ctx.building.attach(dir, name, '', session.account?.name ?? 'admin'); }
+          catch (error) { await rmdir(dir); throw error; }
+          if (!ctx.openFloor(def)) throw Error('Ufficio creato ma apertura non riuscita');
+          ctx.floorsChanged();
+          return send(res, 200, { floorId: def.id });
+        }
+        case 'container-create': {
+          if (!dockerRoot()) throw Error('Docker non configurato');
+          const floor = ctx.floors.get(checkedId(body.floorId));
+          if (!floor) throw Error('Ufficio non trovato');
+          const desk = DESKS.find(d => !d.station && !d.room && !floor.workers.deskOccupied(d.id));
+          if (!desk) throw Error('Nessuna scrivania libera');
+          const r = floor.workers.spawn(desk.id, session.account?.name ?? 'admin', undefined, false, 'agent', 'codex', undefined, undefined, undefined, session.account?.id, [], body.appearance);
+          if (typeof r === 'string') throw Error(r);
+          return send(res, 201, { workerId: r.id });
+        }
+        case 'container': {
+          const floor = ctx.floors.get(checkedId(body.floorId)), id = checkedId(body.workerId);
+          if (!floor || floor.workers.get(id)?.runtime !== 'docker') throw Error('Agente Docker non trovato');
+          const owner = session.account?.id ?? 'shared-admin';
+          switch (body.operation) {
+            case 'start': {
+              const error = floor.workers.resume(id); if (error) throw Error(error);
+              break;
+            }
+            case 'stop': await floor.workers.pauseContainer(id); break;
+            case 'remove': {
+              const result = await floor.sendHome(id);
+              if (result.error) throw Error(result.error);
+              return send(res, 200, { ok: true, note: result.note });
+            }
+            case 'login-state': return send(res, 200, deviceState(id, owner));
+            case 'login-device':
+            case 'login-key': {
+              if (!(req.socket instanceof TLSSocket && req.socket.encrypted) && !['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(req.socket.remoteAddress ?? '')) throw Error('Apri il sito tramite HTTPS per collegare Codex');
+              if (body.operation === 'login-key' && typeof body.apiKey !== 'string') throw Error('Chiave API richiesta');
+              return send(res, 200, await serialWorker(id, () => loginContainer(id, owner, body.operation === 'login-key' ? body.apiKey : undefined)));
+            }
+            default: throw Error('Operazione non valida');
+          }
+          return send(res, 200, { ok: true });
+        }
         case 'worker': {
           const floor = ctx.floors.get(checkedId(body.floorId));
           if (!floor || !floor.workers.get(checkedId(body.workerId))) throw Error('Agente non trovato');

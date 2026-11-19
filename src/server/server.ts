@@ -14,6 +14,7 @@ import { startTimers } from './office/timers.js';
 import { findPublicDir } from './http/static.js';
 import { requestHandler } from './http/router.js';
 import { routes } from './http/routes/index.js';
+import { dockerRoot, reconcileContainers } from './workers/docker.js';
 import { startHookServer } from './hooks/server.js';
 import { acceptWebSockets } from './ws/upgrade.js';
 import { stopServerRoom } from './http/routes/server-room.js';
@@ -36,6 +37,7 @@ export async function startServer(cfg: Config, opts: StartOptions = {}) {
   Object.assign(ctx, createServices(ctx));
   Object.assign(ctx, await openFloors(ctx, hookPort));
   Object.assign(ctx, createLateServices(ctx));
+  if (dockerRoot()) void reconcileContainers(id => !!ctx.workerFloor(id)).catch(error => console.warn('Docker workers:', error.message));
 
   // --- HTTP ------------------------------------------------------------------------------------
   const handler = requestHandler(ctx, routes);

@@ -4,7 +4,7 @@ import type { AgentEffort, AgentProvider, WorkerStatus } from '../../shared/prot
 import { h, openModal, STATUS_LABEL } from './dom';
 import { store } from '../state';
 import { providerPicker, type ProviderPicker } from './provider';
-import { repoPicker } from './prompt';
+import { dockerHireControls, repoPicker } from './prompt';
 import { dictateField } from './dictate';
 import { agentAppearancePicker } from './agent-appearance';
 import type { AgentAppearance } from '../../shared/agent-appearance';
@@ -55,6 +55,7 @@ export function openAsk(opts: AskOptions) {
   const wtRow = h('label.ask-wt', { for: 'ask-wt', title: uiText('Isolate the new worker on its own branch so parallel workers never collide') }, wtBox, uiText('🌿 Work in its own git worktree & branch'));
   const repos = repoPicker(opts.worktreeOption ? opts.repoOptions : undefined, wtBox);
   const provider: ProviderPicker | null = opts.providerOption ? providerPicker(store.project, 'ask-provider') : null;
+  dockerHireControls(provider, wtRow, repos.element, wtBox);
   const submit = h('button.btn.primary', { type: 'submit' });
   const appearance = opts.newDesk ? agentAppearancePicker() : null;
 
@@ -116,11 +117,11 @@ export function openAsk(opts: AskOptions) {
     opts.onSubmit(
       opts.context ? `${opts.context}\n\n${text}` : text,
       to,
-      !to && opts.worktreeOption && wtBox.checked,
+      !to && opts.worktreeOption && !wtBox.disabled && wtBox.checked,
       !to ? provider?.value() : undefined,
       !to ? provider?.model() : undefined,
       !to ? provider?.effort() : undefined,
-      !to && opts.worktreeOption && wtBox.checked ? repos.value() : undefined,
+      !to && opts.worktreeOption && !wtBox.disabled && wtBox.checked ? repos.value() : undefined,
       !to ? appearance?.value() : undefined,
     );
   };

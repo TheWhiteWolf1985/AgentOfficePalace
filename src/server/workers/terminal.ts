@@ -6,7 +6,32 @@ import type { Run, WorkerInfo } from '../../shared/protocol.js';
 import { FLAG_BOLD, FLAG_DIM, FLAG_INVERSE, RGB_FLAG } from '../../shared/protocol.js';
 import { SCROLLBACK } from '../ptys.js';
 import { screenSnapshot } from '../screen.js';
-import type { Worker, WorkerEvents } from './types.js';
+import { clockWork } from './clock.js';
+import { titleNoise } from '../providers/index.js';
+import type { Worker, WorkerContext, WorkerEvents } from './types.js';
+
+export function startFailed(ctx: WorkerContext, w: Worker, message: string) {
+  const what = ctx.command(w.info);
+  const msg = `\r\n\x1b[31mFailed to start ${what}: ${message}\x1b[0m\r\n`;
+  clockWork(w.info, 'exited');
+  w.info.status = 'exited';
+  w.info.exitCode = -1;
+  w.term?.write(msg);
+  if (w.viewers.size) ctx.events.data(w.info.id, msg, [...w.viewers.keys()]);
+  w.screenDirty = true;
+  w.unsaved = true;
+  ctx.events.toast(`Could not start ${what}: ${message}`, 'error');
+  ctx.emit(w);
+  ctx.persist();
+}
+
+export function setTitle(ctx: WorkerContext, w: Worker, title: string) {
+  const clean = title.replace(/^[^\p{L}\p{N}]+/u, '').trim();
+  if (clean && clean !== w.info.title && !titleNoise(clean)) {
+    w.info.title = clean;
+    ctx.emit(w);
+  }
+}
 
 export type HeadlessTerminal = InstanceType<typeof headless.Terminal>;
 

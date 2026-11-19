@@ -12,6 +12,7 @@ import type { ServicesState } from './settings.js';
 import type { WorkerInfo } from './workers.js';
 
 export interface ProjectInfo {
+  codexDocker?: boolean;
   name: string;
   dir: string;
   branch?: string;

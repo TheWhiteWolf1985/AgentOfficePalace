@@ -4,6 +4,8 @@ import { MAX_REPOS, type RepoSource } from '../../workers.js';
 import { OPEN_CODE_MODEL_MAX } from '../../../shared/providers.js';
 import { isAgentEffort, isAgentProvider, type WorkerClientMsg } from '../../../shared/protocol.js';
 import { issueNumber, num, str } from '../../office/input.js';
+import type { Client } from '../../office/client.js';
+import type { Ctx } from '../../office/context.js';
 import { here, workerOf } from './common.js';
 import type { FeatureHooks, HandlerMap, ViewPieces } from './types.js';
 
@@ -14,6 +16,14 @@ export const workersView: ViewPieces['workers'] = (_ctx, floor) => floor?.worker
 /** The least time between two 'term.typing' notes from one person in one terminal. */
 const TYPING_GAP_MS = 500;
 
+function controlledWorker(ctx: Ctx, c: Client, id: unknown) {
+  const w = workerOf(ctx, id);
+  if (w?.info.runtime === 'docker' && !ctx.meOf(c.accountId).admin && (!c.accountId || w.floor.workers.ownerOf(w.wid) !== c.accountId)) {
+    ctx.warn(c, 'Il terminale Docker è riservato al proprietario o a un amministratore');
+    return;
+  }
+  return w;
+}
 export const workerHandlers = {
   'worker.spawn'(ctx, c, msg) {
     const who = c.peer.name;
@@ -47,12 +57,12 @@ export const workerHandlers = {
     ctx.withSignIn(c, kind === 'agent' ? ctx.claudeFor(msg.provider ?? floor.workers.officeDefault.provider) : undefined, () => (msg.worktree === true ? ctx.withFreshBase(c, fresh, hire) : hire()));
   },
   'worker.resume'(ctx, c, msg) {
-    const w = workerOf(ctx, msg.workerId);
+    const w = controlledWorker(ctx, c, msg.workerId);
     ctx.warn(c, w ? w.floor.workers.resume(w.wid) : 'No such worker');
   },
   'worker.kill'(ctx, c, msg) {
     const who = c.peer.name;
-    const w = workerOf(ctx, msg.workerId);
+    const w = controlledWorker(ctx, c, msg.workerId);
     if (!w) return;
     const { floor, info } = w;
     // The worker leaves right away; its worktree is dealt with after that, and the outcome follows.
@@ -64,7 +74,7 @@ export const workerHandlers = {
     });
   },
   'worker.worktree'(ctx, c, msg) {
-    const w = workerOf(ctx, msg.workerId);
+    const w = controlledWorker(ctx, c, msg.workerId);
     if (!w) return;
     void w.floor.workers.inspectWorktree(w.wid).then((state) => {
       if (state) ctx.sendTo(c, { t: 'worker.worktree', workerId: w.wid, state });
@@ -72,7 +82,7 @@ export const workerHandlers = {
   },
   'worker.rebuild'(ctx, c, msg) {
     const who = c.peer.name;
-    const w = workerOf(ctx, msg.workerId);
+    const w = controlledWorker(ctx, c, msg.workerId);
     if (!w) return;
     const { floor } = w;
     // With `all`, every worker on the floor whose worktree was deleted, this one first.
@@ -99,7 +109,7 @@ export const workerHandlers = {
   },
   'worker.attach'(ctx, c, msg) {
     const who = c.peer.name;
-    const w = workerOf(ctx, msg.workerId);
+    const w = controlledWorker(ctx, c, msg.workerId);
     const snap = w?.floor.workers.attach(w.wid, c.id, who);
     if (w && snap) {
       c.attached.add(w.wid);
@@ -114,7 +124,7 @@ export const workerHandlers = {
   },
   'worker.prompt'(ctx, c, msg) {
     const who = c.peer.name;
-    const w = workerOf(ctx, msg.workerId);
+    const w = controlledWorker(ctx, c, msg.workerId);
     const err = w ? w.floor.workers.prompt(w.wid, str(msg.prompt, 20000), who) : 'No such worker';
     ctx.warn(c, err);
     const issue = w?.info.kind === 'agent' ? issueNumber(msg.issue) : undefined;
@@ -129,7 +139,9 @@ export const workerHandlers = {
     if (!floor) return;
     const deskId = str(msg.deskId, 32);
     // Nobody there yet: whoever asks first hires it, on their own sign-ins.
-    const hires = !floor.workers.deskOccupied(deskId);
+    const seated = floor.workers.list().find(w => w.deskId === deskId);
+    if (seated?.runtime && !controlledWorker(ctx, c, seated.id)) return;
+    const hires = !seated;
     ctx.withSignIn(c, hires ? ctx.claudeFor(floor.workers.officeDefault.provider) : undefined, () => {
       const r = floor.workers.station(deskId, who, str(msg.prompt, 20000), c.accountId, msg.appearance);
       if (typeof r === 'string') ctx.warn(c, r);
@@ -138,7 +150,7 @@ export const workerHandlers = {
   },
   'worker.pr'(ctx, c, msg) {
     const who = c.peer.name;
-    const w = workerOf(ctx, msg.workerId);
+    const w = controlledWorker(ctx, c, msg.workerId);
     if (!w) return;
     const { floor, wid } = w;
     ctx.withGitHub(c, (as) => void floor.workers.openPr(wid, who, as).then((r) => {
@@ -170,7 +182,7 @@ export const workerHandlers = {
   },
   'term.typing'(ctx, c, msg) {
     // Everyone else in that terminal sees who's typing. A typist says so about once a second.
-    const w = workerOf(ctx, msg.workerId);
+    const w = controlledWorker(ctx, c, msg.workerId);
     const now = Date.now();
     if (!w || !c.attached.has(w.wid) || now - (c.typingAt.get(w.wid) ?? 0) < TYPING_GAP_MS) return;
     c.typingAt.set(w.wid, now);

@@ -1,6 +1,7 @@
 // The models a provider's own CLI lists, for the hire dialog: what each is called and which
 // reasoning efforts it takes, where the CLI says. Each is asked without a shell, and only what
 // looks like a model gets through.
+import { AGENT_IMAGE, dockerPrefix, dockerRoot } from './workers/docker.js';
 import { spawn } from 'node:child_process';
 import { closeSync, mkdtempSync, openSync, readFileSync, rmSync, statSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -135,7 +136,9 @@ export async function fetchGrokModels(command: string, cwd: string, runner: Mode
  */
 export async function fetchCodexModels(command: string, cwd: string, runner: ModelCommandRunner = runModelCommand): Promise<ModelOption[]> {
   try {
-    const result = await runner(command, ['debug', 'models'], { cwd, timeout: MODEL_COMMAND_TIMEOUT_MS, maxBuffer: MODEL_DETAILS_MAX_BUFFER });
+    const container = !!dockerRoot() && runner === runModelCommand;
+    const args = container ? [...dockerPrefix(), 'run', '--rm', '--pull=never', '--cap-drop=ALL', '--security-opt=no-new-privileges', '--network=none', '--pids-limit=64', '--memory=512m', '--entrypoint=codex', AGENT_IMAGE, 'debug', 'models'] : ['debug', 'models'];
+    const result = await runner(container ? 'docker' : command, args, { cwd, timeout: MODEL_COMMAND_TIMEOUT_MS, maxBuffer: MODEL_DETAILS_MAX_BUFFER });
     const listed: unknown = JSON.parse(result.stdout)?.models;
     if (!Array.isArray(listed)) throw new Error('no models');
     const models: ModelOption[] = [];

@@ -1,8 +1,11 @@
 // The loopback-only server for the workers' own calls: their agents' hook events, and the office's
 // queue and workers for the board agents and the office-workers command.
 import http from 'node:http';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { connect } from 'node:net';
+import { chmodSync, lstatSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { writeCodexHook } from '../codex.js';
+import { dockerRoot } from '../workers/docker.js';
 import type { Ctx } from '../office/context.js';
 import { readBody, send } from '../http/util.js';
 import { officeQueue } from './office-queue.js';
@@ -61,5 +64,30 @@ export async function startHookServer(ctx: Ctx): Promise<{ hookServer: http.Serv
   await listenHooks(lastHookPort).catch(() => listenHooks(0));
   const hookPort = (hookServer.address() as { port: number }).port;
   writeFileSync(hookPortPath, String(hookPort), { mode: 0o600 });
+  const root = dockerRoot();
+  if (root) {
+    const bridge = path.join(root, 'bridge'), socket = path.join(bridge, 'hooks.sock');
+    mkdirSync(bridge, { recursive: true, mode: 0o700 });
+    writeCodexHook(bridge);
+    const old = lstatSync(socket, { throwIfNoEntry: false });
+    if (old) {
+      if (!old.isSocket()) throw Error('Percorso socket hook occupato');
+      // A second office must never unlink the first one's live Unix socket.
+      const active = await new Promise<boolean>((resolve, reject) => {
+        const probe = connect(socket);
+        probe.on('connect', () => { probe.destroy(); resolve(true); });
+        probe.on('error', (error: NodeJS.ErrnoException) => error.code === 'ECONNREFUSED' || error.code === 'ENOENT' ? resolve(false) : reject(error));
+      });
+      if (active) throw Error('Runtime Codex già in uso');
+      if (lstatSync(socket, { throwIfNoEntry: false })?.ino === old.ino) unlinkSync(socket);
+    }
+    const local = http.createServer((req, res) => {
+      if (req.method !== 'POST' || req.url?.split('?')[0] !== '/hooks/codex') return send(res, 404, {});
+      hookServer.emit('request', req, res);
+    });
+    await new Promise<void>((resolve, reject) => { local.once('error', reject); local.listen(socket, resolve); });
+    chmodSync(socket, 0o600);
+    hookServer.once('close', () => local.close());
+  }
   return { hookServer, hookPort };
 }

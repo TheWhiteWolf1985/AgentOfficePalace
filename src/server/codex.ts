@@ -95,10 +95,10 @@ function shellQuote(value: string): string {
  * Build the CLI config overrides for all lifecycle hooks. The command is encoded as a TOML basic
  * string so paths containing spaces remain valid; the command itself is shell-quoted.
  */
-export function codexHookArgs(hookPath: string): string[] {
+export function codexHookArgs(hookPath: string, node = process.execPath): string[] {
   const args: string[] = [];
   for (const event of CODEX_HOOK_EVENTS) {
-    const command = [process.execPath, hookPath, event].map(shellQuote).join(' ');
+    const command = [node, hookPath, event].map(shellQuote).join(' ');
     const config = `hooks.${event}=[{hooks=[{type="command",command=${JSON.stringify(command)},timeout=3}]}]`;
     args.push('-c', config);
   }
@@ -175,11 +175,18 @@ process.stdin.on('end', async () => {
   const base = process.env.AGENT_OFFICE_HOOK_URL;
   const token = process.env.AGENT_OFFICE_HOOK_TOKEN;
   const worker = process.env.AGENT_OFFICE_WORKER_ID;
-  if (!base || !token || !worker) return finish(false);
+  const socket = process.env.AGENT_OFFICE_HOOK_SOCKET;
+  if ((!base && !socket) || !token || !worker) return finish(false);
   try {
-    const url = new URL('/hooks/codex', base);
+    const url = new URL('/hooks/codex', base || 'http://localhost');
     url.searchParams.set('worker', worker);
     url.searchParams.set('event', event);
+    if (socket) {
+      const req = require('node:http').request({ socketPath: socket, path: url.pathname + url.search,
+        method: 'POST', headers: { authorization: 'Bearer ' + token, 'content-type': 'application/json' },
+        signal: AbortSignal.timeout(2000) }, res => { res.resume(); finish(res.statusCode === 200); });
+      req.on('error', () => finish(false)); req.end(JSON.stringify(body)); return;
+    }
     const response = await fetch(url, {
       method: 'POST',
       headers: { authorization: 'Bearer ' + token, 'content-type': 'application/json' },

@@ -94,6 +94,7 @@ export function projectInfo(dir: string, name: string, agentCmd: string, agentAr
     agentCmd: [agentCmd, ...agentArgs].join(' '),
     defaultProvider: configuredProvider(agentCmd),
     agentProviders: agentProviders(configuredProvider(agentCmd)),
+    ...(process.env.AGENT_OFFICE_CODEX_RUNTIME ? { codexDocker: true } : {}),
   };
 }
 

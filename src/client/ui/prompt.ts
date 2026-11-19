@@ -3,7 +3,7 @@ import './prompt.css';
 import type { AgentEffort, AgentProvider, LostBranch, ServerMsg, WorktreeCleanup, WorktreeState } from '../../shared/protocol';
 import { h, openModal } from './dom';
 import { store } from '../state';
-import { providerPicker, type ProviderPicker } from './provider';
+import { officeChoice, providerPicker, type ProviderPicker } from './provider';
 import { dictateField } from './dictate';
 import { agentAppearancePicker } from './agent-appearance';
 import type { AgentAppearance } from '../../shared/agent-appearance';
@@ -58,6 +58,21 @@ export function repoPicker(options: { id: string; name: string }[] | undefined, 
   };
 }
 
+/** Hide native Git worktree controls for a Docker hire, which has its own checkout. */
+export function dockerHireControls(provider: ProviderPicker | null, row: HTMLElement | null, repos: HTMLElement | null | undefined, checkbox: HTMLInputElement) {
+  const project = store.project;
+  const active = () => !!project?.codexDocker && (provider?.value() ?? officeChoice(project).provider) === 'codex';
+  const refresh = () => {
+    const hide = active();
+    for (const el of [row, repos]) if (el) el.style.display = hide ? 'none' : '';
+    checkbox.disabled = hide;
+  };
+  if (project?.codexDocker) {
+    refresh();
+    provider?.element.addEventListener('change', refresh);
+    provider?.element.addEventListener('click', refresh);
+  }
+}
 export function openPrompt(opts: PromptOptions) {
   const ta = h('textarea', { rows: 7, placeholder: opts.placeholder ?? uiText('What should the worker work on?'), 'aria-label': uiText('Prompt') }) as HTMLTextAreaElement;
   ta.value = opts.initial ?? '';
@@ -73,6 +88,7 @@ export function openPrompt(opts: PromptOptions) {
     : null;
   const repos = repoPicker(opts.worktreeOption ? opts.repoOptions : undefined, wtBox);
   const provider: ProviderPicker | null = opts.providerOption ? providerPicker(store.project, 'prompt-provider') : null;
+  dockerHireControls(provider, wtRow, repos.element, wtBox);
   const appearance = opts.appearanceOption ? agentAppearancePicker() : null;
   const submit = h('button.btn.primary', { type: 'submit' }, opts.submitLabel ?? uiText('Send ✨'));
   const cancel = h('button.btn', { type: 'button' }, uiText('Cancel'));
@@ -102,7 +118,7 @@ export function openPrompt(opts: PromptOptions) {
         // storage blocked
       }
     }
-    const worktree = !!opts.worktreeOption && wtBox.checked;
+    const worktree = !!opts.worktreeOption && !wtBox.disabled && wtBox.checked;
     opts.onSubmit(text, { worktree, provider: provider?.value(), model: provider?.model(), effort: provider?.effort(), repos: worktree ? repos.value() : [], appearance: appearance?.value() });
   };
   form.addEventListener('submit', (e) => {

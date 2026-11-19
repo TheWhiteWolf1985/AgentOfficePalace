@@ -61,7 +61,7 @@ export const fileRoutes = {
   termDrop: {
     path: '/api/term/drop',
     auth: 'session',
-    async handle(ctx, { req, res, url }) {
+    async handle(ctx, { req, res, url, session }) {
       const floor = floorParam(ctx, url);
       // A file dropped or pasted into a worker's terminal, kept on this machine for the terminal to type its path.
       if (req.method !== 'POST') return send(res, 405, { error: 'Method not allowed' });
@@ -69,6 +69,8 @@ export const fileRoutes = {
       if (!floor) return send(res, 404, { error: 'No such floor' });
       const workerId = str(url.searchParams.get('worker'), 32);
       if (!floor.workers.get(workerId)) return send(res, 404, { error: 'No such worker' });
+      if (floor.workers.get(workerId)?.runtime === 'docker' && !ctx.meOf(session.account?.id).admin &&
+        (!session.account?.id || session.account.id !== floor.workers.ownerOf(workerId))) return send(res, 403, { error: 'Forbidden' });
       const tooBig = `That file is too big to drop into a terminal (${DROP_MAX_BYTES / 1024 / 1024} MB at most)`;
       if (Number(req.headers['content-length']) > DROP_MAX_BYTES) return send(res, 413, { error: tooBig });
       let body: Buffer;

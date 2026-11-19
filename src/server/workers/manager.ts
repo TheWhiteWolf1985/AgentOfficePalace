@@ -19,20 +19,22 @@ import { ScrollbackStore, searchTerminal, terminalTail } from '../history.js';
 import { DSH_PROFILE_DEFAULT } from '../dsh.js';
 import { DropStore } from '../drops.js';
 import type { Capacity } from '../machine.js';
-import { PROVIDERS, providerAdapter, titleNoise, type LaunchPlan, type ProviderFloor } from '../providers/index.js';
+import { PROVIDERS, providerAdapter, type LaunchPlan, type ProviderFloor } from '../providers/index.js';
 import { launchAcp } from './acp.js';
 import { clockWork } from './clock.js';
 import { childEnv } from './env.js';
 import { midTurn } from './lifecycle.js';
+import { DockerWorkers } from './docker-lifecycle.js';
+import { dockerDrop, dockerHome, dockerRoot, serialWorker, stopContainer } from './docker.js';
 import { codexAtEmptyPrompt } from '../codex.js';
 import { restoreWorkers, saveWorkers } from './persist.js';
 import { WorkerPrs } from './pr.js';
 import { WIN, binScript, defaultShell, resolveCommand, shellRun, shq, writeOfficeCommands } from './process.js';
 import { CARRY_ON_PROMPT, WorkerTasks } from './tasks.js';
-import { flushScreens, fullScreens, newTerm, offlineBanner, screenText, type HeadlessTerminal } from './terminal.js';
+import { startFailed, setTitle, flushScreens, fullScreens, newTerm, offlineBanner, screenText, type HeadlessTerminal } from './terminal.js';
 import type { HookEnv, OpenedPr, RepoSource, RunAs, Worker, WorkerContext, WorkerEvents, WorkerHandle } from './types.js';
 import { clamp, safeEq, truncate } from './util.js';
-import { COLORS, NAMES, newWorker } from './worker.js';
+import { COLORS, NAMES, newWorker, syncViewers } from './worker.js';
 import { WorkerTrees, lostMessage } from './worktree.js';
 
 const SCREEN_INTERVAL_MS = 250;
@@ -50,6 +52,7 @@ const RESTORED_NOTE = '\x1b[2m──── the office restarted · earlier outpu
 export class WorkerManager {
   private workers = new Map<string, Worker>();
   private statePath: string;
+  private containers: DockerWorkers;
   private trees: Worktrees;
   private agentPath: string | null = null;
   readonly defaultProvider: AgentProvider;
@@ -126,6 +129,7 @@ export class WorkerManager {
     this.tasks = new WorkerTasks(this.ctx, claude, childEnv());
     this.worktrees = new WorkerTrees(this.ctx);
     this.prs = new WorkerPrs(this.ctx);
+    this.containers = new DockerWorkers(this.ctx);
     this.host = new PtyHost(dataDir, () => this.events.toast("The workers' terminal host stopped — resuming them", 'warn'));
     this.scrollback = new ScrollbackStore(dataDir);
     this.drops = new DropStore(dataDir);
@@ -228,6 +232,8 @@ export class WorkerManager {
     // Nobody picked (a board agent, say): the office's default worker, model and effort included.
     if (kind === 'agent' && provider === undefined) ({ provider, model, effort } = this.officeDefault);
     const selectedProvider = kind === 'agent' ? provider : undefined;
+    const container = selectedProvider === 'codex' && !!dockerRoot();
+    if (container && (worktree || meeting || repos.length)) return 'Codex Docker usa una copia privata del progetto. Per questa prova scegli una scrivania con worktree disattivato.';
     const modelError = validateWorkerModel(kind, selectedProvider, model);
     if (modelError) return modelError;
     const effortError = validateWorkerEffort(kind, selectedProvider, effort);
@@ -275,6 +281,7 @@ export class WorkerManager {
       id,
       kind,
       provider: selectedProvider,
+      ...(container ? { runtime: 'docker' as const } : {}),
       model: takesModel(selectedProvider) ? model : undefined,
       effort: takesEffort(selectedProvider) ? effort : undefined,
       deskId,
@@ -314,7 +321,8 @@ export class WorkerManager {
   resume(id: string, prompt?: string): string | undefined {
     const w = this.workers.get(id);
     if (!w) return 'No such worker';
-    if (w.pty || w.dsh) return 'Worker is already running';
+    if (w.pty || w.dsh || this.containers.busy(id)) return 'Worker is already running';
+    if (w.info.runtime) { w.info.paused = false; if (!w.info.sessionId) prompt ??= w.info.prompt; }
     if (this.worktrees.checkLost(w, true)) return lostMessage(w.info);
     clockWork(w.info, 'starting');
     w.info.status = 'starting';
@@ -364,7 +372,7 @@ export class WorkerManager {
   /** Starts every worker that isn't running: nobody should be found asleep at their desk. */
   wakeAll() {
     // A DeepSeek Harness worker has no PTY but is still running: only the ones that are gone wake up.
-    for (const w of this.workers.values()) if (!w.pty && !w.dsh) this.resume(w.info.id);
+    for (const w of this.workers.values()) if (!w.pty && !w.dsh && !w.info.paused) this.resume(w.info.id);
   }
 
   /**
@@ -376,6 +384,11 @@ export class WorkerManager {
   async kill(id: string, cleanup?: WorktreeCleanup, landed?: string, landedRepos?: Record<string, string | undefined>): Promise<{ note?: string; error?: string }> {
     const w = this.workers.get(id);
     if (!w) return {};
+    let retained: string | undefined;
+    if (w.info.runtime === 'docker') {
+      try { retained = await this.containers.retire(id); }
+      catch (error) { return { error: (error as Error).message }; }
+    }
     this.workers.delete(id);
     this.tasks.forget(id);
     clearTimeout(w.scanTimer);
@@ -394,6 +407,7 @@ export class WorkerManager {
     this.drops.remove(id);
     this.events.remove(id, w.info);
     this.persist();
+    if (retained) return { note: 'Workspace conservato: ' + retained };
     return this.worktrees.sendHome(w.info, cleanup, landed, landedRepos);
   }
 
@@ -424,7 +438,7 @@ export class WorkerManager {
     const w = this.workers.get(id);
     if (!w) return undefined;
     w.viewers.set(clientId, name);
-    let changed = this.syncViewers(w);
+    let changed = syncViewers(w);
     if (!w.info.acked && w.info.status !== 'needs_input') {
       w.info.acked = true;
       changed = true;
@@ -450,12 +464,12 @@ export class WorkerManager {
   detach(id: string, clientId: string) {
     const w = this.workers.get(id);
     if (!w) return;
-    if (w.viewers.delete(clientId) && this.syncViewers(w)) this.emitUpdate(w);
+    if (w.viewers.delete(clientId) && syncViewers(w)) this.emitUpdate(w);
   }
 
   detachAll(clientId: string) {
     for (const w of this.workers.values()) {
-      if (w.viewers.delete(clientId) && this.syncViewers(w)) this.emitUpdate(w);
+      if (w.viewers.delete(clientId) && syncViewers(w)) this.emitUpdate(w);
     }
   }
 
@@ -486,6 +500,7 @@ export class WorkerManager {
 
   /** Keeps a file dropped or pasted into a worker's terminal on this machine; where it is, for the terminal to type. */
   drop(id: string, name: string, type: string, body: Buffer): string | undefined {
+    if (this.workers.get(id)?.info.runtime === 'docker') return dockerDrop(id, name, type, body);
     return this.workers.has(id) ? this.drops.save(id, name, type, body) : undefined;
   }
 
@@ -621,6 +636,9 @@ export class WorkerManager {
           // already gone
         }
       }
+      if (!keep && w.info.runtime === 'docker') {
+        void serialWorker(w.info.id, () => stopContainer(w.info.id)).catch(e => this.events.toast(e.message, 'warn'));
+      }
       if (keep && w.pty?.id) continue;
       // A restart only takes this one down because it runs in-process: the next office carries on its turn.
       if (keep && midTurn(w)) w.interrupted = true;
@@ -637,6 +655,8 @@ export class WorkerManager {
   }
 
   // ---------------------------------------------------------------------------
+
+  pauseContainer(id: string) { return this.containers.pause(id); }
 
   private launch(w: Worker, prompt: string | undefined, resumeSessionId: string | undefined) {
     const { info } = w;
@@ -665,6 +685,13 @@ export class WorkerManager {
     const adapter = isShell ? undefined : providerAdapter(info.provider);
     const configured = !isShell && info.provider === this.defaultProvider;
     const cwd = this.cwd(info);
+    if (info.runtime === 'docker') {
+      this.containers.launch(w, prompt, resumeSessionId, launch => {
+        adapter?.usage?.locate?.(this.handleOf(w), cwd, { CODEX_HOME: dockerHome(info.id) });
+        this.follow(w, this.host.spawn({ ...launch, cols: info.cols, rows: info.rows, prelude }), term, resumeSessionId);
+      }, message => startFailed(this.ctx, w, message));
+      return;
+    }
     const command = this.command(info);
     const commandPath = isShell ? undefined : configured ? this.agentPath : resolveCommand(command);
     const base = isShell ? (WIN && !process.env.SHELL ? [] : ['-l']) : configured ? [...this.agentArgs] : [];
@@ -694,12 +721,12 @@ export class WorkerManager {
     if (info.repos?.length) env.GIT_CEILING_DIRECTORIES = [path.dirname(cwd), env.GIT_CEILING_DIRECTORIES].filter(Boolean).join(path.delimiter);
     if (w.owner && this.runAs) {
       if (adapter?.signIn && !this.runAs.claudeReady(w.owner)) {
-        this.startFailed(w, `whoever hired ${info.name} (${info.createdBy}) isn't signed in to Claude — they can sign in under ☰ → 🔐 Your sign-ins, then press R here`);
+        startFailed(this.ctx, w, `whoever hired ${info.name} (${info.createdBy}) isn't signed in to Claude — they can sign in under ☰ → 🔐 Your sign-ins, then press R here`);
         return;
       }
       this.runAs.apply(w.owner, env, [this.dir, cwd]);
     }
-    try { workerConnections(this.dir, info.id, env); } catch (error) { this.startFailed(w, (error as Error).message); return; }
+    try { workerConnections(this.dir, info.id, env); } catch (error) { startFailed(this.ctx, w, (error as Error).message); return; }
     info.connectionAccountId = env.AGENT_OFFICE_REMOTE_ACCOUNT;
     adapter?.usage?.locate?.(this.handleOf(w), cwd, env);
 
@@ -729,7 +756,7 @@ export class WorkerManager {
         proc = this.host.spawn({ file: shell, args: shellRun(line), ...where });
       }
     } catch (err) {
-      this.startFailed(w, (err as Error).message);
+      startFailed(this.ctx, w, (err as Error).message);
       return;
     }
     // One that says itself when it's up (see ProviderAdapter.bootHint) starts out 'starting'.
@@ -755,7 +782,7 @@ export class WorkerManager {
     term.write(adopted.snapshot, () => {
       if (w.term === term) w.fresh = term.registerMarker(0);
     });
-    this.setTitle(w, adopted.title);
+    setTitle(this.ctx, w, adopted.title);
     // A hook that came in since the office started already says how it's doing.
     if (info.status === 'offline') {
       clockWork(info, saved.status);
@@ -765,7 +792,7 @@ export class WorkerManager {
     }
     const adapter = providerAdapter(info.provider);
     const locate = adapter?.usage?.locate;
-    if (locate) locate(this.handleOf(w), this.cwd(info), childEnv());
+    if (locate) locate(this.handleOf(w), this.cwd(info), info.runtime === 'docker' && dockerRoot() ? { CODEX_HOME: dockerHome(info.id) } : childEnv());
     this.follow(w, adopted.pty, term, undefined);
     // A turn that ended while the office was down says so with its Stop hook, which retries until
     // the office is back. Claude's progress report, where it gives one, says a turn is still going.
@@ -777,16 +804,8 @@ export class WorkerManager {
   private newTerm(w: Worker): HeadlessTerminal {
     return newTerm(w, {
       progress: providerAdapter(w.info.provider)?.screen?.progress ? (busy) => this.onProgress(w, busy) : undefined,
-      title: (title) => this.setTitle(w, title),
+      title: (title) => setTitle(this.ctx, w, title),
     });
-  }
-
-  private setTitle(w: Worker, title: string) {
-    const clean = title.replace(/^[^\p{L}\p{N}]+/u, '').trim();
-    if (clean && clean !== w.info.title && !titleNoise(clean)) {
-      w.info.title = clean;
-      this.emitUpdate(w);
-    }
   }
 
   /** Shows a worker's terminal output as it comes, and deals with the process ending. */
@@ -805,11 +824,11 @@ export class WorkerManager {
       if (w.pty !== proc || this.workers.get(info.id) !== w) return;
       w.pty = undefined;
       if (error) {
-        this.startFailed(w, error);
+        startFailed(this.ctx, w, error);
         return;
       }
       // The terminal host died and took the process with it: nothing the worker did.
-      if (lost && !this.closing) {
+      if (lost && !this.closing && !info.paused && !this.containers.busy(info.id)) {
         if (midTurn(w)) w.interrupted = true;
         this.resume(info.id);
         return;
@@ -849,24 +868,10 @@ export class WorkerManager {
       }
       if (adapter?.bootHint) {
         w.bootBlocked = true;
-        info.activity = adapter.bootHint;
+        info.activity = info.runtime === 'docker' ? 'Impostazioni → Gestione agenti: collega Codex, poi apri il terminale' : adapter.bootHint;
         this.setStatus(w, 'needs_input');
       } else this.setStatus(w, 'idle');
     }, 12000);
-  }
-
-  private startFailed(w: Worker, message: string) {
-    const what = this.command(w.info);
-    const msg = `\r\n\x1b[31mFailed to start ${what}: ${message}\x1b[0m\r\n`;
-    clockWork(w.info, 'exited');
-    w.info.status = 'exited';
-    w.info.exitCode = -1;
-    w.term?.write(msg);
-    if (w.viewers.size) this.events.data(w.info.id, msg, [...w.viewers.keys()]);
-    w.screenDirty = true;
-    w.unsaved = true;
-    this.events.toast(`Could not start ${what}: ${message}`, 'error');
-    this.emitUpdate(w);
   }
 
   /** What a worker's terminal runs: the shell, the configured agent command, or another provider's CLI. */
@@ -936,16 +941,6 @@ export class WorkerManager {
     if (w.pty?.id || w.dsh) this.persist();
     // At rest: it may have made a branch of its own this turn, and opened its PR from there.
     if (status === 'done' || status === 'idle') void this.worktrees.syncBranch(w);
-  }
-
-  private syncViewers(w: Worker): boolean {
-    const names = [...new Set(w.viewers.values())];
-    const ids = [...w.viewers.keys()];
-    const same = (a: string[], b: string[]) => a.length === b.length && a.every((n, i) => n === b[i]);
-    if (same(names, w.info.viewers) && same(ids, w.info.viewerIds)) return false;
-    w.info.viewers = names;
-    w.info.viewerIds = ids;
-    return true;
   }
 
   private emitUpdate(w: Worker) {

@@ -11,6 +11,16 @@ export const NAMES = [
   'Fizz', 'Glitch', 'Hopper', 'Jinx', 'Kilo', 'Lumen', 'Mochi', 'Noodle', 'Orbit', 'Pip',
   'Quark', 'Rivet', 'Sparky', 'Tofu', 'Uno', 'Volt', 'Waffle', 'Zippy',
 ];
+export function syncViewers(w: Worker): boolean {
+  const names = [...new Set(w.viewers.values())];
+  const ids = [...w.viewers.keys()];
+  const same = (a: string[], b: string[]) => a.length === b.length && a.every((n, i) => n === b[i]);
+  if (same(names, w.info.viewers) && same(ids, w.info.viewerIds)) return false;
+  w.info.viewers = names;
+  w.info.viewerIds = ids;
+  return true;
+}
+
 export const COLORS = ['#ff8a5b', '#5bc0eb', '#9bc53d', '#fde74c', '#c3423f', '#b388eb', '#f7aef8', '#72ddf7', '#ffb400', '#00a6a6'];
 
 export function newWorker(info: WorkerInfo, tracker: UsageTracker, hookToken = randomBytes(16).toString('hex')): Worker {
