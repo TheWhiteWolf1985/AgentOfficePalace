@@ -5,6 +5,7 @@ name: Release
 on:
   push:
     branches: [main, release]
+    tags: ['v*-rc.*']
   pull_request:
     paths:
       - 'src/**'
@@ -83,6 +84,8 @@ jobs:
           curl --fail --silent http://127.0.0.1:4700/login.html > /dev/null
 
       - name: Build the Debian distribution
+        env:
+          PREVIEW_TAG: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
         run: |
           mkdir delivery
           mv agent-office.tgz delivery/
@@ -92,7 +95,7 @@ jobs:
           bash -n delivery/proxmox.sh
 
       - uses: actions/upload-artifact@v4
-        if: github.ref == 'refs/heads/release' && github.event_name != 'pull_request'
+        if: github.event_name == 'push' && github.ref_type == 'tag' || github.ref == 'refs/heads/release' && github.event_name != 'pull_request'
         with:
           name: debian-release
           path: delivery/
@@ -101,7 +104,7 @@ jobs:
 
   publish:
     needs: release
-    if: github.ref == 'refs/heads/release' && github.event_name != 'pull_request'
+    if: github.event_name == 'push' && github.ref_type == 'tag' || github.ref == 'refs/heads/release' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -117,9 +120,14 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          git merge-base --is-ancestor "$GITHUB_SHA" origin/main
           TAG=v$(jq -er .version delivery/release.json)
           test "$(jq -er .commit delivery/release.json)" = "$GITHUB_SHA"
+          if [[ "$GITHUB_REF_TYPE" == tag ]]; then
+            [[ "$GITHUB_REF_NAME" == "$TAG"-rc.* ]]
+            gh release create "$GITHUB_REF_NAME" delivery/* --verify-tag --prerelease --latest=false --title "$GITHUB_REF_NAME" --notes "Candidato Proxmox e Debian per il collaudo."
+            exit 0
+          fi
+          git merge-base --is-ancestor "$GITHUB_SHA" origin/main
           if gh release view "$TAG" >/dev/null 2>&1; then
             test "$(git rev-list -n 1 "$TAG")" = "$GITHUB_SHA"
             gh release download "$TAG" -p release.json -D "$RUNNER_TEMP"

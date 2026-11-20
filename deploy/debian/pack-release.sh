@@ -43,4 +43,4 @@ for name in ('agent-office-linux-amd64.tgz', 'codex-agent-linux-amd64.tgz', 'age
 manifest = dict(schema=1, version=version, commit=commit, platform='debian13-amd64', image=image, sha256=assets)
 (root / 'release.json').write_text(json.dumps(manifest, indent=2) + '\n')
 PY
-python3 deploy/proxmox/make-launcher.py "v$version" "$out"
+python3 deploy/proxmox/make-launcher.py "${PREVIEW_TAG:-v$version}" "$out"
