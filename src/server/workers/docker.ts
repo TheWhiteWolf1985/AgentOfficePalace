@@ -121,7 +121,7 @@ export async function prepareContainer(info: WorkerInfo, project: string, token:
       '--env', 'HOME=' + p.home, '--env', 'CODEX_HOME=' + dockerHome(info.id),
       '--env', 'TERM=xterm-256color', '--env', 'AGENT_OFFICE_WORKER_ID=' + info.id,
       '--env', 'AGENT_OFFICE_HOOK_TOKEN=' + token, '--env', 'AGENT_OFFICE_HOOK_SOCKET=/office-bridge/hooks.sock',
-      AGENT_IMAGE, ...args]);
+      process.env.AGENT_OFFICE_CODEX_IMAGE || AGENT_IMAGE, ...args]);
   }
   if (!/^[a-f0-9]{64}$/.test(cid)) throw Error('Creazione del container non confermata');
   const attach = existing?.status === 'running' ? ['attach', '--sig-proxy=false'] : ['start', '-ai'];

@@ -11,7 +11,7 @@ Applicazione collaborativa con frontend TypeScript/Three.js e backend Node.js. C
 - Account, ruoli e preferenze personali; collegamenti GitHub/Forgejo.
 - Profili grafici, caricamento differito e risorse statiche compresse.
 
-Il codice esistente per lavoratori, terminali, code e provider rimane parte dell'applicazione. La futura integrazione degli agenti in container sarà valutata separatamente; questa versione non installa CLI degli agenti né prepara Docker o servizi cloud.
+Ogni agente Codex dispone di un proprio container Docker rootless e di un workspace persistente. Per installare il software su una VM Debian 13 amd64, seguire la [guida alla distribuzione stabile](deploy/debian/DISTRIBUZIONE.md).
 
 ## Sviluppo e verifiche
 
@@ -32,7 +32,7 @@ node bin/agent-office.js --home /percorso/dati --host 127.0.0.1 --port 4600 --no
 
 Impostare `AGENT_OFFICE_PASSWORD` nell'ambiente del processo oppure configurare gli account dell'applicazione. Dati, credenziali e configurazioni locali restano esterni al checkout. I dettagli dell'avvio nativo usato dal progetto sono in [deploy/debian/README.md](deploy/debian/README.md); le opzioni applicative in [docs/configuration.md](docs/configuration.md). Per voce e schermo al di fuori di localhost è richiesto un contesto HTTPS sicuro.
 
-Gli aggiornamenti sono gestiti dal deployment: pubblicazione del commit verificato, build qualificata e riavvio controllato del servizio. L'applicazione non si auto-installa o auto-aggiorna e non gestisce chiavi SSH o configurazioni dell'host. La pipeline GitHub esistente verifica e pubblica il pacchetto software compilato.
+Forgejo ospita lo sviluppo. Il branch GitHub `main` ne rispecchia il codice e il branch `release` identifica le versioni distribuite. Nelle installazioni gestite il timer Debian controlla le release stabili. L'istanza di sviluppo può continuare a usare il checkout e i deploy di prova.
 
 ## Repository e documentazione
 
