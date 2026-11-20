@@ -1,9 +1,19 @@
 import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
 import type { GhCheck, GhCloseReason, GhComment, GhIssue, GhIssueDetail, GhLabel, GhMergeMethod, GhPull, GhPullDetail, GhRepoInfo, GhReviewComment, GhState } from '../shared/protocol.js';
 import type { GhAs } from './signins.js';
 import { connectedRepository } from './connections/repository.js';
 
 const REFRESH_MS = 90_000;
+const runFile = promisify(execFile);
+const NO_REMOTE = 'Remote not configured yet';
+
+/** Keep the last cards during an outage, but clear them when an office no longer has a remote. */
+function boardFailure<T>(previous: GhState<T>, cause: unknown): GhState<T> {
+  const unconfigured = cause instanceof Error && cause.message === NO_REMOTE;
+  return { ...previous, items: unconfigured ? [] : previous.items, loading: false, fetchedAt: Date.now(),
+    error: unconfigured ? NO_REMOTE : 'Remote temporarily unavailable' };
+}
 /** How long the repo's list of labels is kept before the label picker asks GitHub again. */
 const LABELS_MS = 60_000;
 type GhRunner = (args: string[], cwd: string, timeout?: number, env?: Record<string, string>) => Promise<string>;
@@ -14,9 +24,7 @@ export function friendlyGhError(raw: string): string {
   const text = lines.join(' ');
   const first = lines[0] ?? raw.trim();
   if (/^Unknown JSON field:/i.test(first)) return first;
-  if (/no git remotes found|none of the git remotes/i.test(text)) return 'This project has no GitHub remote yet. Push it to GitHub (git remote add origin <url>) to fill the boards.';
-  if (/not a git repository/i.test(text)) return "This folder isn't a git repository";
-  if (/auth login|not logged in|authentication/i.test(text)) return "gh isn't signed in to GitHub on the office's machine — run `gh auth login` there";
+  if (/no git remotes found|none of the git remotes|not a git repository|gh auth login|not logged in/i.test(text)) return NO_REMOTE;
   if (/could not resolve to a repository|not found/i.test(text)) return "gh can't find this repository on GitHub (check the remote and access)";
   return lines.slice(-2).join(' ') || raw;
 }
@@ -28,7 +36,7 @@ export function gh(args: string[], cwd: string, timeout = 30_000, env?: Record<s
       if (err) {
         const msg = (stderr || err.message || '').trim();
         const signedOut = env && /auth login|not logged in|authentication/i.test(msg);
-        reject(new Error((err as NodeJS.ErrnoException).code === 'ENOENT' ? 'GitHub CLI (gh) is not installed on the server' : signedOut ? 'Your GitHub sign-in stopped working — sign in again (☰ → 🔐 Your sign-ins)' : friendlyGhError(msg)));
+        reject(new Error((err as NodeJS.ErrnoException).code === 'ENOENT' ? NO_REMOTE : signedOut ? 'Your GitHub sign-in stopped working — sign in again (☰ → 🔐 Your sign-ins)' : friendlyGhError(msg)));
       } else resolve(stdout);
     });
   });
@@ -175,6 +183,7 @@ export class GitHub {
   private claims = new Claims();
   /** The look at the issues that's under way, if one is. */
   private listing?: Promise<void>;
+  private gitRemotes?: Promise<boolean>;
 
   constructor(
     private dir: string,
@@ -467,6 +476,16 @@ export class GitHub {
     this.onIssues(this.issues);
   }
 
+  /** Managed bindings take precedence. An office with no remote needs no CLI calls. */
+  private async boardRepository() {
+    const remote = connectedRepository(this.dir);
+    if (remote || process.env.GH_REPO) return remote;
+    this.gitRemotes ??= runFile('git', ['remote'], { cwd: this.dir, timeout: 5000 })
+      .then(({ stdout }) => Boolean(stdout.trim()), () => false).finally(() => { this.gitRemotes = undefined; });
+    if (!await this.gitRemotes) throw Error(NO_REMOTE);
+    return undefined;
+  }
+
   /** Asks GitHub for the issues. With a look already under way it's that one, which may have been asked before whatever just changed. */
   private refreshIssues(): Promise<void> {
     this.listing ??= this.listIssues().finally(() => (this.listing = undefined));
@@ -478,7 +497,7 @@ export class GitHub {
     this.onIssues(this.issues);
     const asked = Date.now();
     try {
-      const remote = connectedRepository(this.dir);
+      const remote = await this.boardRepository();
       if (remote) { this.issues = { items: this.claims.mark(await remote.issues(), asked), fetchedAt: Date.now(), loading: false }; this.onIssues(this.issues); return; }
       // Open and closed separately, so old open issues are never crowded out by recent closed ones.
       const fields = 'number,title,state,url,author,labels,assignees,createdAt,updatedAt,body,comments';
@@ -502,7 +521,7 @@ export class GitHub {
       const items = this.claims.mark(this.relabel('issue', fetched, asked), asked);
       this.issues = { items, fetchedAt: Date.now(), loading: false };
     } catch (err) {
-      this.issues = { ...this.issues, loading: false, error: (err as Error).message, fetchedAt: Date.now() };
+      this.issues = boardFailure(this.issues, err);
     }
     this.onIssues(this.issues);
   }
@@ -513,7 +532,7 @@ export class GitHub {
     this.onPulls(this.pulls);
     const asked = Date.now();
     try {
-      const remote = connectedRepository(this.dir);
+      const remote = await this.boardRepository();
       if (remote) { this.pulls = { items: await remote.pulls(), fetchedAt: Date.now(), loading: false }; this.onPulls(this.pulls); return; }
       const [open, merged, closed] = await Promise.all([
         this.listPulls('open', 150),
@@ -547,7 +566,7 @@ export class GitHub {
       const items = this.relabel('pull', fetched, asked);
       this.pulls = { items, fetchedAt: Date.now(), loading: false };
     } catch (err) {
-      this.pulls = { ...this.pulls, loading: false, error: (err as Error).message, fetchedAt: Date.now() };
+      this.pulls = boardFailure(this.pulls, err);
     }
     this.onPulls(this.pulls);
   }

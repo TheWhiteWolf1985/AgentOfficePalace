@@ -9,7 +9,7 @@ import { PALETTE } from './materials';
 // The potted plants are modelled in Blender (blender/scripts/build_plants.py): each plant is a painted
 // copy of one species in plants.glb (see piece()). A species is its pot, named after it, with everything that
 // grows out of the pot hung under it as `<species>_leaves` (see plantLeaves()). The colors are the old
-// trunk brown for the ficus's, and the kitchen cupboards' blue for the snake plant's glazed pot.
+// trunk brown for the ficus's, and a pale blue for the snake plant's glazed pot.
 export type PlantSpecies = 'monstera' | 'snake_plant' | 'ficus' | 'succulent';
 /** The species that stand on the floor, which a row of plants takes turns with (see floorPlant()). */
 export const FLOOR_PLANTS = ['monstera', 'snake_plant', 'ficus'] as const satisfies readonly PlantSpecies[];

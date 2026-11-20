@@ -1,4 +1,8 @@
-import { test } from 'node:test';
+import { test, type TestContext } from 'node:test';
+import { execFileSync } from 'node:child_process';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
 import assert from 'node:assert/strict';
 import { Claims, GitHub, MergeWatch, friendlyGhError } from '../src/server/github.js';
 import type { GhIssue, GhPull, GhState } from '../src/shared/protocol.js';
@@ -80,7 +84,39 @@ test('gh JSON field errors keep the field that failed', () => {
   );
 });
 
-test('pull request listing works when older gh versions reject optional fields', async () => {
+function localOffice(t: TestContext) {
+  const dir = mkdtempSync(path.join(tmpdir(), 'office-boards-'));
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  execFileSync('git', ['init', '-q', dir]);
+  return dir;
+}
+
+test('both unconfigured boards stay neutral without invoking a provider and recover on refresh', async t => {
+  const dir = localOffice(t);
+  let calls = 0, unavailable = false;
+  const boards = new GitHub(dir, () => {}, () => {}, async () => {
+    calls++;
+    if (unavailable) throw Error('internal component diagnostic');
+    return '[]';
+  });
+  await boards.refresh();
+  assert.equal(calls, 0);
+  assert.ok(boards.issues.fetchedAt > 0 && boards.pulls.fetchedAt > 0, 'an unconfigured floor has already been checked');
+  assert.equal(boards.issues.error, 'Remote not configured yet');
+  assert.equal(boards.pulls.error, boards.issues.error);
+  execFileSync('git', ['-C', dir, 'remote', 'add', 'origin', 'https://example.invalid/qa/office']);
+  unavailable = true; await boards.refresh();
+  assert.ok(calls > 0);
+  assert.equal(boards.issues.error, 'Remote temporarily unavailable');
+  assert.equal(boards.pulls.error, boards.issues.error);
+  unavailable = false; await boards.refresh();
+  assert.equal(boards.pulls.error, undefined);
+  assert.equal(boards.issues.error, undefined);
+});
+
+test('pull request listing works when older gh versions reject optional fields', async t => {
+  const dir = localOffice(t);
+  execFileSync('git', ['-C', dir, 'remote', 'add', 'origin', 'https://example.invalid/qa/office']);
   const unsupported = new Set(['url', 'headRefOid', 'updatedAt', 'statusCheckRollup', 'closingIssuesReferences']);
   const calls: string[] = [];
   const runner = async (args: string[]) => {
@@ -110,7 +146,7 @@ test('pull request listing works when older gh versions reject optional fields',
     ]);
   };
   let pulls: GhState<GhPull> | undefined;
-  const github = new GitHub('/repo', () => {}, (state) => (pulls = state), runner);
+  const github = new GitHub(dir, () => {}, (state) => (pulls = state), runner);
 
   await (github as unknown as { refreshPulls(): Promise<void> }).refreshPulls();
 

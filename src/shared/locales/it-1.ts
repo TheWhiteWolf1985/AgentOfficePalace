@@ -55,8 +55,6 @@ export default {
   "Send to": "Invia a",
   "The worker is told first…": "Prima viene comunicato all'agente…",
   "Enter to send · Shift+Enter for a new line": "Invio per inviare · Maiusc+Invio per andare a capo",
-  "The server is running an older GitHub CLI than this feature expected; update `gh` if the board still cannot load.": "La versione di GitHub CLI sul server è precedente a quella prevista: aggiorna gh se la lavagna continua a non caricarsi.",
-  "The server runs `gh` in the project directory — make sure it is installed and authenticated (gh auth login).": "Il server esegue gh nella cartella del progetto: verifica installazione e autenticazione (gh auth login).",
   "📥 Open": "📥 Aperte",
   "🚧 In progress": "🚧 In lavorazione",
   "✅ Closed": "✅ Chiuse",

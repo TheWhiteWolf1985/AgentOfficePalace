@@ -8,7 +8,6 @@ import serverRoomExteriorUrl from '../models/server_room_exterior.glb?url';
 import atriumUrl from '../models/atrium.glb?url';
 import conferenceRoomUrl from '../models/conference_room.glb?url';
 import deskPropsUrl from '../models/desk_props.glb?url';
-import kitchenUrl from '../models/kitchen.glb?url';
 import loungeUrl from '../models/lounge.glb?url';
 import plantsUrl from '../models/plants.glb?url';
 import receptionAUrl from '../models/reception_a.glb?url';
@@ -35,7 +34,6 @@ const MODELS = {
   server_room_exterior: { url: serverRoomExteriorUrl },
   conference_room: { url: conferenceRoomUrl },
   desk_props: { url: deskPropsUrl },
-  kitchen: { url: kitchenUrl },
   lounge: { url: loungeUrl },
   plants: { url: plantsUrl },
   reception_a: { url: receptionAUrl },
@@ -125,7 +123,7 @@ export async function loadModel(name: ModelName): Promise<Model> {
 
 /** Shared spaces need their own geometry and the meeting-room exterior visible on the tower. */
 export const COMMON_MODELS: readonly ModelName[] = ['atrium', 'conference_room', 'server_room_exterior', 'reception_a', 'reception_b'];
-export const OFFICE_MODELS: readonly ModelName[] = [...COMMON_MODELS, 'desk_props', 'kitchen', 'lounge', 'plants'];
+export const OFFICE_MODELS: readonly ModelName[] = [...COMMON_MODELS, 'desk_props', 'lounge', 'plants'];
 export function avatarModels(look: Look): ModelName[] {
   const hair = avatarHairstyle(look);
   return [avatarModel(look) === 'female' ? 'human_female' : 'human_base', ...(hair === 'bald' ? [] : [`hair_${hair}` as ModelName])];

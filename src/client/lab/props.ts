@@ -13,7 +13,6 @@
 import * as THREE from 'three';
 import { DESKS } from '../../shared/layout';
 import { buildGong } from '../features/gong/world';
-import { buildKitchen } from '../world/kitchen';
 import { preloadModels } from '../world/models';
 import { DESK_BOOKS, FLOOR_PLANTS, buildDesk, coffeeTable, deskBooks, loungeCouch, plant, pouf } from '../world/office';
 import { toon } from '../world/toon';
@@ -32,7 +31,6 @@ const SHOW: Record<string, () => Shown> = {
     g.strike(1);
     return { object: g.group, update: (dt) => g.update(dt) };
   },
-  kitchen: () => ({ object: buildKitchen().group }),
   plants: () => {
     // The floor plants at scale 1 side by side, then the desk succulent, to compare them. A param of
     // its own: plant=<species> keeps just that one.

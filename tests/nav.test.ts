@@ -3,6 +3,12 @@ import assert from 'node:assert/strict';
 import { BALCONY, BALCONY_DOOR, ELEVATOR, ELEVATOR_FRONT, EXIT_DOOR, EXIT_STAIRS, FLOOR, MEETING_ROOM, MEETING_SEATS, PARACHUTE, ROAD, SEATS, STATIONS, WING, deskBuilt, wingMinZ, type DeskDef } from '../src/shared/layout.js';
 import { route, walkable, wayHome, wayIn, wayToBalcony, type Pt } from '../src/shared/nav.js';
 
+test('the former counter and appliance footprints are open on every office layout', () => {
+  for (let wing = 0; wing <= WING.rows; wing++) {
+    for (const x of [-16, -15, -14, -13, -11.3]) assert.ok(walkable(x, 12.2, wing), `blocked at ${x} on wing ${wing}`);
+  }
+});
+
 /** Every place a worker can be on a floor built out `wing` rows, at each build-out there is. */
 const everywhere = (): [DeskDef, number][] => Array.from({ length: WING.rows + 1 }, (_, wing) => [...SEATS, ...STATIONS, ...MEETING_SEATS].filter((d) => deskBuilt(d, wing)).map((d): [DeskDef, number] => [d, wing])).flat();
 

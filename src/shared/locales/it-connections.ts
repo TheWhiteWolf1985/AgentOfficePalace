@@ -91,6 +91,8 @@ export const italianConnections: Record<string, string> = {
   "Not signed in": "Da collegare",
   "Model and effort saved. They take effect when this agent can safely resume its chat.": "Modello ed effort salvati. Diventano attivi quando questo agente può riprendere la chat in sicurezza.",
   "Model and effort are saved immediately. Initial instructions are used when a new chat starts.": "Modello ed effort si salvano subito. Le istruzioni iniziali vengono usate all’avvio di una nuova chat.",
+  "Remote not configured yet": "remote ancora da configurare",
+  "Remote temporarily unavailable": "Remote temporaneamente non disponibile",
   "Configured account": "Account configurato",
   "Active account": "Account in uso",
   "Properties": "Proprietà",

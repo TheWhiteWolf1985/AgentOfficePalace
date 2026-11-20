@@ -49,7 +49,7 @@ export interface GhPull {
 
 export interface GhState<T> {
   items: T[];
-  error?: string;
+  error?: 'Remote not configured yet' | 'Remote temporarily unavailable';
   fetchedAt: number;
   loading: boolean;
 }

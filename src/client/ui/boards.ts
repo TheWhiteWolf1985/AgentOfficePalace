@@ -25,11 +25,6 @@ interface Column<T> {
 
 const byUpdated = (a: { updatedAt: string }, b: { updatedAt: string }) => b.updatedAt.localeCompare(a.updatedAt);
 
-function githubErrorHint(error: string): string {
-  if (/^Unknown JSON field:/i.test(error)) return uiText('The server is running an older GitHub CLI than this feature expected; update `gh` if the board still cannot load.');
-  return uiText('The server runs `gh` in the project directory — make sure it is installed and authenticated (gh auth login).');
-}
-
 function issueColumns(items: GhIssue[]): Column<GhIssue>[] {
   const open = items.filter((i) => i.state === 'OPEN');
   const started = open.filter((i) => inProgress(i, store.taskForIssue(i.number)));
@@ -245,9 +240,14 @@ export function openBoard(kind: 'issues' | 'pulls', net: Net, actions: BoardActi
     return section;
   };
 
+  const updateStatus = () => {
+    const st = kind === 'issues' ? store.issues : store.pulls;
+    if (st.error) status.textContent = st.items.length ? uiText(st.error) : '';
+    else status.textContent = st.loading ? uiText('Refreshing…') : st.fetchedAt ? uiText`Updated ${timeAgo(st.fetchedAt)}` : '';
+  };
   const render = () => {
     const st = kind === 'issues' ? store.issues : store.pulls;
-    status.textContent = st.loading ? uiText('Refreshing…') : st.fetchedAt ? uiText`Updated ${timeAgo(st.fetchedAt)}` : '';
+    updateStatus();
     // Every refresh rebuilds the columns, so note how far each was scrolled and put it back afterwards,
     // and keep focus (and the caret, in a filter box) on the header, label toggle or box it was on.
     const scrolled = [...body.querySelectorAll('.column > ul')].map((ul) => ul.scrollTop);
@@ -257,7 +257,7 @@ export function openBoard(kind: 'issues' | 'pulls', net: Net, actions: BoardActi
     const caret = active instanceof HTMLInputElement ? ([active.selectionStart, active.selectionEnd] as const) : null;
     body.replaceChildren();
     if (st.error && !st.items.length) {
-      body.append(h('div.board-error', {}, uiText`Couldn't load from repository: ${st.error}`, h('br'), h('small', {}, githubErrorHint(st.error))));
+      body.append(h('div.board-note', {}, uiText(st.error)));
       return;
     }
     const all = boardLabels(st.items);
@@ -306,10 +306,7 @@ export function openBoard(kind: 'issues' | 'pulls', net: Net, actions: BoardActi
   const unsubs = [store.on(kind, render), store.on('queue', render)];
   // Which desk a PR came from can change (a worker sent home, a PR opened from a desk).
   if (kind === 'pulls') unsubs.push(store.on('workers', render));
-  const timer = setInterval(() => {
-    const st = kind === 'issues' ? store.issues : store.pulls;
-    status.textContent = st.loading ? uiText('Refreshing…') : st.fetchedAt ? uiText`Updated ${timeAgo(st.fetchedAt)}` : '';
-  }, 15000);
+  const timer = setInterval(updateStatus, 15000);
   const modal = openModal(el, {
     doing: kind === 'issues' ? uiText('📋 at the issues board') : uiText('🔀 at the PR board'),
     onClose: () => {

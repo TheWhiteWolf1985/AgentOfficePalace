@@ -1,7 +1,7 @@
 /** Office sounds and alerts, weather and footsteps. */
 import { construction } from './construction';
 import type { GongWhy } from '../../shared/protocol';
-import { birdsong, Fridge, nightCrickets, startRoomTone, startWind } from './ambience';
+import { birdsong, nightCrickets, startRoomTone, startWind } from './ambience';
 import { ding } from './alerts';
 import { bonk, hatch, poleLanding, rung, slide, twirl } from '../features/climbing/sound';
 import { AudioCore, type Listener } from './core';
@@ -16,7 +16,6 @@ export class OfficeSound {
   private readonly a: AudioCore = new AudioCore({ start: (ctx) => this.start(ctx) });
   private readonly typing = new Typing(this.a);
   private readonly feet = new Footsteps(this.a);
-  private readonly fridge = new Fridge(this.a);
   private readonly rain = new Rain(this.a);
   private readonly birds = birdsong(this.a);
   private readonly crickets = nightCrickets(this.a);
@@ -27,7 +26,6 @@ export class OfficeSound {
   constructor() {
     // What the room does every frame, in this order (it's the order the random numbers are drawn in).
     this.a.every((now) => this.typing.scheduleTyping(now));
-    this.a.every((now) => this.fridge.tickFridge(now));
     this.a.every((now) => this.birds.tick(now));
     this.a.every((now) => this.crickets.tick(now));
     this.a.every((now) => this.rain.tickRain(now));
@@ -39,7 +37,6 @@ export class OfficeSound {
     this.a.applyVolume();
     this.a.applyVisibility();
     startRoomTone(this.a);
-    this.fridge.startFridge();
     startWind(this.a);
     this.a.applyOutdoors();
     const now = ctx.currentTime;

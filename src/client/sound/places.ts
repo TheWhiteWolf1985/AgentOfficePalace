@@ -3,7 +3,6 @@ import { FLOOR, GONG, WINDOWS as OPENINGS } from '../../shared/layout';
 /** A point in the office, where a sound comes from or where you hear it. */
 export type Pos = { x: number; y: number; z: number };
 
-export const FRIDGE: Pos = { x: -11.3, y: 1.1, z: 12.2 };
 /** Just outside the office's windows (not the loft's). */
 export const WINDOWS: Pos[] = OPENINGS.filter((o) => o.y0 < 2).map((o) =>
   o.wall === 'south' || o.wall === 'north'
