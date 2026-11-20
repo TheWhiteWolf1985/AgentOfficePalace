@@ -8,7 +8,7 @@ import path from 'node:path';
 import type { WorkerInfo } from '../../shared/protocol.js';
 
 const exec = promisify(execFile);
-export const AGENT_IMAGE = 'aop-codex:0.154.0';
+export const AGENT_IMAGE = 'aop-codex:0.171.0';
 export const dockerRoot = () => process.env.AGENT_OFFICE_CODEX_RUNTIME;
 const socket = () => process.env.AGENT_OFFICE_DOCKER_SOCKET;
 const jobs = new Map<string, Promise<unknown>>();

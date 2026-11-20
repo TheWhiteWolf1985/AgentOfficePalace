@@ -1,14 +1,21 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, rmSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { serialWorker, dockerHome, dockerDrop } from '../src/server/workers/docker.js';
+import { AGENT_IMAGE, serialWorker, dockerHome, dockerDrop } from '../src/server/workers/docker.js';
 import { restoreWorkers, saveWorkers } from '../src/server/workers/persist.js';
 import { newWorker } from '../src/server/workers/worker.js';
 import { newTracker } from '../src/server/usage.js';
 import { DESKS } from '../src/shared/layout.js';
 import type { Worker } from '../src/server/workers/types.js';
+
+test('agent creation and model discovery select the CLI version built by default', () => {
+  const dockerfile = readFileSync(new URL('../deploy/codex-agent/Dockerfile', import.meta.url), 'utf8');
+  const version = /^ARG CODEX_VERSION=(\d+\.\d+\.\d+)$/m.exec(dockerfile)?.[1];
+  assert.ok(version);
+  assert.equal(AGENT_IMAGE, `aop-codex:${version}`);
+});
 
 test('operations for one container run in order; another agent can start independently', async () => {
   const steps: string[] = [];
