@@ -135,7 +135,10 @@ export function openTerminal(net: Net, workerId: string, onChanges?: () => void,
   const sayBtn = h('button.btn.primary', { type: 'submit' }, uiText('Send'));
   const sayForm = h('form.term-say', {}, dictateField(say), sayBtn);
   const keypad = opts.keypad ? h('div.term-keypad', {}, keys, sayForm) : null;
-  const tabs = termTabs(workerId, { host, keypad, focusTerm: () => term.focus() });
+  const detailsBtn = h('button.btn.small.hidden', {
+    type: 'button', disabled: true, title: uiText('Send Ctrl+T to Codex to view details'),
+  }, uiText('Details · Ctrl+T'));
+  const tabs = termTabs(workerId, { host, keypad, terminalAction: detailsBtn, focusTerm: () => term.focus() });
   // What you say is typed in at the terminal's cursor, as a paste, for you to read over and send (see dictate.ts).
   const mic = dictation(
     {
@@ -264,6 +267,8 @@ export function openTerminal(net: Net, workerId: string, onChanges?: () => void,
     cost.title = w.kind === 'agent' && w.usage ? usageTitle(w.usage, workerProvider) : w.kind === 'agent' ? providerUsageNote(workerProvider!) : '';
     renderPresence(w);
     const openCode = w.kind === 'agent' && resolvedProvider(w.provider, store.project) === 'opencode';
+    detailsBtn.classList.toggle('hidden', workerProvider !== 'codex');
+    detailsBtn.disabled = workerProvider !== 'codex' || !ready || isAsleep(w.status);
     modelsBtn.classList.toggle('hidden', !openCode);
     modelsBtn.toggleAttribute('disabled', !openCode || !ready || isAsleep(w.status));
     escBtn.toggleAttribute('disabled', !ready || isAsleep(w.status));
@@ -469,6 +474,12 @@ export function openTerminal(net: Net, workerId: string, onChanges?: () => void,
     },
     true,
   );
+  detailsBtn.addEventListener('click', () => {
+    if (detailsBtn.disabled) return;
+    sayTyping();
+    term.input('\x14');
+    if (!opts.keypad) term.focus();
+  });
   escBtn.addEventListener('click', () => {
     if (escBtn.hasAttribute('disabled')) return;
     sendEsc();

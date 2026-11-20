@@ -25,6 +25,7 @@ export interface TermTabsOptions {
   /** The terminal's own area and keypad, hidden while a web page shows. */
   host: HTMLElement;
   keypad: HTMLElement | null;
+  terminalAction: HTMLButtonElement;
   /** Back on the terminal's tab. */
   focusTerm(): void;
 }
@@ -39,7 +40,7 @@ export function termTabs(workerId: string, opts: TermTabsOptions): { bar: HTMLEl
   const addBtn = h('button.term-tab-add', { type: 'button', title: uiText('Pin a web page open beside this terminal (a linked chat, docs, anything with an address)') }, uiText('+ Web page'));
   // Plenty of sites won't show inside another page (chatgpt.com doesn't): this opens the one showing in a tab of its own.
   const openOut = h('a.term-tab-out.hidden', { target: '_blank', rel: 'noopener noreferrer', title: uiText("Open this page in a browser tab of its own (for a site that won't show here)") }, uiText('↗ New tab')) as HTMLAnchorElement;
-  const bar = h('div.term-tabbar', {}, tabsBar, openOut, addBtn, form);
+  const bar = h('div.term-tabbar', {}, tabsBar, opts.terminalAction, openOut, addBtn, form);
   const pages = h('div.term-webhost.hidden');
 
   const tabs = tabsByWorker.get(workerId) ?? [];
@@ -72,6 +73,7 @@ export function termTabs(workerId: string, opts: TermTabsOptions): { bar: HTMLEl
       ),
     );
     const page = tabs.find((t) => t.id === active);
+    opts.terminalAction.hidden = !!page;
     openOut.classList.toggle('hidden', !page);
     if (page) openOut.href = page.url;
   };

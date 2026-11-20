@@ -175,6 +175,8 @@ export default {
   "🧠 Models": "🧠 Modelli",
   "Send Esc to the terminal (Ctrl+[): closes a menu like /skills, or interrupts the agent. The Esc key on its own leaves the terminal": "Invia Esc al terminale (Ctrl+[): chiude un menu come /skills o interrompe l'agente. Il solo tasto Esc esce dal terminale",
   "Send Esc to the terminal": "Invia Esc al terminale",
+  "Details · Ctrl+T": "Dettagli · Ctrl+T",
+  "Send Ctrl+T to Codex to view details": "Invia Ctrl+T a Codex per visualizzare i dettagli",
   "⎋ Esc": "⎋ Esc",
   "What this worker changed: files, diff, commit, open a PR (C at the desk)": "Modifiche dell'agente: file, differenze, commit e apertura PR (C alla scrivania)",
   "Hide this terminal; the worker keeps running at its desk": "Nascondi il terminale; l'agente continua a lavorare alla scrivania",
