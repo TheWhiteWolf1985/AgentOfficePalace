@@ -210,7 +210,7 @@ export function openBookshelf(deps: ShelfDeps) {
           'li.bs-item',
           { role: 'option', 'aria-selected': String(i === sel), class: `${i === sel ? 'sel' : ''} ${doc.path === current ? 'open' : ''}`, title: doc.path },
           h('div.bs-title', {}, ...(doc.title ? marked(title, hit.title) : marked(title, new Set([...hit.path].map((p) => p - (doc.path.length - title.length)))))),
-          h('div.bs-path', {}, ...marked(doc.path, hit.path)),
+          h('div.bs-path', {}, ...(doc.workerName ? [doc.workerName + ' · ' + doc.path.split('/').slice(4).join('/')] : marked(doc.path, hit.path))),
         );
         li.addEventListener('mousedown', (e) => e.preventDefault());
         li.addEventListener('click', () => {
@@ -289,7 +289,7 @@ export function openBookshelf(deps: ShelfDeps) {
         a.removeAttribute('target');
         a.dataset.doc = to.path;
         a.dataset.hash = to.hash;
-      } else if (repoUrl) {
+      } else if (repoUrl && !path.startsWith('//agents/')) {
         a.href = `${repoUrl}/blob/HEAD/${to.path.split('/').map(encodeURIComponent).join('/')}${to.hash ? `#${to.hash}` : ''}`;
       } else {
         a.removeAttribute('href');
@@ -324,12 +324,12 @@ export function openBookshelf(deps: ShelfDeps) {
     wire(body, path);
     page.replaceChildren(body);
     const dir = path.slice(0, path.length - nameOf(path).length);
-    crumbs.replaceChildren(dir ? h('span.dir', {}, dir) : '', nameOf(path));
+    crumbs.replaceChildren(dir ? h('span.dir', {}, info?.workerName ? info.workerName + ' · ' + dir.split('/').slice(4).join('/') : dir) : '', nameOf(path));
     crumbs.title = path;
     const words = doc.text.split(/\s+/).filter(Boolean).length;
     meta.replaceChildren(
       [uiText`${Math.max(1, Math.round(words / 220))} min read`, info ? size(info.size) : '', info ? uiText`updated ${timeAgo(info.mtime)}` : ''].filter(Boolean).join(' · '),
-      repoUrl ? h('a', { href: `${repoUrl}/blob/HEAD/${path.split('/').map(encodeURIComponent).join('/')}`, target: '_blank', rel: 'noopener noreferrer', title: uiText('Open it on GitHub') }, uiText('GitHub ↗')) : '',
+      repoUrl && !info?.workerName ? h('a', { href: `${repoUrl}/blob/HEAD/${path.split('/').map(encodeURIComponent).join('/')}`, target: '_blank', rel: 'noopener noreferrer', title: uiText('Open it on GitHub') }, uiText('GitHub ↗')) : '',
     );
     turnedAt = 0;
     jump(hash);

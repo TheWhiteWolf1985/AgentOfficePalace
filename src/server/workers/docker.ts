@@ -30,6 +30,13 @@ function paths(id: string) {
   const dir = path.join(root, 'workers', id);
   return { dir, home: path.join(dir, 'home'), drops: path.join(root, 'drops', id), work: path.join(dir, 'workspace'), bridge: path.join(root, 'bridge'), name: 'aop-codex-' + id };
 }
+/** Resolve an existing workspace without following a replaced runtime directory. */
+export function dockerWorkspace(id: string): string | undefined {
+  if (!dockerRoot()) return;
+  const dir = paths(id).work;
+  try { if (realpathSync(dir) === dir) return dir; } catch { /* not provisioned yet */ }
+  return undefined;
+}
 export const dockerHome = (id: string) => path.join(paths(id).home, '.codex');
 export function dockerDrop(id: string, name: string, type: string, body: Buffer) {
   const p = paths(id);

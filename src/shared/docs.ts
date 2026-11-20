@@ -7,6 +7,8 @@ export interface DocFile {
   path: string;
   /** Its first heading (or front matter title), when it has one near the top. */
   title?: string;
+  /** Name of the desk whose private checkout contains this document. */
+  workerName?: string;
   size: number;
   /** Last modified, ms since epoch. */
   mtime: number;
@@ -37,6 +39,11 @@ export function isDocPath(p: string): boolean {
  * site, mailto:…) or out of the project.
  */
 export function resolveDocLink(from: string, href: string): { path: string; hash: string } | undefined {
+  const workspace = from.match(/^(\/\/agents\/[0-9a-f]{12}\/)(.*)$/);
+  if (workspace) {
+    const link = resolveDocLink(workspace[2], href);
+    return link && { ...link, path: workspace[1] + link.path };
+  }
   if (!href || /^[a-z][a-z0-9+.-]*:/i.test(href) || href.startsWith('//')) return undefined;
   const hashAt = href.indexOf('#');
   const hash = hashAt >= 0 ? href.slice(hashAt + 1) : '';

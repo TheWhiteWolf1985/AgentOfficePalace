@@ -36,6 +36,7 @@ export const routes: readonly Route[] = [
   connectionsRoute,
   receptionSignRoute,
   agentRoutes.models,
+  agentRoutes.queueTargets,
   fileRoutes.image,
   fileRoutes.whiteboardFile,
   fileRoutes.termDrop,

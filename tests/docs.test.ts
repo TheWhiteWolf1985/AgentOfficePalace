@@ -37,6 +37,16 @@ function fixture(t: { after(fn: () => void): void }, git: boolean) {
   return { root, dir, docs: new Docs(dir) };
 }
 
+test('workspace shelves retain relative links and hide internal metadata', async (t) => {
+  const { dir } = fixture(t, true);
+  const docs = new Docs(dir, true);
+  const prefix = '//agents/123456789abc/';
+  assert.deepEqual(resolveDocLink(prefix + 'docs/API.MD', '../pic.png'), { path: prefix + 'pic.png', hash: '' });
+  assert.equal(resolveDocLink(prefix + 'root.md', '../other.md'), undefined);
+  assert.ok('error' in await docs.read('.agent-office/meetings/notes.md'));
+  assert.ok((await docs.list()).files.some(f => f.path === 'NOTES.md'));
+});
+
 test('the shelf is every Markdown file git counts as the project, with its title', async (t) => {
   const { docs } = fixture(t, true);
   const { files, more } = await docs.list();

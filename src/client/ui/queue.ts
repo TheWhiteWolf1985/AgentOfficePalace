@@ -55,8 +55,11 @@ export function openQueue(net: Net, actions: QueueActions) {
 
   const ta = h('textarea', { rows: 2, placeholder: uiText('Describe a task for the next free worker…'), 'aria-label': uiText('New task') }) as HTMLTextAreaElement;
   const provider = providerPicker(store.project, 'queue-provider');
+  const target = document.createElement('select');
+  target.setAttribute('aria-label', uiText('Assign to'));
+  target.onchange = () => { provider.element.hidden = !!target.value; };
   const addBtn = h('button.btn.primary', { type: 'submit' }, uiText('Add to queue'));
-  const form = h('form.queue-add', {}, dictateField(ta), provider.element, addBtn) as HTMLFormElement;
+  const form = h('form.queue-add', {}, dictateField(ta), target, provider.element, addBtn) as HTMLFormElement;
   form.noValidate = true;
   const submit = () => {
     const text = ta.value.trim();
@@ -64,8 +67,9 @@ export function openQueue(net: Net, actions: QueueActions) {
       ta.focus();
       return;
     }
-    if (!provider.valid()) return;
-    net.send({ t: 'queue.add', prompt: text, provider: provider.value(), model: provider.model(), effort: provider.effort() });
+    if (!target.value && !provider.valid()) return;
+    const custom = !target.value && provider.customized();
+    net.send({ t: 'queue.add', prompt: text, targetWorkerId: target.value || undefined, provider: target.value ? store.workers.get(target.value)?.provider : custom ? provider.value() : undefined, model: custom ? provider.model() : undefined, effort: custom ? provider.effort() : undefined });
     ta.value = '';
   };
   form.addEventListener('submit', (e) => {
@@ -107,7 +111,7 @@ export function openQueue(net: Net, actions: QueueActions) {
       meta.push(uiText`by ${t.addedBy}`);
       if (w) {
         buttons.push(h('button.btn', { type: 'button', onclick: () => actions.openTerminal(w.id) }, uiText('🖥️ Terminal')));
-        buttons.push(
+        if (!t.reused) buttons.push(
           h('button.btn', {
             type: 'button',
             title: uiText('Send the worker home; the task counts as stopped'),
@@ -119,6 +123,7 @@ export function openQueue(net: Net, actions: QueueActions) {
       const queued = store.queue.tasks.filter((x) => x.status === 'queued');
       const i = queued.indexOf(t);
       pos = String(i + 1);
+      if (t.targetWorkerId) meta.push(store.workers.get(t.targetWorkerId)?.name ?? uiText('Assigned worker unavailable'));
       meta.push(`⚙️ ${providerLabel(t.provider, store.project)}${model}${usageSuffix(t.provider, w?.usage)}`);
       meta.push(uiText`added by ${t.addedBy} ${timeAgo(t.addedAt)}`);
       buttons.push(h('button.btn', { type: 'button', title: uiText('Move up'), 'aria-label': uiText('Move up'), disabled: i === 0, onclick: () => net.send({ t: 'queue.move', taskId: t.id, delta: -1 }) }, '↑'));
@@ -148,27 +153,41 @@ export function openQueue(net: Net, actions: QueueActions) {
   const list = h('div');
   body.append(form, list);
 
+  let permitted = new Set<string>();
+  let rosterKey: string | undefined;
+  const floor = store.floor;
   const render = () => {
+    if (store.floor !== floor) return;
+    const key = Array.from(store.workers.keys()).join('|');
+    if (key !== rosterKey) {
+      rosterKey = key;
+      void fetch('/api/queue/targets?' + new URLSearchParams({floor: floor ?? ''})).then(async response => {
+        if (!response.ok) throw Error();
+        const ids: string[] = await response.json();
+        if (rosterKey !== key || !el.isConnected) return;
+        permitted = new Set(ids);
+        render();
+      }).catch(() => { if (rosterKey === key) rosterKey = undefined; });
+    }
+    const selected = target.value;
+    const options = [new Option(uiText('Automatic assignment'), '')];
+    for (const w of store.workers.values()) {
+      if (!permitted.has(w.id)) continue;
+      options.push(new Option([w.name, w.model, STATUS_LABEL[w.status]].filter(Boolean).join(' · '), w.id));
+    }
+    if (selected && !options.some(o => o.value === selected)) options.push(new Option(uiText('Assigned worker unavailable'), selected));
+    if (options.map(o => o.text + o.value).join('|') !== Array.from(target.options, o => o.text + o.value).join('|')) {
+      target.replaceChildren(...options);
+      target.value = selected;
+    }
     const q = store.queue;
     limitValue.textContent = q.maxWorkers === 0 ? uiText('Paused') : String(q.maxWorkers);
     minus.toggleAttribute('disabled', q.maxWorkers <= 0);
     const running = q.tasks.filter((t) => t.status === 'running');
     const queued = q.tasks.filter((t) => t.status === 'queued');
     const done = q.tasks.filter((t) => t.status === 'done').slice().reverse();
-    const m = store.machine;
     const parts: (HTMLElement | null)[] = [
-      h(
-        'p.note',
-        {},
-        uiText('Or open the 📌 Issues board and click '),
-        h('b', {}, uiText('Add to queue')),
-        uiText(' on an issue. Whenever a desk is free and fewer than '),
-        h('b', {}, q.maxWorkers === 0 ? '0' : String(q.maxWorkers)),
-        uiText(" of its tasks are running, the next task gets a fresh worker in its own git worktree (workers you hire yourself don't count). Issues are assigned on GitHub when they start, and the pull request is linked when it shows up."),
-      ),
-      queued.length && officeFull(m)
-        ? h('p.note', {}, uiText`⏸ The office is at its limit of ${m.limit} worker${m.limit === 1 ? '' : 's'}, so the next task waits until one goes home. A queue worker that's finished goes home by itself to make room.`)
-        : null,
+      h('p.note', {}, uiText('The queue uses available agents on this floor. Choose a name to wait for that specific agent.')),
       section(uiText('🤖 Working on it'), running),
       section(uiText('⏳ Up next'), queued),
       section(uiText('✅ Finished'), done, h('button.btn', { type: 'button', onclick: () => net.send({ t: 'queue.clear' }) }, uiText('Clear'))),

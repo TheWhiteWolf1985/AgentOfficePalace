@@ -42,8 +42,38 @@ function fixture(defaultProvider: AgentProvider = 'claude') {
     queues.push(queue);
     return queue;
   };
-  return { dir, workers, open, emptied: () => emptied, close() { queues.forEach((q) => q.shutdown()); rmSync(dir, { recursive: true, force: true }); } };
+  return { dir, workers, manager, open, emptied: () => emptied, close() { queues.forEach((q) => q.shutdown()); rmSync(dir, { recursive: true, force: true }); } };
 }
+
+test('automatic dispatch reuses desks and a named task waits for its own worker', (t) => {
+  const f = fixture();
+  t.after(() => f.close());
+  for (const name of ['Byte', 'Pixel']) {
+    const w = f.manager.spawn(name, 'Tester', '', false, 'agent', 'codex') as WorkerInfo;
+    w.name = name;
+    w.status = 'idle';
+  }
+  const [byte, pixel] = f.workers;
+  f.manager.assignTask = (id) => {
+    const w = f.workers.find(w => w.id === id)!;
+    if (w.status !== 'idle' && w.status !== 'done') return false;
+    w.status = 'working';
+    return true;
+  };
+  const q = f.open(() => 0);
+  q.add('automatic', 'Tester');
+  assert.equal(q.state().tasks[0].workerId, byte.id);
+  q.add('specific', 'Tester', undefined, undefined, undefined, undefined, undefined, undefined, byte.id);
+  assert.equal(q.state().tasks[1].status, 'queued');
+  q.add('second automatic', 'Tester');
+  assert.equal(q.state().tasks[2].workerId, pixel.id);
+  byte.status = 'done';
+  q.onWorker(byte);
+  assert.equal(q.state().tasks[1].workerId, byte.id);
+  assert.equal(q.state().tasks[1].reused, true);
+  assert.equal(f.workers.length, 2);
+  assert.ok(q.add('wrong owner', 'Tester', undefined, undefined, undefined, undefined, undefined, 'another-account', byte.id));
+});
 
 test('queue seats the selected provider and preserves it through completion and retry', (t) => {
   const f = fixture(); t.after(() => f.close());

@@ -14,6 +14,7 @@ import { TaskQueue } from './queue.js';
 import { Changes } from './changes.js';
 import { Decor } from './decor.js';
 import { FloorPlanStore } from './floorplan.js';
+import { dockerWorkspace } from './workers/docker.js';
 import { Docs } from './docs.js';
 import { Whiteboard } from './whiteboard.js';
 import { MeetingRoom } from './meetings.js';
@@ -115,6 +116,22 @@ export class Floor {
   readonly meetings: MeetingRoom;
   /** The bookshelf: the project's Markdown files (see docs.ts). */
   readonly docs: Docs;
+  private workerShelves = new Map<string, Docs>();
+
+  workspaceShelves(accountId?: string) {
+    const shelves = new Map<string, { name: string; docs: Docs }>();
+    for (const w of this.workers.list()) {
+      if (w.runtime !== 'docker') continue;
+      const owner = this.workers.ownerOf(w.id);
+      if (owner && owner !== accountId) continue;
+      const dir = dockerWorkspace(w.id);
+      if (!dir) continue;
+      const docs = this.workerShelves.get(w.id) ?? new Docs(dir, true);
+      this.workerShelves.set(w.id, docs);
+      shelves.set(w.id, { name: w.name, docs });
+    }
+    return shelves;
+  }
   /** Settles once the workers whose terminals outlived the last office are picked back up, and the rest woken. */
   readonly ready: Promise<void>;
   private timer: NodeJS.Timeout;
@@ -156,6 +173,7 @@ export class Floor {
           this.sendLandedHome();
         },
         remove: (workerId) => {
+          this.workerShelves.delete(workerId);
           this.changes?.forget(workerId);
           ctx.emit(this, { t: 'worker.remove', workerId });
           this.queue?.onWorkerGone(workerId);

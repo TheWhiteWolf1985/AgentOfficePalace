@@ -114,19 +114,34 @@ export const fileRoutes = {
     method: 'GET',
     prefix: '/api/docs',
     auth: 'session',
-    async handle(ctx, { res, url, path: p }) {
+    async handle(ctx, { res, url, path: p, session }) {
       const floor = floorParam(ctx, url);
       // The bookshelf: the project's Markdown files, one to read, and the pictures in it (see docs.ts).
       if (!floor) return send(res, 404, { error: 'No such floor' });
-      if (p === '/api/docs') return send(res, 200, await floor.docs.list());
-      const file = str(url.searchParams.get('path'), 4096);
+      const shelves = floor.workspaceShelves(session.account?.id);
+      if (p === '/api/docs') {
+        const project = await floor.docs.list();
+        const files = [...project.files];
+        let more = project.more;
+        for (const [id, shelf] of shelves) {
+          const list = await shelf.docs.list();
+          more ||= list.more;
+          files.push(...list.files.map(f => ({ ...f, path: '//agents/' + id + '/' + f.path, workerName: shelf.name })));
+        }
+        return send(res, 200, { files, more });
+      }
+      const requested = str(url.searchParams.get('path'), 4096);
+      const source = requested.match(/^\/\/agents\/([0-9a-f]{12})\/(.+)$/);
+      const docs = source ? shelves.get(source[1])?.docs : floor.docs;
+      if (!docs || (!source && requested.startsWith('/'))) return send(res, 404, { error: 'Unknown document' });
+      const file = source?.[2] ?? requested;
       if (!file) return send(res, 400, { error: 'Bad request' });
       if (p === '/api/docs/file') {
-        const r = await floor.docs.read(file);
+        const r = await docs.read(file);
         return 'error' in r ? send(res, r.status, { error: r.error }) : send(res, 200, r);
       }
       if (p === '/api/docs/picture') {
-        const r = await floor.docs.picture(file);
+        const r = await docs.picture(file);
         if ('error' in r) return send(res, r.status, { error: r.error });
         res.writeHead(200, {
           'content-type': r.type,

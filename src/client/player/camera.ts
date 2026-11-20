@@ -37,12 +37,11 @@ export interface Followed {
 }
 
 /**
- * Puts the camera where you see from: at your eyes in first person (bobbing `bob` as you walk, and
- * `lift` up or down while you sit), or round behind you in third, where it eases over unless `snap`.
+ * Puts the camera where you see from: at eye level in first person (including the seated height), or round behind you in third, where it eases over unless `snap`.
  */
-export function aimCamera(camera: THREE.PerspectiveCamera, p: Followed, bob: number, lift: number, snap: boolean) {
+export function aimCamera(camera: THREE.PerspectiveCamera, p: Followed, lift: number, snap: boolean) {
   if (p.view === 'first') {
-    camera.position.set(p.pos.x, p.pos.y + EYE_HEIGHT + bob + p.stepOffset + lift, p.pos.z);
+    camera.position.set(p.pos.x, p.pos.y + EYE_HEIGHT + p.stepOffset + lift, p.pos.z);
     camera.rotation.set(p.lookPitch, p.camYaw, 0);
     return;
   }

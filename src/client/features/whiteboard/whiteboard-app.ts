@@ -10,7 +10,7 @@ import { t as uiText, languageTag } from '../../../shared/i18n';
 import { createElement as e } from 'react';
 import { createRoot } from 'react-dom/client';
 import { CaptureUpdateAction, Excalidraw, MainMenu, WelcomeScreen, exportToCanvas, reconcileElements, restoreElements } from '@excalidraw/excalidraw';
-import '@excalidraw/excalidraw/index.css';
+import editorCss from '@excalidraw/excalidraw/index.css?inline';
 import type { Collaborator, ExcalidrawImperativeAPI, SocketId } from '@excalidraw/excalidraw/types';
 import type { ExcalidrawElement } from '@excalidraw/excalidraw/element/types';
 import type { RemoteExcalidrawElement } from '@excalidraw/excalidraw/data/reconcile';
@@ -218,6 +218,12 @@ export function mountWhiteboard(host: HTMLElement, send: (msg: ClientMsg) => voi
   };
 
   const initial = asExcalidraw([...store.whiteboard.values()].sort(byIndex));
+  if (!document.getElementById('office-excalidraw-style')) {
+    const style = document.createElement('style');
+    style.id = 'office-excalidraw-style';
+    style.textContent = editorCss;
+    document.head.append(style);
+  }
   const root = createRoot(host);
   root.render(
     e(
