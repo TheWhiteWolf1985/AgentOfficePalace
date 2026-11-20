@@ -27,15 +27,27 @@ python3 deploy/codex-agent/seccomp.py > "$work/package/distribution/codex-seccom
 tar -C "$work/package" -czf "$out/agent-office-linux-amd64.tgz" .
 image="aop-codex:release-$commit"
 docker build --tag "$image" deploy/codex-agent
-image_id=$(docker image inspect --format '{{.Id}}' "$image")
 docker run --rm --entrypoint /bin/sh "$image" -ec 'codex --version; bwrap --version; rg --pcre2-version'
 docker save "$image" | gzip -1 > "$out/codex-agent-linux-amd64.tgz"
 cp deploy/debian/{agent-office-release.py,install.sh} "$out/"
-python3 - "$out" "$version" "$commit" "$image_id" <<'PY'
-import hashlib, json, sys
+python3 - "$out" "$version" "$commit" "$image" <<'PY'
+import hashlib, json, sys, tarfile
 from pathlib import Path
-out, version, commit, image = sys.argv[1:]
+out, version, commit, image_tag = sys.argv[1:]
 root = Path(out)
+# A containerd-backed builder can report the index digest as .Id. Debian Docker
+# identifies a loaded image by the digest of the config bytes inside docker save.
+with tarfile.open(root / 'codex-agent-linux-amd64.tgz') as tar:
+    entries = json.load(tar.extractfile('manifest.json'))
+    configs = {row['Config'] for row in entries
+               if any(tag.split('/')[-1] == image_tag for tag in (row.get('RepoTags') or []))}
+    if len(configs) != 1:
+        raise ValueError('Il tag deve identificare una sola immagine esportata')
+    config_bytes = tar.extractfile(configs.pop()).read()
+    cfg = json.loads(config_bytes)
+    if (cfg['os'], cfg['architecture']) != ('linux', 'amd64'):
+        raise ValueError('Piattaforma immagine agente inattesa')
+    image = 'sha256:' + hashlib.sha256(config_bytes).hexdigest()
 assets = {}
 for name in ('agent-office-linux-amd64.tgz', 'codex-agent-linux-amd64.tgz', 'agent-office-release.py'):
     with (root / name).open('rb') as f:
