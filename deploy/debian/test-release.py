@@ -2,8 +2,11 @@
 import hashlib
 import importlib.util
 import json
+import os
 from pathlib import Path
+import tarfile
 import tempfile
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
@@ -29,6 +32,30 @@ class ReleaseTest(unittest.TestCase):
         manager.link(self.root / 'current', target)
         if target == self.new:
             raise RuntimeError('Smoke test failed')
+
+    def test_service_can_traverse_extracted_program_under_private_installer_umask(self):
+        tree = self.root / 'payload'
+        helper = tree / 'distribution' / manager.MANAGER
+        helper.parent.mkdir(parents=True)
+        helper.write_text('manager')
+        (tree / 'bin').mkdir()
+        archive = self.root / 'program.tgz'
+        with tarfile.open(archive, 'w:gz') as tar:
+            tar.add(tree, arcname='.')
+        release = SimpleNamespace(target=self.root / 'releases/v1.0.3',
+                                  manifest={'sha256': {manager.MANAGER: manager.digest(helper)}, 'image': 'test'},
+                                  asset=lambda name, dest: archive)
+        def check_service_access(*args, cwd=None):
+            self.assertEqual(cwd.stat().st_mode & 0o005, 0o005)
+            self.assertEqual((cwd / 'bin').stat().st_mode & 0o005, 0o005)
+        mask = os.umask(0o077)
+        try:
+            with patch.object(manager, 'run', check_service_access), patch.object(manager, 'docker', return_value=['docker']), \
+                    patch.object(manager.subprocess, 'run', return_value=SimpleNamespace(returncode=0)):
+                manager.stage(release)
+            self.assertEqual(os.umask(0o077), 0o077)
+        finally:
+            os.umask(mask)
 
     def test_health_failure_restores_running_release(self):
         with patch.object(manager, 'start', self.start), self.assertRaises(RuntimeError):

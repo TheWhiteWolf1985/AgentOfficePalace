@@ -157,6 +157,9 @@ def prepare_host():
         ROOT.mkdir(mode=0o755)
         atomic(owner, '1\n')
     (ROOT / 'releases').mkdir(exist_ok=True)
+    # Also repair the two program directories if a previous install stopped before activation.
+    ROOT.chmod(0o755)
+    (ROOT / 'releases').chmod(0o755)
     ETC.mkdir(mode=0o700, exist_ok=True)
     # Debian may start newly installed daemons. Only mask units belonging to packages
     # which have never been installed on this guest. Existing Docker workloads are independent.
@@ -267,10 +270,16 @@ def stage(release):
     with tempfile.TemporaryDirectory(dir=ROOT / 'releases') as temp:
         tmp = Path(temp)
         app = tmp / 'app'
-        app.mkdir(mode=0o755)
         archive = release.asset(ARCHIVE, tmp)
-        with tarfile.open(archive) as tar:
-            tar.extractall(app, filter='data')
+        # The data filter leaves directory creation modes to umask. The service user must
+        # be able to traverse this public application tree even when root uses umask 077.
+        previous_mask = os.umask(0o022)
+        try:
+            app.mkdir(mode=0o755)
+            with tarfile.open(archive) as tar:
+                tar.extractall(app, filter='data')
+        finally:
+            os.umask(previous_mask)
         if digest(app / 'distribution' / MANAGER) != release.manifest['sha256'][MANAGER]:
             raise ValueError('Gestore aggiornamenti diverso dal manifest')
         # Check native modules on the target OS before switching the running application.
