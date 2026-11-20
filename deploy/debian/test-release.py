@@ -43,6 +43,13 @@ class ReleaseTest(unittest.TestCase):
             manager.recover()
         self.assertEqual(manager.current(), self.old)
 
+    def test_first_start_does_not_reset_an_unloaded_unit(self):
+        from subprocess import CompletedProcess
+        with patch.object(manager.subprocess, 'run', return_value=CompletedProcess([], 1)), \
+                patch.object(manager, 'run') as execute, patch.object(manager, 'healthy', return_value=True):
+            manager.start(self.new)
+        execute.assert_called_once_with('systemctl', 'restart', manager.SERVICE)
+
     def test_successful_switch_preserves_rollback_target(self):
         with patch.object(manager, 'start', lambda path: manager.link(self.root / 'current', path)):
             manager.activate(self.new)

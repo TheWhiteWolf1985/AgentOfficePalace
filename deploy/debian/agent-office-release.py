@@ -158,7 +158,7 @@ def prepare_host():
                 if output('systemctl', 'show', '-p', 'LoadState', '--value', unit) == 'not-found':
                     run('systemctl', 'mask', unit)
     run('apt-get', 'update', '-q')
-    run('apt-get', 'install', '-y', '--no-install-recommends', 'ca-certificates', 'git', 'openssh-client',
+    run('apt-get', 'install', '-y', '--no-remove', '--no-install-recommends', 'ca-certificates', 'git', 'openssh-client',
         'docker.io', 'docker-cli', 'uidmap', 'rootlesskit', 'slirp4netns', 'dbus-user-session', 'fuse-overlayfs',
         env={**os.environ, 'DEBIAN_FRONTEND': 'noninteractive'})
     try:
@@ -193,7 +193,7 @@ WantedBy=default.target
     run(*userctl, 'enable', '--now', 'aop-docker.service')
     for i in range(30):
         probe = subprocess.run([*docker(), 'info', '--format', '{{json .SecurityOptions}}'], capture_output=True, text=True)
-        if probe.returncode == 0 and 'name=rootless' in json.loads(probe.stdout):
+        if probe.returncode == 0 and 'name=rootless' in (json.loads(probe.stdout or 'null') or []):
             break
         time.sleep(1)
     else:
@@ -229,7 +229,7 @@ After=network-online.target
 ConditionPathExists=!{ETC}/paused
 [Service]
 Type=oneshot
-ExecStart={TOOL} update
+ExecStart={TOOL} update --scheduled
 TimeoutStartSec=30min
 """)
     atomic(UNIT / TIMER, f"""[Unit]
@@ -297,7 +297,8 @@ def healthy():
 
 def start(target):
     link(ROOT / 'current', target)
-    run('systemctl', 'reset-failed', SERVICE, stdout=subprocess.DEVNULL)
+    if subprocess.run(['systemctl', 'is-failed', '--quiet', SERVICE]).returncode == 0:
+        run('systemctl', 'reset-failed', SERVICE)
     run('systemctl', 'restart', SERVICE)
     if not healthy():
         raise RuntimeError('Servizio non pronto dopo 30 secondi')
@@ -340,9 +341,12 @@ def recover():
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('action', choices=['install', 'update', 'status', 'pause', 'resume', 'rollback'], nargs='?', default='install')
+    parser.add_argument('--scheduled', action='store_true', help=argparse.SUPPRESS)
     parser.add_argument('--from-dir', type=Path, help='Cartella di consegna con release.json e archivi')
     a = parser.parse_args()
-    if os.geteuid() or os.uname().machine != 'x86_64' or not re.search('^VERSION_ID="?13"?$', Path('/etc/os-release').read_text(), re.M) or not Path('/etc/debian_version').exists():
+    distro = Path('/etc/os-release').read_text()
+    if (os.geteuid() or os.uname().machine != 'x86_64' or not re.search('^ID="?debian"?$', distro, re.M)
+            or not re.search('^VERSION_ID="?13"?$', distro, re.M) or not Path('/run/systemd/system').is_dir()):
         parser.error('Eseguire come root in una VM Debian 13 amd64 con systemd')
     with open('/run/lock/agent-office-release.lock', 'a') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
@@ -372,13 +376,23 @@ def main():
                 print('Aggiornamenti in pausa')
                 return
             release = Release(a.from_dir)
+            rejected = ETC / 'failed-update'
+            if a.scheduled and rejected.is_file() and rejected.read_text() == release.manifest['commit']:
+                print('Questa versione è già stata ripristinata. Per riprovarla usare agent-office-release update.')
+                return
             active = current() if (ROOT / '.managed').is_file() else None
             if active and tuple(map(int, active.name[1:].split('.'))) > tuple(map(int, release.manifest['version'].split('.'))):
                 raise ValueError('Versione precedente a quella attiva. Usare rollback per tornare indietro.')
             if a.action == 'install':
                 prepare_host()
             stage(release)
-            activate(release.target)
+            try:
+                activate(release.target)
+            except Exception:
+                if active:
+                    atomic(rejected, release.manifest['commit'])
+                raise
+            rejected.unlink(missing_ok=True)
             if a.action == 'install':
                 link(TOOL, ROOT / 'current/distribution' / MANAGER)
                 run('systemctl', 'enable', SERVICE)

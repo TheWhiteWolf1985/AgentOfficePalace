@@ -10,7 +10,7 @@ apt-get update && apt-get install -y ca-certificates curl && curl -fLsS https://
 
 Per trasportare una consegna, copia nella stessa cartella `install.sh`, `agent-office-release.py`, `release.json`, `agent-office-linux-amd64.tgz` e `codex-agent-linux-amd64.tgz`. Dalla cartella esegui `bash ./install.sh "$PWD"`. Per i prerequisiti Debian serve accesso ai repository APT o a un mirror aziendale. Node 22, dipendenze applicative e immagine Codex sono già nella consegna.
 
-Apri **https://IP-DELLA-VM:4643**. La password originale è nel file `/etc/agent-office-palace.env`, leggibile da root. L'app genera un certificato per il primo avvio. La configurazione del certificato aziendale e del connettore Proxmox per la console della sala server appartengono alla singola installazione. Ogni utente collega i propri accessi Codex tramite l'app.
+Apri **https://IP-DELLA-VM:4643**. La password originale è nel file `/etc/agent-office-palace.env`, leggibile da root. L'app genera un certificato per il primo avvio. La configurazione del certificato aziendale e del connettore Proxmox per la console della sala server appartengono alla singola installazione. Per collegare la lavagna del terminale vedere [Console della sala server](../../docs/server-room.md). Ogni utente collega i propri accessi Codex tramite l'app.
 
 I file del programma sono in `/opt/agent-office-palace/releases`. Il link `current` identifica la versione attiva. Dati degli uffici, workspace, accessi e dati del motore rootless sono nella home `/var/lib/agent-office-palace`. Per il backup includi anche la configurazione locale in `/etc`. Se una macchina contiene una precedente installazione di Agent Office Palace, usa una VM nuova per affiancarla, oppure pianifica la migrazione dei dati separatamente.
 
@@ -27,7 +27,7 @@ Ogni istanza gestita controlla GitHub circa una volta all'ora e dopo l'avvio. Il
 | Riattivare la versione precedente | `agent-office-release rollback` |
 | Consultare l'esito del timer | `journalctl -u agent-office-palace-update.service` |
 
-Il rollback automatico scatta se l'avvio della nuova versione o il controllo di salute falliscono. Il rollback manuale mette in pausa gli aggiornamenti. Il ripristino riguarda programma e riferimento all'immagine. Per una futura release che migri il formato dei dati serve una migrazione reversibile o un backup coerente. Un'istanza spenta recupera la stabile al controllo successivo.
+Il rollback automatico scatta se l'avvio della nuova versione o il controllo di salute falliscono. Dopo il ripristino automatico, il timer attende un altro commit. Il comando manuale di aggiornamento permette di riprovare. Il rollback manuale mette in pausa gli aggiornamenti. Il ripristino riguarda programma e riferimento all'immagine. Per una futura release che migri il formato dei dati serve una migrazione reversibile o un backup coerente. Un'istanza spenta recupera la stabile al controllo successivo.
 
 ## Come pubblicare
 
