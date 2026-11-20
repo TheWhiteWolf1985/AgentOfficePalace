@@ -1,5 +1,19 @@
 # Agent Office Palace su Debian 13
 
+## Crea la VM dal nodo Proxmox
+
+Dalla shell root del nodo Proxmox VE amd64 esegui il comando del candidato:
+
+```bash
+script=$(curl -fsSL https://github.com/TheWhiteWolf1985/AgentOfficePalace/releases/download/v0.1.276-rc.1/proxmox.sh) && bash -c "$script"
+```
+
+Lo script propone ID libero, nome, storage e bridge e aspetta conferma. Puoi scegliere un nome diverso quando nel cluster esiste già `agent-office-palace`. Crea una VM Debian 13 ufficiale con 4 vCPU, 16 GiB RAM, disco da 30 GiB, DHCP e avvio automatico. Il nodo deve poter raggiungere Debian Cloud e GitHub. La VM deve poter raggiungere i repository Debian e GitHub. Il piccolo secondo disco contiene la configurazione del primo avvio, senza password.
+
+Al termine compaiono l’URL HTTPS e il comando Proxmox per leggere la password applicativa. Per impostare una password per la console Debian usa `qm guest passwd ID root` dal nodo. In caso di errore dopo la creazione, controlla la console seriale e `/var/log/cloud-init-output.log` nella VM. La creazione ripetuta richiede un nuovo ID e un nome disponibile.
+
+Per un'installazione non interattiva passa `--yes` e, se necessario, `--vmid`, `--name`, `--storage`, `--bridge`. Ogni release incorpora nel suo `proxmox.sh` il tag e il checksum del manifest. Dopo la prima promozione stabile l'URL permanente sarà `https://github.com/TheWhiteWolf1985/AgentOfficePalace/releases/latest/download/proxmox.sh`.
+
 ## Prima installazione
 
 Il punto di partenza è una VM Debian 13 amd64 con systemd, rete in uscita e accesso root. Per una macchina con due agenti puoi partire dalla configurazione di prova con 4 vCPU, 16 GiB di RAM e 30 GiB di disco. Lascia spazio aggiuntivo per workspace e immagini. Lancia il comando nella console della VM. Il percorso pubblico diventa disponibile con la prima GitHub Release che contiene `install.sh`.
