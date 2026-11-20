@@ -1,6 +1,9 @@
 /* ⚙️ Settings: the categories down the side, the one picked on the right, a card per setting. */
 .modal.settings { width: min(960px, 100%); height: min(760px, calc(100vh - 32px)); }
 .settings-body { flex: 1; min-height: 0; display: grid; grid-template-columns: 220px minmax(0, 1fr); }
+.settings-apply { display: flex; align-items: center; justify-content: flex-end; gap: 12px; flex: none; }
+.settings-apply[hidden] { display: none; }
+.settings-apply [role=status] { margin-right: auto; }
 .settings-nav { display: flex; flex-direction: column; gap: 4px; padding: 12px 10px; overflow: auto; background: var(--paper-2); border-right: 3px solid var(--ink); }
 .settings-tab { display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 12px; text-align: left; font: inherit; font-size: 15px; font-weight: 800; color: var(--ink); background: none; border: 2px solid transparent; border-radius: 12px; cursor: pointer; }
 .settings-tab .icon { flex: none; width: 22px; font-size: 18px; text-align: center; }

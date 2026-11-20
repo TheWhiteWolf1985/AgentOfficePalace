@@ -39,8 +39,8 @@ export function buildElevator(height = WALL_HEIGHT): Elevator {
   const { x, width, depth, wall, doorWidth, doorHeight } = ELEVATOR;
   const group = new THREE.Group();
   const colliders: Collider[] = [];
-  const tall = height >= WALL_HEIGHT;
-  const topOf = (floorY: number) => (tall ? 99 : floorY + height);
+  // Each stop owns its storey. A shut door below must never block the one above.
+  const topOf = (floorY: number) => floorY + height;
   const minX = x - width / 2;
   const maxX = x + width / 2;
   const back = FLOOR.minZ;
@@ -62,15 +62,15 @@ export function buildElevator(height = WALL_HEIGHT): Elevator {
     [x + doorWidth / 2, maxX],
   ]) {
     group.add(mesh(new THREE.BoxGeometry(pillar, height, wall), steel, (x0 + x1) / 2, height / 2, front - wall / 2));
+    group.add(mesh(new THREE.BoxGeometry(pillar, 0.25, wall + 0.04), steelDark, (x0 + x1) / 2, 0.125, front - wall / 2, false));
     colliders.push({ minX: x0, maxX: x1, minZ: front - wall, maxZ: front, bottom: 0, top: topOf(0) });
   }
   const header = height - doorHeight;
   group.add(mesh(new THREE.BoxGeometry(doorWidth, header, wall), steel, x, doorHeight + header / 2, front - wall / 2));
-  // A brass frame round the doorway, and a kick plate along the bottom of the shaft.
+  // A brass frame round the doorway, clear of the walking surface.
   const frameT = 0.08;
   group.add(mesh(new THREE.BoxGeometry(doorWidth + frameT * 2, frameT, 0.05), brass, x, doorHeight + frameT / 2, front + 0.02, false));
   for (const sx of [-1, 1]) group.add(mesh(new THREE.BoxGeometry(frameT, doorHeight, 0.05), brass, x + sx * (doorWidth / 2 + frameT / 2), doorHeight / 2, front + 0.02, false));
-  group.add(mesh(new THREE.BoxGeometry(width + 0.02, 0.25, wall + 0.04), steelDark, x, 0.125, front - wall / 2, false));
 
   // Inside: a dark floor, a mirror on the back wall, handrails, a strip light over the doors.
   const inW = ELEVATOR_CAR.maxX - ELEVATOR_CAR.minX;

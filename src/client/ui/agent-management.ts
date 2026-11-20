@@ -5,19 +5,21 @@ import { t, remoteText } from '../../shared/i18n';
 import type { ConnectionsView, ConnectionFloor } from '../../shared/connections';
 import type { WorkerInfo } from '../../shared/protocol';
 import { DESKS, WING_DESKS } from '../../shared/layout';
+import { settingsApply } from './settings-apply';
 import { h, STATUS_LABEL } from './dom';
 import { agentFields } from './provider';
 import { connectionRequest as request, loadConnections, connectionField as field, connectionSelect as select, connectionButton as button } from './connections-client';
 
-export function agentManagementPanel(): { element: HTMLElement; dispose(): void } {
+export function agentManagementPanel() {
+  let canLeave = () => true;
   let data: ConnectionsView, disposed = false, busy = false;
   let releaseForm: (() => void) | undefined;
-  const resetForm = () => { releaseForm?.(); releaseForm = undefined; };
+  const resetForm = () => { releaseForm?.(); releaseForm = undefined; canLeave = () => true; };
   const status = h('p.connection-status', { role: 'status' });
   const body = h('div.connection-content');
   const filter = h('input', { type: 'search', placeholder: t('Search agents in all offices'), 'aria-label': t('Search agents') }) as HTMLInputElement;
   const element = h('section.agent-management', {}, h('p.setting-note', {}, t('Manage individual agents across all offices. General office defaults remain in Workers.')),
-    h('div.agent-filters', {}, filter, button(t('Refresh'), () => run(reload))), status, body);
+    h('div.agent-filters', {}, filter, button(t('Refresh'), () => { if (canLeave()) void run(reload); })), status, body);
   const run = async (work: () => Promise<void>) => {
     if (busy || disposed) return; busy = true; status.className = 'connection-status'; status.textContent = t('Working…');
     try { await work(); if (!disposed) status.textContent = t('Operation completed'); }
@@ -81,12 +83,25 @@ export function agentManagementPanel(): { element: HTMLElement; dispose(): void 
     const props = h('div.connection-card', {}, h('h4', {}, t('Editable properties')), field(t('Name'), name), field(t('Color'), color), field(t('Desk'), desk),
       look?.element ?? null, worker.kind === 'agent' ? engine.element : h('p', {}, t('Shared shell')), field(t('Initial instructions'), prompt),
       worker.runtime === 'docker' ? h('p.setting-note', {}, t('Stop the container before changing the model or instructions.')) : h('label', {}, restart, ' ', t('Start a new session to apply engine or instruction changes. Previous terminal history is retained.')),
-      h('p.setting-note', {}, t('A working agent or one waiting for an answer cannot be restarted here.')),
-      button(t('Save properties'), () => run(async () => {
-        if (worker.kind === 'agent' && !engine.valid()) throw Error(t('Check the engine fields'));
-        const configuration = { name: name.value, color: color.value, deskId: desk.value, ...(worker.kind === 'agent' ? engine.choice() : {}), prompt: prompt.value || undefined, ...(look ? { appearance: look.value() ?? 'random' } : {}), restart: restart.checked };
-        await request('worker', { floorId: floor.id, workerId: worker.id, configuration }); await reload();
-      })));
+      h('p.setting-note', {}, t('A working agent or one waiting for an answer cannot be restarted here.')));
+    const apply = settingsApply(lock => { element.inert = lock; });
+    canLeave = apply.canDismiss;
+    const configuration = () => ({
+      name: name.value, color: color.value, deskId: desk.value,
+      ...(worker.kind === 'agent' ? engine.choice() : {}), prompt: prompt.value || undefined,
+      ...(look ? { appearance: look.value() ?? 'random' } : {}), restart: restart.checked,
+    });
+    let saved = JSON.stringify(configuration());
+    apply.add({
+      dirty: () => JSON.stringify(configuration()) !== saved,
+      validate: () => { if (worker.kind === 'agent' && !engine.valid()) throw Error(t('Check the engine fields')); },
+      apply: async () => {
+        await request('worker', { floorId: floor.id, workerId: worker.id, configuration: configuration() });
+        restart.checked = false;
+        saved = JSON.stringify(configuration());
+      },
+    });
+    for (const event of ['input', 'change', 'click']) props.addEventListener(event, apply.refresh);
     const binding = bindingFor(floor);
     const identity = h('div.connection-card', {}, h('h4', {}, t('Repository identity')));
     if (binding) {
@@ -96,15 +111,25 @@ export function agentManagementPanel(): { element: HTMLElement; dispose(): void 
       const effective = h('p');
       const paint = () => { effective.textContent = t`Effective on next session: ${accountName(account.value || binding.accountId)}`; };
       account.addEventListener('change', paint); paint();
+      let savedAccount = account.value;
+      account.addEventListener('change', apply.refresh);
+      apply.add({
+        dirty: () => account.value !== savedAccount,
+        apply: async () => {
+          const latest = (await loadConnections()).bindings.find(b => b.floorId === floor.id);
+          if (!latest) throw new Error(t('Connect this office to a repository in GitHub and Forgejo first.'));
+          await request('bind', { ...latest, agents: { ...latest.agents, [worker.id]: { accountId: account.value || undefined } } });
+          savedAccount = account.value;
+        },
+      });
       identity.append(field(t('Specific account'), account), effective, h('p', {}, t`Active account: ${accountName(worker.connectionAccountId)}`),
-        button(t('Save identity assignment'), () => run(async () => { await request('bind', { ...binding, agents: { ...binding.agents, [worker.id]: { accountId: account.value || undefined } } }); await reload(); })),
         h('p.setting-note', {}, t('Changing this assignment does not replace credentials inside an already running session.')));
     } else identity.append(h('p', {}, t('Connect this office to a repository in GitHub and Forgejo first.')));
     const details = h('details.connection-card', {}, h('summary', {}, t('Read-only runtime properties')), h('dl', {}, ...[
       [t('Identifier'), worker.id], [t('Office'), floor.name], [t('Type'), worker.kind], [t('Status'), STATUS_LABEL[worker.status]], [t('Session'), worker.sessionId ?? '—'],
       [t('Worktree'), worker.worktree?.path ?? '—'], [t('Branch'), worker.worktree?.branch ?? floor.project.branch ?? '—'], [t('Created by'), worker.createdBy], [t('Activity'), worker.activity ?? '—'],
     ].flatMap(([key, value]) => [h('dt', {}, key), h('dd', {}, value)])));
-    body.replaceChildren(button(t('Back to all agents'), list), h('h3', {}, floor.name + ' · ' + worker.name), props, ...(worker.runtime ? [] : [identity]), details);
+    body.replaceChildren(button(t('Back to all agents'), () => { if (canLeave()) void run(reload); }), h('h3', {}, floor.name + ' · ' + worker.name), props, ...(worker.runtime ? [] : [identity]), details);
     if (worker.runtime === 'docker') {
       const action = (operation: string, extra = {}) => request('container', { floorId: floor.id, workerId: worker.id, operation, ...extra });
       const key = h('input', { type: 'password', autocomplete: 'off', spellcheck: false }) as HTMLInputElement;
@@ -130,13 +155,18 @@ export function agentManagementPanel(): { element: HTMLElement; dispose(): void 
         })));
       const stopped = worker.paused || ['exited', 'offline'].includes(worker.status);
       const control = h('div.connection-card', {}, h('h4', {}, 'Docker'), h('p', {}, STATUS_LABEL[worker.status]),
-        button(stopped ? t('Start container') : t('Stop container'), () => run(async () => { await action(stopped ? 'start' : 'stop'); await reload(); })),
+        button(stopped ? t('Start container') : t('Stop container'), () => { if (canLeave()) void run(async () => { await action(stopped ? 'start' : 'stop'); await reload(); }); }),
         button(t('Remove agent'), () => confirmDialog(t('Remove agent?'), t('The private checkout is retained. Its Codex sign-in and session history will be removed.'), t('Remove'), () => void run(async () => { await action('remove'); await reload(); }))));
       body.append(control);
       if (!stopped) { body.append(auth); void poll().catch(() => {}); }
     }
+    body.append(apply.element);
   }
-  filter.addEventListener('input', list);
+  filter.addEventListener('input', () => {
+    if (!canLeave()) return;
+    if (body.querySelector('.settings-apply')) void run(reload);
+    else list();
+  });
   void run(reload);
-  return { element, dispose() { disposed = true; resetForm(); } };
+  return { element, canDismiss: () => canLeave(), dispose() { disposed = true; resetForm(); } };
 }

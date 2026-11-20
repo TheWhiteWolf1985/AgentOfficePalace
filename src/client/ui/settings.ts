@@ -5,8 +5,10 @@ import type { OfficeSound } from '../sound';
 import { store, type NeedsYouSound, type Settings, type ViewMode } from '../state';
 import { askNotifyPermission, notifyPermission, type DesktopNotifier } from '../notify';
 import type { WebhookKind } from '../../shared/protocol';
+import { chooseLanguage, getLanguage } from '../i18n';
+import { confirmSetting, settingsApply } from './settings-apply';
 import { h, openModal, timeAgo } from './dom';
-import { agentFields, choiceLabel, officeChoice } from './provider';
+import { agentFields, choiceLabel, officeChoice, resolvedProvider } from './provider';
 import { openPromptEditor, rewrittenPrompts } from './prompts';
 import { outsideSetting } from './settings-sky';
 import { choiceRow } from './settings-rows';
@@ -57,6 +59,29 @@ let lastPane: SettingsPane = 'you';
 
 /** `outside` describes the sky over the office (see describeSky), once the server has said. `first` opens on that category instead of the last one. */
 export function openSettings(net: Net, settings: Settings, onChange: (s: Settings) => void, onCharacter: () => void, sound: Pick<OfficeSound, 'ding' | 'needsYou'>, notifier: DesktopNotifier, onSignOut: () => void, outside?: { now: string; live: boolean }, first?: SettingsPane) {
+  const live = settings;
+  let baseline = { ...settings };
+  const personalKeys = ['view', 'volume', 'muted', 'pageTurns', 'pushToTalk', 'notify', 'needsYouSound'] as const;
+  const personalPatch = () => Object.fromEntries(personalKeys.filter(k => settings[k] !== baseline[k]).map(k => [k, settings[k]]));
+  const apply = settingsApply(busy => { content.inert = busy; });
+  let enablePermission = false;
+  apply.add({
+    dirty: () => enablePermission || Object.keys(personalPatch()).length > 0,
+    apply: async () => {
+      if (enablePermission && await askNotifyPermission() !== 'granted') {
+        enablePermission = false;
+        settings = { ...settings, notify: baseline.notify };
+        paintNotify();
+        throw new Error(uiText('Could not enable notifications'));
+      }
+      enablePermission = false;
+      onChange({ ...live, ...personalPatch() });
+      baseline = { ...settings };
+      paintNotify();
+    },
+  });
+  settings = { ...baseline };
+  const language = languageSelect(apply.refresh);
   const seg = h('div.seg', { role: 'radiogroup', 'aria-label': uiText('Camera view') });
   const note = h('p.setting-note');
   const paint = () => {
@@ -72,7 +97,7 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
             onclick: () => {
               if (settings.view === view) return;
               settings = { ...settings, view };
-              onChange(settings);
+              apply.refresh();
               paint();
             },
           },
@@ -103,13 +128,13 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
     paint();
     slider.addEventListener('input', () => {
       settings = { ...settings, [level]: Number(slider.value) / 100, [muted]: false };
-      onChange(settings);
+      apply.refresh();
       paint();
     });
     if (preview) slider.addEventListener('change', preview);
     mute.addEventListener('click', () => {
       settings = { ...settings, [muted]: !settings[muted] };
-      onChange(settings);
+      apply.refresh();
       paint();
       if (!settings[muted]) preview?.();
     });
@@ -120,11 +145,22 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
   /** Changes some of your own settings, and has the office take them up. */
   const change = (some: Partial<Settings>) => {
     settings = { ...settings, ...some };
-    onChange(settings);
+    apply.refresh();
   };
-  let graphics = loadGraphics();
-  const qualityRow = choiceRow<GraphicsQuality>(uiText('Visual quality'), [['high', uiText('High (default)')], ['balanced', uiText('Balanced')], ['economy', uiText('Economy')]], () => graphics.quality, quality => { graphics = { ...graphics, quality }; saveGraphics(graphics); });
-  const rateRow = choiceRow<RenderRate>(uiText('Rendering frequency'), [[30, '30 FPS'], [60, uiText('60 FPS (default)')], [0, uiText('Display refresh rate')]], () => graphics.fps, fps => { graphics = { ...graphics, fps }; saveGraphics(graphics); });
+  let savedGraphics = loadGraphics();
+  let graphics = { ...savedGraphics };
+  apply.add({
+    dirty: () => graphics.quality !== savedGraphics.quality || graphics.fps !== savedGraphics.fps,
+    apply: () => {
+      const next = loadGraphics();
+      if (graphics.quality !== savedGraphics.quality) next.quality = graphics.quality;
+      if (graphics.fps !== savedGraphics.fps) next.fps = graphics.fps;
+      saveGraphics(next);
+      savedGraphics = { ...graphics };
+    },
+  });
+  const qualityRow = choiceRow<GraphicsQuality>(uiText('Visual quality'), [['high', uiText('High (default)')], ['balanced', uiText('Balanced')], ['economy', uiText('Economy')]], () => graphics.quality, quality => { graphics = { ...graphics, quality }; apply.refresh(); });
+  const rateRow = choiceRow<RenderRate>(uiText('Rendering frequency'), [[30, '30 FPS'], [60, uiText('60 FPS (default)')], [0, uiText('Display refresh rate')]], () => graphics.fps, fps => { graphics = { ...graphics, fps }; apply.refresh(); });
   // Voice chat: an open mic, or muted until you hold V.
   const talkRow = choiceRow(uiText('Voice chat'), [[false, uiText('🎙️ Open mic')], [true, uiText('✋ Push to talk')]], () => settings.pushToTalk, (pushToTalk) => change({ pushToTalk }));
 
@@ -149,13 +185,13 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
           'button.btn.primary',
           {
             type: 'button',
-            onclick: async () => {
-              if ((await askNotifyPermission()) === 'granted') {
-                settings = { ...settings, notify: true };
-                onChange(settings);
-                notifier.sample();
-              }
+            class: enablePermission ? 'on' : '',
+            'aria-pressed': String(enablePermission),
+            onclick: () => {
+              enablePermission = !enablePermission;
+              settings = { ...settings, notify: enablePermission || baseline.notify };
               paintNotify();
+              apply.refresh();
             },
           },
           uiText('🔔 Turn on notifications'),
@@ -176,7 +212,7 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
               class: on === value ? 'on' : '',
               onclick: () => {
                 settings = { ...settings, notify: value };
-                onChange(settings);
+                apply.refresh();
                 paintNotify();
               },
             },
@@ -198,14 +234,15 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
   // The office's Slack / Discord webhook, shared by everyone.
   const hookStatus = h('p.setting-note');
   const hookInput = h('input', { type: 'text', placeholder: 'https://hooks.slack.com/services/…', 'aria-label': uiText('Slack or Discord webhook URL'), spellcheck: 'false', autocomplete: 'off' }) as HTMLInputElement;
-  const hookSave = h('button.btn.primary', { type: 'button' }, uiText('Save'));
+  let removeHook = false;
   const hookTest = h('button.btn', { type: 'button' }, uiText('Send a test'));
   const hookRemove = h('button.btn.danger', { type: 'button' }, uiText('Remove'));
   const hookActions = h('div.seg', { style: 'margin-top:8px' }, hookTest, hookRemove);
   const paintHook = () => {
     const { webhook, error, lastSentAt } = store.notify;
     hookActions.classList.toggle('hidden', !webhook);
-    hookSave.textContent = webhook ? uiText('Replace') : uiText('Save');
+    hookRemove.setAttribute('aria-pressed', String(removeHook));
+    hookRemove.classList.toggle('on', removeHook);
     hookStatus.classList.toggle('bad', !!error);
     hookStatus.textContent = !webhook
       ? uiText('Paste an incoming webhook from Slack or Discord, and the office posts to that channel when a worker needs input or finishes and nobody has its terminal open. It’s for everyone in the office.')
@@ -214,27 +251,35 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
         : uiText`📣 Posting to ${WEBHOOK_NAME[webhook.kind]} (${webhook.hint}), set by ${webhook.by} ${timeAgo(webhook.at)}${lastSentAt ? uiText` · last message ${timeAgo(lastSentAt)}` : ''}.`;
   };
   paintHook();
-  const saveHook = () => {
-    const url = hookInput.value.trim();
-    if (!url) return hookInput.focus();
-    net.send({ t: 'notify.webhook', url });
-    hookInput.value = '';
-  };
-  hookSave.addEventListener('click', saveHook);
-  hookInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') saveHook();
-  });
+  hookInput.addEventListener('input', () => { removeHook = false; paintHook(); apply.refresh(); });
+  hookRemove.addEventListener('click', () => { removeHook = !removeHook; hookInput.value = ''; paintHook(); apply.refresh(); });
   hookTest.addEventListener('click', () => net.send({ t: 'notify.test' }));
-  hookRemove.addEventListener('click', () => net.send({ t: 'notify.webhook', url: '' }));
+  apply.add({
+    dirty: () => removeHook || !!hookInput.value.trim(),
+    apply: async () => {
+      const url = removeHook ? '' : hookInput.value.trim();
+      const before = store.notify.webhook?.at;
+      await confirmSetting(net, { t: 'notify.webhook', url }, 'notify', () => url ? !!store.notify.webhook && store.notify.webhook.at !== before : !store.notify.webhook);
+      removeHook = false;
+      hookInput.value = '';
+      paintHook();
+    },
+  });
 
   // The worker everyone starts on, unless whoever starts one picks another. Admins pick it.
   const agent = agentFields(store.project, 'office-agent', officeChoice(store.project));
   let agentTouched = false;
-  agent.element.addEventListener('change', () => (agentTouched = true));
-  agent.element.addEventListener('input', () => (agentTouched = true));
-  const agentSave = h('button.btn.primary', { type: 'button' }, uiText('Save'));
+  let resetAgent = false;
+  const editAgent = () => {
+    resetAgent = false;
+    agentTouched = JSON.stringify(agent.choice()) !== JSON.stringify(officeChoice(store.project));
+    agentBack.setAttribute('aria-pressed', 'false');
+    apply.refresh();
+  };
+  agent.element.addEventListener('change', editAgent);
+  agent.element.addEventListener('input', editAgent);
   const agentBack = h('button.btn', { type: 'button' });
-  const agentActions = h('div.seg', { style: 'margin-top:8px' }, agentSave, agentBack);
+  const agentActions = h('div.seg', { style: 'margin-top:8px' }, agentBack);
   const agentNow = h('p.outside-now');
   const agentNote = h('p.setting-note');
   const paintAgent = () => {
@@ -254,14 +299,24 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
       (admin ? '' : uiText(' Admins can change it.'));
   };
   paintAgent();
-  agentSave.addEventListener('click', () => {
-    if (!agent.valid()) return;
-    agentTouched = false;
-    net.send({ t: 'prompts.agent', choice: agent.choice() });
-  });
   agentBack.addEventListener('click', () => {
-    agentTouched = false;
-    net.send({ t: 'prompts.agent', choice: null });
+    resetAgent = !resetAgent;
+    agentTouched = resetAgent;
+    agent.set(resetAgent ? { provider: resolvedProvider(undefined, store.project) } : officeChoice(store.project));
+    agentBack.setAttribute('aria-pressed', String(resetAgent));
+    apply.refresh();
+  });
+  apply.add({
+    dirty: () => agentTouched,
+    validate: () => { if (!resetAgent && !agent.valid()) throw new Error(uiText('Check the engine fields')); },
+    apply: async () => {
+      const choice = resetAgent ? null : agent.choice();
+      await confirmSetting(net, { t: 'prompts.agent', choice }, 'prompts', () => choice
+        ? JSON.stringify(officeChoice(store.project)) === JSON.stringify(choice) : !store.prompts.agent);
+      agentTouched = resetAgent = false;
+      agentBack.setAttribute('aria-pressed', 'false');
+      paintAgent();
+    },
   });
 
   // The prompts the office writes for workers by itself, for the whole office. Admins rewrite them.
@@ -279,9 +334,9 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
 
   // The most workers the office runs at once, across every floor. Admins set it.
   const limitInput = h('input', { type: 'text', inputmode: 'numeric', 'aria-label': uiText('Most workers at once'), spellcheck: 'false', autocomplete: 'off' }) as HTMLInputElement;
-  const limitSave = h('button.btn.primary', { type: 'button' }, uiText('Set limit'));
+  let clearLimit = false;
   const limitClear = h('button.btn', { type: 'button' });
-  const limitRow = h('div.webhook', {}, limitInput, limitSave, limitClear);
+  const limitRow = h('div.webhook', {}, limitInput, limitClear);
   const limitNote = h('p.setting-note');
   const paintLimit = () => {
     const m = store.machine;
@@ -299,23 +354,45 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
     limitNote.textContent = now + from + cap + (admin ? '' : uiText(' Admins can change it.'));
   };
   paintLimit();
-  const saveLimit = () => {
-    const n = Number(limitInput.value.trim());
-    if (!limitInput.value.trim() || !Number.isInteger(n) || n < 1) return limitInput.focus();
-    net.send({ t: 'machine.limit', limit: n });
+  limitInput.addEventListener('input', () => { clearLimit = false; limitClear.setAttribute('aria-pressed', 'false'); apply.refresh(); });
+  limitClear.addEventListener('click', () => {
+    clearLimit = !clearLimit;
+    limitClear.setAttribute('aria-pressed', String(clearLimit));
     limitInput.value = '';
-  };
-  limitSave.addEventListener('click', saveLimit);
-  limitInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') saveLimit();
+    apply.refresh();
   });
-  limitClear.addEventListener('click', () => net.send({ t: 'machine.limit', limit: null }));
+  apply.add({
+    dirty: () => clearLimit || !!limitInput.value.trim(),
+    validate: () => {
+      const n = Number(limitInput.value.trim());
+      if (!clearLimit && (!Number.isInteger(n) || n < 1 || (store.machine.ceiling && n > store.machine.ceiling))) {
+        throw new Error(uiText('Check the worker limit'));
+      }
+    },
+    apply: async () => {
+      const limit = clearLimit ? null : Number(limitInput.value.trim());
+      if (limit !== (store.machine.set?.limit ?? null)) {
+        await confirmSetting(net, { t: 'machine.limit', limit }, 'machine', () => (store.machine.set?.limit ?? null) === limit);
+      }
+      clearLimit = false;
+      limitInput.value = '';
+      limitClear.setAttribute('aria-pressed', 'false');
+    },
+  });
 
   // Whether a worker whose pull request merged goes home by itself, for everyone.
   const leaveRow = h('div.seg', { role: 'radiogroup', 'aria-label': uiText('Workers whose pull request merged') });
   const leaveNote = h('p.setting-note');
+  let leaveDraft: boolean | undefined;
+  apply.add({ dirty: () => leaveDraft !== undefined && leaveDraft !== store.leaveOnMerge.on, apply: async () => {
+    const on = leaveDraft!;
+    await confirmSetting(net, { t: 'leaveOnMerge.set', on }, 'leaveOnMerge', () => store.leaveOnMerge.on === on);
+    leaveDraft = undefined;
+  } });
   const paintLeave = () => {
-    const { on, by, at } = store.leaveOnMerge;
+    const { by, at } = store.leaveOnMerge;
+    if (leaveDraft === store.leaveOnMerge.on) leaveDraft = undefined;
+    const on = leaveDraft ?? store.leaveOnMerge.on;
     leaveRow.replaceChildren(
       ...([
         [true, uiText('🏠 Go home by themselves')],
@@ -329,7 +406,9 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
             'aria-checked': String(on === value),
             class: on === value ? 'on' : '',
             onclick: () => {
-              if (store.leaveOnMerge.on !== value) net.send({ t: 'leaveOnMerge.set', on: value });
+              leaveDraft = value;
+              paintLeave();
+              apply.refresh();
             },
           },
           label,
@@ -345,15 +424,15 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
 
   // Where the elevator clones new projects on the office's machine. Admins move it.
   const dirInput = h('input', { type: 'text', placeholder: '~/Workspace', 'aria-label': uiText('Workspace folder'), spellcheck: 'false', autocomplete: 'off' }) as HTMLInputElement;
-  const dirSave = h('button.btn.primary', { type: 'button' }, uiText('Save'));
+  let dirEdited = false, resetDir = false;
   const dirDefault = h('button.btn', { type: 'button' }, uiText('Use the default'));
-  const dirRow = h('div.webhook', {}, dirInput, dirSave);
+  const dirRow = h('div.webhook', {}, dirInput);
   const dirActions = h('div.seg', { style: 'margin-top:8px' }, dirDefault);
   const dirNote = h('p.setting-note');
   const paintDir = () => {
     const { dir, custom, by, at } = store.projectsDir;
     const admin = store.me.admin;
-    dirInput.value = dir;
+    if (!dirEdited) dirInput.value = dir;
     dirRow.classList.toggle('hidden', !admin);
     dirActions.classList.toggle('hidden', !admin || !custom);
     dirNote.textContent =
@@ -362,22 +441,38 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
       (admin ? uiText(' A checkout of the same repository that’s already there is used as it is. Floors you already have stay where they are.') : uiText(' An admin can move it.'));
   };
   paintDir();
-  const saveDir = () => {
-    const dir = dirInput.value.trim();
-    if (!dir) return dirInput.focus();
-    if (dir !== store.projectsDir.dir) net.send({ t: 'floor.projectsDir', dir });
-  };
-  dirSave.addEventListener('click', saveDir);
-  dirInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') saveDir();
+  dirInput.addEventListener('input', () => {
+    dirEdited = dirInput.value !== store.projectsDir.dir;
+    resetDir = false;
+    dirDefault.setAttribute('aria-pressed', 'false');
+    apply.refresh();
   });
-  dirDefault.addEventListener('click', () => net.send({ t: 'floor.projectsDir', dir: '' }));
+  dirDefault.addEventListener('click', () => {
+    resetDir = !resetDir;
+    dirEdited = resetDir;
+    dirDefault.setAttribute('aria-pressed', String(resetDir));
+    dirInput.value = resetDir ? '' : store.projectsDir.dir;
+    apply.refresh();
+  });
+  apply.add({
+    dirty: () => dirEdited,
+    validate: () => { if (!resetDir && !dirInput.value.trim()) throw new Error(uiText('Enter a workspace folder')); },
+    apply: async () => {
+      const dir = resetDir ? '' : dirInput.value.trim();
+      const before = store.projectsDir;
+      await confirmSetting(net, { t: 'floor.projectsDir', dir }, 'projectsDir', () =>
+        dir ? store.projectsDir.dir === dir || (store.projectsDir.at !== before.at && store.projectsDir.by === store.profile.name) : !store.projectsDir.custom);
+      dirEdited = resetDir = false;
+      dirDefault.setAttribute('aria-pressed', 'false');
+      paintDir();
+    },
+  });
 
   // What the sky's doing, and which clock it keeps (see settings-sky.ts).
-  const sky = outside && outsideSetting(net, outside, (body) => setting(uiText('Outside'), 'office', ...body));
+  const sky = outside && outsideSetting(net, apply, outside, (body) => setting(uiText('Outside'), 'office', ...body));
   const account = store.me.account;
   const signOut = h('button.btn', { type: 'button' }, uiText('🚪 Sign out'));
-  signOut.addEventListener('click', onSignOut);
+  signOut.addEventListener('click', () => { if (canDismiss()) onSignOut(); });
   const character = h('button.btn', { type: 'button' }, uiText('🧍 Your character'));
   const connections = store.me.admin ? connectionsPanel() : undefined;
   const management = store.me.admin ? agentManagementPanel() : undefined;
@@ -391,7 +486,7 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
     management: [management?.element ?? h('p', {}, uiText('Administrator access required'))],
     'atrium-logo': [receptionSign.element],
     language: [setting(uiText('Language'), 'you',
-      languageSelect(),
+      language,
       h('p.setting-note', {}, uiText('Changing language reloads this page. Your agents keep working.')))],
     you: [
       setting(uiText('Your character'), null, character, h('p.setting-note', {}, account ? uiText('Your appearance and preferences follow your personal account.') : uiText('Shared access keeps appearance and preferences in this browser.'))),
@@ -406,7 +501,7 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
     ],
     notify: [
       setting(uiText('Desktop notifications'), 'you', notifyRow, notifyNote),
-      setting(uiText('Team notifications (Slack / Discord)'), 'office', h('div.webhook', {}, hookInput, hookSave), hookActions, hookStatus),
+      setting(uiText('Team notifications (Slack / Discord)'), 'office', h('div.webhook', {}, hookInput), hookActions, hookStatus),
     ],
     building: [
       ...(sky ? [sky.section] : []),
@@ -432,6 +527,7 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
   }
   const show = (id: SettingsPane) => {
     lastPane = id;
+    apply.element.hidden = ['atrium-logo', 'connections', 'management'].includes(id);
     if (id === 'atrium-logo') receptionSign.load();
     el.classList.toggle('settings-wide', id === 'connections' || id === 'management');
     for (const [t, tab] of tabs) {
@@ -455,13 +551,17 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
   });
 
   const close = h('button.btn.close', { 'aria-label': uiText('Close') }, '✕');
-  const el = h('div.modal.settings', { role: 'dialog', 'aria-label': uiText('Settings') }, h('header', {}, h('h2', {}, uiText('⚙️ Settings')), close), h('div.settings-body', {}, nav, ...bodies.values()));
+  apply.add({ dirty: () => language.value !== getLanguage(), apply: () => chooseLanguage(language.value) });
+  const content = h('div.settings-body', {}, nav, ...bodies.values());
+  const el = h('div.modal.settings', { role: 'dialog', 'aria-label': uiText('Settings') }, h('header', {}, h('h2', {}, uiText('⚙️ Settings')), close), content, apply.element);
   const offNotify = store.on('notify', paintHook);
-  const offLeave = store.on('leaveOnMerge', paintLeave);
+  const offLeave = store.on('leaveOnMerge', () => { paintLeave(); apply.sync(); });
   const offLimit = [store.on('machine', paintLimit), store.on('me', paintLimit)];
   const offDir = [store.on('projectsDir', paintDir), store.on('me', paintDir)];
   const offPrompts = [store.on('prompts', paintAgent), store.on('prompts', paintPrompts), store.on('me', paintAgent), store.on('me', paintPrompts)];
+  const canDismiss = () => (management?.canDismiss() ?? true) && apply.canDismiss();
   const modal = openModal(el, {
+    canDismiss,
     doing: uiText('⚙️ in settings'),
     onClose: () => {
       connections?.dispose(); management?.dispose();
@@ -475,9 +575,8 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
     },
   });
   show(first ?? lastPane);
-  close.addEventListener('click', () => modal.close());
+  close.addEventListener('click', () => { if (canDismiss()) modal.close(); });
   character.addEventListener('click', () => {
-    modal.close();
     onCharacter();
   });
 }

@@ -81,7 +81,7 @@ export function agentAppearancePicker(initial?: AgentAppearance) {
 export function editAgentAppearance(initial: AgentAppearance | undefined, onApply: (appearance?: AgentAppearance) => void) {
   const picker = agentAppearancePicker(initial);
   const cancel = h('button.btn', { type: 'button' }, t('Cancel'));
-  const apply = h('button.btn.primary', { type: 'button' }, t('Save'));
+  const apply = h('button.btn.primary', { type: 'button' }, t('Apply'));
   const title = t('Agent appearance');
   const dialog = h('div.modal', { role: 'dialog', 'aria-label': title },
     h('header', {}, h('h2', {}, title)), h('div.body', {}, picker.element), h('footer', {}, cancel, apply));

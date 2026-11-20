@@ -36,7 +36,7 @@ export function connectionsPanel(): { element: HTMLElement; dispose(): void } {
     const url = h('input', { value: old?.url ?? '', type: 'url', placeholder: 'https://forgejo.example.org' }) as HTMLInputElement;
     provider.addEventListener('change', () => { if (!old) url.value = provider.value === 'github' ? 'https://github.com' : ''; });
     const form = h('div.connection-card', {}, h('h4', {}, old ? t('Edit server') : t('Add server')), field(t('Name'), name), field(t('Service'), provider), field(t('Server address'), url),
-      button(t('Save server'), () => run(async () => { const saved = await request('server', { id: old?.id, name: name.value, provider: provider.value, url: url.value }); selectedServer = saved.id; await reload(); })));
+      button(t('Apply'), () => run(async () => { const saved = await request('server', { id: old?.id, name: name.value, provider: provider.value, url: url.value }); selectedServer = saved.id; await reload(); })));
     body.append(form);
   }
   function servers() {
@@ -54,7 +54,7 @@ export function connectionsPanel(): { element: HTMLElement; dispose(): void } {
     const username = h('input', { value: old?.username ?? '', placeholder: t('Username, optional until verification'), autocomplete: 'off' }) as HTMLInputElement;
     const token = h('input', { type: 'password', autocomplete: 'new-password', placeholder: old ? t('Leave empty to keep the saved token') : t('Personal access token'), maxlength: 4096 }) as HTMLInputElement;
     const card = h('div.connection-card', {}, h('h4', {}, old ? t('Edit account') : t('Add account')), field(t('Server'), server), field(t('Account name'), name), field(t('Username'), username), field(t('Token'), token),
-      button(t('Save account'), () => run(async () => { const saved = await request('account', { id: old?.id, serverId: server.value, name: name.value, username: username.value, token: token.value || undefined }); token.value = ''; selectedAccount = saved.id; selectedServer = server.value; await reload(); })),
+      button(t('Apply'), () => run(async () => { const saved = await request('account', { id: old?.id, serverId: server.value, name: name.value, username: username.value, token: token.value || undefined }); token.value = ''; selectedAccount = saved.id; selectedServer = server.value; await reload(); })),
       h('p.setting-note', {}, t('Credentials are saved on the server in a separate persistent file for each account. Saved tokens are never displayed.')));
     const web = button(t('Sign in with GitHub'), () => run(async () => {
       const result = await request('login', { serverId: server.value, name: name.value || t('GitHub account') }); login = result.flow;

@@ -79,7 +79,7 @@ export function setDoing(modal: Modal, doing: string | undefined) {
  * is what teammates see under your name tag while it's open, like "reading PR #12", and `reading`
  * puts an open book in your character's hands. `onClose` hears whether it was the Esc key.
  */
-export function openModal(content: HTMLElement, opts: { escCloses?: boolean; onClose?: (byEsc: boolean) => void; backdropCloses?: boolean; closeButton?: boolean; doing?: string; reading?: boolean } = {}): Modal {
+export function openModal(content: HTMLElement, opts: { canDismiss?: () => boolean; escCloses?: boolean; onClose?: (byEsc: boolean) => void; backdropCloses?: boolean; closeButton?: boolean; doing?: string; reading?: boolean } = {}): Modal {
   const backdrop = h('div.backdrop', {}, content);
   const root = document.getElementById('modal-root')!;
   root.append(backdrop);
@@ -91,6 +91,7 @@ export function openModal(content: HTMLElement, opts: { escCloses?: boolean; onC
       // Stop it here so the Esc that closes a terminal isn't also typed into it.
       e.preventDefault();
       e.stopPropagation();
+      if (opts.canDismiss && !opts.canDismiss()) return;
       byEsc = true;
       modal.close();
     }
@@ -112,9 +113,9 @@ export function openModal(content: HTMLElement, opts: { escCloses?: boolean; onC
     },
   };
   backdrop.addEventListener('mousedown', (e) => {
-    if (e.target === backdrop && opts.backdropCloses !== false) modal.close();
+    if (e.target === backdrop && opts.backdropCloses !== false && (opts.canDismiss?.() ?? true)) modal.close();
   });
-  if (opts.closeButton ?? opts.escCloses !== false) addCloseButton(content, () => modal.close());
+  if (opts.closeButton ?? opts.escCloses !== false) addCloseButton(content, () => { if (opts.canDismiss?.() ?? true) modal.close(); });
   window.addEventListener('keydown', onKey, true);
   stack.push(modal);
   listeners.forEach((fn) => fn(true));

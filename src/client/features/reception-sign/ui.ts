@@ -23,7 +23,7 @@ export function receptionSignPanel() {
     const text=h('textarea',{rows:4,maxlength:SIGN_TEXT_MAX,'aria-label':t('Reception text'),placeholder:t('Company name or message')}) as HTMLTextAreaElement;text.value=initial.text;
     const file=h('input',{type:'file',accept:'image/png,image/jpeg,image/webp','aria-label':t('Company logo')}) as HTMLInputElement;
     const modes=h('div.seg',{'role':'radiogroup','aria-label':t('Reception sign mode')});
-    const status=h('p.setting-note',{'role':'status'}),save=h('button.btn.primary',{type:'button'},t('Save'));
+    const status=h('p.setting-note',{'role':'status'}),save=h('button.btn.primary',{type:'button'},t('Apply'));
     const remove=h('button.btn',{type:'button'},t('Remove logo'));
     const textSection=h('div',{},h('label',{},t('Reception text')),text,h('p.setting-note',{},t('Centered horizontally and vertically. Use Enter for a new line; the text fits the panel automatically.')));
     const logoSection=h('div',{},file,remove,h('p.setting-note',{},t('PNG, JPEG or WebP, up to 2 MB and 4096 × 4096 pixels. The logo keeps its proportions.')));

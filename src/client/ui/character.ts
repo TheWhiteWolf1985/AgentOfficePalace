@@ -280,7 +280,7 @@ export async function openCharacter(first: boolean, onSave: (p: Profile) => void
 
   const surprise = h('button.btn', { type: 'button', title: uiText('Random look') }, uiText('🎲 Surprise me'));
   surprise.addEventListener('click', () => change(randomLook(), AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)]));
-  const save = h('button.btn.primary', { type: 'submit' }, first ? uiText('Enter the office 🚪') : uiText('Save'));
+  const save = h('button.btn.primary', { type: 'submit' }, first ? uiText('Enter the office 🚪') : uiText('Apply'));
   const close = h('button.btn.close', { type: 'button', 'aria-label': uiText('Close'), title: first ? uiText('Skip: go in with this look (Esc)') : uiText('Close (Esc)') }, '✕');
 
   const form = h(
@@ -319,6 +319,7 @@ export async function openCharacter(first: boolean, onSave: (p: Profile) => void
     saveProfile(store.profile);
     modal.close();
     onSave(store.profile);
+    if (!first) toast(uiText('Settings applied'));
   };
   const modal = openModal(form, {
     // A stray click shouldn't skip the first one; ✕ and Esc still do.
