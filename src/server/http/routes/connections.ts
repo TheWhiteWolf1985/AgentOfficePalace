@@ -3,6 +3,7 @@ import path from 'node:path';
 import { mkdtemp, mkdir, rmdir } from 'node:fs/promises';
 import { TLSSocket } from 'node:tls';
 import { deviceState, dockerRoot, loginContainer, serialWorker } from '../../workers/docker.js';
+import { codexAccounts } from '../../workers/docker-accounts.js';
 import { DESKS } from '../../../shared/layout.js';
 import { connections, repositoryName, checkedId } from '../../connections/store.js';
 import { RemoteApi } from '../../connections/api.js';
@@ -30,7 +31,11 @@ export const connectionsRoute: Route = {
     try {
       if (req.method === 'GET') {
         if (url.searchParams.has('login')) return send(res, 200, await githubLoginState(checkedId(url.searchParams.get('login'))));
-        return send(res, 200, { ...store.snapshot(), admin: true, codexDocker: !!dockerRoot(), floors: [...ctx.floors.values()].map((f) => ({ id: f.id, name: f.def.name, dir: f.def.dir, project: { ...f.project, agentProviders: managedProviders(f.project.agentProviders) }, workers: f.workers.list() })) });
+        const floors = [...ctx.floors.values()].map(f => ({ id: f.id, name: f.def.name, dir: f.def.dir,
+          project: { ...f.project, agentProviders: managedProviders(f.project.agentProviders) }, workers: f.workers.list() }));
+        const accounts = url.searchParams.has('agents') && dockerRoot()
+          ? await codexAccounts(floors.flatMap(f => f.workers.filter(w => w.runtime === 'docker').map(w => w.id))) : undefined;
+        return send(res, 200, { ...store.snapshot(), admin: true, codexDocker: !!dockerRoot(), floors, codexAccounts: accounts });
       }
       const body = JSON.parse(await readBody(req, 65536));
       switch (body.action) {
@@ -65,7 +70,8 @@ export const connectionsRoute: Route = {
           if (!floor) throw Error('Ufficio non trovato');
           const desk = DESKS.find(d => !d.station && !d.room && !floor.workers.deskOccupied(d.id));
           if (!desk) throw Error('Nessuna scrivania libera');
-          const r = floor.workers.spawn(desk.id, session.account?.name ?? 'admin', undefined, false, 'agent', 'codex', undefined, undefined, undefined, session.account?.id, [], body.appearance);
+          if (body.prompt !== undefined && (typeof body.prompt !== 'string' || body.prompt.length > 20000)) throw Error('Istruzioni non valide');
+          const r = floor.workers.spawn(desk.id, session.account?.name ?? 'admin', body.prompt, false, 'agent', 'codex', body.model, body.effort, undefined, session.account?.id, [], body.appearance);
           if (typeof r === 'string') throw Error(r);
           return send(res, 201, { workerId: r.id });
         }
@@ -102,7 +108,7 @@ export const connectionsRoute: Route = {
           if (!desk || !deskBuilt(desk, floor.workers.wing())) throw Error('La scrivania non e disponibile su questo piano');
           if (body.configuration?.provider && !managedProviders(floor.project.agentProviders).includes(body.configuration.provider)) throw Error('Provider non disponibile su questo server');
           await floor.workers.configure(body.workerId, body.configuration);
-          return send(res, 200, { ok: true });
+          return send(res, 200, { ok: true, worker: floor.workers.get(body.workerId) });
         }
         case 'bind': {
           const floor = ctx.floors.get(checkedId(body.floorId));

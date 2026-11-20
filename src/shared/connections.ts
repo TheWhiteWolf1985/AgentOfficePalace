@@ -11,5 +11,8 @@ export interface GitBinding {
 }
 export interface GitConnectionsState { servers: GitServer[]; accounts: GitAccount[]; bindings: GitBinding[] }
 export interface ConnectionFloor { id: string; name: string; dir: string; workers: WorkerInfo[]; project: ProjectInfo }
-export interface ConnectionsView extends GitConnectionsState { floors: ConnectionFloor[]; admin: boolean; codexDocker?: boolean }
+export type CodexIdentity = { method: 'chatgpt'; email?: string } | { method: 'api-key' };
+export type CodexAccount = CodexIdentity | 'signed-out' | 'unknown';
+export interface CodexAccounts { configured: CodexAccount; active: CodexAccount | 'stopped' }
+export interface ConnectionsView extends GitConnectionsState { floors: ConnectionFloor[]; admin: boolean; codexDocker?: boolean; codexAccounts?: Record<string, CodexAccounts> }
 export interface WorkerConfiguration { appearance?: AgentAppearance | 'random'; name: string; color: string; deskId: string; provider?: AgentProvider; model?: string; effort?: AgentEffort; prompt?: string; restart?: boolean }

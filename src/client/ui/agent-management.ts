@@ -2,15 +2,22 @@ import './connections.css';
 import { confirmDialog } from './prompt';
 import { agentAppearancePicker } from './agent-appearance';
 import { t, remoteText } from '../../shared/i18n';
-import type { ConnectionsView, ConnectionFloor } from '../../shared/connections';
+import type { ConnectionsView, ConnectionFloor, CodexAccounts } from '../../shared/connections';
 import type { WorkerInfo } from '../../shared/protocol';
 import { DESKS, WING_DESKS } from '../../shared/layout';
 import { settingsApply } from './settings-apply';
 import { h, STATUS_LABEL } from './dom';
-import { agentFields } from './provider';
+import { agentFields, modelBadge } from './provider';
 import { connectionRequest as request, loadConnections, connectionField as field, connectionSelect as select, connectionButton as button } from './connections-client';
 
-export function agentManagementPanel() {
+function accountLabel(account?: CodexAccounts['active']): string {
+  if (!account || account === 'unknown') return t('Could not verify');
+  if (account === 'stopped') return t('Container stopped');
+  if (account === 'signed-out') return t('Not signed in');
+  return account.method === 'api-key' ? t('OpenAI API key') : account.email ? 'ChatGPT · ' + account.email : 'ChatGPT';
+}
+
+export function agentManagementPanel(lazy = false) {
   let canLeave = () => true;
   let data: ConnectionsView, disposed = false, busy = false;
   let releaseForm: (() => void) | undefined;
@@ -28,7 +35,7 @@ export function agentManagementPanel() {
   };
   const accountName = (id?: string) => data.accounts.find((a) => a.id === id)?.name ?? t('Not assigned');
   const bindingFor = (floor: ConnectionFloor) => data.bindings.find((b) => b.floorId === floor.id);
-  async function reload() { data = await loadConnections(); if (!disposed) list(); }
+  async function reload() { data = await loadConnections(true); if (!disposed) list(); }
   function list() {
     resetForm();
     if (!data) return;
@@ -37,8 +44,10 @@ export function agentManagementPanel() {
     const table = h('table', {}, h('thead', {}, h('tr', {}, ...['Office', 'Agent', 'Model', 'Status', 'Configured account', 'Active account', 'Properties'].map((label) => h('th', {}, t(label))))),
       h('tbody', {}, ...rows.map(({ floor, worker }) => {
         const binding = bindingFor(floor), assigned = binding?.agents[worker.id];
-        return h('tr', {}, h('td', {}, floor.name), h('td', {}, worker.name), h('td', {}, `${worker.provider ?? worker.kind} · ${worker.model ?? t('Default')}`),
-          h('td', {}, STATUS_LABEL[worker.status]), h('td', {}, accountName(assigned?.accountId ?? binding?.accountId)), h('td', {}, accountName(worker.connectionAccountId)), h('td', {}, button(t('Edit properties'), () => edit(floor, worker))));
+        const accounts = data.codexAccounts?.[worker.id];
+        return h('tr', {}, h('td', {}, floor.name), h('td', {}, worker.name), h('td', {}, `${worker.provider ?? worker.kind} · ${modelBadge(worker.provider, worker.model, worker.effort) ?? t('Default')}`),
+          h('td', {}, STATUS_LABEL[worker.status]), h('td', {}, worker.runtime ? accountLabel(accounts?.configured) : accountName(assigned?.accountId ?? binding?.accountId)),
+          h('td', {}, worker.runtime ? accountLabel(accounts?.active) : accountName(worker.connectionAccountId)), h('td', {}, button(t('Edit properties'), () => edit(floor, worker))));
       })));
     body.replaceChildren(h('p', {}, t`Agents: ${rows.length}`), h('div.agent-table-wrap', {}, table));
     if (data.codexDocker) body.prepend(button(t('Create Codex agent'), create));
@@ -57,10 +66,14 @@ export function agentManagementPanel() {
       })));
       return;
     }
-    body.append(field(t('Office'), floor), appearance.element,
+    const engine = agentFields({ ...data.floors[0].project, agentProviders: ['codex'] }, 'create-codex', { provider: 'codex' });
+    const prompt = h('textarea', { maxlength: 20000, rows: 3 }) as HTMLTextAreaElement;
+    body.append(field(t('Office'), floor), engine.element, field(t('Initial instructions'), prompt), appearance.element,
       h('p.setting-note', {}, t('The agent starts at a free desk with a private copy of the committed project.')),
       button(t('Create Codex agent'), () => run(async () => {
-        const result = await request('container-create', { floorId: floor.value, appearance: appearance.value() });
+        if (!engine.valid()) throw Error(t('Check the engine fields'));
+        const { model, effort } = engine.choice();
+        const result = await request('container-create', { floorId: floor.value, model, effort, prompt: prompt.value.trim() || undefined, appearance: appearance.value() });
         const id = floor.value;
         await reload();
         const f = data.floors.find(f => f.id === id);
@@ -80,10 +93,19 @@ export function agentManagementPanel() {
     const engine = agentFields(worker.runtime === 'docker' ? { ...floor.project, agentProviders: ['codex'] } : floor.project, 'manage-' + worker.id, { provider: worker.provider ?? 'custom', model: worker.model, effort: worker.effort });
     const prompt = h('textarea', { maxlength: 20000, rows: 8 }, worker.prompt ?? '') as HTMLTextAreaElement;
     const restart = h('input', { type: 'checkbox' }) as HTMLInputElement;
+    const dockerNote = h('p.setting-note', { role: 'status' });
+    const paintDockerNote = (current: WorkerInfo) => {
+      const active = current.containerEngine;
+      const pending = active && (active.model !== current.model || active.effort !== current.effort);
+      dockerNote.textContent = pending && !current.paused
+        ? t('Model and effort saved. They take effect when this agent can safely resume its chat.')
+        : t('Model and effort are saved immediately. Initial instructions are used when a new chat starts.');
+    };
+    paintDockerNote(worker);
     const props = h('div.connection-card', {}, h('h4', {}, t('Editable properties')), field(t('Name'), name), field(t('Color'), color), field(t('Desk'), desk),
       look?.element ?? null, worker.kind === 'agent' ? engine.element : h('p', {}, t('Shared shell')), field(t('Initial instructions'), prompt),
-      worker.runtime === 'docker' ? h('p.setting-note', {}, t('Stop the container before changing the model or instructions.')) : h('label', {}, restart, ' ', t('Start a new session to apply engine or instruction changes. Previous terminal history is retained.')),
-      h('p.setting-note', {}, t('A working agent or one waiting for an answer cannot be restarted here.')));
+      worker.runtime === 'docker' ? dockerNote : h('label', {}, restart, ' ', t('Start a new session to apply engine or instruction changes. Previous terminal history is retained.')),
+      worker.runtime === 'docker' ? null : h('p.setting-note', {}, t('A working agent or one waiting for an answer cannot be restarted here.')));
     const apply = settingsApply(lock => { element.inert = lock; });
     canLeave = apply.canDismiss;
     const configuration = () => ({
@@ -96,7 +118,8 @@ export function agentManagementPanel() {
       dirty: () => JSON.stringify(configuration()) !== saved,
       validate: () => { if (worker.kind === 'agent' && !engine.valid()) throw Error(t('Check the engine fields')); },
       apply: async () => {
-        await request('worker', { floorId: floor.id, workerId: worker.id, configuration: configuration() });
+        const result = await request('worker', { floorId: floor.id, workerId: worker.id, configuration: configuration() });
+        if (worker.runtime && result.worker) paintDockerNote(result.worker);
         restart.checked = false;
         saved = JSON.stringify(configuration());
       },
@@ -133,7 +156,7 @@ export function agentManagementPanel() {
     if (worker.runtime === 'docker') {
       const action = (operation: string, extra = {}) => request('container', { floorId: floor.id, workerId: worker.id, operation, ...extra });
       const key = h('input', { type: 'password', autocomplete: 'off', spellcheck: false }) as HTMLInputElement;
-      const feedback = h('p', { role: 'status' });
+      const feedback = h('p', { role: 'status' }, accountLabel(data.codexAccounts?.[worker.id]?.active));
       const auth = h('div.connection-card', {}, h('h4', {}, t('Codex sign-in')), feedback);
       let timer: ReturnType<typeof setTimeout> | undefined;
       let closed = false;
@@ -141,8 +164,8 @@ export function agentManagementPanel() {
       const poll = async () => {
         const s = await action('login-state');
         if (closed) return;
-        feedback.replaceChildren();
         if (s.state === 'waiting') {
+          feedback.replaceChildren();
           if (s.url && s.code) feedback.append(h('a', { href: s.url, target: '_blank', rel: 'noopener noreferrer' }, t('Open ChatGPT')), ' · ', s.code);
           else feedback.textContent = t('Waiting for the device code…');
           timer = setTimeout(() => void poll().catch(() => { feedback.textContent = t('Connection failed'); }), 1500);
@@ -167,6 +190,7 @@ export function agentManagementPanel() {
     if (body.querySelector('.settings-apply')) void run(reload);
     else list();
   });
-  void run(reload);
-  return { element, canDismiss: () => canLeave(), dispose() { disposed = true; resetForm(); } };
+  const load = () => { if (!data && !busy) void run(reload); };
+  if (!lazy) load();
+  return { element, load, canDismiss: () => canLeave(), dispose() { disposed = true; resetForm(); } };
 }

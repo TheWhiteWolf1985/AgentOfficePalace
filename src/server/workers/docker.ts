@@ -50,6 +50,18 @@ async function docker(args: string[]) {
     throw Error(diagnostic?.replace(/[a-f0-9]{32,}/gi, '…').slice(0, 300) || 'Docker non disponibile');
   }
 }
+/** Resolve only running containers belonging to this installation. */
+export async function runningCodexContainers(): Promise<Map<string, string>> {
+  const rows = await docker(['ps', '--no-trunc', '--filter', 'label=' + instanceLabel + '=' + instance(),
+    '--format', '{{.Label "' + label + '"}} {{.ID}}']);
+  const running = new Map<string, string>();
+  for (const row of rows.split('\n')) {
+    const [worker, cid] = row.split(' ');
+    if (/^[0-9a-f]{12}$/.test(worker) && /^[0-9a-f]{64}$/.test(cid)) running.set(worker, cid);
+  }
+  return running;
+}
+
 async function owned(id: string) {
   const name = paths(id).name;
   const ids = await docker(['ps', '-a', '--no-trunc', '--filter', 'name=^/' + name + '$', '--format', '{{.ID}}']);
@@ -113,7 +125,7 @@ export async function prepareContainer(info: WorkerInfo, project: string, token:
   }
   if (!/^[a-f0-9]{64}$/.test(cid)) throw Error('Creazione del container non confermata');
   const attach = existing?.status === 'running' ? ['attach', '--sig-proxy=false'] : ['start', '-ai'];
-  return { file: 'docker', args: [...dockerPrefix(), ...attach, cid], env: cliEnv(), cwd: p.dir };
+  return { file: 'docker', args: [...dockerPrefix(), ...attach, cid], env: cliEnv(), cwd: p.dir, created: !existing || !['running', 'created'].includes(existing.status) };
 }
 
 /** Recover compute left between a floor removal and process shutdown. Only our labelled containers qualify. */

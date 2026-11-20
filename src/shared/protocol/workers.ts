@@ -34,6 +34,8 @@ export interface WorkerInfo {
   provider?: AgentProvider;
   runtime?: 'docker';
   paused?: boolean;
+  /** Launch settings of the current Docker container, independent of edits saved during a turn. */
+  containerEngine?: { model?: string; effort?: AgentEffort };
   /** Model requested for this worker, instead of the office's configured default: a Claude model alias, an OpenCode provider/model id, a Codex, Grok, Muse or Pi model id, or an opaque DeepSeek Harness catalog id. What its session says it runs on is `usage.model`. */
   model?: string;
   /** Reasoning effort requested for this worker, when one was chosen. */

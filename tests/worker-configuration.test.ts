@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { DockerWorkers } from '../src/server/workers/docker-lifecycle.js';
 import { configureWorker } from '../src/server/workers/configure.js';
 import type { Worker, WorkerContext } from '../src/server/workers/types.js';
 import type { WorkerConfiguration } from '../src/shared/connections.js';
@@ -23,6 +24,34 @@ test('engine changes cannot interrupt a working agent or a pending user question
     assert.equal(f.worker.info.model, f.input.model); assert.equal(f.saves(), 0);
   }
 });
+test('Docker Apply saves while either agent needs input and resumes only the edited chat when idle', async () => {
+  const f = fixture(), w = f.worker;
+  Object.assign(w.info, { runtime: 'docker', sessionId: 'original', status: 'needs_input' });
+  w.pty = {} as Worker['pty'];
+  const other = { info: { id: 'agent2', deskId: 'desk-2', status: 'needs_input' } } as Worker;
+  f.ctx.workers.set('agent2', other);
+  const stops: string[] = [], resumes: string[] = [];
+  const docker = new DockerWorkers(f.ctx);
+  f.ctx.applyContainerSettings = worker => docker.applyWhenIdle(worker);
+  docker.pause = async id => { stops.push(id); };
+  f.ctx.resume = id => { resumes.push(id); return undefined; };
+  await configureWorker(f.ctx, 'agent1', { ...f.input, model: 'gpt-6-astra', effort: 'medium' });
+  assert.equal(w.info.model, 'gpt-6-astra'); assert.equal(w.info.effort, 'medium');
+  assert.deepEqual(w.info.containerEngine, { model: f.input.model, effort: f.input.effort });
+  for (const status of ['needs_input', 'working', 'starting'] as const) {
+    w.info.status = status; docker.applyWhenIdle(w);
+  }
+  assert.deepEqual(stops, []);
+  let text = '› Unsent draft';
+  w.term = { buffer: { active: { baseY: 0, cursorY: 0, cursorX: 2,
+    getLine: () => ({ translateToString: () => text, getCell: () => ({ isDim: () => false }) }) } } } as unknown as Worker['term'];
+  w.info.status = 'done'; docker.applyWhenIdle(w); assert.deepEqual(stops, []);
+  text = '› Ask Codex to do anything'; docker.applyWhenIdle(w);
+  await Promise.resolve();
+  assert.deepEqual(stops, ['agent1']); assert.deepEqual(resumes, ['agent1']);
+  assert.equal(w.info.sessionId, 'original'); assert.equal(other.info.status, 'needs_input'); assert.equal(f.saves(), 1);
+});
+
 test('invalid names, models and occupied desks leave the agent unchanged', async () => {
   const f = fixture();
   await assert.rejects(configureWorker(f.ctx, 'agent1', { ...f.input, model: 'invalid model' }));

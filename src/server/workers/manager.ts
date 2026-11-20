@@ -119,6 +119,7 @@ export class WorkerManager {
       persist: () => this.persist(),
       setStatus: (w, status) => this.setStatus(w, status),
       resume: (id, prompt) => this.resume(id, prompt),
+      applyContainerSettings: w => this.containers.applyWhenIdle(w),
       cwd: (info) => this.cwd(info),
       command: (info) => this.command(info),
       notePrompt: (w, prompt) => this.tasks.notePrompt(w, prompt),
@@ -193,7 +194,7 @@ export class WorkerManager {
   get(id: string): WorkerInfo | undefined {
     return this.workers.get(id)?.info;
   }
-  configure(id: string, input: import('../../shared/connections.js').WorkerConfiguration): Promise<void> { return configureWorker(this.ctx, id, input); }
+  configure(id: string, input: import('../../shared/connections.js').WorkerConfiguration) { return configureWorker(this.ctx, id, input); }
 
   /** The account a worker runs as (see RunAs), if not the office. */
   ownerOf(id: string): string | undefined {
@@ -1010,6 +1011,7 @@ export class WorkerManager {
    */
   private checkBlocked(w: Worker) {
     checkBlocked(w, (status) => this.setStatus(w, status));
+    if (w.info.runtime === 'docker') this.containers.applyWhenIdle(w);
   }
 
   private saveScrollback(w: Worker) {

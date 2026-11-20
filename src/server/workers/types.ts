@@ -175,6 +175,7 @@ export interface WorkerContext {
   setStatus(w: Worker, status: WorkerStatus): void;
   /** Starts a worker that isn't running again (see WorkerManager.resume). */
   resume(id: string, prompt?: string): string | undefined;
+  applyContainerSettings(w: Worker): void;
   /** Where a worker works: its worktree, its workspace across repositories, or the project itself. */
   cwd(info: WorkerInfo): string;
   /** What a worker's terminal runs. */

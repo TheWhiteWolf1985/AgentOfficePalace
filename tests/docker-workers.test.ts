@@ -1,3 +1,4 @@
+import { displayAccount } from '../src/server/workers/docker-accounts.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
@@ -44,6 +45,14 @@ test('a stopped Docker worker restores its identity, sign-in boundary and chosen
   assert.equal(restored.info.runtime, 'docker'); assert.equal(restored.info.paused, true);
   assert.equal(restored.info.sessionId, 'existing-session'); assert.equal(restored.owner, 'owner');
   assert.equal(restored.hookToken, w.hookToken);
+});
+
+test('Codex account labels expose only the sign-in method and optional display email', () => {
+  const encoded = Buffer.from(JSON.stringify({ email: 'qa@example.invalid', privateClaim: 'private' })).toString('base64url');
+  assert.deepEqual(displayAccount({ auth_mode: 'chatgpt', tokens: { id_token: 'head.' + encoded + '.sig', refresh_token: 'secret' } }),
+    { method: 'chatgpt', email: 'qa@example.invalid' });
+  assert.deepEqual(displayAccount({ auth_mode: 'apikey', OPENAI_API_KEY: 'secret' }), { method: 'api-key' });
+  assert.equal(displayAccount({}), 'unknown');
 });
 
 test('container drops resolve inside the worker-only read-only mount', t => {

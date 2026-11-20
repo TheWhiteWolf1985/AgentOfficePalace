@@ -475,7 +475,7 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
   signOut.addEventListener('click', () => { if (canDismiss()) onSignOut(); });
   const character = h('button.btn', { type: 'button' }, uiText('🧍 Your character'));
   const connections = store.me.admin ? connectionsPanel() : undefined;
-  const management = store.me.admin ? agentManagementPanel() : undefined;
+  const management = store.me.admin ? agentManagementPanel(true) : undefined;
   const receptionSign = receptionSignPanel();
   const panes: Record<SettingsPane, Node[]> = {
     graphics: [
@@ -528,6 +528,7 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
   const show = (id: SettingsPane) => {
     lastPane = id;
     apply.element.hidden = ['atrium-logo', 'connections', 'management'].includes(id);
+    if (id === 'management') management?.load();
     if (id === 'atrium-logo') receptionSign.load();
     el.classList.toggle('settings-wide', id === 'connections' || id === 'management');
     for (const [t, tab] of tabs) {
