@@ -33,6 +33,7 @@ TIMER = APP + '-update.timer'
 SERVICE = APP + '.service'
 TAG = re.compile(r'v[0-9]+\.[0-9]+\.[0-9]+')
 SHA = re.compile(r'[a-f0-9]{64}')
+SLOT = re.compile(TAG.pattern + r'(?:-[a-f0-9]{64})?')
 
 
 def run(*args, **kwargs):
@@ -104,6 +105,14 @@ class Release:
                 or any(not SHA.fullmatch(m['sha256'][name]) for name in [ARCHIVE, IMAGE, MANAGER])):
             raise ValueError('Manifest della release non valido')
         self.target = ROOT / 'releases' / ('v' + m['version'])
+        if self.target.is_dir():
+            installed = json.loads((self.target / 'release.json').read_text())
+            if installed['commit'] != m['commit']:
+                raise ValueError('Lo stesso tag identifica due commit diversi')
+            if installed != m:
+                # A locally qualified kit and GitHub's build can share a commit but differ in bytes.
+                fingerprint = hashlib.sha256(json.dumps(m, sort_keys=True).encode()).hexdigest()
+                self.target = self.target.with_name(self.target.name + '-' + fingerprint)
 
     def get(self, url, binary=False):
         headers = dict(self.headers)
@@ -128,7 +137,7 @@ def current(slot='current'):
     if not path.is_symlink():
         return None
     target = path.resolve(strict=True)
-    if target.parent != ROOT / 'releases' or not TAG.fullmatch(target.name):
+    if target.parent != ROOT / 'releases' or not SLOT.fullmatch(target.name):
         raise ValueError('Destinazione di installazione non valida')
     return target
 
@@ -331,7 +340,7 @@ def recover():
         run('systemctl', 'stop', SERVICE)
         (ROOT / 'current').unlink(missing_ok=True)
     else:
-        if not TAG.fullmatch(name):
+        if not SLOT.fullmatch(name):
             raise ValueError('Journal di aggiornamento non valido')
         start(ROOT / 'releases' / name)
         print('Ripristinata ' + name)
@@ -381,7 +390,7 @@ def main():
                 print('Questa versione è già stata ripristinata. Per riprovarla usare agent-office-release update.')
                 return
             active = current() if (ROOT / '.managed').is_file() else None
-            if active and tuple(map(int, active.name[1:].split('.'))) > tuple(map(int, release.manifest['version'].split('.'))):
+            if active and tuple(map(int, active.name.split('-')[0][1:].split('.'))) > tuple(map(int, release.manifest['version'].split('.'))):
                 raise ValueError('Versione precedente a quella attiva. Usare rollback per tornare indietro.')
             if a.action == 'install':
                 prepare_host()
@@ -397,7 +406,7 @@ def main():
                 link(TOOL, ROOT / 'current/distribution' / MANAGER)
                 run('systemctl', 'enable', SERVICE)
                 run('systemctl', 'enable', '--now', TIMER)
-            print('Versione attiva:', release.target.name, release.manifest['commit'])
+            print('Versione attiva:', 'v' + release.manifest['version'], release.manifest['commit'])
             if a.action == 'install':
                 print('Apri https://<IP-della-VM>:4643. La password è in /etc/agent-office-palace.env (solo root).')
 

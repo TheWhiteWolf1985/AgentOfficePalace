@@ -56,10 +56,26 @@ class ReleaseTest(unittest.TestCase):
         self.assertEqual(manager.current(), self.new)
         self.assertEqual(manager.current('previous'), self.old)
 
+    def test_stable_build_replaces_local_build_of_the_same_commit(self):
+        m = dict(schema=1, platform='debian13-amd64', version='1.0.2', commit='a' * 40, image='sha256:' + 'b' * 64,
+                 sha256={n: 'a' * 64 for n in (manager.ARCHIVE, manager.IMAGE, manager.MANAGER)})
+        (self.new / 'release.json').write_text(json.dumps(m))
+        m['sha256'][manager.ARCHIVE] = 'b' * 64
+        (self.root / 'release.json').write_text(json.dumps(m))
+        stable = manager.Release(self.root)
+        self.assertNotEqual(stable.target, self.new)
+        self.assertRegex(stable.target.name, manager.SLOT)
+        self.assertEqual(manager.Release(self.root).target, stable.target)
+        m['commit'] = 'c' * 40
+        (self.root / 'release.json').write_text(json.dumps(m))
+        with self.assertRaises(ValueError):
+            manager.Release(self.root)
+
     def test_corrupt_archive_and_unsafe_versions_are_rejected(self):
         manifest = dict(schema=1, platform='debian13-amd64', version='1.0.2', commit='a' * 40, image='sha256:' + 'b' * 64,
                         sha256={n: hashlib.sha256(b'expected').hexdigest() for n in (manager.ARCHIVE, manager.IMAGE, manager.MANAGER)})
         path = self.root / 'release.json'
+        (self.new / 'release.json').write_text(json.dumps(manifest))
         path.write_text(json.dumps(manifest))
         (self.root / manager.ARCHIVE).write_bytes(b'incorrect')
         with self.assertRaises(ValueError):
