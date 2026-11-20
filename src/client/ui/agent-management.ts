@@ -17,11 +17,11 @@ function accountLabel(account?: CodexAccounts['active']): string {
   return account.method === 'api-key' ? t('OpenAI API key') : account.email ? 'ChatGPT · ' + account.email : 'ChatGPT';
 }
 
-export function agentManagementPanel(lazy = false) {
+export function agentManagementPanel(actions: HTMLElement, lazy = false) {
   let canLeave = () => true;
   let data: ConnectionsView, disposed = false, busy = false;
   let releaseForm: (() => void) | undefined;
-  const resetForm = () => { releaseForm?.(); releaseForm = undefined; canLeave = () => true; };
+  const resetForm = () => { releaseForm?.(); releaseForm = undefined; actions.replaceChildren(); canLeave = () => true; };
   const status = h('p.connection-status', { role: 'status' });
   const body = h('div.connection-content');
   const filter = h('input', { type: 'search', placeholder: t('Search agents in all offices'), 'aria-label': t('Search agents') }) as HTMLInputElement;
@@ -183,11 +183,11 @@ export function agentManagementPanel(lazy = false) {
       body.append(control);
       if (!stopped) { body.append(auth); void poll().catch(() => {}); }
     }
-    body.append(apply.element);
+    actions.replaceChildren(apply.element);
   }
   filter.addEventListener('input', () => {
     if (!canLeave()) return;
-    if (body.querySelector('.settings-apply')) void run(reload);
+    if (actions.childElementCount) void run(reload);
     else list();
   });
   const load = () => { if (!data && !busy) void run(reload); };

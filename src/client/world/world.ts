@@ -61,7 +61,7 @@ export function officeWorld(office: Office, upstairs: () => boolean, wing: () =>
       return officeNav(wing());
     },
     ways: {
-      home: (seat) => (upstairs() ? { way: wayToBalcony(seat, wing()), chute: true } : { way: wayHome(seat, wing()), chute: false }),
+      home: (seat, from) => (upstairs() ? { way: wayToBalcony(seat, wing(), from), chute: true } : { way: wayHome(seat, wing(), from), chute: false }),
       in: (seat) => wayIn(seat, wing()),
     },
     rain: [

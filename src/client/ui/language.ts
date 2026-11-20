@@ -14,6 +14,7 @@ export function languageSelect(onChange: (language: string) => void): HTMLSelect
 /** The lite view has no 3D settings panel, but shares the same language choice. */
 export function openLanguageSettings(): void {
   const body = h('div.body');
+  const managementActions = h('div.agent-management-actions');
   const apply = settingsApply();
   const language = languageSelect(apply.refresh);
   apply.add({ dirty: () => language.value !== getLanguage(), apply: () => chooseLanguage(language.value) });
@@ -23,12 +24,12 @@ export function openLanguageSettings(): void {
     apply.element.hidden = kind !== 'language';
     panel?.dispose(); panel = undefined;
     if (kind === 'language') body.replaceChildren(h('label', {}, t('Language'), language), h('p.setting-note', {}, t('Changing language reloads this page. Your agents keep working.')));
-    else { panel = kind === 'connections' ? connectionsPanel() : agentManagementPanel(); body.replaceChildren(panel.element); }
+    else { panel = kind === 'connections' ? connectionsPanel() : agentManagementPanel(managementActions); body.replaceChildren(panel.element); }
   };
   const nav = h('nav.connection-tabs', {}, ...([['language', 'Language'], ['management', 'Agent management'], ['connections', 'GitHub and Forgejo']] as const).map(([key, label]) => {
     const button = h('button.btn', { type: 'button', onclick: () => show(key) }, t(label)); return button;
   }));
   show('language');
-  openModal(h('div.modal.language-settings', { role: 'dialog', 'aria-label': t('Settings'), style: 'width:min(1000px,calc(100vw - 32px))' }, h('header', {}, h('h2', {}, t('⚙️ Settings'))), nav, body, apply.element),
+  openModal(h('div.modal.language-settings', { role: 'dialog', 'aria-label': t('Settings'), style: 'width:min(1000px,calc(100vw - 32px))' }, h('header', {}, h('h2', {}, t('⚙️ Settings'))), nav, body, managementActions, apply.element),
     { canDismiss: () => (panel?.canDismiss?.() ?? true) && apply.canDismiss(), doing: t('⚙️ in settings'), onClose: () => panel?.dispose() });
 }

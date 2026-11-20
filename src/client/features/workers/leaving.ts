@@ -1,7 +1,7 @@
 import { t as uiText } from '../../../shared/i18n';
 import * as THREE from 'three';
 import { BALCONY, PARACHUTE } from '../../../shared/layout';
-import { walkOff, type Pt } from '../../../shared/nav';
+import { walkOff, type NavGrid, type Pt } from '../../../shared/nav';
 import type { Worker } from '../../world/character';
 import type { Laptop } from './laptop';
 import type { DeskView } from '../../world/types';
@@ -478,6 +478,22 @@ export class Arrivals {
     this.walkers.push({ model, desk, way, next: 1, t: -delay, heading: 0, stepIn: 0, hop: 0 });
   }
 
+  /** Walk from the actual seat (or the current aisle position on a second reassignment). */
+  transfer(model: Worker, source: DeskView, desk: DeskView, nav: NavGrid) {
+    model.stopDancing();
+    this.forget(model);
+    const atSeat = model.root.parent === source.seatAnchor;
+    this.parent.attach(model.root);
+    const { x, z } = model.root.position;
+    // Leave the old chair via its side and back, then enter the new chair by reversing its exit route.
+    const exit = atSeat ? nav.wayFrom(source.def, [desk.def.x, desk.def.z]).slice(0, 2) : [];
+    const start: Pt = exit[1] ?? [x, z];
+    const way = [...exit, ...nav.wayFrom(desk.def, start).reverse()];
+    model.root.rotation.reorder('YXZ');
+    model.walking = true;
+    this.walkers.push({ model, desk, way, next: 0, t: 0, heading: model.root.rotation.y, stepIn: 0, hop: 0 });
+  }
+
   /** Stops walking `model` in: it was sent home before it sat down, or it's gone. */
   forget(model: Worker) {
     const w = this.walkers.find((x) => x.model === model);
@@ -489,7 +505,7 @@ export class Arrivals {
 
   /** Off to another floor: whoever is still on the way goes with the rest of that floor's workers. */
   clear() {
-    for (const w of this.walkers) w.model.walking = false;
+    for (const w of this.walkers) this.sit(w.model, w.desk);
     this.walkers = [];
   }
 
@@ -501,7 +517,7 @@ export class Arrivals {
   update(dt: number) {
     this.walkers = this.walkers.filter((w) => {
       const walking = this.step(w, dt);
-      if (!walking) this.sit(w);
+      if (!walking) this.sit(w.model, w.desk);
       return walking;
     });
   }
@@ -554,10 +570,11 @@ export class Arrivals {
   }
 
   /** In its seat: from here on it's where every worker sits. */
-  private sit(w: Arriver) {
-    const { root } = w.model;
-    w.model.walking = false;
-    w.desk.seatAnchor.add(root);
+  sit(model: Worker, desk: DeskView) {
+    const { root } = model;
+    model.walking = false;
+    root.visible = true;
+    desk.seatAnchor.add(root);
     root.position.set(0, 0, 0);
     root.rotation.set(0, 0, 0);
     root.scale.setScalar(1);

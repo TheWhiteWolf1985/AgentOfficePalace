@@ -412,8 +412,8 @@ export function wayIn(seat: DeskDef, wing = 0): Pt[] {
  * furniture to the exit door in the west wall, across the landing outside, down the steps to the
  * street and off along the sidewalk.
  */
-export function wayHome(seat: DeskDef, wing = 0): Pt[] {
-  const inside = wayTo(seat, EXIT, wing);
+export function wayHome(seat: DeskDef, wing = 0, from?: Pt): Pt[] {
+  const inside = from ? route(from, EXIT, wing) : officeNav(wing).wayFrom(seat, EXIT);
   const { landingZ1, steps, run } = EXIT_STAIRS;
   return [...inside, [STEPS_X, EXIT_DOOR.u], ...walkOff([STEPS_X, landingZ1 + (steps - 1) * run + 0.6])];
 }
@@ -422,17 +422,12 @@ export function wayHome(seat: DeskDef, wing = 0): Pt[] {
  * The same walk on a floor above the bottom one, which has no exit door: round the furniture to the
  * balcony doors, out across the balcony and up to its railing (PARACHUTE.jump), where it goes over.
  */
-export function wayToBalcony(seat: DeskDef, wing = 0): Pt[] {
-  const inside = wayTo(seat, BALCONY_IN, wing);
+export function wayToBalcony(seat: DeskDef, wing = 0, from?: Pt): Pt[] {
+  const inside = from ? route(from, BALCONY_IN, wing) : officeNav(wing).wayFrom(seat, BALCONY_IN);
   return [...inside, [BALCONY_DOOR.u, BALCONY.minZ + 0.4], [PARACHUTE.jump.x, PARACHUTE.jump.z]];
 }
 
 /** From `from`, down on the street, over to the near sidewalk and off along it to the west, where they're gone. */
 export function walkOff(from: Pt): Pt[] {
   return [from, [from[0], SIDEWALK_Z], [WALK_OFF_X, SIDEWALK_Z]];
-}
-
-/** From beside `seat`, where it hops down, round the furniture to `door` on the office floor. */
-function wayTo(seat: DeskDef, door: Pt, wing: number): Pt[] {
-  return officeNav(wing).wayFrom(seat, door);
 }

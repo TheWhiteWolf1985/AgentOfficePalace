@@ -64,7 +64,8 @@ export function installGong(ctx: Ctx, deps: GongDeps) {
       const desk = ctx.world().desks.get(v.deskId);
       if (!desk || isAsleep(store.workers.get(id)?.status ?? 'offline')) continue;
       // Up and about, away from its desk: a jump for joy where it stands.
-      v.model.dance(stageOf(desk, v.model));
+      if (v.model.root.parent === desk.seatAnchor) v.model.dance(stageOf(desk, v.model));
+      else v.model.celebrate();
     }
     // The board agents still waiting to be asked, too.
     for (const a of deps.idleAgents()) if (a.view.vacancy.visible) a.model.dance(stageOf(a.view, a.model));

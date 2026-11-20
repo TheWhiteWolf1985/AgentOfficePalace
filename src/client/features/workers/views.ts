@@ -24,6 +24,7 @@ import { renderUsage } from '../../ui/usage';
 import { Worker } from '../../world/character';
 import { loadAgentVisual } from '../../world/character/agent-assets';
 import { sanitizeAgentAppearance, agentAppearanceForId } from '../../../shared/agent-appearance';
+import type { DeskView } from '../../world/types';
 import { Laptop } from './laptop';
 import { Arrivals, Departures } from './leaving';
 
@@ -83,6 +84,17 @@ export function installWorkerViews(ctx: Ctx, core: CoreState, parts: WorkerViews
     seatedAlready = true;
   }
 
+  function assignDesk(v: WorkerView, desk: DeskView) {
+    departures.vacate(desk.def.id);
+    v.deskId = desk.def.id;
+    v.model.setVisualSeat(desk.def.station ? undefined : desk.seatAnchor);
+    const beside = desk.def.station ? new THREE.Vector3(0.62, 0.9, 0) : new THREE.Vector3(0.64, 0.5, -0.1);
+    v.model.setPropSpot(desk.seatAnchor.worldToLocal(desk.laptopAnchor.localToWorld(beside)));
+    desk.laptopAnchor.add(v.laptop.root);
+    noOutline(desk.group);
+    desk.chair.rotation.y = 0;
+  }
+
   function syncWorkers() {
     const world = ctx.world();
     for (const w of store.workers.values()) {
@@ -90,28 +102,25 @@ export function installWorkerViews(ctx: Ctx, core: CoreState, parts: WorkerViews
       const desk = world.desks.get(w.deskId);
       if (!desk) continue;
       if (!v) {
-        departures.vacate(w.deskId);
         const model = new Worker(w.name, w.color);
         desk.seatAnchor.add(model.root);
         if (w.kind === 'agent') {
           void loadAgentVisual(sanitizeAgentAppearance(w.appearance) ?? agentAppearanceForId(w.id)).then(visual => {
-            model.setVisual(visual, desk.def.station ? undefined : desk.seatAnchor);
+            model.setVisual(visual);
             noOutline(model.root);
           }).catch(error => console.warn('Agent avatar could not be loaded', error));
         }
-        // Its globe floats beside the laptop (or the kiosk's counter), out from behind the card over
-        // its head and the back of its chair, so it shows from across the room.
-        const beside = desk.def.station ? new THREE.Vector3(0.62, 0.9, 0) : new THREE.Vector3(0.64, 0.5, -0.1);
-        model.setPropSpot(model.root.worldToLocal(desk.laptopAnchor.localToWorld(beside)));
         // Called to a meeting just now: out of the elevator and over to the table, one after another.
         if (desk.def.room && !seatedAlready) arrivals.add(model, desk);
 
-        const laptop = new Laptop();
-        desk.laptopAnchor.add(laptop.root);
-        noOutline(desk.group);
-        desk.chair.rotation.y = 0;
-        v = { model, laptop, deskId: w.deskId, status: '', acked: true };
+        v = { model, laptop: new Laptop(), deskId: w.deskId, status: '', acked: true };
+        assignDesk(v, desk);
         workerViews.set(w.id, v);
+      } else if (v.deskId !== w.deskId) {
+        const previous = world.desks.get(v.deskId);
+        assignDesk(v, desk);
+        if (previous && !seatedAlready) arrivals.transfer(v.model, previous, desk, world.nav);
+        else arrivals.sit(v.model, desk);
       }
       if (v.status !== w.status || v.acked !== w.acked) {
         // It just finished or started waiting on you (not already so when this page first saw it): ding (one that needs you has an alarm of its own, see features/needsyou), and notify if you're away.
@@ -146,8 +155,11 @@ export function installWorkerViews(ctx: Ctx, core: CoreState, parts: WorkerViews
       arrivals.forget(v.model);
       const desk = world.desks.get(v.deskId);
       // Sent home: pack up and walk out; the seat becomes free once the worker stands up.
-      if (desk && sentHome.has(id)) departures.add(v.model, v.laptop, desk);
-      else {
+      if (desk && sentHome.has(id)) {
+        const { root } = v.model;
+        const from = root.parent === desk.seatAnchor ? undefined : root.getWorldPosition(new THREE.Vector3());
+        departures.add(v.model, v.laptop, desk, from && [from.x, from.z]);
+      } else {
         v.model.root.removeFromParent();
         v.laptop.root.removeFromParent();
         v.model.dispose();

@@ -144,7 +144,11 @@ export class Worker {
     this.setName(name);
   }
 
-  setVisual(visual: ReturnType<typeof agentVisual>, seat?: THREE.Object3D) {
+  setVisualSeat(seat?: THREE.Object3D) {
+    this.visualSeat = seat;
+  }
+
+  setVisual(visual: ReturnType<typeof agentVisual>, seat = this.visualSeat) {
     if (this.disposed) { visual.dispose(); return; }
     this.visual?.root.removeFromParent();
     this.visual?.dispose();

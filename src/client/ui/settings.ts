@@ -475,7 +475,8 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
   signOut.addEventListener('click', () => { if (canDismiss()) onSignOut(); });
   const character = h('button.btn', { type: 'button' }, uiText('🧍 Your character'));
   const connections = store.me.admin ? connectionsPanel() : undefined;
-  const management = store.me.admin ? agentManagementPanel(true) : undefined;
+  const managementActions = h('div.agent-management-actions');
+  const management = store.me.admin ? agentManagementPanel(managementActions, true) : undefined;
   const receptionSign = receptionSignPanel();
   const panes: Record<SettingsPane, Node[]> = {
     graphics: [
@@ -528,6 +529,7 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
   const show = (id: SettingsPane) => {
     lastPane = id;
     apply.element.hidden = ['atrium-logo', 'connections', 'management'].includes(id);
+    managementActions.hidden = id !== 'management';
     if (id === 'management') management?.load();
     if (id === 'atrium-logo') receptionSign.load();
     el.classList.toggle('settings-wide', id === 'connections' || id === 'management');
@@ -554,7 +556,7 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
   const close = h('button.btn.close', { 'aria-label': uiText('Close') }, '✕');
   apply.add({ dirty: () => language.value !== getLanguage(), apply: () => chooseLanguage(language.value) });
   const content = h('div.settings-body', {}, nav, ...bodies.values());
-  const el = h('div.modal.settings', { role: 'dialog', 'aria-label': uiText('Settings') }, h('header', {}, h('h2', {}, uiText('⚙️ Settings')), close), content, apply.element);
+  const el = h('div.modal.settings', { role: 'dialog', 'aria-label': uiText('Settings') }, h('header', {}, h('h2', {}, uiText('⚙️ Settings')), close), content, managementActions, apply.element);
   const offNotify = store.on('notify', paintHook);
   const offLeave = store.on('leaveOnMerge', () => { paintLeave(); apply.sync(); });
   const offLimit = [store.on('machine', paintLimit), store.on('me', paintLimit)];
