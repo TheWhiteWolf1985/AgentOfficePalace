@@ -39,10 +39,15 @@ export async function startHookServer(ctx: Ctx): Promise<{ hookServer: http.Serv
     }
     const token = (req.headers.authorization ?? '').replace(/^Bearer\s+/i, '');
     const workerId = url.searchParams.get('worker') ?? '';
-    const workers = ctx.workerFloor(workerId)?.workers;
-    if (!workers) return send(res, 401, {});
+    const floor = ctx.workerFloor(workerId);
+    if (!floor) return send(res, 401, {});
+    const workers = floor.workers;
     const event = url.searchParams.get('event') ?? '';
     const ok = workers.handleProviderHook(route as AgentProvider, workerId, token, event, payload);
+    if (ok && route === 'codex' && workers.get(workerId)?.runtime === 'docker' && payload && typeof payload === 'object') {
+      const requestId = floor.peerRequests.hook(workerId, workers.ownerOf(workerId), event, payload);
+      return send(res, 200, { requestId });
+    }
     send(res, ok ? 200 : 401, {});
   });
   // Workers' terminals outlive a restart of the office (see ptys.ts) with this address in their
@@ -89,7 +94,7 @@ export async function startHookServer(ctx: Ctx): Promise<{ hookServer: http.Serv
     renameSync(dest + '.tmp', dest);
     const local = http.createServer((req, res) => {
       const route = req.url?.split('?')[0];
-      if ((req.method === 'GET' && route === '/office/workers') || (req.method === 'POST' && route === '/office/workers/tell')) {
+      if ((req.method === 'GET' && route === '/office/workers') || (req.method === 'POST' && ['/office/workers/tell', '/office/workers/result', '/office/workers/reply'].includes(route ?? ''))) {
         const url = new URL(req.url!, 'http://localhost');
         void officeWorkers(ctx, req, res, url, true).catch(() => send(res, 500, { error: 'Delivery failed' }));
         return;

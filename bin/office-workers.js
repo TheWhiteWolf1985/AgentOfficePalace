@@ -43,9 +43,9 @@ export const EFFORTS = ['low', 'medium', 'high', 'xhigh', 'max'];
 /** How long the office may take to come back when it's restarting (a dev reload, an upgrade). */
 const RETRY_MS = 6000;
 /** Sending several workers home waits on git for each; hiring may fetch from GitHub first. */
-const TIMEOUT_MS = { list: 15_000, tell: 15_000, pr: 45_000, hire: 90_000, home: 300_000 };
+const TIMEOUT_MS = { list: 15_000, tell: 15_000, result: 5000, reply: 15_000, pr: 45_000, hire: 90_000, home: 300_000 };
 /** Where each call goes, under /office/workers. */
-const PATHS = { list: '', hire: '', home: '/home', tell: '/tell', pr: '/pr' };
+const PATHS = { list: '', hire: '', home: '/home', tell: '/tell', result: '/result', reply: '/reply', pr: '/pr' };
 
 /**
  * Reads `--flag value` and `--flag=value` options, and the words that aren't options.
@@ -158,7 +158,7 @@ export function officeEnv(env) {
 
 /**
  * The HTTP request for one of the office's worker calls.
- * @param {'list' | 'hire' | 'home' | 'tell' | 'pr'} what
+ * @param {'list' | 'hire' | 'home' | 'tell' | 'result' | 'reply' | 'pr'} what
  * @param {{ url: string, worker: string, token: string }} office
  * @param {Record<string, unknown>} [body]
  * @returns {{ method: string, url: string, headers: Record<string, string>, body?: string, timeout: number }}
@@ -207,7 +207,7 @@ async function send(req, fetchImpl) {
 
 /**
  * Makes one call to the office; resolves to what it answered, or throws with why it said no.
- * @param {'list' | 'hire' | 'home' | 'tell' | 'pr'} what
+ * @param {'list' | 'hire' | 'home' | 'tell' | 'result' | 'reply' | 'pr'} what
  * @param {Record<string, unknown> | undefined} body
  * @param {{ env: Record<string, string | undefined>, fetch: typeof fetch }} io
  */
@@ -279,6 +279,26 @@ export function formatLinked(answer) {
 const MCP_VERSIONS = ['2025-11-25', '2025-06-18', '2025-03-26', '2024-11-05'];
 
 const WORKER_NOTE = 'A worker is named by its name (e.g. "Mochi") or its id, as list_workers shows them.';
+
+const requestIdField = { type: 'string', description: 'The office request ID.' };
+const peerTools = [
+  { name: 'wait_for_reply', description: 'Continue waiting for the actual answer to a previous tell_worker request. Repeat while pending, using the same ID.',
+    inputSchema: { type: 'object', properties: { requestId: requestIdField }, required: ['requestId'], additionalProperties: false } },
+  { name: 'reply_to_request', description: 'Return your answer or the reason you could not complete a delegated Office request directly to the asking colleague.',
+    inputSchema: { type: 'object', properties: { requestId: requestIdField, reply: { type: 'string', minLength: 1, maxLength: 20000 } }, required: ['requestId', 'reply'], additionalProperties: false } },
+];
+
+async function awaitReply(id, io) {
+  const until = Date.now() + 20_000;
+  for (;;) {
+    const r = await call('result', { requestId: id }, io);
+    if (r.status === 'answered') return { text: JSON.stringify({ requestId: id, status: 'answered', reply: r.reply }) };
+    if (r.status === 'failed') return { text: r.error, isError: true };
+    if (r.status !== 'pending') throw Error('Unknown reply status');
+    if (Date.now() >= until) return { text: JSON.stringify({ requestId: id, status: 'pending', next: 'Call wait_for_reply with this requestId until answered. Do not resend the task.' }) };
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }
+}
 
 export const TOOLS = [
   {
@@ -397,8 +417,19 @@ async function runTool(name, args, io) {
     return { text: formatHome(answer, a.merged === true), isError: results.some((r) => r.error) && !results.some((r) => r.went || r.skipped) };
   }
   if (name === 'tell_worker') {
-    const answer = await call('tell', a, io);
+    const tracked = !!io.env.AGENT_OFFICE_HOOK_SOCKET;
+    const answer = await call('tell', tracked ? { ...a, expectReply: true } : a, io);
+    if (tracked) {
+      if (!answer.requestId) throw Error('Office accepted delivery but did not return a request ID');
+      return awaitReply(answer.requestId, io);
+    }
     return { text: `Told ${answer.worker?.name ?? a.worker}.` };
+  }
+  if (name === 'wait_for_reply') return awaitReply(a.requestId, io);
+  if (name === 'reply_to_request') {
+    if (typeof a.reply !== 'string' || !a.reply.trim()) throw Error('Supply the answer to return');
+    await call('reply', { requestId: a.requestId, reply: a.reply }, io);
+    return { text: 'Reply delivered to the requesting colleague.' };
   }
   if (name === 'link_pr') return { text: formatLinked(await call('pr', a, io)) };
   throw new Error(`Unknown tool: ${name}`);
@@ -415,7 +446,7 @@ export async function handleMcp(msg, io) {
   }
   if (!('id' in msg)) return undefined;
   const ok = (result) => ({ jsonrpc: '2.0', id: msg.id, result });
-  const tools = io.env.AGENT_OFFICE_HOOK_SOCKET ? TOOLS.filter(t => ['list_workers', 'tell_worker'].includes(t.name)) : TOOLS;
+  const tools = io.env.AGENT_OFFICE_HOOK_SOCKET ? [...TOOLS.filter(t => ['list_workers', 'tell_worker'].includes(t.name)), ...peerTools] : TOOLS;
   switch (msg.method) {
     case 'initialize': {
       const asked = msg.params?.protocolVersion;
@@ -423,7 +454,7 @@ export async function handleMcp(msg, io) {
         protocolVersion: MCP_VERSIONS.includes(asked) ? asked : MCP_VERSIONS[0],
         capabilities: { tools: { listChanged: false } },
         serverInfo: { name: 'agent-office', title: 'Agent Office', version: '1.0.0' },
-        instructions: io.env.AGENT_OFFICE_HOOK_SOCKET ? 'Named office colleagues are real agents on this floor. Use list_workers then tell_worker with the exact colleague ID. Never substitute an internal subagent. Delivery is not completion. Each colleague writes to a separate /workspace visible in the floor bookshelf.' : INSTRUCTIONS,
+        instructions: io.env.AGENT_OFFICE_HOOK_SOCKET ? 'Named office colleagues are real agents on this floor. Use list_workers then tell_worker with the exact colleague ID. Never substitute an internal subagent. If pending, use wait_for_reply until the colleague answers before reporting the outcome. For incoming [Office request ID] use reply_to_request with your result or reason you cannot complete it. Each colleague writes to a separate /workspace visible in the floor bookshelf.' : INSTRUCTIONS,
       });
     }
     case 'ping':

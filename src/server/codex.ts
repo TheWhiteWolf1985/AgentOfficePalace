@@ -182,10 +182,26 @@ process.stdin.on('end', async () => {
     url.searchParams.set('worker', worker);
     url.searchParams.set('event', event);
     if (socket) {
-      const req = require('node:http').request({ socketPath: socket, path: url.pathname + url.search,
-        method: 'POST', headers: { authorization: 'Bearer ' + token, 'content-type': 'application/json' },
-        signal: AbortSignal.timeout(2000) }, res => { res.resume(); finish(res.statusCode === 200); });
-      req.on('error', () => finish(false)); req.end(JSON.stringify(body)); return;
+      const signal = AbortSignal.timeout(2000);
+      const post = (path, data) => new Promise((resolve, reject) => {
+        const req = require('node:http').request({ socketPath: socket, path, method: 'POST', signal,
+          headers: { authorization: 'Bearer ' + token, 'content-type': 'application/json' } }, async res => {
+          try {
+            let text = '';
+            for await (const chunk of res) { text += chunk; if (text.length > 2048) throw Error('Invalid hook response'); }
+            if (res.statusCode !== 200) throw Error('Hook refused');
+            resolve(JSON.parse(text || '{}'));
+          } catch (err) { reject(err); }
+        });
+        req.on('error', reject); req.end(JSON.stringify(data));
+      });
+      const ack = await post(url.pathname + url.search, body);
+      if (event === 'Stop' && typeof ack.requestId === 'string') {
+        const text = typeof input.last_assistant_message === 'string' ? input.last_assistant_message.trim() : '';
+        const reply = text.length > MAX_TEXT ? text.slice(0, MAX_TEXT - 16) + ' […]' : text;
+        await post('/office/workers/reply?worker=' + encodeURIComponent(worker), { requestId: ack.requestId, reply });
+      }
+      return finish(true);
     }
     const response = await fetch(url, {
       method: 'POST',

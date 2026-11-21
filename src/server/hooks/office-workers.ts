@@ -68,13 +68,36 @@ export async function officeWorkers(ctx: Ctx, req: http.IncomingMessage, res: ht
       workers: list.map((w) => workerRow(w, view, me.id)),
     });
   }
-  if (restricted && action !== '/tell') return send(res, 403, { error: 'Only peer messaging is available' });
-  if (req.method !== 'POST' || !['', '/home', '/tell', '/pr'].includes(action)) return send(res, 405, { error: 'GET /office/workers, or POST to /office/workers, /office/workers/home, /office/workers/tell or /office/workers/pr' });
+  const peerAction = action === '/result' || action === '/reply';
+  if (peerAction && !restricted) return send(res, 403, { error: 'Container identity required' });
+  if (restricted && action !== '/tell' && !peerAction) return send(res, 403, { error: 'Only peer messaging is available' });
+  if (req.method !== 'POST' || (!peerAction && !['', '/home', '/tell', '/pr'].includes(action))) return send(res, 405, { error: 'Unsupported office worker operation' });
   let body: unknown;
   try {
     body = JSON.parse((await readBody(req)) || '{}');
   } catch {
     return send(res, 400, { error: 'Send JSON' });
+  }
+
+  if (peerAction) {
+    const b = (body ?? {}) as { requestId?: unknown; reply?: unknown };
+    const id = str(b.requestId, 64);
+    const owner = floor.workers.ownerOf(me.id);
+    if (action === '/reply') {
+      if (typeof b.reply !== 'string' || b.reply.length > 20_000) return send(res, 400, { error: 'Expected a reply of up to 20000 characters' });
+      return floor.peerRequests.answer(id, me.id, owner, b.reply.trim())
+        ? send(res, 200, { ok: true }) : send(res, 404, { error: 'No matching open request' });
+    }
+    const r = floor.peerRequests.result(id, me.id, owner, wid => {
+      const w = floor.workers.get(wid);
+      return w?.status === 'done' ? w.waitingSince : undefined;
+    });
+    if (!r) return send(res, 404, { error: 'Unknown or expired request' });
+    const peer = peers().find(w => w.id === r.workerId);
+    if (!peer || (r.status === 'pending' && (peer.paused || peer.status === 'offline' || peer.status === 'exited'))) {
+      return send(res, 409, { error: 'The recipient is unavailable' });
+    }
+    return send(res, 200, r);
   }
 
   if (action === '/home') {
@@ -119,7 +142,7 @@ export async function officeWorkers(ctx: Ctx, req: http.IncomingMessage, res: ht
   }
 
   if (action === '/tell') {
-    const b = (body ?? {}) as { worker?: unknown; prompt?: unknown };
+    const b = (body ?? {}) as { worker?: unknown; prompt?: unknown; expectReply?: unknown };
     const w = findWorker(peers(), str(b.worker, 64));
     if (typeof w === 'string') return send(res, 404, { error: w });
     if (w.id === me.id) return send(res, 400, { error: "That's you" });
@@ -129,9 +152,17 @@ export async function officeWorkers(ctx: Ctx, req: http.IncomingMessage, res: ht
     const text = str(b.prompt, 20000).replace(/\r\n?/g, '\n').trim();
     if (!text) return send(res, 400, { error: 'Say what to tell it: prompt' });
     if (restricted) {
-      if (!floor.workers.assignTask(w.id, text, who, floor.workers.ownerOf(me.id))) return send(res, 409, { error: w.name + ' is unavailable. Check list_workers before retrying.' });
+      const owner = floor.workers.ownerOf(me.id);
+      let requestId: string | undefined;
+      if (b.expectReply === true) {
+        const prefix = (id: string) => '[Office request ' + id + '] From ' + who + '. Send your answer, including any inability to complete the task, with reply_to_request using this ID.\n\n';
+        if (prefix('x'.repeat(36)).length + text.length > 20_000) return send(res, 400, { error: 'Delegation prompt too long' });
+        requestId = floor.peerRequests.start(me.id, w.id, owner, id => floor.workers.assignTask(w.id, prefix(id) + text, who, owner));
+      }
+      const delivered = b.expectReply === true ? !!requestId : floor.workers.assignTask(w.id, text, who, owner);
+      if (!delivered) return send(res, 409, { error: w.name + ' is unavailable. Check list_workers before retrying.' });
       ctx.toastFloor(floor, who + ' → ' + w.name);
-      return send(res, 200, { ok: true, delivered: true, worker: row(w.id) });
+      return send(res, 200, { ok: true, delivered: true, requestId, worker: row(w.id) });
     }
     let err = floor.workers.prompt(w.id, text, who);
     // Stopped or asleep: it wakes up with this as its next message.
