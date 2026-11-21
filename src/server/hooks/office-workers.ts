@@ -155,7 +155,7 @@ export async function officeWorkers(ctx: Ctx, req: http.IncomingMessage, res: ht
       const owner = floor.workers.ownerOf(me.id);
       let requestId: string | undefined;
       if (b.expectReply === true) {
-        const prefix = (id: string) => '[Office request ' + id + '] From ' + who + '. Send your answer, including any inability to complete the task, with reply_to_request using this ID.\n\n';
+        const prefix = (id: string) => '[Office request ' + id + '] From ' + who + '. Answer normally in your final message, including any reason you cannot complete the task. The office returns it to the sender automatically.\n\n';
         if (prefix('x'.repeat(36)).length + text.length > 20_000) return send(res, 400, { error: 'Delegation prompt too long' });
         requestId = floor.peerRequests.start(me.id, w.id, owner, id => floor.workers.assignTask(w.id, prefix(id) + text, who, owner));
       }
