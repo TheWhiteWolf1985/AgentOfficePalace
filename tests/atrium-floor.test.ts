@@ -27,6 +27,13 @@ test('the real GLB parquet and all three rugs remain the first visible surfaces 
   const { scene } = await new GLTFLoader().parseAsync(bytes, '');
   scene.add(streetSurfaces());
   scene.updateMatrixWorld(true);
+  const slab = scene.getObjectByName('atrio_ceiling_slab_1')!;
+  const up = (x: number, z: number) => new THREE.Raycaster(new THREE.Vector3(x, 1.5, z), new THREE.Vector3(0, 1, 0));
+  for (const z of [-11.5, -7, -3.1]) {
+    const hit = up(-12.5, z).intersectObject(slab, true)[0];
+    assert.ok(hit && Math.abs(hit.point.y - 5.2) < 0.0001, 'the ceiling covers the former stairwell');
+  }
+  assert.equal(up(8.5, -12).intersectObject(scene, true).length, 0, 'the elevator shaft remains open');
   for (const [x, z, name] of [
     [0.3, 9, 'atrio_floor_boards_main'],
     [0, -5, 'atrio_reception_rug'],

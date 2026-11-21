@@ -2,9 +2,6 @@ import test, { type TestContext } from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import { PlayerController } from '../src/client/player/index.js';
-import { ATRIUM_COLLIDERS } from '../src/shared/atrium.js';
-import { LOBBY_GATE, crossedStairs, stairArrival } from '../src/shared/atrium-stairs.js';
-import { LOBBY } from '../src/shared/rooftop.js';
 import { Effects } from '../src/client/player/effects.js';
 import type { Collider } from '../src/client/world/types.js';
 import { BALCONY, FLOOR, LOFT, SEATING_BY_ID, SLAB, STAIRS, seatAt, seatPlace } from '../src/shared/layout.js';
@@ -55,30 +52,6 @@ test('third-person walking keeps its framing with irregular frame intervals', t 
     assert.ok(camera.quaternion.angleTo(initialRotation) < 1e-6);
   }
   assert.ok(player.pos.z < 0.5);
-});
-
-test('walk both real atrium flights up to the threshold and down from the return landing', t => {
-  const { player, keys } = controller(t, ATRIUM_COLLIDERS);
-  player.pos.set(-14.4, 0, -3.75);
-  const walk = (key: string, until: () => boolean) => {
-    keys(key);
-    for (let i = 0; i < 180; i++) {
-      const before = player.pos.clone();
-      player.update(1 / 60);
-      if (until()) return crossedStairs(true, before, player.pos);
-    }
-    assert.fail(`blocked at ${player.pos.toArray()} walking with ${key}`);
-  };
-  walk('KeyW', () => player.pos.z <= -10);
-  assert.ok(Math.abs(player.pos.y - 2.6) < 0.01);
-  walk('KeyD', () => player.pos.x >= LOBBY_GATE.x);
-  assert.ok(walk('KeyS', () => player.pos.z >= LOBBY_GATE.z));
-  const down = stairArrival(LOBBY);
-  player.pos.set(down.x, down.y, down.z);
-  assert.equal(walk('KeyW', () => player.pos.z <= -10), false);
-  walk('KeyA', () => player.pos.x <= -14.4);
-  walk('KeyS', () => player.pos.z >= -3.7);
-  assert.ok(Math.abs(player.pos.y) < 0.01);
 });
 
 const desk: Collider = { minX: -1.05, maxX: 1.05, minZ: -0.53, maxZ: 0.53, top: 0.78 };

@@ -143,8 +143,8 @@ export interface Navigation {
   /** Up to the shared meeting room, by elevator. */
   goToRoof(c: Client): void;
   /** Out to the lobby, where the elevator has nowhere to go: the building's last floor was taken off. */
-  toLobby(c: Client, at?: Spot): void;
-  goToServerRoom(c: Client, at?: Spot): void;
+  toLobby(c: Client): void;
+  goToServerRoom(c: Client): void;
 }
 
 /** What has to be true before something happens for someone (office/gates.ts). */

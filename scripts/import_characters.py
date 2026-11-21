@@ -125,7 +125,7 @@ def main(selection='all'):
                           for role in ROLES + ['bow', 'mouth'] if f'char_mat_{role}' in materials}
         if folder == 'Atrio':
             placements = read(base / 'reception.placements.json')
-            require(placements['source_atrium_sha256'] == sha(RUNTIME / 'atrium.glb'), 'Atrium placement reference differs')
+            require(placements['source_atrium_sha256'] == sha(ROOT / 'sala_atrio/delivery/atrium.glb'), 'Atrium placement reference differs')
             i = len(staff)
             slot = placements['placements'][i]
             pos, scale = slot['runtime_position'], 1.15

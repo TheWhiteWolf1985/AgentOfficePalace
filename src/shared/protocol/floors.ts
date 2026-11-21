@@ -118,7 +118,7 @@ export type FloorClientMsg =
    * `at` is where you arrive instead: the same spot on the other floor (switching floors from the
    * floor list), or the ladder or fire pole you came by.
    */
-  | { t: 'floor.go'; floor: string; via?: 'stairs'; at?: { x: number; y: number; z: number; rotY: number } }
+  | { t: 'floor.go'; floor: string; at?: { x: number; y: number; z: number; rotY: number } }
   /** The repositories that could become a floor; answered with `floor.repos`. */
   | { t: 'floor.repos'; refresh?: boolean }
   /** Clone a repository and make it a new floor; answered with `floor.added` once it's there. */
@@ -138,7 +138,6 @@ export type PlanClientMsg =
   | { t: 'floor.shrink' };
 
 export type FloorServerMsg =
-  | { t: 'floor.stairs.unavailable' }
   /** You arrived on another floor: everything on it, replacing the last one's, and where everyone is now. */
   | ({ t: 'floor.enter'; peers: PeerInfo[] } & FloorView)
   | { t: 'floors'; floors: FloorInfo[] }

@@ -46,7 +46,7 @@ export interface Hint {
 export type StopWhy = 'start' | 'taken' | 'trip' | 'map' | 'walk' | 'errand' | 'desk';
 
 /** How you're going to another floor: by elevator, straight there from the floor list, or by the ladder or a pole. */
-export type TripKind = 'elevator' | 'switch' | 'stairs' | Grip;
+export type TripKind = 'elevator' | 'switch' | Grip;
 
 /**
  * A trip under way: the lights are down (and by elevator the doors are shut) until the next floor

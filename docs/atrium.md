@@ -7,8 +7,7 @@ Sala riunioni (`@roof`) sempre in cima. Con zero uffici l'edificio contiene comu
 Atrio, Sala server e Sala riunioni. Nessuno dei tre spazi può
 essere rimosso come un progetto.
 
-La destinazione d'ingresso già esistente ora apre il modello in
-`sala_atrio/delivery/atrium.glb`: reception, due salottini con dieci posti
+L’Atrio usa il modello runtime ricavato da `sala_atrio/delivery/atrium.glb`: reception, due salottini con dieci posti
 utilizzabili, consolle, quattordici piante e pannello aziendale dietro la reception.
 Il pannello dietro la reception può mostrare testo centrato o un logo aziendale. WASD permette di girare; E usa l'ascensore o una
 seduta. Posizione e spazio vengono ripristinati dopo la riconnessione.
@@ -41,11 +40,10 @@ originale è a quota zero e i tre tappeti sono rialzati di pochi millimetri.
 Un piano esterno sovrapposto coprirebbe questi dettagli; la geometria del GLB
 rimane alla quota consegnata, senza compensazioni o spostamenti degli arredi.
 
-Salendo le due rampe, attraversare il pianerottolo superiore porta automaticamente
-al primo ufficio disponibile. Se tutti gli uffici sono ancora in creazione o
-l'edificio è vuoto, si arriva alla Sala server. Per scendere, attraversare il
-varco «↓ Atrio» accanto all'ascensore del piano collegato. Si riappare sul
-pianerottolo dell'Atrio rivolti verso i gradini.
+Per passare dall’Atrio agli altri piani si usa l’ascensore. L’importazione
+rimuove le due rampe, i pianerottoli, i sostegni e la scritta «SCALE / PIANI
+SUPERIORI» dal modello distribuito. Il parquet è percorribile a quota zero
+e il soffitto copre il vecchio vano scala.
 
 Per importare nuovamente la stessa consegna:
 
@@ -58,7 +56,7 @@ npm run build
 
 L'import verifica i 22 elementi elencati dal manifest del pacchetto (24 file
 complessivi, inclusi i rapporti di copia), conserva GLB/Blender originali e
-genera `src/shared/atrium-data.ts`. I rapporti del produttore non vengono
+genera `src/client/models/atrium.glb` e `src/shared/atrium-data.ts`. I rapporti del produttore non vengono
 riscritti: i limiti delle sue verifiche restano distinti dai test applicativi.
 
 ## Pannello reception

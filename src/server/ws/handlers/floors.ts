@@ -2,7 +2,6 @@
 // off floors.
 import type { FloorClientMsg } from '../../../shared/protocol.js';
 import { LOBBY, ROOF, SERVER_ROOM } from '../../../shared/rooftop.js';
-import { stairArrival, stairNeighbor } from '../../../shared/atrium-stairs.js';
 import { arrivalSpot, str } from '../../office/input.js';
 import type { HandlerMap, ViewPieces } from './types.js';
 
@@ -10,20 +9,15 @@ export const projectView: ViewPieces['project'] = (_ctx, floor) => floor?.projec
 
 export const floorHandlers = {
   'floor.go'(ctx, c, msg) {
-    const stairs = msg.via === 'stairs';
-    if (stairs && msg.floor !== stairNeighbor(c.peer.floor, ctx.floors.keys().next().value)) {
-      return ctx.sendTo(c, { t: 'floor.stairs.unavailable' });
-    }
-    const landing = stairs ? stairArrival(msg.floor) : undefined;
-    if (msg.floor === SERVER_ROOM) return ctx.goToServerRoom(c, landing);
-    if (msg.floor === LOBBY) return ctx.toLobby(c, landing);
+    if (msg.floor === SERVER_ROOM) return ctx.goToServerRoom(c);
+    if (msg.floor === LOBBY) return ctx.toLobby(c);
     if (msg.floor === ROOF) {
       ctx.goToRoof(c);
       return;
     }
     const floor = ctx.floors.get(str(msg.floor, 64));
     if (!floor) ctx.warn(c, ctx.building.pending().some((d) => d.id === msg.floor) ? "That floor is still being cloned — it'll be ready in a moment" : 'No such floor');
-    else ctx.goToFloor(c, floor, landing ?? arrivalSpot(msg.at));
+    else ctx.goToFloor(c, floor, arrivalSpot(msg.at));
   },
   'floor.repos'(ctx, c, msg) {
     void ctx.building.repos(msg.refresh === true).then(

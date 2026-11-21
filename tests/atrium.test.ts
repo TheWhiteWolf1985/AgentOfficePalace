@@ -7,12 +7,12 @@ import { ATRIUM_DATA, ATRIUM_SEATING, ATRIUM_COLLIDERS } from '../src/shared/atr
 import { LOBBY, ROOF } from '../src/shared/rooftop.js';
 import { roofDrop, serverDrop, seatHere, STOREY, SERVER_ROOM_STOREY, streetBelow } from '../src/shared/layout.js';
 import { atriumRoute } from '../src/shared/atrium-nav.js';
-import { blockerAt, groundAt } from '../src/client/player/collide.js';
+import { blockerAt, ceilingAt, groundAt } from '../src/client/player/collide.js';
 import { openModel } from './glb.js';
 
-test('the atrium imports the original GLB and all ten lounge anchors without another axis rotation', () => {
+test('the runtime atrium preserves the ten delivered lounge anchors without another axis rotation', () => {
   const bytes = readFileSync(new URL('../src/client/models/atrium.glb', import.meta.url));
-  assert.equal(createHash('sha256').update(bytes).digest('hex'), ATRIUM_DATA.sourceSha256);
+  assert.equal(createHash('sha256').update(bytes).digest('hex'), ATRIUM_DATA.runtimeSha256);
   const glb = openModel('atrium');
   assert.equal(ATRIUM_SEATING.length, 10);
   assert.ok(glb.byName(ATRIUM_DATA.logo.surface) >= 0);
@@ -26,6 +26,21 @@ test('the atrium imports the original GLB and all ten lounge anchors without ano
   }
   assert.equal(seatHere('seat_001:0', LOBBY), undefined);
   assert.equal(seatHere('couch:0', LOBBY), undefined);
+});
+
+test('the former stairwell has clear parquet and a closed ceiling, with no stair or wall sign in the asset', () => {
+  const glb = openModel('atrium');
+  const stair = /^atrio_(stair|landing_)/;
+  assert.ok(glb.nodes.every(n => !stair.test(n.name ?? '')));
+  assert.ok(ATRIUM_COLLIDERS.every(c => !stair.test(c.id)));
+  const body = { pos: new Vector3(), grounded: true, stepOffset: 0, colliders: ATRIUM_COLLIDERS };
+  for (const x of [-15.4, -13.3, -11.6, -10.4]) {
+    for (const z of [-11.05, -9.4, -6.5, -3.3]) {
+      assert.equal(blockerAt(body, x, z, 0), null);
+      assert.equal(groundAt(body.colliders, x, z, 0), 0);
+      assert.equal(ceilingAt(body.colliders, x, z, 0), ATRIUM_DATA.height);
+    }
+  }
 });
 
 test('the ground floor is fixed below offices and the meeting room stays above them, including zero offices', () => {
