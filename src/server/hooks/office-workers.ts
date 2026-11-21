@@ -38,12 +38,15 @@ async function pullOf(floor: Floor, n: number, repo?: string): Promise<{ number:
  * says which pull request is one's (for one the office couldn't tell by itself). The
  * worker's own hook token says who's asking, and the floor hears who did what, as from anyone.
  */
-export async function officeWorkers(ctx: Ctx, req: http.IncomingMessage, res: http.ServerResponse, url: URL) {
+export async function officeWorkers(ctx: Ctx, req: http.IncomingMessage, res: http.ServerResponse, url: URL, socket = false) {
   const workerId = url.searchParams.get('worker') ?? '';
   const token = (req.headers.authorization ?? '').replace(/^Bearer\s+/i, '');
   const floor = ctx.workerFloor(workerId);
   const me = floor?.workers.authenticate(workerId, token);
   if (!floor || !me) return send(res, 401, { error: 'Send your own AGENT_OFFICE_WORKER_ID as ?worker= and AGENT_OFFICE_HOOK_TOKEN as the bearer token' });
+  if (socket && me.runtime !== 'docker') return send(res, 403, { error: 'Container identity required' });
+  const restricted = me.runtime === 'docker';
+  const peers = () => floor.workers.list().filter(w => !restricted || (w.runtime === 'docker' && w.kind === 'agent' && floor.workers.ownerOf(w.id) === floor.workers.ownerOf(me.id)));
   const who = me.name;
   const view: PullsView = { pulls: floor.github.pulls.items, tasks: floor.queue.state().tasks, pullsOf: (id) => ctx.floors.get(id)?.github.pulls.items };
   const row = (id: string) => {
@@ -52,7 +55,7 @@ export async function officeWorkers(ctx: Ctx, req: http.IncomingMessage, res: ht
   };
   const action = url.pathname.slice('/office/workers'.length);
   if (req.method === 'GET' && !action) {
-    const list = floor.workers.list();
+    const list = peers();
     const free = nextFreeSeat((id) => floor.workers.deskOccupied(id), floor.plan.wing);
     return send(res, 200, {
       floor: { id: floor.id, name: floor.def.name, repo: floor.def.repo, branch: floor.project.branch },
@@ -65,6 +68,7 @@ export async function officeWorkers(ctx: Ctx, req: http.IncomingMessage, res: ht
       workers: list.map((w) => workerRow(w, view, me.id)),
     });
   }
+  if (restricted && action !== '/tell') return send(res, 403, { error: 'Only peer messaging is available' });
   if (req.method !== 'POST' || !['', '/home', '/tell', '/pr'].includes(action)) return send(res, 405, { error: 'GET /office/workers, or POST to /office/workers, /office/workers/home, /office/workers/tell or /office/workers/pr' });
   let body: unknown;
   try {
@@ -98,7 +102,7 @@ export async function officeWorkers(ctx: Ctx, req: http.IncomingMessage, res: ht
     }
     // One at a time: git takes a lock on the repository's refs to delete a branch.
     for (const { w, why } of going) {
-      if (w.runtime === 'docker' && (!floor.workers.ownerOf(me.id) || floor.workers.ownerOf(me.id) !== floor.workers.ownerOf(w.id))) {
+      if (!restricted && w.runtime === 'docker' && (!floor.workers.ownerOf(me.id) || floor.workers.ownerOf(me.id) !== floor.workers.ownerOf(w.id))) {
         results.push({ worker: w.name, id: w.id, error: 'Different worker owner' }); continue;
       }
       if (floor.workers.get(w.id) !== w) {
@@ -116,14 +120,19 @@ export async function officeWorkers(ctx: Ctx, req: http.IncomingMessage, res: ht
 
   if (action === '/tell') {
     const b = (body ?? {}) as { worker?: unknown; prompt?: unknown };
-    const w = findWorker(floor.workers.list(), str(b.worker, 64));
+    const w = findWorker(peers(), str(b.worker, 64));
     if (typeof w === 'string') return send(res, 404, { error: w });
     if (w.id === me.id) return send(res, 400, { error: "That's you" });
-    if (w.runtime === 'docker' && (!floor.workers.ownerOf(me.id) || floor.workers.ownerOf(me.id) !== floor.workers.ownerOf(w.id))) return send(res, 403, { error: 'Different worker owner' });
+    if (!restricted && w.runtime === 'docker' && (!floor.workers.ownerOf(me.id) || floor.workers.ownerOf(me.id) !== floor.workers.ownerOf(w.id))) return send(res, 403, { error: 'Different worker owner' });
     // A shell would run it as a command, in someone's terminal.
     if (w.kind !== 'agent') return send(res, 400, { error: `${w.name} is a shell, not an agent` });
     const text = str(b.prompt, 20000).replace(/\r\n?/g, '\n').trim();
     if (!text) return send(res, 400, { error: 'Say what to tell it: prompt' });
+    if (restricted) {
+      if (!floor.workers.assignTask(w.id, text, who, floor.workers.ownerOf(me.id))) return send(res, 409, { error: w.name + ' is unavailable. Check list_workers before retrying.' });
+      ctx.toastFloor(floor, who + ' → ' + w.name);
+      return send(res, 200, { ok: true, delivered: true, worker: row(w.id) });
+    }
     let err = floor.workers.prompt(w.id, text, who);
     // Stopped or asleep: it wakes up with this as its next message.
     if (err === 'Worker is not running') err = floor.workers.resume(w.id, text);

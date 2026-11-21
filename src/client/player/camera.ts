@@ -37,12 +37,11 @@ export interface Followed {
 }
 
 /**
- * Puts the camera where you see from: at your eyes in first person (bobbing `bob` as you walk, and
- * `lift` up or down while you sit), or round behind you in third, where it eases over unless `snap`.
+ * Puts the camera where you see from: at eye level in first person (including the seated height), or round behind you in third, where it eases over unless `snap`.
  */
-export function aimCamera(camera: THREE.PerspectiveCamera, p: Followed, bob: number, lift: number, snap: boolean) {
+export function aimCamera(camera: THREE.PerspectiveCamera, p: Followed, lift: number, snap: boolean, dt: number, previousFocus: THREE.Vector3) {
   if (p.view === 'first') {
-    camera.position.set(p.pos.x, p.pos.y + EYE_HEIGHT + bob + p.stepOffset + lift, p.pos.z);
+    camera.position.set(p.pos.x, p.pos.y + EYE_HEIGHT + p.stepOffset + lift, p.pos.z);
     camera.rotation.set(p.lookPitch, p.camYaw, 0);
     return;
   }
@@ -98,7 +97,12 @@ export function aimCamera(camera: THREE.PerspectiveCamera, p: Followed, bob: num
     else cam.z = R.maxZ + e;
   }
   if (snap) camera.position.copy(cam);
-  else camera.position.lerp(cam, 0.25);
+  else {
+    // Translate with the walker; smooth the orbit and clearance changes independently of frame rate.
+    if (cam.x === target.x + off.x) camera.position.x += p.pos.x - previousFocus.x;
+    if (cam.z === target.z + off.z) camera.position.z += p.pos.z - previousFocus.z;
+    camera.position.lerp(cam, 1 - Math.pow(0.75, dt * 60));
+  }
   camera.lookAt(target);
 }
 

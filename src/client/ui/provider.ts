@@ -290,7 +290,7 @@ export function agentFields(project: ProjectInfo | null, id: string, initial: Ag
  * Which worker to start: the office's default (⚙️ Settings), shown as a line, with an ✏️ Edit button
  * that opens the provider, model and effort fields to pick another for this one.
  */
-export function providerPicker(project: ProjectInfo | null, id: string, label = uiText('Worker')): ProviderPicker {
+export function providerPicker(project: ProjectInfo | null, id: string, label = uiText('Worker')): ProviderPicker & { customized(): boolean } {
   let editing = false;
   const fields = agentFields(project, id, officeChoice(project));
   fields.element.classList.add('hidden');
@@ -320,6 +320,7 @@ export function providerPicker(project: ProjectInfo | null, id: string, label = 
   const off = store.on('prompts', () => (element.isConnected ? paint() : off()));
   return {
     element,
+    customized: () => editing,
     value: () => (editing ? fields.value() : officeChoice(project).provider),
     model: () => (editing ? fields.model() : officeChoice(project).model),
     effort: () => (editing ? fields.effort() : officeChoice(project).effort),

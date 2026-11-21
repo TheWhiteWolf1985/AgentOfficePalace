@@ -6,6 +6,7 @@ import { t as uiText } from '../../shared/i18n';
  * says about where you are: the project in the corner and the tab's title, the connection status, and the
  * sign-ins a newcomer is greeted with.
  */
+import { ATRIUM_DATA } from '../../shared/atrium-data';
 import { SLAB, inElevator } from '../../shared/layout';
 import { LOBBY, LOBBY_NAME, ROOF, ROOF_NAME, SERVER_ROOM, SERVER_ROOM_NAME, isFixedFloor } from '../../shared/rooftop';
 import { renderTitle } from '../shared/title';
@@ -75,7 +76,8 @@ export function installArrival(ctx: Ctx, core: CoreState, parts: ArrivalParts) {
       // Where the office put you: back in the spot you left (if there's still room there), or in the elevator car.
       travel.setPlace();
       travel.syncStack();
-      if (lastSpot() && !(inElevator(mine.x, mine.z) || pastTheWing(mine, parts.worlds.officeWing())) && player.fits(mine.x, mine.z, mine.y)) {
+      const aboveLobby = core.atLobby && mine.y >= ATRIUM_DATA.height;
+      if (lastSpot() && !aboveLobby && !(inElevator(mine.x, mine.z) || pastTheWing(mine, parts.worlds.officeWing())) && player.fits(mine.x, mine.z, mine.y)) {
         placeAt(mine);
         travel.arrive('back');
       } else {

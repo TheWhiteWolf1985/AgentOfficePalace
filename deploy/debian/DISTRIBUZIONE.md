@@ -5,7 +5,7 @@
 Dalla shell root del nodo Proxmox VE amd64 esegui il comando del candidato:
 
 ```bash
-script=$(curl -fsSL https://github.com/TheWhiteWolf1985/AgentOfficePalace/releases/download/v0.1.280-rc.3/proxmox.sh) && bash -c "$script"
+script=$(curl -fsSL https://github.com/TheWhiteWolf1985/AgentOfficePalace/releases/download/v0.1.285-rc.4/proxmox.sh) && bash -c "$script"
 ```
 
 Lo script propone ID libero, nome, storage e bridge e aspetta conferma. Puoi scegliere un nome diverso quando nel cluster esiste già `agent-office-palace`. Crea una VM Debian 13 ufficiale con 4 vCPU, 16 GiB RAM, disco da 30 GiB, DHCP e avvio automatico. Il nodo deve poter raggiungere Debian Cloud e GitHub. La VM deve poter raggiungere i repository Debian e GitHub. Il piccolo secondo disco contiene la configurazione del primo avvio, senza password.

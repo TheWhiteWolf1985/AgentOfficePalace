@@ -1,6 +1,6 @@
 """Verify the original delivery; derive runtime data and a compact exterior GLB."""
 from pathlib import Path
-from copy import deepcopy
+from static_glb import pack_static_nodes
 import hashlib
 import json
 import re
@@ -38,8 +38,7 @@ def collider(c, index):
 
 # Copy only the architectural shell, retaining the original node transforms and geometry.
 # Repack the referenced buffer views so racks/equipment are not downloaded from other floors.
-shell = deepcopy(gltf)
-nodes = shell['nodes']
+nodes = gltf['nodes']
 pattern = re.compile(r'^server_v12_(wall_|window_|floor_support_|ceiling_)')
 selected = {i for i, n in enumerate(nodes) if 'mesh' in n and pattern.match(n.get('name', ''))}
 parents = {child: i for i, n in enumerate(nodes) for child in n.get('children', [])}
@@ -47,53 +46,7 @@ for i in list(selected):
     while i in parents:
         i = parents[i]
         selected.add(i)
-node_ids = {old: new for new, old in enumerate(sorted(selected))}
-shell['nodes'] = [nodes[i] for i in sorted(selected)]
-for n in shell['nodes']:
-    if 'children' in n:
-        n['children'] = [node_ids[i] for i in n['children'] if i in selected]
-for scene in shell['scenes']:
-    scene['nodes'] = [node_ids[i] for i in scene['nodes'] if i in selected]
-meshes = sorted({n['mesh'] for n in shell['nodes'] if 'mesh' in n})
-mesh_ids = {old: new for new, old in enumerate(meshes)}
-shell['meshes'] = [shell['meshes'][i] for i in meshes]
-for n in shell['nodes']:
-    if 'mesh' in n:
-        n['mesh'] = mesh_ids[n['mesh']]
-accessors = set()
-for mesh in shell['meshes']:
-    for p in mesh['primitives']:
-        accessors.update(p['attributes'].values())
-        if 'indices' in p:
-            accessors.add(p['indices'])
-accessors = sorted(accessors)
-accessor_ids = {old: new for new, old in enumerate(accessors)}
-shell['accessors'] = [shell['accessors'][i] for i in accessors]
-for mesh in shell['meshes']:
-    for p in mesh['primitives']:
-        p['attributes'] = {k: accessor_ids[v] for k, v in p['attributes'].items()}
-        if 'indices' in p:
-            p['indices'] = accessor_ids[p['indices']]
-views = sorted({a['bufferView'] for a in shell['accessors']})
-view_ids = {old: new for new, old in enumerate(views)}
-shell['bufferViews'] = [shell['bufferViews'][i] for i in views]
-payload = bytearray()
-for view in shell['bufferViews']:
-    while len(payload) % 4:
-        payload.append(0)
-    offset = view.get('byteOffset', 0)
-    view['byteOffset'] = len(payload)
-    payload += binary[offset:offset + view['byteLength']]
-for a in shell['accessors']:
-    assert 'sparse' not in a
-    a['bufferView'] = view_ids[a['bufferView']]
-shell['buffers'] = [{'byteLength': len(payload)}]
-json_bytes = json.dumps(shell, separators=(',', ':')).encode()
-json_bytes += b' ' * (-len(json_bytes) % 4)
-payload += b'\0' * (-len(payload) % 4)
-shell_bytes = (struct.pack('<4sII', b'glTF', 2, 28 + len(json_bytes) + len(payload)) +
-               struct.pack('<I4s', len(json_bytes), b'JSON') + json_bytes +
-               struct.pack('<I4s', len(payload), b'BIN\0') + payload)
+shell_bytes = pack_static_nodes(gltf, binary, selected)
 assert len(shell_bytes) < len(raw) * .3
 
 seats = [dict(id=s['seat'], chair=manifest['operations']['workstations'][i]['operator_chair'],

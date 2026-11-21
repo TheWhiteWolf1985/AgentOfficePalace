@@ -20,7 +20,8 @@ function controller(t: TestContext, colliders: Collider[]) {
       else Reflect.deleteProperty(globalThis, name);
     });
   }
-  const player = new PlayerController(new THREE.PerspectiveCamera(), new EventTarget() as unknown as HTMLElement, [officeFloor, ...colliders]);
+  const camera = new THREE.PerspectiveCamera();
+  const player = new PlayerController(camera, new EventTarget() as unknown as HTMLElement, [officeFloor, ...colliders]);
   player.camYaw = 0;
   function keys(...codes: string[]) {
     player.clearKeys();
@@ -33,8 +34,25 @@ function controller(t: TestContext, colliders: Collider[]) {
   function frames(count: number, dt = 1 / 60) {
     for (let i = 0; i < count; i++) player.update(dt);
   }
-  return { player, keys, frames };
+  return { player, camera, keys, frames };
 }
+
+test('third-person walking keeps its framing with irregular frame intervals', t => {
+  const { player, camera, keys } = controller(t, []);
+  player.pos.set(0, 0, 1);
+  player.setView('third');
+  player.camYaw = 0;
+  player.updateCamera(true);
+  const offset = camera.position.clone().sub(player.pos);
+  const initialRotation = camera.quaternion.clone();
+  keys('KeyW');
+  for (const dt of [0.04, 0.008, 0.022, 0.035, 0.01, 0.05, 0.016]) {
+    player.update(dt);
+    assert.ok(camera.position.clone().sub(player.pos).distanceTo(offset) < 1e-6);
+    assert.ok(camera.quaternion.angleTo(initialRotation) < 1e-6);
+  }
+  assert.ok(player.pos.z < 0.5);
+});
 
 const desk: Collider = { minX: -1.05, maxX: 1.05, minZ: -0.53, maxZ: 0.53, top: 0.78 };
 

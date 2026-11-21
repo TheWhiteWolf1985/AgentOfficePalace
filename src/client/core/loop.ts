@@ -80,7 +80,7 @@ export function installLoop(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'stage
     const grip = ctx.view.grip();
     me.setGrip(grip);
     if (visual) {
-      me.update(visual.dt, t, (player.moving && player.grounded) || (grip === 'ladder' && player.moving), !player.grounded && !grip && !ctx.activities.any('hidesHands'), player.effects.speed);
+      me.update(visual.dt, t, (player.moving && player.grounded) || (grip === 'ladder' && player.moving), !player.grounded && !grip && !ctx.activities.any('hidesHands'), player.effects.speed, player.view !== 'third');
       me.setVoiceLevel(voice.inVoice ? voice.localLevel : 0);
     }
     const firstPerson = player.view === 'first';

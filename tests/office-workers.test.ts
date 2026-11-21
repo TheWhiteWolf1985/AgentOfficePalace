@@ -306,3 +306,11 @@ test("Codex is told to pass the office's variables on to the MCP server", () => 
     'mcp_servers.agent-office.env_vars=["AGENT_OFFICE_HOOK_URL","AGENT_OFFICE_WORKER_ID","AGENT_OFFICE_HOOK_TOKEN"]',
   ]);
 });
+
+test('a container exposes only authenticated floor peer tools', async () => {
+  const io = { env: { AGENT_OFFICE_HOOK_SOCKET: '/office-bridge/hooks.sock' }, fetch };
+  const list = await handleMcp({ jsonrpc: '2.0', id: 1, method: 'tools/list' }, io);
+  assert.deepEqual(list.result.tools.map((t: { name: string }) => t.name), ['list_workers', 'tell_worker']);
+  const call = await handleMcp({ jsonrpc: '2.0', id: 2, method: 'tools/call', params: { name: 'hire_worker' } }, io);
+  assert.equal(call.error.code, -32602);
+});

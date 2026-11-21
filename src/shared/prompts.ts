@@ -50,7 +50,7 @@ const JOB: Record<StationKind, string> = {
 };
 
 /** How a board agent reaches the queue: the office-queue command, which the office puts on its PATH. */
-const QUEUE_API = `The task queue gives each task a fresh worker in its own git worktree, a few at a time; a task usually ends with a pull request. Use it with the office-queue command, which is on your PATH (it knows who you are, so don't call the office's HTTP API yourself):
+const QUEUE_API = `The task queue assigns tasks to available agents on this floor, a few at a time; a task usually ends with a pull request. Use it with the office-queue command, which is on your PATH (it knows who you are, so don't call the office's HTTP API yourself):
 - See it: office-queue list (each task's id, status, title, worker and pull request)
 - Add a task: office-queue add --title "Short title" [--issue <number>], with the task's prompt on stdin in a quoted heredoc so nothing in it gets expanded. It prints the new task's id. With --issue the task is linked to that GitHub issue, which is assigned when the task starts.
   office-queue add --title "Fix the login redirect" <<'EOF'

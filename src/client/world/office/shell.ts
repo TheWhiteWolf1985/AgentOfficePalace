@@ -1,5 +1,6 @@
 import { t as uiText } from '../../../shared/i18n';
 import * as THREE from 'three';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { BALCONY_DOOR, EXIT_DOOR, FLOOR, WALL_HEIGHT, WALL_T, WINDOWS, WING, type Opening, type Side } from '../../../shared/layout';
 import type { NightParts } from '../outside';
 import { mergeByMaterial, mesh, textPlane, toon } from '../toon';
@@ -201,6 +202,8 @@ export function buildWalls(group: THREE.Group, colliders: Collider[], openings: 
     const alongX = w.side === 'north' || w.side === 'south';
     // A box's faces go +x, -x, +y, -y, +z, -z; the one facing outdoors gets the outside paint, and so
     // do the ends of the north and south walls, which run on past the east and west ones to the corners.
+    // A wall has two paints and two shadow zones. Pack its faces once, keeping windows and doors separate.
+    const faces = new Map<THREE.Material, Map<boolean, THREE.BufferGeometry[]>>();
     const out = { east: 0, west: 1, south: 4, north: 5 }[w.side];
     const at = (u: number, y: number) => (alongX ? new THREE.Vector3(u, y, w.at) : new THREE.Vector3(w.at, y, u));
     const piece = (u0: number, u1: number, y0: number, y1: number) => {
@@ -212,14 +215,27 @@ export function buildWalls(group: THREE.Group, colliders: Collider[], openings: 
         return;
       }
       const ends = alongX ? [u0 <= FLOOR.minX - T + 0.001 ? 1 : -1, u1 >= FLOOR.maxX + T - 0.001 ? 0 : -1] : [];
-      const mats = Array.from({ length: 6 }, (_, i) => (i === out || ends.includes(i) ? outside : inside));
-      const m = new THREE.Mesh(alongX ? box(u1 - u0, y1 - y0, T) : box(T, y1 - y0, u1 - u0), mats);
-      m.position.copy(at((u0 + u1) / 2, (y0 + y1) / 2));
-      m.castShadow = y1 <= SHADE_HEIGHT;
-      m.receiveShadow = true;
-      // Indoors, walls stop taking shadows (see features/lamplight): the lamps overhead would cast them down the wall from whatever hangs there.
-      m.userData.wall = true;
-      group.add(m);
+      const shape = alongX ? box(u1 - u0, y1 - y0, T) : box(T, y1 - y0, u1 - u0);
+      const pos = at((u0 + u1) / 2, (y0 + y1) / 2);
+      shape.translate(pos.x, pos.y, pos.z);
+      const cast = y1 <= SHADE_HEIGHT;
+      for (const material of [inside, outside]) {
+        const indices: number[] = [];
+        for (const face of shape.groups) {
+          const outer = face.materialIndex === out || ends.includes(face.materialIndex!);
+          if (outer !== (material === outside)) continue;
+          for (let i = face.start; i < face.start + face.count; i++) indices.push(shape.index!.getX(i));
+        }
+        const geometry = shape.clone();
+        geometry.setIndex(indices);
+        geometry.clearGroups();
+        const zones = faces.get(material) ?? new Map<boolean, THREE.BufferGeometry[]>();
+        faces.set(material, zones);
+        const pieces = zones.get(cast) ?? [];
+        pieces.push(geometry);
+        zones.set(cast, pieces);
+      }
+      shape.dispose();
     };
     // Baseboard and collider run between the doors.
     const run = (u0: number, u1: number) => {
@@ -250,6 +266,15 @@ export function buildWalls(group: THREE.Group, colliders: Collider[], openings: 
       }
       piece(u, b, 0, top);
       run(floorU, b);
+    }
+    for (const [material, zones] of faces) for (const [cast, pieces] of zones) {
+      const geometry = mergeGeometries(pieces)!;
+      for (const piece of pieces) piece.dispose();
+      const wall = new THREE.Mesh(geometry, material);
+      wall.castShadow = cast;
+      wall.receiveShadow = true;
+      wall.userData.wall = true;
+      group.add(wall);
     }
   }
 }

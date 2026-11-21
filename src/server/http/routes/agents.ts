@@ -4,6 +4,13 @@ import { send } from '../util.js';
 import type { Route } from '../router.js';
 
 export const agentRoutes = {
+  queueTargets: {
+    method: 'GET', path: '/api/queue/targets', auth: 'session',
+    handle(ctx, { res, session, url }) {
+      const floor = ctx.floors.get(url.searchParams.get('floor') ?? '');
+      return floor ? send(res, 200, floor.queue.targets(session.account?.id).map(w => w.id)) : send(res, 404, { error: 'Unknown floor' });
+    },
+  },
   /** GET /api/agents/<provider>/models */
   models: {
     method: 'GET',

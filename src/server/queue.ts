@@ -13,6 +13,9 @@ export interface QueueWorkers {
   /** What a task starts on when whoever queued it didn't pick (⚙️ Settings); the default provider without it. */
   readonly officeDefault?: AgentChoice;
   list(): WorkerInfo[];
+  ownerOf?(id: string): string | undefined;
+  assignTask?(id: string, prompt: string, by: string, owner?: string): boolean;
+  usesPrivateWorkspace?(provider: AgentProvider): boolean;
   deskOccupied(deskId: string): boolean;
   /** How many rows the floor's back office is built out, for its desks (see WING). */
   wing?(): number;
@@ -86,7 +89,13 @@ export class TaskQueue {
 
   /** Queues a task. With no `provider`, it runs on the office's default worker, model and effort included. */
   /** Queues a task; `owner` is the account adding it, whose sign-ins its worker will run on. */
-  add(prompt: string, by: string, title?: string, issue?: number, provider?: AgentProvider, model?: string, effort?: AgentEffort, owner?: string): string | undefined {
+  add(prompt: string, by: string, title?: string, issue?: number, provider?: AgentProvider, model?: string, effort?: AgentEffort, owner?: string, targetWorkerId?: string): string | undefined {
+    const anyProvider = !targetWorkerId && !provider && !model && !effort;
+    if (targetWorkerId) {
+      const worker = this.targets(owner).find(w => w.id === targetWorkerId);
+      if (!worker) return 'Agente non disponibile su questo piano';
+      ({ provider, model, effort } = worker);
+    }
     if (provider === undefined) ({ provider, model, effort } = this.workers.officeDefault ?? { provider: this.workers.defaultProvider });
     if (!isAgentProvider(provider) || (provider === 'custom' && this.workers.defaultProvider !== 'custom')) return 'Unknown agent provider';
     const modelError = validateWorkerModel('agent', provider, model);
@@ -95,6 +104,7 @@ export class TaskQueue {
     if (effortError) return effortError;
     const clean = prompt.replace(/\r\n?/g, '\n').trim();
     if (!clean) return 'Empty task';
+    if (/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/.test(clean)) return 'Invalid task text';
     if (issue !== undefined && this.tasks.some((t) => t.issue === issue && t.status !== 'done')) return `Issue #${issue} is already on the queue`;
     if (this.tasks.filter((t) => t.status !== 'done').length >= MAX_TASKS) return `The queue is full (${MAX_TASKS} tasks)`;
     const task: QueueTask = {
@@ -106,6 +116,7 @@ export class TaskQueue {
       title: (title?.trim() || firstLine(clean)).slice(0, 120),
       prompt: clean,
       addedBy: by,
+      targetWorkerId, anyProvider,
       ...(owner ? { owner } : {}),
       addedAt: Date.now(),
       status: 'queued',
@@ -155,7 +166,7 @@ export class TaskQueue {
     if (t.status !== 'done') return 'That task is still on the queue';
     if (t.issue !== undefined && this.tasks.some((x) => x !== t && x.issue === t.issue && x.status !== 'done')) return `Issue #${t.issue} is already on the queue`;
     this.tasks.splice(this.tasks.indexOf(t), 1);
-    const fresh: QueueTask = { id: t.id, provider: t.provider, model: t.model, effort: t.effort, issue: t.issue, title: t.title, prompt: t.prompt, addedBy: t.addedBy, owner: t.owner, addedAt: Date.now(), status: 'queued' };
+    const fresh: QueueTask = { id: t.id, anyProvider: t.anyProvider, targetWorkerId: t.targetWorkerId, provider: t.provider, model: t.model, effort: t.effort, issue: t.issue, title: t.title, prompt: t.prompt, addedBy: t.addedBy, owner: t.owner, addedAt: Date.now(), status: 'queued' };
     this.tasks.push(fresh);
     this.changed();
     this.pump();
@@ -289,8 +300,8 @@ export class TaskQueue {
    * is looking at its terminal), and return its seat. Workers with a linked PR go first — their work
    * is delivered.
    */
-  private recycleDesk(): string | undefined {
-    const pick = this.recyclable();
+  private recycleDesk(owner?: string): string | undefined {
+    const pick = this.recyclable(owner);
     if (!pick) return undefined;
     const done = this.workers.kill(pick.w.id);
     this.events.toast(`📋 ${pick.w.name} went home after ${label(pick.t)} to make room for the next task`, 'info');
@@ -302,13 +313,18 @@ export class TaskQueue {
   }
 
   /** The finished worker recycleDesk would send home, if there is one. */
-  private recyclable(): { t: QueueTask; w: WorkerInfo } | undefined {
+  private recyclable(owner?: string): { t: QueueTask; w: WorkerInfo } | undefined {
     const byId = new Map(this.workers.list().map((w) => [w.id, w]));
     return this.tasks
-      .filter((t) => t.status === 'done' && t.workerId && byId.has(t.workerId))
+      .filter((t) => t.status === 'done' && t.owner === owner && !t.reused && t.workerId && byId.has(t.workerId) && !this.tasks.some(q => q.status !== 'done' && (q.targetWorkerId === t.workerId || q.workerId === t.workerId)))
       .map((t) => ({ t, w: byId.get(t.workerId!)! }))
       .filter(({ w }) => FINISHED.has(w.status) && w.viewers.length === 0)
       .sort((a, b) => Number(!!b.t.pr) - Number(!!a.t.pr) || (a.t.finishedAt ?? 0) - (b.t.finishedAt ?? 0))[0];
+  }
+
+  targets(owner?: string) {
+    return this.workers.list().filter(w => w.kind === 'agent' && !w.meeting &&
+      !DESK_BY_ID.get(w.deskId)?.station && this.workers.ownerOf?.(w.id) === owner);
   }
 
   private seat() {
@@ -318,23 +334,40 @@ export class TaskQueue {
       if (this.busy() >= this.maxWorkers) break;
       // A spent budget holds the queue instead of failing every task; the pump seats them once hiring resumes.
       if (this.events.hiringPaused()) break;
-      // So does an office at its worker limit (--max-workers), unless one of the queue's own finished
-      // workers going home makes room. Over the limit (it was just lowered), it waits for people to send some home.
-      const room = this.events.room?.() ?? Infinity;
-      if (room < 0) break;
-      const free = room > 0 ? this.freeDesk() : undefined;
-      if (!free && !this.recyclable()) break;
-      // Its worktree starts from what's on GitHub now, PRs merged since included: fetch that first,
-      // and come back to seat it once it's in.
-      const fetching = this.useWorktree ? this.workers.fetchBase?.() : undefined;
-      if (fetching) {
-        void fetching.then(() => this.pump());
-        break;
+      const candidates = this.workers.assignTask && this.targets(t.owner).filter(w =>
+        t.targetWorkerId ? w.id === t.targetWorkerId :
+          !w.paused && !w.lost && w.status !== 'exited' && w.status !== 'offline' &&
+          (t.anyProvider || (w.provider === t.provider && (!t.model || (w.containerEngine ?? w).model === t.model) && (!t.effort || (w.containerEngine ?? w).effort === t.effort))));
+      let r: WorkerInfo | string;
+      if (t.targetWorkerId || candidates?.length) {
+        const worker = candidates?.find(w => !this.tasks.some(q => q.status === 'running' && q.workerId === w.id) &&
+          this.workers.assignTask!(w.id, t.prompt, t.addedBy + ' (queue)', t.owner));
+        if (!worker) continue;
+        t.reused = true;
+        t.provider = worker.provider;
+        t.model = (worker.containerEngine ?? worker).model;
+        t.effort = (worker.containerEngine ?? worker).effort;
+        r = worker;
+      } else {
+        // So does an office at its worker limit (--max-workers), unless one of the queue's own finished
+        // workers going home makes room. Over the limit (it was just lowered), it waits for people to send some home.
+        const room = this.events.room?.() ?? Infinity;
+        if (room < 0) continue;
+        const free = room > 0 ? this.freeDesk() : undefined;
+        if (!free && !this.recyclable(t.owner)) continue;
+        // Its worktree starts from what's on GitHub now, PRs merged since included: fetch that first,
+        // and come back to seat it once it's in.
+        const worktree = this.useWorktree && !this.workers.usesPrivateWorkspace?.(t.provider ?? this.workers.defaultProvider);
+        const fetching = worktree ? this.workers.fetchBase?.() : undefined;
+        if (fetching) {
+          void fetching.then(() => this.pump());
+          continue;
+        }
+        const desk = free ?? this.recycleDesk(t.owner);
+        if (!desk) continue;
+        const note = worktree ? this.events.worktreeNote?.() ?? PROMPTS['queue.worktree'].text : '';
+        r = this.workers.spawn(desk, `${t.addedBy} (queue)`, note ? `${t.prompt}\n\n${note}` : t.prompt, worktree, 'agent', t.provider ?? this.workers.defaultProvider, t.model, t.effort, undefined, t.owner);
       }
-      const desk = free ?? this.recycleDesk();
-      if (!desk) break;
-      const note = this.useWorktree ? this.events.worktreeNote?.() ?? PROMPTS['queue.worktree'].text : '';
-      const r = this.workers.spawn(desk, `${t.addedBy} (queue)`, note ? `${t.prompt}\n\n${note}` : t.prompt, this.useWorktree, 'agent', t.provider ?? this.workers.defaultProvider, t.model, t.effort, undefined, t.owner);
       changed = true;
       if (typeof r === 'string') {
         t.status = 'done';
@@ -351,7 +384,7 @@ export class TaskQueue {
       t.startedAt = Date.now();
       t.error = undefined;
       this.lastStatus.set(r.id, r.status);
-      this.events.toast(`📋 ${r.name} sat down at ${DESK_BY_ID.get(desk)?.label ?? 'a desk'} to work on ${label(t)}`, 'info');
+      this.events.toast(`📋 ${r.name} sat down at ${DESK_BY_ID.get(r.deskId)?.label ?? 'a desk'} to work on ${label(t)}`, 'info');
       if (t.issue !== undefined) {
         const issue = t.issue;
         void this.events.claimIssue(issue, t.owner).then((err) => {
@@ -396,6 +429,9 @@ export class TaskQueue {
           addedAt: s.addedAt ?? Date.now(),
           status: s.status === 'running' || s.status === 'done' ? s.status : 'queued',
           workerId: s.workerId,
+          targetWorkerId: typeof s.targetWorkerId === 'string' ? s.targetWorkerId : undefined,
+          reused: s.reused === true,
+          anyProvider: s.anyProvider === true,
           workerName: s.workerName,
           branch: s.branch,
           startedAt: s.startedAt,

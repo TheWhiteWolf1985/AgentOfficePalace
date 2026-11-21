@@ -15,8 +15,11 @@ function wallPieces(g: THREE.Object3D): { all: number; tagged: number } {
   let all = 0;
   let tagged = 0;
   g.traverse((o) => {
-    const size = ((o as THREE.Mesh).geometry as THREE.BoxGeometry | undefined)?.parameters;
-    if (!size || size.height <= 0.25) return;
+    const geometry = (o as THREE.Mesh).geometry;
+    if (!geometry) return;
+    geometry.computeBoundingBox();
+    const bounds = geometry.boundingBox!;
+    if (bounds.max.y - bounds.min.y <= 0.25) return;
     all++;
     if (o.userData.wall) tagged++;
   });

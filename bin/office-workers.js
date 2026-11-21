@@ -7,6 +7,7 @@
 // same as an MCP server on stdio, which the office hands the agents that take one. Plain Node, no
 // build step, no dependencies.
 
+import { request } from 'node:http';
 import { realpathSync } from 'node:fs';
 import { createInterface } from 'node:readline';
 import { fileURLToPath } from 'node:url';
@@ -145,14 +146,14 @@ export function parseArgs(argv) {
  * @param {Record<string, string | undefined>} env
  */
 export function officeEnv(env) {
-  const missing = ENV.filter((k) => !env[k]);
+  const missing = ENV.filter((k) => !env[k] && !(k === 'AGENT_OFFICE_HOOK_URL' && env.AGENT_OFFICE_HOOK_SOCKET));
   if (missing.length) {
     throw new Error(
       `${missing.join(', ')} ${missing.length === 1 ? "isn't" : "aren't"} set. office-workers only works inside Agent Office, ` +
         "from a worker's terminal.",
     );
   }
-  return { url: env.AGENT_OFFICE_HOOK_URL.replace(/\/+$/, ''), worker: env.AGENT_OFFICE_WORKER_ID, token: env.AGENT_OFFICE_HOOK_TOKEN };
+  return { url: (env.AGENT_OFFICE_HOOK_SOCKET ? 'http://localhost' : env.AGENT_OFFICE_HOOK_URL).replace(/\/+$/, ''), worker: env.AGENT_OFFICE_WORKER_ID, token: env.AGENT_OFFICE_HOOK_TOKEN };
 }
 
 /**
@@ -211,7 +212,20 @@ async function send(req, fetchImpl) {
  * @param {{ env: Record<string, string | undefined>, fetch: typeof fetch }} io
  */
 export async function call(what, body, io) {
-  const res = await send(buildRequest(what, officeEnv(io.env), body), io.fetch);
+  const req = buildRequest(what, officeEnv(io.env), body);
+  const socketPath = io.env.AGENT_OFFICE_HOOK_SOCKET;
+  const transport = socketPath ? (url, options) => new Promise((resolve, reject) => {
+    const endpoint = new URL(url);
+    const stream = request({ socketPath, path: endpoint.pathname + endpoint.search, method: options.method, headers: options.headers, signal: options.signal }, response => {
+      const chunks = [];
+      response.on('data', chunk => chunks.push(chunk));
+      response.on('error', reject);
+      response.on('end', () => resolve({ status: response.statusCode, text: () => Buffer.concat(chunks).toString('utf8') }));
+    });
+    stream.on('error', reject);
+    stream.end(options.body);
+  }) : io.fetch;
+  const res = await send(req, transport);
   if (res.status < 200 || res.status >= 300) throw new Error(refusal(res.status, res.body));
   return res.body;
 }
@@ -401,6 +415,7 @@ export async function handleMcp(msg, io) {
   }
   if (!('id' in msg)) return undefined;
   const ok = (result) => ({ jsonrpc: '2.0', id: msg.id, result });
+  const tools = io.env.AGENT_OFFICE_HOOK_SOCKET ? TOOLS.filter(t => ['list_workers', 'tell_worker'].includes(t.name)) : TOOLS;
   switch (msg.method) {
     case 'initialize': {
       const asked = msg.params?.protocolVersion;
@@ -408,16 +423,16 @@ export async function handleMcp(msg, io) {
         protocolVersion: MCP_VERSIONS.includes(asked) ? asked : MCP_VERSIONS[0],
         capabilities: { tools: { listChanged: false } },
         serverInfo: { name: 'agent-office', title: 'Agent Office', version: '1.0.0' },
-        instructions: INSTRUCTIONS,
+        instructions: io.env.AGENT_OFFICE_HOOK_SOCKET ? 'Named office colleagues are real agents on this floor. Use list_workers then tell_worker with the exact colleague ID. Never substitute an internal subagent. Delivery is not completion. Each colleague writes to a separate /workspace visible in the floor bookshelf.' : INSTRUCTIONS,
       });
     }
     case 'ping':
       return ok({});
     case 'tools/list':
-      return ok({ tools: TOOLS });
+      return ok({ tools });
     case 'tools/call': {
       const name = msg.params?.name;
-      if (!TOOLS.some((t) => t.name === name)) return { jsonrpc: '2.0', id: msg.id, error: { code: -32602, message: `Unknown tool: ${name}` } };
+      if (!tools.some((t) => t.name === name)) return { jsonrpc: '2.0', id: msg.id, error: { code: -32602, message: `Unknown tool: ${name}` } };
       try {
         const { text, isError } = await runTool(name, msg.params?.arguments, io);
         return ok({ content: [{ type: 'text', text }], ...(isError ? { isError: true } : {}) });

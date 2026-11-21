@@ -2,9 +2,10 @@
 // queue and workers for the board agents and the office-workers command.
 import http from 'node:http';
 import { connect } from 'node:net';
-import { chmodSync, lstatSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
+import { chmodSync, copyFileSync, renameSync, lstatSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { writeCodexHook } from '../codex.js';
+import { binScript } from '../workers/process.js';
 import { dockerRoot } from '../workers/docker.js';
 import type { Ctx } from '../office/context.js';
 import { readBody, send } from '../http/util.js';
@@ -81,7 +82,18 @@ export async function startHookServer(ctx: Ctx): Promise<{ hookServer: http.Serv
       if (active) throw Error('Runtime Codex già in uso');
       if (lstatSync(socket, { throwIfNoEntry: false })?.ino === old.ino) unlinkSync(socket);
     }
+    const script = binScript('office-workers.js');
+    if (!script) throw Error('Missing office-workers command');
+    const dest = path.join(bridge, 'office-workers.mjs');
+    copyFileSync(script, dest + '.tmp');
+    renameSync(dest + '.tmp', dest);
     const local = http.createServer((req, res) => {
+      const route = req.url?.split('?')[0];
+      if ((req.method === 'GET' && route === '/office/workers') || (req.method === 'POST' && route === '/office/workers/tell')) {
+        const url = new URL(req.url!, 'http://localhost');
+        void officeWorkers(ctx, req, res, url, true).catch(() => send(res, 500, { error: 'Delivery failed' }));
+        return;
+      }
       if (req.method !== 'POST' || req.url?.split('?')[0] !== '/hooks/codex') return send(res, 404, {});
       hookServer.emit('request', req, res);
     });

@@ -115,7 +115,11 @@ export class Docs {
   /** Titles by path, kept while the file's size and time stay the same. */
   private titles = new Map<string, { sig: string; title?: string }>();
 
-  constructor(private dir: string) {}
+  constructor(private dir: string, private workspace = false) {}
+
+  private visible(file: string) {
+    return !this.workspace || file.split(/[\\/]/).every(part => part && !part.startsWith('.') && !SKIP_DIRS.has(part));
+  }
 
   /** Every Markdown file in the project, by path. */
   list(): Promise<DocList> {
@@ -125,7 +129,9 @@ export class Docs {
   }
 
   private async scan(): Promise<DocList> {
-    const found = ((await gitDocs(this.dir)) ?? (await walkDocs(this.dir))).filter(isDocPath).map((p) => p.split(path.sep).join('/'));
+    // A container controls its checkout, including its Git configuration. Only the host project invokes Git.
+    const pathsFromGit = this.workspace ? undefined : await gitDocs(this.dir);
+    const found = (pathsFromGit ?? await walkDocs(this.dir)).filter(p => isDocPath(p) && this.visible(p)).map((p) => p.split(path.sep).join('/'));
     found.sort((a, b) => a.localeCompare(b));
     const more = found.length > MAX_DOCS;
     const files: DocFile[] = [];
@@ -136,7 +142,8 @@ export class Docs {
       const batch = await Promise.all(
         paths.slice(i, i + 32).map(async (p): Promise<DocFile | undefined> => {
           try {
-            const abs = path.join(this.dir, p);
+            const abs = await insideCheckout(this.dir, p);
+            if (!abs || !this.visible(path.relative(this.dir, abs))) return undefined;
             const s = await stat(abs);
             // Tracked but deleted, or a folder called something.md.
             if (!s.isFile()) return undefined;
@@ -161,8 +168,8 @@ export class Docs {
   /** One doc's Markdown. Only Markdown, and only inside the project (not through a link out of it). */
   async read(file: string): Promise<DocText | Failure> {
     if (!isDocPath(file)) return { status: 415, error: 'Only Markdown files are on the bookshelf' };
-    const abs = await insideCheckout(this.dir, file);
-    if (!abs) return { status: 404, error: 'That file is not in the project' };
+    const abs = this.visible(file) ? await insideCheckout(this.dir, file) : undefined;
+    if (!abs || !this.visible(path.relative(this.dir, abs))) return { status: 404, error: 'That file is not in the project' };
     try {
       const s = await stat(abs);
       if (!s.isFile()) return { status: 404, error: 'That is not a file' };
@@ -178,8 +185,8 @@ export class Docs {
   async picture(file: string): Promise<ImageResult> {
     const type = changedImageType(file);
     if (!type) return { status: 415, error: 'Only pictures' };
-    const abs = await insideCheckout(this.dir, file);
-    if (!abs) return { status: 404, error: 'That file is not in the project' };
+    const abs = this.visible(file) ? await insideCheckout(this.dir, file) : undefined;
+    if (!abs || !this.visible(path.relative(this.dir, abs))) return { status: 404, error: 'That file is not in the project' };
     try {
       const s = await stat(abs);
       if (!s.isFile()) return { status: 404, error: 'That is not a file' };

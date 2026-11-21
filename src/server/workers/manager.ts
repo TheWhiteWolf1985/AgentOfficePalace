@@ -1,3 +1,4 @@
+import { assignTask, submitPrompt } from './input.js';
 import { randomAgentAppearance, sanitizeAgentAppearance, type AgentAppearance } from '../../shared/agent-appearance.js';
 import { checkBlocked } from './readiness.js';
 import { workerConnections } from '../connections/git.js';
@@ -517,31 +518,16 @@ export class WorkerManager {
     return true;
   }
 
-  /** Types a prompt into the agent's input box and submits it; `by` is the person who sent it, if any. */
-  prompt(id: string, text: string, by?: string): string | undefined {
-    const w = this.workers.get(id);
-    if (!w) return 'No such worker';
-    if (w.dsh) {
-      const clean = text.replace(/\r\n?/g, '\n').trim();
-      if (!clean) return 'Empty prompt';
-      w.dsh.prompt(clean);
-      w.info.activity = truncate(clean, 80);
-      this.tasks.notePrompt(w, clean);
-      if (by) w.info.lastInput = { by, at: Date.now() };
-      this.emitUpdate(w);
-      return undefined;
-    }
-    if (!w.pty) return 'Worker is not running';
-    const clean = text.replace(/\r\n?/g, '\n').trim();
-    if (!clean) return 'Empty prompt';
-    // Bracketed paste keeps multi-line prompts in one message, then Enter submits.
-    w.pty.write(`\x1b[200~${clean}\x1b[201~`);
-    setTimeout(() => w.pty?.write('\r'), 120);
-    w.info.activity = truncate(clean, 80);
-    this.tasks.notePrompt(w, clean);
-    if (by) w.info.lastInput = { by, at: Date.now() };
-    this.emitUpdate(w);
-    return undefined;
+  usesPrivateWorkspace(provider: AgentProvider) {
+    return provider === 'codex' && !!dockerRoot();
+  }
+
+  assignTask(id: string, text: string, by: string, owner?: string) {
+    return assignTask(this.ctx, id, text, by, owner);
+  }
+
+  prompt(id: string, text: string, by?: string) {
+    return submitPrompt(this.ctx, id, text, by);
   }
 
   /** Pushes a worktree worker's branch and opens a pull request for it, as `as` or else the office (see WorkerPrs.openPr). */

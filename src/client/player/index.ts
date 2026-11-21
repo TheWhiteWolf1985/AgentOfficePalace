@@ -30,9 +30,9 @@ export class PlayerController extends PlayerInput {
   /** At a run: holding Shift, or on the long stretch of a walk along a path. */
   running = false;
   grounded = true;
-  /** Walk cycle phase, shared by the camera bob and the first-person hands. */
+  /** Walk cycle phase, used by footsteps and first-person hands. */
   walkPhase = 0;
-  private bob = 0;
+  private readonly lastCameraFocus = new THREE.Vector3();
   /** Eased out after a step up or down, so the camera glides up stairs instead of popping. */
   stepOffset = 0;
   /**
@@ -98,7 +98,6 @@ export class PlayerController extends PlayerInput {
     this.grounded = true;
     this.moving = false;
     this.stepOffset = 0;
-    this.bob = 0;
     this.facing = place.rotY;
     if (this.view === 'first') {
       this.camYaw = place.rotY - Math.PI;
@@ -156,9 +155,8 @@ export class PlayerController extends PlayerInput {
       this.vy = 0;
       this.grounded = false;
       this.stepOffset *= Math.exp(-dt * 16);
-      this.bob = 0;
       this.jitterT += dt;
-      this.updateCamera();
+      this.updateCamera(false, dt);
       return;
     }
     if (this.seat) {
@@ -166,7 +164,7 @@ export class PlayerController extends PlayerInput {
         this.moving = false;
         this.facing = this.seat.rotY;
         this.jitterT += dt;
-        this.updateCamera();
+        this.updateCamera(false, dt);
         return;
       }
       this.stand();
@@ -237,10 +235,8 @@ export class PlayerController extends PlayerInput {
     this.stepOffset *= Math.exp(-dt * 16);
     const walking = this.moving && this.grounded;
     this.walkPhase += dt * (walking ? (this.running ? 14 : 11) * this.effects.speed : 0);
-    const bob = walking ? Math.abs(Math.sin(this.walkPhase)) * 0.035 : 0;
-    this.bob += (bob - this.bob) * Math.min(1, dt * 18);
     this.jitterT += dt;
-    this.updateCamera();
+    this.updateCamera(false, dt);
   }
 
   /** A step along `path`: toward its next corner, turning (and in first person, looking) the way you go. */
@@ -280,8 +276,9 @@ export class PlayerController extends PlayerInput {
     }
   }
 
-  updateCamera(snap = false) {
-    aimCamera(this.camera, this, this.bob, this.lift, snap);
+  updateCamera(snap = false, dt = 1 / 60) {
+    aimCamera(this.camera, this, this.lift, snap, dt, this.lastCameraFocus);
+    this.lastCameraFocus.copy(this.pos);
     this.shake();
   }
 
