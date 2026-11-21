@@ -368,7 +368,7 @@ export class Person {
 
 
   /** `pace` speeds up the walk cycle for someone walking faster than usual. */
-  update(dt: number, t: number, moving: boolean, airborne: boolean, pace = 1) {
+  update(dt: number, t: number, moving: boolean, airborne: boolean, pace = 1, bounce = true) {
     const target = moving ? 1 : 0;
     this.walkPhase += dt * 11 * target * pace;
     const swing = Math.sin(this.walkPhase) * 0.7 * target;
@@ -437,7 +437,7 @@ export class Person {
       this.legR.rotation.set(-1.15, 0, 0.35);
       this.body.rotation.z = -0.16;
     }
-    this.body.position.y = moving && !airborne ? Math.abs(Math.sin(this.walkPhase)) * 0.06 : 0;
+    this.body.position.y = bounce && moving && !airborne ? Math.abs(Math.sin(this.walkPhase)) * 0.06 : 0;
     // Down onto (or up onto) the seat: the hips go where it puts them.
     if (sit) this.body.position.y = THREE.MathUtils.lerp(this.body.position.y, this.seatHips - HIPS, sit);
     if (this.speaking) this.mic.scale.setScalar(1 + Math.sin(t * 14) * 0.2);

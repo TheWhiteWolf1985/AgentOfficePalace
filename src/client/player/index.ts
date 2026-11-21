@@ -32,6 +32,7 @@ export class PlayerController extends PlayerInput {
   grounded = true;
   /** Walk cycle phase, used by footsteps and first-person hands. */
   walkPhase = 0;
+  private readonly lastCameraFocus = new THREE.Vector3();
   /** Eased out after a step up or down, so the camera glides up stairs instead of popping. */
   stepOffset = 0;
   /**
@@ -155,7 +156,7 @@ export class PlayerController extends PlayerInput {
       this.grounded = false;
       this.stepOffset *= Math.exp(-dt * 16);
       this.jitterT += dt;
-      this.updateCamera();
+      this.updateCamera(false, dt);
       return;
     }
     if (this.seat) {
@@ -163,7 +164,7 @@ export class PlayerController extends PlayerInput {
         this.moving = false;
         this.facing = this.seat.rotY;
         this.jitterT += dt;
-        this.updateCamera();
+        this.updateCamera(false, dt);
         return;
       }
       this.stand();
@@ -235,7 +236,7 @@ export class PlayerController extends PlayerInput {
     const walking = this.moving && this.grounded;
     this.walkPhase += dt * (walking ? (this.running ? 14 : 11) * this.effects.speed : 0);
     this.jitterT += dt;
-    this.updateCamera();
+    this.updateCamera(false, dt);
   }
 
   /** A step along `path`: toward its next corner, turning (and in first person, looking) the way you go. */
@@ -275,8 +276,9 @@ export class PlayerController extends PlayerInput {
     }
   }
 
-  updateCamera(snap = false) {
-    aimCamera(this.camera, this, this.lift, snap);
+  updateCamera(snap = false, dt = 1 / 60) {
+    aimCamera(this.camera, this, this.lift, snap, dt, this.lastCameraFocus);
+    this.lastCameraFocus.copy(this.pos);
     this.shake();
   }
 
