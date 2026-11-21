@@ -41,10 +41,11 @@ originale è a quota zero e i tre tappeti sono rialzati di pochi millimetri.
 Un piano esterno sovrapposto coprirebbe questi dettagli; la geometria del GLB
 rimane alla quota consegnata, senza compensazioni o spostamenti degli arredi.
 
-Le scale del modello sono geometria collidibile; per passare ad altri piani
-si usa l'ascensore. Il loro collegamento tra ambienti e le altre
-rifiniture saranno interventi successivi. Questa integrazione non abilita
-agenti, postazioni reception operative o la lavagna della Sala riunioni.
+Salendo le due rampe, attraversare il pianerottolo superiore porta automaticamente
+al primo ufficio disponibile. Se tutti gli uffici sono ancora in creazione o
+l'edificio è vuoto, si arriva alla Sala server. Per scendere, attraversare il
+varco «↓ Atrio» accanto all'ascensore del piano collegato. Si riappare sul
+pianerottolo dell'Atrio rivolti verso i gradini.
 
 Per importare nuovamente la stessa consegna:
 

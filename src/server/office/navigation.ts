@@ -36,9 +36,9 @@ export function navigation(ctx: Ctx): Navigation {
   };
 
   /** Out to the lobby, where the elevator has nowhere to go: the building's last floor was taken off. */
-  const toLobby = (c: Client) => {
+  const toLobby = (c: Client, at?: Spot) => {
     if (c.peer.floor === LOBBY) return;
-    const left = leave(c);
+    const left = leave(c, at);
     c.peer.floor = LOBBY;
     ctx.sendTo(c, { t: 'floor.enter', peers: [...ctx.clients.values()].map((o) => o.peer), ...lobbyView(ctx) });
     arrived(c, left);
@@ -63,9 +63,9 @@ export function navigation(ctx: Ctx): Navigation {
     for (const then of after) then();
   };
 
-  const goToServerRoom = (c: Client) => {
+  const goToServerRoom = (c: Client, at?: Spot) => {
     if (c.peer.floor === SERVER_ROOM) return;
-    const left = leave(c); c.peer.floor = SERVER_ROOM;
+    const left = leave(c, at); c.peer.floor = SERVER_ROOM;
     ctx.sendTo(c, { t: 'floor.enter', peers: [...ctx.clients.values()].map(o => o.peer), ...serverRoomView(ctx) });
     arrived(c, left); ctx.floorsChanged();
   };
