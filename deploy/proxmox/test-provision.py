@@ -40,6 +40,15 @@ class ProvisionTest(unittest.TestCase):
             with self.assertRaises(ValueError):
                 vm.verify(path, 'sha256', '0' * 64)
 
+    def test_reports_address_confirmed_by_guest_installer(self):
+        def read(vmid, *args):
+            files = {'/var/lib/agent-office-provision/status': 'PRONTA',
+                     '/etc/agent-office-proxy/address': '10.34.8.7'}
+            self.assertEqual(args[0], 'cat')
+            return files[args[1]]
+        with patch.object(vm, 'guest', read):
+            self.assertEqual(str(vm.wait_ready('123')), '10.34.8.7')
+
     def test_failed_guest_stops_before_reporting_url(self):
         with patch.object(vm, 'guest', return_value='ERRORE download'), self.assertRaisesRegex(RuntimeError, 'download'):
             vm.wait_ready('123')

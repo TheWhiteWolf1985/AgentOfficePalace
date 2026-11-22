@@ -23,6 +23,7 @@ node -p 'process.release.sourceUrl' > "$work/package/node-source-url"
 curl --fail --silent --show-error --location --proto '=https' "https://raw.githubusercontent.com/nodejs/node/$(node --version)/LICENSE" -o "$work/package/NODE-LICENSE"
 mkdir -p "$work/package/distribution"
 cp deploy/debian/agent-office-release.py "$work/package/distribution/"
+install -m755 deploy/debian/agent-office-proxy.py "$work/package/distribution/agent-office-proxy.py"
 python3 deploy/codex-agent/seccomp.py > "$work/package/distribution/codex-seccomp.json"
 tar -C "$work/package" -czf "$out/agent-office-linux-amd64.tgz" .
 image="aop-codex:release-$commit"

@@ -212,7 +212,7 @@ WantedBy=default.target
         raise ValueError('Il motore Docker rootless non è pronto')
     config = Path('/etc/agent-office-palace.env')
     if not config.exists():
-        atomic(config, f'AGENT_OFFICE_PASSWORD={secrets.token_urlsafe(24)}\nAGENT_OFFICE_HTTPS_PORT=4643\n'
+        atomic(config, f'AGENT_OFFICE_PASSWORD={secrets.token_urlsafe(24)}\n'
                f'AGENT_OFFICE_CODEX_RUNTIME={HOME}/codex-runtime\nAGENT_OFFICE_DOCKER_SOCKET=/run/user/{account.pw_uid}/aop-docker.sock\n'
                'AGENT_OFFICE_MANAGED_PROVIDERS=codex\n', 0o600)
     atomic(UNIT / SERVICE, f"""[Unit]
@@ -227,7 +227,7 @@ Environment=HOME={HOME}
 Environment=PATH={ROOT}/current/bin:/usr/local/bin:/usr/bin:/bin
 EnvironmentFile={ROOT}/current/release.env
 EnvironmentFile={config}
-ExecStart={ROOT}/current/bin/node {ROOT}/current/bin/agent-office.js --home {HOME}/office --projects {HOME}/projects --host 0.0.0.0 --port 4600 --no-open
+ExecStart={ROOT}/current/bin/node {ROOT}/current/bin/agent-office.js --home {HOME}/office --projects {HOME}/projects --host 127.0.0.1 --port 4600 --trust-proxy --no-open
 Restart=on-failure
 RestartSec=3
 UMask=0077
@@ -254,6 +254,23 @@ RandomizedDelaySec=5min
 WantedBy=timers.target
 """)
     run('systemctl', 'daemon-reload')
+
+
+def install_proxy():
+    # Prevent the Debian default site from starting on a fresh install.
+    state = output('systemctl', 'show', '-p', 'LoadState', '--value', 'nginx.service')
+    mask = state == 'not-found'
+    if mask:
+        run('systemctl', 'mask', '--runtime', 'nginx.service')
+    try:
+        run('apt-get', 'install', '-y', '--no-remove', '--no-install-recommends',
+            'nginx', 'openssl', 'iproute2', env={**os.environ, 'DEBIAN_FRONTEND': 'noninteractive'})
+    finally:
+        if mask:
+            run('systemctl', 'unmask', '--runtime', 'nginx.service')
+    proxy = ROOT / 'current/distribution/agent-office-proxy.py'
+    run(sys.executable, proxy)
+    link(Path('/usr/local/sbin/agent-office-proxy'), proxy)
 
 
 def docker():
@@ -412,12 +429,14 @@ def main():
                 raise
             rejected.unlink(missing_ok=True)
             if a.action == 'install':
+                install_proxy()
                 link(TOOL, ROOT / 'current/distribution' / MANAGER)
                 run('systemctl', 'enable', SERVICE)
                 run('systemctl', 'enable', '--now', TIMER)
             print('Versione attiva:', 'v' + release.manifest['version'], release.manifest['commit'])
             if a.action == 'install':
-                print('Apri https://<IP-della-VM>:4643. La password è in /etc/agent-office-palace.env (solo root).')
+                ip = Path('/etc/agent-office-proxy/address').read_text().strip()
+                print(f'Apri https://{ip}/. La password è in /etc/agent-office-palace.env (solo root).')
 
 
 if __name__ == '__main__':

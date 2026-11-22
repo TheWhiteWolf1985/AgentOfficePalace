@@ -15,6 +15,28 @@ manager = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(manager)
 
 
+proxy_spec = importlib.util.spec_from_file_location('proxy', Path(__file__).with_name('agent-office-proxy.py'))
+proxy = importlib.util.module_from_spec(proxy_spec)
+proxy_spec.loader.exec_module(proxy)
+
+
+class ProxyTest(unittest.TestCase):
+    def test_selects_assigned_route_source_and_rejects_nonlocal_override(self):
+        interfaces = json.dumps([{'addr_info': [{'family': 'inet', 'scope': 'global', 'local': '10.8.6.5'}]}])
+        with patch.object(proxy, 'run', side_effect=[interfaces, '[{"prefsrc": "10.8.6.5"}]']):
+            self.assertEqual(proxy.address(None), '10.8.6.5')
+        with patch.object(proxy, 'run', return_value=interfaces), self.assertRaises(ValueError):
+            proxy.address('10.8.6.9')
+
+    def test_forgejo_keeps_other_sections_and_uses_the_external_port(self):
+        original = '[server]\nHTTP_PORT = 3000\n\n[database]\nPATH = /some/data.db\n'
+        result = proxy.forgejo_settings(original, '10.8.6.5')
+        self.assertIn('ROOT_URL = https://10.8.6.5:8443/\n', result)
+        self.assertIn('LOCAL_ROOT_URL = http://127.0.0.1:3000/\n', result)
+        self.assertTrue(result.endswith('[database]\nPATH = /some/data.db\n'))
+        self.assertEqual(proxy.forgejo_settings(result, '10.8.6.5'), result)
+
+
 class ReleaseTest(unittest.TestCase):
     def setUp(self):
         tmp = tempfile.TemporaryDirectory()

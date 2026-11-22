@@ -57,7 +57,8 @@ progress "$phase"
 python3 ./agent-office-release.py install --from-dir "$work"
 phase=https
 progress "$phase"
-curl -kfSs --noproxy '*' https://127.0.0.1:4643/api/health |
+ip=$(cat /etc/agent-office-proxy/address)
+curl -fSs --noproxy '*' --cacert /etc/agent-office-proxy/ca.crt "https://$ip/api/health" |
     python3 -c 'import sys,json; sys.exit(json.load(sys.stdin).get("ok") is not True)'
 progress PRONTA
 '''
@@ -147,8 +148,7 @@ def wait_ready(vmid):
         if status.startswith('ERRORE'):
             raise RuntimeError(status)
         if status == 'PRONTA':
-            route = json.loads(guest(vmid, 'ip', '-j', '-4', 'route', 'get', '1.1.1.1'))
-            return ipaddress.IPv4Address(route[0]['prefsrc'])
+            return ipaddress.IPv4Address(guest(vmid, 'cat', '/etc/agent-office-proxy/address'))
         time.sleep(8)
     raise RuntimeError('Tempo scaduto in attesa del guest. Verificare DHCP, DNS e accesso ai repository.')
 
@@ -207,7 +207,7 @@ def main():
             print(f'VM {vmid} conservata. Console: qm terminal {vmid}. '
                   'Log nel guest: /var/log/cloud-init-output.log', file=sys.stderr)
             raise
-    print(f'VM {vmid} pronta: https://{ip}:4643')
+    print(f'VM {vmid} pronta: https://{ip}/')
     print(f'Password applicativa dal nodo: qm guest exec {vmid} -- grep ^AGENT_OFFICE_PASSWORD= /etc/agent-office-palace.env')
 
 
