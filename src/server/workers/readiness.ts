@@ -1,5 +1,5 @@
 import type { WorkerStatus } from '../../shared/protocol.js';
-import { codexAtEmptyPrompt } from '../codex.js';
+import { codexAtEmptyPrompt, codexStartupDialog } from '../codex.js';
 import { providerAdapter } from '../providers/index.js';
 import { screenText } from './terminal.js';
 import type { Worker } from './types.js';
@@ -9,9 +9,17 @@ export function checkBlocked(w: Worker, setStatus: (status: WorkerStatus) => voi
   const s = w.info.status;
   // A previously blocked Codex may reach its prompt after onboarding or an update notice.
   // Only the live, fresh screen counts; never clear real questions or approvals by timeout.
-  if (w.term && w.info.provider === 'codex' && w.bootBlocked && s === 'needs_input') {
+  if (w.term && w.info.provider === 'codex' && (s === 'starting' || s === 'idle' || (w.bootBlocked && s === 'needs_input'))) {
     const text = screenText(w.term, w.term.buffer.active.type === 'normal' ? Math.max(0, w.fresh?.line ?? 0) : 0);
-    if (codexAtEmptyPrompt(text)) {
+    if (w.info.runtime === 'docker' && codexStartupDialog(text)) {
+      if (!w.bootBlocked || s !== 'needs_input') {
+        w.bootBlocked = true;
+        w.info.activity = 'Apri il terminale per esaminare la configurazione di Codex';
+        setStatus('needs_input');
+      }
+      return;
+    }
+    if (w.bootBlocked && s === 'needs_input' && codexAtEmptyPrompt(text)) {
       w.bootBlocked = false;
       w.info.activity = undefined;
       setStatus('idle');

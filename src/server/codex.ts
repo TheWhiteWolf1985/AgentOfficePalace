@@ -4,7 +4,14 @@ import type { AgentEffort } from '../shared/providers.js';
 
 /** A resumed Codex session can reach its empty prompt without sending SessionStart. */
 export function codexAtEmptyPrompt(screen: string): boolean {
-  return /(?:^|\n)\s*[›>]\s*Ask Codex to do anything\s*(?:\n|$)/.test(screen);
+  return /(?:^|\n)\s*[›>]\s*Ask Codex to do anything\s*(?:\n|$)/.test(screen)
+    && !/^\s*loading(?:…|\.\.\.)?\s*$/im.test(screen) && !codexStartupDialog(screen);
+}
+
+/** A visible first-run dialog can temporarily cover an already rendered composer. */
+export function codexStartupDialog(screen: string): boolean {
+  return (/Trust this folder\?/i.test(screen) && /1\.\s*Trust and continue/i.test(screen))
+    || (/Hooks need review/i.test(screen) && /1\.\s*Review hooks/i.test(screen));
 }
 
 export const CODEX_HOOK_EVENTS = [
@@ -95,14 +102,24 @@ function shellQuote(value: string): string {
  * Build the CLI config overrides for all lifecycle hooks. The command is encoded as a TOML basic
  * string so paths containing spaces remain valid; the command itself is shell-quoted.
  */
-export function codexHookArgs(hookPath: string, node = process.execPath): string[] {
-  const args: string[] = [];
-  for (const event of CODEX_HOOK_EVENTS) {
+function codexHookSettings(hookPath: string, node: string): string[] {
+  return CODEX_HOOK_EVENTS.map(event => {
     const command = [node, hookPath, event].map(shellQuote).join(' ');
-    const config = `hooks.${event}=[{hooks=[{type="command",command=${JSON.stringify(command)},timeout=3}]}]`;
-    args.push('-c', config);
-  }
-  return args;
+    return `hooks.${event}=[{hooks=[{type="command",command=${JSON.stringify(command)},timeout=3}]}]`;
+  });
+}
+
+export function codexHookArgs(hookPath: string, node = process.execPath): string[] {
+  return codexHookSettings(hookPath, node).flatMap(setting => ['-c', setting]);
+}
+
+/** System configuration for the private workspace and the read-only Office bridge in Docker. */
+export function dockerCodexConfig(): string {
+  return [
+    'projects."/workspace".trust_level = "trusted"',
+    ...codexHookSettings('/office-bridge/agent-office-codex-hook.cjs', '/usr/local/bin/node'),
+    '',
+  ].join('\n');
 }
 
 /**

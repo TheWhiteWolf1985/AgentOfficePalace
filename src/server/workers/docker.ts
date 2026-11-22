@@ -125,6 +125,7 @@ export async function prepareContainer(info: WorkerInfo, project: string, token:
       '--mount', 'type=bind,src=' + p.home + ',dst=' + p.home,
       '--mount', 'type=bind,src=' + p.drops + ',dst=/office-drops,readonly',
       '--mount', 'type=bind,src=' + p.bridge + ',dst=/office-bridge,readonly',
+      '--mount', 'type=bind,src=' + path.join(p.bridge, 'codex-system') + ',dst=/etc/codex,readonly',
       '--env', 'HOME=' + p.home, '--env', 'CODEX_HOME=' + dockerHome(info.id),
       '--env', 'TERM=xterm-256color', '--env', 'AGENT_OFFICE_WORKER_ID=' + info.id,
       '--env', 'AGENT_OFFICE_HOOK_TOKEN=' + token, '--env', 'AGENT_OFFICE_HOOK_SOCKET=/office-bridge/hooks.sock',

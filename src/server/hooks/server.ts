@@ -4,7 +4,7 @@ import http from 'node:http';
 import { connect } from 'node:net';
 import { chmodSync, copyFileSync, renameSync, lstatSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { writeCodexHook } from '../codex.js';
+import { dockerCodexConfig, writeCodexHook } from '../codex.js';
 import { binScript } from '../workers/process.js';
 import { dockerRoot } from '../workers/docker.js';
 import type { Ctx } from '../office/context.js';
@@ -89,6 +89,11 @@ export async function startHookServer(ctx: Ctx): Promise<{ hookServer: http.Serv
     }
     const script = binScript('office-workers.js');
     if (!script) throw Error('Missing office-workers command');
+    const configDir = path.join(bridge, 'codex-system');
+    mkdirSync(configDir, { recursive: true, mode: 0o700 });
+    const config = path.join(configDir, 'config.toml');
+    writeFileSync(config + '.tmp', dockerCodexConfig(), { mode: 0o600 });
+    renameSync(config + '.tmp', config);
     const dest = path.join(bridge, 'office-workers.mjs');
     copyFileSync(script, dest + '.tmp');
     renameSync(dest + '.tmp', dest);

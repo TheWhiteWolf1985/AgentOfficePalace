@@ -4,12 +4,15 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
+import headless from '@xterm/headless';
 import { AGENT_IMAGE, serialWorker, dockerHome, dockerDrop } from '../src/server/workers/docker.js';
 import { restoreWorkers, saveWorkers } from '../src/server/workers/persist.js';
 import { newWorker } from '../src/server/workers/worker.js';
 import { newTracker } from '../src/server/usage.js';
 import { DESKS } from '../src/shared/layout.js';
-import type { Worker } from '../src/server/workers/types.js';
+import type { Worker, WorkerContext } from '../src/server/workers/types.js';
+import { assignTask, submitPrompt } from '../src/server/workers/input.js';
+import { checkBlocked } from '../src/server/workers/readiness.js';
 
 test('agent creation and model discovery select the CLI version built by default', () => {
   const dockerfile = readFileSync(new URL('../deploy/codex-agent/Dockerfile', import.meta.url), 'utf8');
@@ -29,6 +32,28 @@ test('operations for one container run in order; another agent can start indepen
   assert.deepEqual(steps, ['creating', 'another agent']);
   release(); await rejected; await retry;
   assert.equal(steps.at(-1), 'retry');
+});
+
+test('a first-run dialog blocks direct and delegated input until the Docker agent is ready', async t => {
+  const term = new headless.Terminal({ cols: 100, rows: 12, allowProposedApi: true });
+  t.after(() => term.dispose());
+  const written: string[] = [];
+  const w = { info: { id: 'first', kind: 'agent', runtime: 'docker', provider: 'codex', status: 'idle' },
+    term, pty: { write: (data: string) => written.push(data) } } as unknown as Worker;
+  const setStatus = (status: Worker['info']['status']) => { w.info.status = status; };
+  const ctx = { workers: new Map([['first', w]]), emit() {}, notePrompt() {}, setStatus() {} } as unknown as WorkerContext;
+  const render = (text: string) => new Promise<void>(resolve => term.write('\x1b[2J\x1b[H' + text, resolve));
+  await render('Hooks need review\r\n› 1. Review hooks');
+  assert.equal(assignTask(ctx, 'first', 'incarico', 'collega'), false);
+  assert.ok(submitPrompt(ctx, 'first', 'incarico', 'utente'));
+  checkBlocked(w, setStatus);
+  assert.equal(w.info.status, 'needs_input');
+  assert.deepEqual(written, []);
+  await render('› Ask Codex to do anything\r\n');
+  checkBlocked(w, setStatus);
+  assert.equal(w.info.status, 'idle');
+  assert.equal(assignTask(ctx, 'first', 'incarico', 'collega'), true);
+  assert.match(written[0], /incarico/);
 });
 
 test('a stopped Docker worker restores its identity, sign-in boundary and chosen runtime', t => {

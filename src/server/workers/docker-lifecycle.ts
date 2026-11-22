@@ -1,5 +1,5 @@
 import { codexMcpArgs } from '../office-workers.js';
-import { codexHookArgs, codexModelArgs } from '../codex.js';
+import { codexModelArgs } from '../codex.js';
 import { prepareContainer, serialWorker, stopContainer, retireContainer } from './docker.js';
 import type { Worker, WorkerContext } from './types.js';
 
@@ -17,7 +17,7 @@ export class DockerWorkers {
     this.provisioning.add(info.id);
     const engine = { model: info.model, effort: info.effort };
     const args = codexModelArgs([], engine.model, engine.effort);
-    args.push(...codexHookArgs('/office-bridge/agent-office-codex-hook.cjs', 'node'), ...codexMcpArgs('/office-bridge/office-workers.mjs', true), '--no-alt-screen');
+    args.push(...codexMcpArgs('/office-bridge/office-workers.mjs', true), '--no-alt-screen');
     if (resume) args.push('resume', resume);
     if (prompt) args.push('--', prompt);
     this.ctx.persist();

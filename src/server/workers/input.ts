@@ -1,5 +1,7 @@
 import type { WorkerContext } from './types.js';
 import { truncate } from './util.js';
+import { codexAtEmptyPrompt, codexStartupDialog } from '../codex.js';
+import { screenText } from './terminal.js';
 
 export function assignTask(ctx: WorkerContext, id: string, text: string, by: string, owner?: string): boolean {
   const w = ctx.workers.get(id);
@@ -34,6 +36,12 @@ export function submitPrompt(ctx: WorkerContext, id: string, text: string, by?: 
   if (!w.pty) return 'Worker is not running';
   const clean = text.replace(/\r\n?/g, '\n').trim();
   if (!clean) return 'Empty prompt';
+  if (w.info.runtime === 'docker' && w.info.provider === 'codex' && w.term) {
+    const screen = screenText(w.term, w.term.buffer.active.type === 'normal' ? w.fresh?.line : 0);
+    if (codexStartupDialog(screen) || (!w.info.sessionId && !codexAtEmptyPrompt(screen))) {
+      return 'Codex non è ancora pronto a ricevere incarichi';
+    }
+  }
   // Bracketed paste keeps multi-line prompts in one message, then Enter submits.
   w.pty.write(`\x1b[200~${clean}\x1b[201~`);
   setTimeout(() => w.pty?.write('\r'), 120);
