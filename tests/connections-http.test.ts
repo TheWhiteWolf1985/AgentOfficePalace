@@ -7,6 +7,7 @@ import path from 'node:path';
 import type { Ctx } from '../src/server/office/context.js';
 import { connectionsRoute, managedProviders } from '../src/server/http/routes/connections.js';
 import { connections } from '../src/server/connections/store.js';
+import { testOffice } from './support/managed-floor-office.js';
 
 test('central management offers only engines supported by the deployed runner', () => {
   const previous = process.env.AGENT_OFFICE_MANAGED_PROVIDERS;
@@ -51,4 +52,32 @@ test('connection endpoints enforce admin and origin checks and never return stor
     if (previous === undefined) delete process.env.AGENT_OFFICE_CONNECTIONS_DIR; else process.env.AGENT_OFFICE_CONNECTIONS_DIR = previous;
     rmSync(root, { recursive: true, force: true });
   }
+});
+
+test('only admins can use floor management and the agent settings entry point creates the same private floor', async t => {
+  const f = await testOffice(t); f.seedGit();
+  let admin = false;
+  const ctx = { ...f.ctx, meOf: () => ({ admin }) } as Ctx;
+  const service = http.createServer((req, res) => {
+    const url = new URL(req.url!, 'http://localhost');
+    void connectionsRoute.handle(ctx, { req, res, url, path: url.pathname, session: {} as any });
+  });
+  await new Promise<void>(resolve => service.listen(0, '127.0.0.1', resolve));
+  t.after(() => new Promise<void>(resolve => { service.closeAllConnections(); service.close(() => resolve()); }));
+  const origin = 'http://127.0.0.1:' + (service.address() as { port: number }).port;
+  const endpoint = origin + '/api/connections';
+  const post = (action: string, from = origin) => fetch(endpoint, { method: 'POST',
+    headers: { Origin: from, 'Content-Type': 'application/json' }, body: JSON.stringify({ action, name: 'Ufficio test' }) });
+  assert.equal((await fetch(endpoint + '?floor-management=1')).status, 403);
+  for (const action of ['floor-create', 'floor-update', 'floor-delete', 'container-office']) assert.equal((await post(action)).status, 403);
+  admin = true;
+  assert.equal((await post('floor-create', 'https://other.example')).status, 403);
+  assert.deepEqual(f.calls, []);
+  assert.equal((await post('container-office')).status, 200);
+  const response = await fetch(endpoint + '?floor-management=1');
+  assert.equal(response.status, 200);
+  const state = await response.json();
+  assert.equal(state.floors[0].repo, 'uffici/Uff_test');
+  assert.equal(f.repos.get(state.floors[0].repo)?.private, true);
+  assert.deepEqual(Object.keys(state).sort(), ['configured', 'floors', 'organization', 'root']);
 });

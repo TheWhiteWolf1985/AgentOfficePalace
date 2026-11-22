@@ -4,8 +4,10 @@ import { existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSyn
 import { cp } from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
 import { MAX_FLOORS } from '../shared/floors.js';
+import { LOBBY } from '../shared/rooftop.js';
 import { officeRepoName, type FloorManagementView } from '../shared/floor-management.js';
 import type { Ctx } from './office/context.js';
+import type { Client } from './office/client.js';
 import type { FloorDef } from './building.js';
 import type { Floor } from './floor.js';
 import { connections, repositoryName, serverUrl } from './connections/store.js';
@@ -89,6 +91,11 @@ function validateClone(dir: string) {
   if (existsSync(path.join(dir, '.agent-office')) || presentLink(path.join(dir, '.agent-office')))
     throw Error('Il repository contiene la cartella riservata .agent-office');
 }
+function retainFailedWorkspace(dir: string) {
+  const retained = path.join(path.dirname(dir), '.office-recovery-' + randomUUID());
+  renameSync(dir, retained);
+  return ' Copia locale conservata in ' + retained + '.';
+}
 async function selectRepo(ctx: Ctx, cfg: ForgeConfig, full: string, existing: boolean, currentId?: string): Promise<Repository> {
   if (ctx.building.list().some(f => f.id !== currentId && same(f.repo, full))) throw Error('Repository già associato a un piano');
   let repo: Repository | undefined = await forge(cfg, '/repos/' + full);
@@ -116,11 +123,12 @@ async function create(ctx: Ctx, body: Input, who: string) {
   const repo = await selectRepo(ctx, cfg, full, body.existing === true);
   const stage = mkdtempSync(path.join(path.dirname(dir), '.office-clone-'));
   let def: FloorDef | undefined;
+  let installed = false;
   try {
     await cloneRepository(connections(), cfg.readerAccountId, full, stage);
     validateClone(stage);
     destination(ctx, dir);
-    renameSync(stage, dir);
+    renameSync(stage, dir); installed = true;
     def = ctx.building.attach(dir, name, repo.full_name, who, repo.id);
     connections().bind({ dir, floorId: def.id, accountId: cfg.readerAccountId, repository: repo.full_name, agents: {} });
     if (!ctx.openFloor(def)) throw Error('Impossibile aprire il piano');
@@ -128,7 +136,8 @@ async function create(ctx: Ctx, body: Input, who: string) {
     return { floorId: def.id };
   } catch (e) {
     if (def) { ctx.building.remove(def.id); connections().unbind(dir); }
-    throw Error((e as Error).message + '. Il repository è conservato: riprovare con «Collega esistente».');
+    const retained = installed ? retainFailedWorkspace(dir) : '';
+    throw Error((e as Error).message + '. Il repository è conservato: riprovare con «Collega esistente».' + retained);
   } finally { rmSync(stage, { recursive: true, force: true }); }
 }
 
@@ -146,9 +155,11 @@ async function update(ctx: Ctx, body: Input) {
   const canMove = () => {
     if (move && floor.workers.list().some(w => !['exited','offline'].includes(w.status) && !w.paused))
       throw Error('Fermare le sessioni degli agenti di questo piano prima di spostare la cartella');
+    if (move && existsSync(path.join(old.dir, '.git', 'worktrees'))) throw Error('Rimuovere prima le worktree Git collegate');
   };
   canMove();
   if (!move && !changingRepo && name === old.name) return { floorId: old.id };
+  available(floor, ctx);
   const store = connections(), previous = store.binding(old.dir);
   let target: Repository | undefined, cfg: ForgeConfig | undefined, stage: string | undefined;
   if (changingRepo) {
@@ -157,12 +168,14 @@ async function update(ctx: Ctx, body: Input) {
     await verifyGit(store, cfg.readerAccountId, target.full_name);
   }
   const next = { ...old, name, dir, ...(target && { repo: target.full_name, forgejoId: target.id }) };
-  const visitors = () => [...ctx.clients.values()].filter(c => c.peer.floor === old.id);
+  let visitors: [string, Client][] = [];
+  const returnVisitors = (opened: Floor) => {
+    for (const [id, c] of visitors) if (ctx.clients.get(id) === c && c.peer.floor === LOBBY) ctx.goToFloor(c, opened);
+  };
   let stopped = false, replaced = false, savedOrigin: string | undefined, installedGit = false;
+  let installedCopy = false;
   const installedFiles: string[] = [];
   try {
-    available(floor, ctx);
-    if (move && existsSync(path.join(old.dir, '.git', 'worktrees'))) throw Error('Rimuovere prima le worktree Git collegate');
     if (target && !existsSync(path.join(old.dir, '.git'))) {
       stage = mkdtempSync(path.join(ctx.building.projectsDir, '.office-import-'));
       await cloneRepository(store, cfg!.readerAccountId, target.full_name, stage);
@@ -172,8 +185,8 @@ async function update(ctx: Ctx, body: Input) {
     current(ctx, body); canMove();
     available(floor, ctx);
     if (move) destination(ctx, dir);
-    const clients = visitors();
-    for (const c of clients) ctx.toLobby(c);
+    visitors = [...ctx.clients].filter(([, c]) => c.peer.floor === old.id);
+    for (const [, c] of visitors) ctx.toLobby(c);
     floor.shutdown(!move); ctx.floors.delete(old.id); stopped = true;
     if (move) {
       if (!lstatSync(old.dir).isDirectory()) throw Error('Workspace sorgente non valido');
@@ -182,7 +195,7 @@ async function update(ctx: Ctx, body: Input) {
         const pty = path.join(old.dir, '.agent-office', 'pty.sock');
         await cp(old.dir, copy, { recursive: true, verbatimSymlinks: true, filter: src => src !== pty });
         destination(ctx, dir);
-        renameSync(copy, dir);
+        renameSync(copy, dir); installedCopy = true;
       } finally { rmSync(copy, { recursive: true, force: true }); }
     }
     if (stage) {
@@ -199,10 +212,11 @@ async function update(ctx: Ctx, body: Input) {
     if (target || previous) store.bind({ dir, floorId: old.id, repository: target?.full_name ?? previous!.repository, accountId: cfg?.readerAccountId ?? previous!.accountId,
       agents: previous?.agents ?? {} });
     ctx.building.replace(next); replaced = true;
-    if (!ctx.openFloor(next)) throw Error('Il nuovo workspace non si apre');
+    const opened = ctx.openFloor(next);
+    if (!opened) throw Error('Il nuovo workspace non si apre');
     if (move && previous) store.unbind(old.dir);
     ctx.floorsChanged();
-    for (const c of clients) ctx.goToFloor(c, ctx.floors.get(old.id)!);
+    returnVisitors(opened);
     return { floorId: old.id, ...(move && { retained: old.dir }) };
   } catch (error) {
     if (stopped) {
@@ -215,8 +229,10 @@ async function update(ctx: Ctx, body: Input) {
         else git(dir, 'remote', 'remove', 'origin');
       }
       if (!move && stage) for (const file of installedFiles) renameSync(path.join(dir, file), path.join(stage, file));
-      ctx.openFloor(old); ctx.floorsChanged();
+      const opened = ctx.openFloor(old); ctx.floorsChanged();
+      if (opened) returnVisitors(opened);
     }
+    if (installedCopy) throw Error((error as Error).message + '.' + retainFailedWorkspace(dir));
     throw error;
   } finally { if (stage) rmSync(stage, { recursive: true, force: true }); }
 }

@@ -6,6 +6,10 @@ La cartella indicata è quella del progetto sulla VM. Lasciandola vuota in creaz
 
 La rimozione conserva per impostazione predefinita repository e cartella locale. Per eliminare un remoto creato dall'applicazione occorre selezionare l'opzione e digitare il nome completo. I repository importati si possono scollegare. Per ricostruire un ufficio sul lavoro conservato si usa **Collega repository privato esistente**.
 
+Se Office ha già copiato la cartella ma l'apertura fallisce, il messaggio indica dove recuperare la copia. La destinazione richiesta torna disponibile per riprovare. Se il repository è già stato creato, seleziona **Collega repository privato esistente**.
+
+I test di integrazione di `npm test` usano cartelle temporanee, Git reale e un servizio Forgejo simulato. Con Chrome installato, `npm run test:floor-ui` verifica anche il pannello, le conferme e il recupero delle modifiche in bozza.
+
 ## Configurazione del backend
 
 Predisporre un'organizzazione privata sul Forgejo dell'installazione e un account tecnico ordinario proprietario dell'organizzazione. Per il backend usare un token dedicato con accesso a repository e organizzazione. Registrare in **GitHub e Forgejo** il server HTTPS e un secondo token dello stesso account con soli permessi di lettura di utente, repository e segnalazioni. Verificarlo e recuperarne l'identificativo. Il runtime Node e il client Git del servizio devono riconoscere la CA di quel Forgejo.

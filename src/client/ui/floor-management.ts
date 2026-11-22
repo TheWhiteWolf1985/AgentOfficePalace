@@ -11,14 +11,17 @@ export function floorManagementPanel(initial = '') {
   const body = h('div.connections');
   const element = h('section.connections', {}, message, body);
   let selected = initial, busy = false, dirty = false, closed = false, loaded = false;
+  let readVersion = 0;
   const canDismiss = () => !busy && (!dirty || window.confirm(t('Discard unapplied changes?')));
   async function load(notice = '') {
     if (closed) return;
+    const version = ++readVersion;
+    const current = () => !closed && !dirty && version === readVersion;
     try {
       const state = await getFloorManagement();
-      if (closed) return;
+      if (!current()) return;
       loaded = true; render(state); message.textContent = notice;
-    } catch (e) { message.textContent = (e as Error).message; }
+    } catch (e) { if (current()) message.textContent = (e as Error).message; }
   }
   function render(state: FloorManagementView) {
     dirty = false;
@@ -27,6 +30,7 @@ export function floorManagementPanel(initial = '') {
     const picker = select(t('Office floor'), [{ id: '', name: t('New office floor') }, ...state.floors], selected);
     picker.onchange = () => {
       if (!canDismiss()) { picker.value = selected; return; }
+      readVersion++;
       selected = picker.value; message.textContent = ''; render(state);
     };
     const name = h('input', { maxlength: '80', value: floor?.name ?? '', required: true }) as HTMLInputElement;
@@ -68,6 +72,7 @@ export function floorManagementPanel(initial = '') {
 
     async function change(action: string, input: Record<string, unknown>) {
       if (busy) return;
+      readVersion++;
       busy = true; body.inert = true; message.textContent = t('Working…');
       try {
         const result = await request(action, { ...input, floorId: floor?.id, version: floor?.version });
