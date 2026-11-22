@@ -6,6 +6,7 @@ import { LOBBY, LOBBY_NAME, ROOF, ROOF_NAME, SERVER_ROOM, SERVER_ROOM_NAME } fro
 import type { Net } from '../net';
 import { store } from '../state';
 import { h, openModal, timeAgo, toast, type Modal } from './dom';
+import { getFloorManagement, openFloorManagement } from './floor-management';
 import { confirmDialog } from './prompt';
 
 // The elevator's panel: a button for every floor (every project), and "add a project", which clones
@@ -64,6 +65,7 @@ export function openElevator(opts: ElevatorOptions): void {
   // name in the corner) opens it again.
   const setup = !store.floor;
   const { net } = opts;
+  let managed = false;
   let filter = '';
   let selected: string | null = null;
   let adding: string | null = null;
@@ -168,6 +170,7 @@ export function openElevator(opts: ElevatorOptions): void {
   };
 
   const confirmRemove = (f: FloorInfo) => {
+    if (managed) { modal.close(); openFloorManagement(f.id); return; }
     const next = store.floors.find((o) => o.id !== f.id && !o.cloning);
     const workers = f.workers ? uiText`Its ${f.workers} worker${f.workers === 1 ? '' : 's'} stop${f.workers === 1 ? 's' : ''}. ` : '';
     const people = f.people ? uiText`Everyone on it rides the elevator to ${next ? next.name : uiText('the lobby')}. ` : '';
@@ -255,6 +258,11 @@ export function openElevator(opts: ElevatorOptions): void {
   };
 
   const renderAdd = () => {
+    if (managed) {
+      const manage = h('button.btn', { type: 'button' }, uiText('Floor management'));
+      manage.onclick = () => { modal.close(); openFloorManagement(); };
+      addEl.replaceChildren(manage); addBtn.classList.add('hidden'); return;
+    }
     if (!showAdd) {
       const open = h('button.btn', { type: 'button' }, uiText('➕ Add a project'));
       open.addEventListener('click', () => {
@@ -415,7 +423,13 @@ export function openElevator(opts: ElevatorOptions): void {
   current = modal;
   close.addEventListener('click', () => modal.close());
   renderFloors();
-  if (showAdd) needRepos();
+  if (store.me.admin) void getFloorManagement().then(state => {
+    if (current !== modal) return;
+    managed = state.configured;
+    if (showAdd && !managed) needRepos();
+    renderAdd();
+  }).catch(() => { if (current === modal && showAdd) needRepos(); });
+  else if (showAdd) needRepos();
   renderAdd();
   if (showAdd) setTimeout(() => input.focus(), 30);
 }

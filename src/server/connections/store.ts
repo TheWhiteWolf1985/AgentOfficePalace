@@ -106,6 +106,13 @@ export class ConnectionsStore {
     }
     this.save();
   }
+  unbind(dir: string) {
+    const remaining = this.data.bindings.filter(b => path.resolve(b.dir) !== path.resolve(dir));
+    if (remaining.length !== this.data.bindings.length) {
+      atomic(path.join(this.root, 'connections.json'), JSON.stringify({ ...this.data, bindings: remaining }, null, 2));
+      this.data.bindings = remaining;
+    }
+  }
   selected(dir: string, workerId?: string): { binding: GitBinding; account: GitAccount; server: GitServer } | undefined {
     const binding = this.binding(dir); if (!binding) return;
     const assignment = workerId ? binding.agents[workerId] : undefined;

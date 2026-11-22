@@ -2,6 +2,7 @@ import './language.css';
 import { chooseLanguage, getLanguage, t } from '../i18n';
 import { settingsApply } from './settings-apply';
 import { h, openModal } from './dom';
+import { floorManagementPanel } from './floor-management';
 import { connectionsPanel } from './connections';
 import { agentManagementPanel } from './agent-management';
 
@@ -19,14 +20,15 @@ export function openLanguageSettings(): void {
   const language = languageSelect(apply.refresh);
   apply.add({ dirty: () => language.value !== getLanguage(), apply: () => chooseLanguage(language.value) });
   let panel: { element: HTMLElement; dispose(): void; canDismiss?(): boolean } | undefined;
-  const show = (kind: 'language' | 'connections' | 'management') => {
+  const show = (kind: 'language' | 'connections' | 'management' | 'floors') => {
     if (panel?.canDismiss && !panel.canDismiss()) return;
     apply.element.hidden = kind !== 'language';
     panel?.dispose(); panel = undefined;
     if (kind === 'language') body.replaceChildren(h('label', {}, t('Language'), language), h('p.setting-note', {}, t('Changing language reloads this page. Your agents keep working.')));
+    else if (kind === 'floors') { const floors = floorManagementPanel(); panel = floors; body.replaceChildren(floors.element); floors.load(); }
     else { panel = kind === 'connections' ? connectionsPanel() : agentManagementPanel(managementActions); body.replaceChildren(panel.element); }
   };
-  const nav = h('nav.connection-tabs', {}, ...([['language', 'Language'], ['management', 'Agent management'], ['connections', 'GitHub and Forgejo']] as const).map(([key, label]) => {
+  const nav = h('nav.connection-tabs', {}, ...([['language', 'Language'], ['floors', 'Floor management'], ['management', 'Agent management'], ['connections', 'GitHub and Forgejo']] as const).map(([key, label]) => {
     const button = h('button.btn', { type: 'button', onclick: () => show(key) }, t(label)); return button;
   }));
   show('language');
