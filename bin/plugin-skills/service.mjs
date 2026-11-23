@@ -3,6 +3,7 @@ import path from 'node:path';
 import { chmodSync, lstatSync, readdirSync, readFileSync, renameSync, unlinkSync, writeFileSync } from 'node:fs';
 import { accessGrant, begin, exchange, googleSecretIssue, identity, invoke, operations, Problem, providers, string } from './providers.mjs';
 import { openCallback, removeStaleCallbacks, tunnelProfile } from './auth-tunnel.mjs';
+import { pdfTools, processPdf } from './pdf.mjs';
 
 process.umask(0o077);
 const data = path.join(process.env.AOP_PLUGIN_DATA_DIR || '/data', 'accounts.json');
@@ -159,7 +160,8 @@ async function getAccess(id) {
 }
 async function worker(op, b) {
   if (op === 'list') return {
-    tools: operations.filter(tool => { const a = state.accounts[tool.name.split('.')[0]]; return a && !a.reauth; }),
+    tools: operations.filter(tool => { const a = state.accounts[tool.name.split('.')[0]]; return a && !a.reauth; })
+      .concat(skills.has('pdf-ocr') && state.skills['pdf-ocr'] ? pdfTools : []),
     skills: [...skills].filter(([id]) => state.skills[id]).map(([id, s]) => ({ name: 'skill.' + id, description: s.description })),
   };
   if (op !== 'use') throw new Problem(404, 'Unknown operation.');
@@ -200,8 +202,14 @@ const server = http.createServer(async (req, res) => {
   try {
     const route = /^\/(admin|worker)\/([a-z]+)$/.exec(req.url || '');
     if (req.method !== 'POST' || !route) throw new Problem(404, 'Unknown operation.');
-    const input = await body(req);
-    const result = await (route[1] === 'admin' ? admin : worker)(route[2], input);
+    let result;
+    if (req.url === '/worker/file') {
+      if (!skills.has('pdf-ocr') || !state.skills['pdf-ocr']) throw new Problem(404, 'Skill unavailable.');
+      if (req.headers['content-type'] !== 'application/octet-stream') throw new Problem(415, 'File upload required.');
+      result = await processPdf(req);
+    } else {
+      result = await (route[1] === 'admin' ? admin : worker)(route[2], await body(req));
+    }
     res.writeHead(200, { 'content-type': 'application/json' }).end(JSON.stringify(result));
   } catch (error) {
     const expected = error instanceof Problem;

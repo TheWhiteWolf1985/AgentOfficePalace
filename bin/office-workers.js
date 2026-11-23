@@ -174,7 +174,8 @@ export function buildRequest(what, office, body) {
   url.searchParams.set('worker', office.worker);
   const headers = { authorization: `Bearer ${office.token}` };
   if (what === 'list') return { method: 'GET', url: url.href, headers, timeout: TIMEOUT_MS.list };
-  return { method: 'POST', url: url.href, headers: { ...headers, 'content-type': 'application/json' }, body: JSON.stringify(body ?? {}), timeout: TIMEOUT_MS[what] };
+  const timeout = what === 'use' && body?.arguments?.file ? 50_000 : TIMEOUT_MS[what];
+  return { method: 'POST', url: url.href, headers: { ...headers, 'content-type': 'application/json' }, body: JSON.stringify(body ?? {}), timeout };
 }
 
 /** Why the office turned a request down, in words. */
@@ -405,7 +406,14 @@ const INSTRUCTIONS =
 async function runTool(name, args, io) {
   const a = args && typeof args === 'object' ? args : {};
   if (name === 'list_office_tools') return { text: JSON.stringify(await call('tools', {}, io)) };
-  if (name === 'use_office_tool') return { text: JSON.stringify(await call('use', a, io)) };
+  if (name === 'use_office_tool') {
+    const result = await call('use', a, io);
+    if (result?.image?.mimeType === 'image/jpeg' && typeof result.image.data === 'string') {
+      const { image, ...detail } = result;
+      return { text: JSON.stringify(detail), image };
+    }
+    return { text: JSON.stringify(result) };
+  }
   if (name === 'list_workers') {
     if (io.env.AGENT_OFFICE_HOOK_SOCKET && a.requestId) return awaitReply(a.requestId, io);
     return { text: JSON.stringify(await call('list', undefined, io), null, 1) };
@@ -476,8 +484,10 @@ export async function handleMcp(msg, io) {
       const name = msg.params?.name;
       if (!tools.some((t) => t.name === name)) return { jsonrpc: '2.0', id: msg.id, error: { code: -32602, message: `Unknown tool: ${name}` } };
       try {
-        const { text, isError } = await runTool(name, msg.params?.arguments, io);
-        return ok({ content: [{ type: 'text', text }], ...(isError ? { isError: true } : {}) });
+        const { text, image, isError } = await runTool(name, msg.params?.arguments, io);
+        const content = [{ type: 'text', text }];
+        if (image) content.push({ type: 'image', ...image });
+        return ok({ content, ...(isError ? { isError: true } : {}) });
       } catch (e) {
         return ok({ content: [{ type: 'text', text: e.message }], isError: true });
       }

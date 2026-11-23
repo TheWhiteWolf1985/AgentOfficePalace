@@ -7,6 +7,13 @@ Apri **Impostazioni → Plugin & Skills** in Office 3D o Lite con un account amm
 | Google Drive | Ricerca per nome, elenco paginato, lettura di Google Docs e di file di testo o Markdown fino a 256 KiB |
 | Canva | Ricerca ed elenco paginato dei progetti, lettura dei dettagli e dei collegamenti di un progetto |
 | Revisione Markdown | Istruzioni condivise per controllare struttura, collegamenti e fonti, attivabili dalla pagina |
+| PDF e OCR | Estrazione del testo nativo, riconoscimento di scansioni in italiano e inglese, anteprima della pagina originale |
+
+## PDF e OCR
+
+Attiva **PDF e OCR** in **Impostazioni → Plugin & Skills**. L'attivazione vale per tutti i piani. Trascina un PDF nel terminale dell'agente oppure scegli un PDF già presente nel suo workspace. Per esempio, «Leggi le prime tre pagine del PDF allegato, trascrivi anche le scansioni e salva un verbale Markdown nella libreria del piano. Indica la pagina accanto a ogni decisione».
+
+La skill usa `pdf.text`, `pdf.ocr` e `pdf.render` su una pagina alla volta, numerata da 1. Ogni risposta indica il numero totale di pagine. Il riconoscimento usa italiano e inglese insieme, oppure una lingua scelta con `ita` o `eng`. La dimensione massima per documento è 16 MiB. Il container elabora una pagina per volta e, se occupato, invita a riprovare. L'agente può confrontare la trascrizione con l'immagine originale prima di salvare il Markdown nel proprio workspace. La libreria Documenti lo mostra sul piano dell'agente.
 
 ## Collegare gli account
 
@@ -29,7 +36,7 @@ Il container crea un socket Unix privato e temporaneo per quel callback OAuth. I
 
 ## Container e aggiornamenti
 
-Quando è configurato il runtime Docker rootless degli agenti, Office avvia in background un container dedicato. Riutilizza l’immagine Node già presente per gli agenti, con un processo e un filesystem separati. Il pacchetto applicativo include il servizio e le skill sotto `bin/plugin-skills/`. Il container ha limiti di 0,5 CPU, 192 MiB di RAM e 64 processi e usa la politica di riavvio Docker `unless-stopped`.
+Office esegue tutte le skill e tutti i connettori in un unico container Docker rootless dedicato. Un'eccezione richiede un limite tecnico documentato e l'autorizzazione esplicita del gestore dell'istanza. Il pacchetto in `bin/plugin-skills/` costruisce l'immagine `aop-plugin-skills`, che include il servizio, le skill, Poppler, Tesseract e i modelli linguistici. Alla prima costruzione Docker scarica la base e i pacchetti Debian. Office riusa l'immagine locale finché il pacchetto resta identico. Il container dispone di 1 CPU, 512 MiB di RAM e 64 processi e usa la politica di riavvio Docker `unless-stopped`. I programmi per i PDF girano con un utente separato e ricevono il file attraverso lo standard input. Office verifica l'identità dell'agente e inoltra i byte del solo file richiesto.
 
 Il servizio comunica con Office attraverso un socket Unix privato. La directory `$AGENT_OFFICE_CODEX_RUNTIME/plugin-skills/data/` conserva le credenziali e le attivazioni anche quando il container viene ricreato. Va protetta nei backup della singola installazione. L’immagine distribuibile contiene il catalogo iniziale. La VM effettua le chiamate a Google e Canva via Internet.
 

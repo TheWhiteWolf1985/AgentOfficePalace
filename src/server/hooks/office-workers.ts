@@ -8,7 +8,9 @@ import type { WorkerInfo } from '../../shared/protocol.js';
 import type { Ctx } from '../office/context.js';
 import { str } from '../office/input.js';
 import { readBody, send } from '../http/util.js';
-import { pluginCall, PluginError } from '../plugin-service.js';
+import path from 'node:path';
+import { dockerDrops, dockerWorkspace } from '../workers/docker.js';
+import { pluginCall, pluginFile, PluginError } from '../plugin-service.js';
 
 /**
  * Pull request `n` on a floor, for a worker to have as its own: one that's open, or merged and still
@@ -61,8 +63,13 @@ export async function officeWorkers(ctx: Ctx, req: http.IncomingMessage, res: ht
     catch { return send(res, 400, { error: 'Invalid request.' }); }
     try {
       // These fixed operations can only discover or use the shared catalogue, never manage credentials.
-      const result = action === '/tools' ? await pluginCall('worker/list') :
-        await pluginCall('worker/use', { name: input?.name, arguments: input?.arguments });
+      let result;
+      if (action === '/tools') result = await pluginCall('worker/list');
+      else if (typeof input?.name === 'string' && input?.arguments && Object.hasOwn(input.arguments, 'file')) {
+        const roots = restricted ? { workspace: dockerWorkspace(me.id), drops: dockerDrops(me.id) }
+          : { workspace: me.worktree?.path ?? floor.dir, drops: path.join(floor.dir, '.agent-office', 'drops', me.id), native: true };
+        result = await pluginFile(input.name, input.arguments, roots);
+      } else result = await pluginCall('worker/use', { name: input?.name, arguments: input?.arguments });
       return send(res, 200, result);
     } catch (e) {
       const status = e instanceof PluginError ? e.status : 503;

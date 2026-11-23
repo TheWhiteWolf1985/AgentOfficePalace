@@ -32,6 +32,7 @@ export const italianPlugins = {
   'Disconnected': 'Scollegato',
   'Connected': 'Collegato',
   'Enable skill': 'Attiva skill',
+  'Read PDF pages, recognize scans in Italian and English, and inspect the original page image.': 'Estrae il testo dai PDF, riconosce scansioni in italiano e inglese e mostra la pagina originale.',
   'Disable skill': 'Disattiva skill',
   'Review structure, links and sources in a Markdown document.': 'Controlla struttura, collegamenti e fonti di un documento Markdown.',
   'Plugin & Skills service unavailable.': 'Il servizio Plugin & Skills non è disponibile. Riprova con Aggiorna.',
