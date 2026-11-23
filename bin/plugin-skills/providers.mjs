@@ -22,6 +22,13 @@ export function string(value, max, label) {
   return value.trim();
 }
 
+// Older Google clients can have a different secret format. Reject obvious copy/paste errors.
+export function googleSecretIssue(secret, clientId) {
+  if (typeof secret !== 'string' || !secret.trim()) return 'OAuth client secret required.';
+  if (/^https?:\/\//i.test(secret.trim())) return 'The Google client secret field contains a web address. Paste the full client secret from Google Cloud.';
+  if (secret.trim() === clientId || /[*•●]{3,}/u.test(secret)) return 'Paste the full client secret for this Google web application.';
+}
+
 const maxBytes = 256 * 1024;
 async function readLimited(response) {
   const reader = response.body.getReader();
@@ -47,6 +54,10 @@ async function remote(url, options, plain = false) {
       const errorBody = await readLimited(response);
       let reason;
       try { reason = JSON.parse(errorBody).error; } catch { /* provider sent plain text */ }
+      if (url === providers.get('drive').token) {
+        if (reason === 'invalid_client' || reason === 'deleted_client') throw new Problem(401, 'Google rejected the OAuth client credentials. Check the client ID and its active client secret in Google Cloud.');
+        if (reason === 'invalid_grant' && options.body.get('grant_type') === 'authorization_code') throw new Problem(400, 'Google rejected the sign-in code. Start a new Google sign-in from Plugin & Skills.');
+      }
       if (reason === 'invalid_grant' || response.status === 401) throw new Problem(401, 'Reconnect this account.');
       if (response.status === 429) throw new Problem(429, 'Provider rate limit reached. Try again later.');
       if (response.status === 403 || response.status === 404) throw new Problem(response.status, 'The provider denied access or the item was not found.');
@@ -81,6 +92,10 @@ export async function exchange(id, account, params) {
   if (account.kind !== 'service') {
     if (id === 'canva') headers.Authorization = 'Basic ' + Buffer.from(account.clientId + ':' + account.secret).toString('base64');
     else { body.set('client_id', account.clientId); body.set('client_secret', account.secret); }
+  }
+  if (id === 'drive' && account.kind !== 'service') {
+    const issue = googleSecretIssue(account.secret, account.clientId);
+    if (issue) throw new Problem(400, issue);
   }
   const result = await remote(providers.get(id).token, { method: 'POST', headers, body });
   if (!result.access_token || !Number.isFinite(result.expires_in)) throw new Problem(502, 'Invalid token response.');

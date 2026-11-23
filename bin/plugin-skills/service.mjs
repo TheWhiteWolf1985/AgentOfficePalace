@@ -1,7 +1,7 @@
 import http from 'node:http';
 import path from 'node:path';
 import { chmodSync, lstatSync, readdirSync, readFileSync, renameSync, unlinkSync, writeFileSync } from 'node:fs';
-import { accessGrant, begin, exchange, identity, invoke, operations, Problem, providers, string } from './providers.mjs';
+import { accessGrant, begin, exchange, googleSecretIssue, identity, invoke, operations, Problem, providers, string } from './providers.mjs';
 import { openCallback, removeStaleCallbacks, tunnelProfile } from './auth-tunnel.mjs';
 
 process.umask(0o077);
@@ -55,9 +55,11 @@ function snapshot(browser) {
   return {
     providers: [...providers].map(([id, p]) => {
       const account = state.accounts[id];
+      const client = state.clients?.[id] ?? account;
+      const clientIssue = id === 'drive' && client?.clientId ? googleSecretIssue(client.secret, client.clientId) : undefined;
       const flow = pending.get(id);
       const tunnel = flow?.tunnel && flow.browser === browser && flow.until > Date.now() && !flow.tunnel.received ? tunnelView(flow) : undefined;
-      return { id, name: p.name, account: account?.label, tunnel, hasClient: !!(state.clients?.[id]?.clientId || account?.clientId),
+      return { id, name: p.name, account: account?.label, tunnel, hasClient: !!client?.clientId, clientIssue,
         status: account?.reauth ? 'reconnect' : account ? 'connected' : 'disconnected' };
     }),
     skills: [...skills].map(([id, s]) => ({ id, name: s.name, description: s.description, enabled: state.skills[id] === true })),
@@ -88,9 +90,12 @@ async function admin(op, b) {
       return snapshot();
     }
     if (op === 'client' && id === 'drive') {
-      const clientId = string(b.clientId, 1024, 'OAuth client ID required.');
+      const saved = state.clients?.drive ?? old;
+      const clientId = string(b.clientId === '' || b.clientId === undefined ? saved?.clientId : b.clientId, 1024, 'OAuth client ID required.');
       if (!/^[\w-]+\.apps\.googleusercontent\.com$/.test(clientId)) throw new Problem(400, 'Enter a Google web application client ID.');
       const secret = string(b.secret, 2048, 'OAuth client secret required.');
+      const issue = googleSecretIssue(secret, clientId);
+      if (issue) throw new Problem(400, issue);
       save(next => { (next.clients ??= {}).drive = { clientId, secret }; });
       forget(id);
       return snapshot();
@@ -106,6 +111,10 @@ async function admin(op, b) {
         kind: 'oauth', clientId: string(b.clientId || saved?.clientId, 1024, 'OAuth client ID required.'),
         secret: string(b.secret || ((!b.clientId || b.clientId === saved?.clientId) && saved?.secret), 2048, 'OAuth client secret required.'),
       };
+      if (id === 'drive') {
+        const issue = googleSecretIssue(account.secret, account.clientId);
+        if (issue) throw new Problem(400, issue);
+      }
       const flow = { ...begin(id, account.clientId, redirect), account, redirect, browser, until: Date.now() + 600_000 };
       forget(id);
       if (profile) flow.tunnel = await openCallback({ profile, directory: path.dirname(socket),

@@ -30,6 +30,9 @@ test('Drive connects the selected user with PKCE, requires the initiating browse
   const socketDir = path.join(dir, 'plugin-skills', 'socket');
   await mkdir(socketDir, { recursive: true });
   const socket = path.join(socketDir, 'plugins.sock');
+  const clientId = 'demo.apps.googleusercontent.com';
+  const pastedUrl = 'https://example.invalid/accidental-copy';
+  await writeFile(path.join(dir, 'accounts.json'), JSON.stringify({ version: 1, accounts: {}, skills: {}, clients: { drive: { clientId, secret: pastedUrl } } }));
   // Drive is simulated only at its HTTPS boundary. Run the real broker, state store and refresh logic.
   const preload = path.join(dir, 'provider.mjs');
   await writeFile(preload, [
@@ -42,6 +45,8 @@ test('Drive connects the selected user with PKCE, requires the initiating browse
     '    const b = options.body;',
     "    assert.equal(b.get('client_id'), 'demo.apps.googleusercontent.com');",
     "    assert.equal(b.get('client_secret'), 'test-secret');",
+    "    if (b.get('code') === 'client-failure') return Response.json({error:'invalid_client',error_description:'sensitive diagnostic'}, {status:401});",
+    "    if (b.get('code') === 'grant-failure') return Response.json({error:'invalid_grant',error_description:'sensitive diagnostic'}, {status:400});",
     "    if (b.get('grant_type') === 'refresh_token') assert.equal(b.get('refresh_token'), 'offline');",
     '    else {',
     "      assert.equal(b.get('redirect_uri'), 'http://127.0.0.1:4600/api/plugins/callback/drive');",
@@ -75,7 +80,25 @@ test('Drive connects the selected user with PKCE, requires the initiating browse
   }
   const id = 'drive', browser = 'browser-one', redirect = 'http://127.0.0.1:4600/api/plugins/callback/drive';
   const login = { id, browser, redirect };
-  assert.equal((await call('admin/begin', login)).status, 400);
+  await t.test('a saved URL explains the setup issue, blocks consent and can be repaired with the secret alone', async () => {
+    const info = (await call('admin/status')).data.providers[0];
+    assert.equal(info.hasClient, true);
+    assert.match(info.clientIssue, /web address/);
+    assert.doesNotMatch(JSON.stringify(info), /accidental-copy/);
+    for (const op of ['admin/begin', 'admin/tunnel']) {
+      const invalid = await call(op, { ...login, origin: 'https://192.0.2.1' });
+      assert.equal(invalid.status, 400); assert.equal(invalid.data.error, info.clientIssue);
+    }
+    assert.deepEqual(await readdir(socketDir), ['plugins.sock']);
+    const repaired = await call('admin/client', { id, clientId: '', secret: 'test-secret' });
+    assert.equal(repaired.status, 200);
+    assert.equal(repaired.data.providers[0].clientIssue, undefined);
+    for (const secret of [pastedUrl, '••••1234', clientId]) {
+      assert.equal((await call('admin/client', { id, clientId, secret })).status, 400);
+    }
+    const saved = JSON.parse(await readFile(path.join(dir, 'accounts.json'), 'utf8'));
+    assert.deepEqual(saved.clients.drive, { clientId, secret: 'test-secret' });
+  });
   assert.equal((await call('admin/service', { id, credential: {} })).status, 400);
   assert.equal((await call('admin/client', { id, clientId: 'invalid', secret: 'test-secret' })).status, 400);
   const setup = await call('admin/client', { id, clientId: 'demo.apps.googleusercontent.com', secret: 'test-secret' });
@@ -100,6 +123,15 @@ test('Drive connects the selected user with PKCE, requires the initiating browse
   const cancel = await start();
   assert.equal((await call('admin/finish', { ...cancel, code: '' })).status, 400);
   assert.equal((await call('admin/status')).data.providers[0].account, 'reader@example.org');
+  await t.test('a rejected Google client and an invalid one-time code give distinct repair instructions', async () => {
+    for (const [code, expected] of [['client-failure', 'active client secret'], ['grant-failure', 'new Google sign-in']]) {
+      const failure = await call('admin/finish', { ...await start(), code });
+      assert.ok(failure.status >= 400);
+      assert.ok(failure.data.error.includes(expected));
+      assert.doesNotMatch(JSON.stringify(failure.data), /sensitive diagnostic|test-secret/);
+    }
+    assert.equal((await call('admin/status')).data.providers[0].status, 'connected');
+  });
   assert.deepEqual((await call('worker/use', { name: 'drive.search' })).data, { files: [] });
   const detached = await call('admin/disconnect', { id });
   assert.equal(detached.data.providers[0].hasClient, true);

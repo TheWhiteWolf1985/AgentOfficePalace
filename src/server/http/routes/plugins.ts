@@ -1,5 +1,6 @@
 import { TLSSocket } from 'node:tls';
 import { googleDriveSignInOrigin } from '../../../shared/google-drive-oauth.js';
+import { italianPlugins } from '../../../shared/locales/it-plugins.js';
 import { PluginError, pluginCall, startPluginService } from '../../plugin-service.js';
 import type { Route } from '../router.js';
 import { isSecure, sameOrigin, readBody, send } from '../util.js';
@@ -73,6 +74,12 @@ export const pluginsRoute: Route = {
       if (returning && error instanceof PluginError && error.message === 'Sign-in was cancelled.') {
         res.writeHead(200, { ...callbackHeaders, 'content-type': 'text/plain; charset=utf-8' })
           .end('Accesso annullato. Puoi chiudere questa scheda e tornare a Plugin & Skills.');
+        return;
+      }
+      if (returning && error instanceof PluginError) {
+        const message = Object.hasOwn(italianPlugins, error.message)
+          ? italianPlugins[error.message as keyof typeof italianPlugins] : error.message;
+        res.writeHead(error.status, { ...callbackHeaders, 'content-type': 'text/plain; charset=utf-8' }).end(message);
         return;
       }
       return send(res, error instanceof PluginError ? error.status : 503,

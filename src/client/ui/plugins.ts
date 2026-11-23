@@ -4,7 +4,7 @@ import { connectionButton as button, connectionField as field } from './connecti
 import { h } from './dom';
 
 type SignInTunnel = { url: string; command: string; until: number };
-type Provider = { id: 'drive' | 'canva'; name: string; account?: string; hasClient: boolean; tunnel?: SignInTunnel; status: 'connected' | 'disconnected' | 'reconnect' };
+type Provider = { id: 'drive' | 'canva'; name: string; account?: string; hasClient: boolean; clientIssue?: string; tunnel?: SignInTunnel; status: 'connected' | 'disconnected' | 'reconnect' };
 type Catalogue = { providers: Provider[]; skills: { id: string; name: string; description: string; enabled: boolean }[] };
 const labels = { connected: 'Connected', disconnected: 'Disconnected', reconnect: 'Reconnect this account.' };
 
@@ -50,9 +50,11 @@ export function pluginsPanel() {
   }
   function googleAccount(p: Provider) {
     const origin = googleDriveSignInOrigin(location.origin);
-    const client = h('input', { autocomplete: 'off', maxlength: 1024 });
+    const ready = p.hasClient && !p.clientIssue;
+    const client = h('input', { autocomplete: 'off', maxlength: 1024, placeholder: p.hasClient ? t('Leave blank to keep the saved client ID') : '' });
     const secret = h('input', { autocomplete: 'new-password', type: 'password', maxlength: 2048 });
-    const setup = h('details', { open: !p.hasClient }, h('summary', {}, t('Google application setup')),
+    const setup = h('details', { open: !ready }, h('summary', {}, t('Google application setup')),
+      p.clientIssue && h('p.setting-note', { role: 'alert' }, remoteText(p.clientIssue)),
       h('p.setting-note', {}, t('Enable the Drive API and register a web application with this redirect URL.')),
       h('code', {}, origin + '/api/plugins/callback/drive'),
       h('p', {}, h('a', { href: 'https://console.cloud.google.com/auth/clients', target: '_blank', rel: 'noopener noreferrer' }, 'Google Cloud Console')),
@@ -69,7 +71,7 @@ export function pluginsPanel() {
             const plan = await request<SignInTunnel>({ action: 'prepare-tunnel', id: p.id });
             if (!closed) { show(plan); message.textContent = ''; }
           }));
-          prepare.disabled = !p.hasClient;
+          prepare.disabled = !ready;
           controls.replaceChildren(prepare);
           return;
         }
@@ -108,7 +110,7 @@ export function pluginsPanel() {
         } catch (error) { popup?.close(); throw error; }
       });
     });
-    login.disabled = !p.hasClient;
+    login.disabled = !ready;
     return h('div', {}, setup, login);
   }
   function provider(p: Provider) {
