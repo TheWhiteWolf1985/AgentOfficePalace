@@ -153,9 +153,9 @@ const officeToolInstructions = [
   'Office plugins and skills run in the shared Plugin & Skills container.',
   'For PDFs, OCR, scans, attachments or connected services, first call agent-office.list_office_tools.',
   'Read the matching skill and invoke its operations with agent-office.use_office_tool. Pass the original attachment path.',
-  'If this session lacks those MCP tools, run node /office-bridge/office-workers.mjs tools,',
-  'then node /office-bridge/office-workers.mjs use NAME followed by the JSON arguments as one quoted argument.',
-  'For a CLI preview add --save-image /tmp/UNIQUE.jpg, then view the saved image.',
+  'If MCP tools are deferred, search for the agent-office tools. If the two tools are missing from this session,',
+  'tell the user to stop and start this agent from Settings > Agent management after the current turn, so Codex reloads the office tools.',
+  'The sandboxed shell is not a substitute for MCP. Do not request elevated permissions for a connector.',
   'Save requested Markdown under /workspace for this floor’s Documenti.',
   'If the catalogue or required tool is unavailable, report it. Do not download, unpack or install substitute tools in the agent.',
 ].join(' ');

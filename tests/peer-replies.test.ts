@@ -93,7 +93,7 @@ test('the Docker Stop hook returns only the requested final answer to the caller
   const { hookSpecificOutput } = await hook('UserPromptSubmit', { prompt: '[Office request ' + id + '] meteo?' });
   assert.equal(hookSpecificOutput.hookEventName, 'UserPromptSubmit');
   assert.match(hookSpecificOutput.additionalContext, /list_office_tools/);
-  assert.match(hookSpecificOutput.additionalContext, /node \/office-bridge\/office-workers\.mjs tools/);
+  assert.match(hookSpecificOutput.additionalContext, /reloads the office tools/);
   assert.ok(!hookSpecificOutput.additionalContext.includes(id));
   assert.deepEqual(await hook('Stop', { turn_id: 'other', last_assistant_message: 'private unrelated answer' }), {});
   await hook('Stop', { last_assistant_message: 'Non posso osservare il meteo.' });

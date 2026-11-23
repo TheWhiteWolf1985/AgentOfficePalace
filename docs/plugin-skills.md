@@ -15,7 +15,7 @@ Attiva **PDF e OCR** in **Impostazioni → Plugin & Skills**. L'attivazione vale
 
 La skill usa `pdf.text`, `pdf.ocr` e `pdf.render` su una pagina alla volta, numerata da 1. Ogni risposta indica il numero totale di pagine. Il riconoscimento usa italiano e inglese insieme, oppure una lingua scelta con `ita` o `eng`. La dimensione massima per documento è 16 MiB. Il container elabora una pagina per volta e, se occupato, invita a riprovare. L'agente può confrontare la trascrizione con l'immagine originale prima di salvare il Markdown nel proprio workspace. La libreria Documenti lo mostra sul piano dell'agente.
 
-Quando invii un messaggio dal terminale di una scrivania Codex, Office indica all'agente come consultare il catalogo condiviso. Anche una chat aperta prima dell'attivazione può usare lo stesso catalogo tramite il client in `/office-bridge/office-workers.mjs`. Per un'anteprima quel client accetta `--save-image` con il percorso di un nuovo file JPEG temporaneo.
+Quando invii un messaggio dal terminale di una scrivania Codex, Office indica all'agente come trovare il catalogo aggiornato. Le chat aperte prima dell'introduzione degli strumenti MCP di Office possono avere ancora l'elenco precedente. A turno concluso, in **Impostazioni → Gestione agenti → Modifica proprietà**, scegli **Ferma container** e poi **Avvia container**. Codex riprende la conversazione e carica gli strumenti aggiornati. Le successive attivazioni valgono nella stessa chat.
 
 ## Collegare gli account
 
