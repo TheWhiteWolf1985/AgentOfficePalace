@@ -3,7 +3,8 @@ import { googleDriveSignInOrigin } from '../../shared/google-drive-oauth';
 import { connectionButton as button, connectionField as field } from './connections-client';
 import { h } from './dom';
 
-type Provider = { id: 'drive' | 'canva'; name: string; account?: string; hasClient: boolean; status: 'connected' | 'disconnected' | 'reconnect' };
+type SignInTunnel = { url: string; command: string; until: number };
+type Provider = { id: 'drive' | 'canva'; name: string; account?: string; hasClient: boolean; tunnel?: SignInTunnel; status: 'connected' | 'disconnected' | 'reconnect' };
 type Catalogue = { providers: Provider[]; skills: { id: string; name: string; description: string; enabled: boolean }[] };
 const labels = { connected: 'Connected', disconnected: 'Disconnected', reconnect: 'Reconnect this account.' };
 
@@ -21,6 +22,7 @@ export function pluginsPanel() {
   const refresh = button(t('Refresh'), () => load());
   const element = h('section.connections', {}, refresh, message, body);
   let closed = false, busy = false, waiting = false, generation = 0;
+  let expiry: ReturnType<typeof setTimeout> | undefined;
   async function load() {
     if (closed || busy) return;
     const version = ++generation;
@@ -60,12 +62,36 @@ export function pluginsPanel() {
         secret.value = '';
       })));
     if (origin !== location.origin) {
-      return h('div', {}, setup,
-        h('details', { open: p.hasClient }, h('summary', {}, t('Sign in with Google')),
-          h('p.setting-note', {}, t('For this IP address, open an SSH tunnel on the computer where you will sign in. Replace USER with your VM SSH username.')),
-          h('code', {}, 'ssh -NT -o ExitOnForwardFailure=yes -L 127.0.0.1:4600:127.0.0.1:4600 USER@' + location.hostname),
-          h('p', {}, h('a.btn', { href: origin + '/lite', target: '_blank', rel: 'noopener noreferrer' }, t('Open local Office'))),
-          h('p.setting-note', {}, t('In local Office, open Settings → Plugin & Skills and select Sign in with Google. Close the tunnel after consent.'))));
+      const controls = h('div');
+      function show(session?: SignInTunnel) {
+        if (!session) {
+          const prepare = button(t('Prepare sign-in tunnel'), () => run(async () => {
+            const plan = await request<SignInTunnel>({ action: 'prepare-tunnel', id: p.id });
+            if (!closed) { show(plan); message.textContent = ''; }
+          }));
+          prepare.disabled = !p.hasClient;
+          controls.replaceChildren(prepare);
+          return;
+        }
+        const command = h('textarea', { readOnly: true, rows: 3, 'aria-label': 'PowerShell' });
+        command.value = session.command;
+        const expiryTime = new Date(session.until).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const signIn = h('a.btn', { href: session.url, target: '_blank', rel: 'noopener noreferrer' }, t('Sign in with Google'));
+        signIn.addEventListener('click', () => { waiting = true; });
+        controls.replaceChildren(
+          h('p', {}, t('Run this command in PowerShell on this computer. Enter your VM SSH username when prompted.')),
+          command, button(t('Copy command'), async () => {
+            try { await navigator.clipboard.writeText(session!.command); message.textContent = t('Command copied.'); }
+            catch { command.focus(); command.select(); message.textContent = t('Press Ctrl+C to copy the command.'); }
+          }),
+          h('p', {}, t('When PowerShell shows Tunnel-OK, continue with Google in this browser.')),
+          signIn, button(t('Cancel sign-in'), () => run(() => change({ action: 'cancel-tunnel', id: p.id }))),
+          h('p.setting-note', {}, t('The tunnel closes after sign-in or cancellation. Expires at'), ' ', expiryTime));
+        clearTimeout(expiry);
+        expiry = setTimeout(() => { if (!closed) void load(); }, Math.max(1, session.until - Date.now() + 100));
+      }
+      show(p.tunnel);
+      return h('div', {}, setup, controls);
     }
     const login = button(t('Sign in with Google'), () => {
       // Open on the user's click; async requests otherwise trigger popup blockers.
@@ -117,6 +143,7 @@ export function pluginsPanel() {
     return form;
   }
   function render(view: Catalogue) {
+    clearTimeout(expiry);
     body.replaceChildren(...view.providers.map(provider), h('h4', {}, t('Skills')),
       ...view.skills.map(skill => h('section.setting', {}, h('strong', {}, skill.name),
         h('p.setting-note', {}, t(skill.description)),
@@ -124,5 +151,5 @@ export function pluginsPanel() {
   }
   const onFocus = () => { if (waiting && !closed && !busy) { waiting = false; void load(); } };
   window.addEventListener('focus', onFocus);
-  return { element, load, dispose() { closed = true; window.removeEventListener('focus', onFocus); } };
+  return { element, load, dispose() { closed = true; clearTimeout(expiry); window.removeEventListener('focus', onFocus); } };
 }

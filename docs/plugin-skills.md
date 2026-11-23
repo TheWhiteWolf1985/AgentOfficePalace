@@ -14,7 +14,14 @@ Apri **Impostazioni → Plugin & Skills** in Office 3D o Lite con un account amm
 
 Per autorizzare gli agenti, premi **Accedi con Google**, scegli l’account sul sito Google e concedi la lettura di Drive. Office richiede l’accesso offline e conserva la concessione nel container condiviso. Google può chiedere password, passkey o secondo fattore secondo le impostazioni dell’account.
 
-**Collaudo su IP senza DNS.** Google accetta il loopback come indirizzo di ritorno. Dal PC dell’amministratore apri il tunnel indicato nella pagina, quindi **Apri Office su localhost**. Accedi a Office e premi **Accedi con Google** nella stessa pagina delle impostazioni. L’URI da registrare con la porta suggerita è `http://127.0.0.1:4600/api/plugins/callback/drive`. Tieni il tunnel aperto fino alla conferma dell’account collegato. Gli agenti potranno poi usare Drive dalla VM anche dopo la chiusura del tunnel. Con un dominio HTTPS autorizzato si può effettuare l’intero accesso direttamente dall’indirizzo registrato. [Indirizzi di ritorno accettati da Google](https://developers.google.com/identity/protocols/oauth2/web-server#uri-validation)
+**Accesso su IP senza DNS.** Registra in Google Cloud l’URI esatto `http://127.0.0.1:4600/api/plugins/callback/drive`. Apri Office in HTTPS sul PC con cui darai il consenso.
+
+1. Premi **Prepara tunnel di accesso**, poi **Copia comando**. Eseguilo in PowerShell sullo stesso PC, con il client OpenSSH e la porta locale 4600 libera.
+2. Al prompt inserisci un utente SSH della VM autorizzato a raggiungere il socket privato del servizio. Al primo collegamento verifica l’impronta SSH nella console della VM. Le credenziali SSH vengono richieste sul PC.
+3. Quando compare `Tunnel-OK`, premi **Accedi con Google** in Office. Scegli l’account e concedi l’accesso. Il browser torna all’istanza Office per confermare il collegamento.
+4. Il comando termina al ritorno da Google, premendo **Annulla accesso** in Office o dopo dieci minuti. Se chiudi Google prima del consenso, puoi annullare dalla pagina Office. La concessione salvata permette agli agenti di usare Drive anche a PC spento.
+
+Il container crea un socket Unix privato e temporaneo per quel callback OAuth. Il browser che ha avviato la richiesta completa lo scambio del codice. Il profilo Drive fissa porta e percorso. Altri provider possono usare lo stesso modulo amministrativo dopo la registrazione del proprio profilo. Con un dominio HTTPS autorizzato il browser può completare l’accesso direttamente. [Regole Google per gli indirizzi di ritorno](https://developers.google.com/identity/protocols/oauth2/web-server#uri-validation) · [Inoltro locale OpenSSH](https://man.openbsd.org/ssh.1#L)
 
 **Canva.** Registra l’indirizzo di ritorno mostrato nella pagina presso il fornitore. Usa un’app con accesso utente e gli ambiti `profile:read` e `design:meta:read`. Inserisci client ID e client secret, premi **Accedi al servizio** e apri la pagina di accesso. Torna alla scheda Office dopo il consenso. [Autenticazione Canva](https://www.canva.dev/docs/connect/authentication/)
 

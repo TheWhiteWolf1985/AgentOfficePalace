@@ -2,6 +2,7 @@ import http from 'node:http';
 import path from 'node:path';
 import { chmodSync, lstatSync, readdirSync, readFileSync, renameSync, unlinkSync, writeFileSync } from 'node:fs';
 import { accessGrant, begin, exchange, identity, invoke, operations, Problem, providers, string } from './providers.mjs';
+import { openCallback, removeStaleCallbacks, tunnelProfile } from './auth-tunnel.mjs';
 
 process.umask(0o077);
 const data = path.join(process.env.AOP_PLUGIN_DATA_DIR || '/data', 'accounts.json');
@@ -34,17 +35,29 @@ for (const entry of readdirSync(new URL('./skills/', import.meta.url), { withFil
   } catch { console.warn('Invalid skill package:', entry.name); }
 }
 const pending = new Map();
+function forget(id) {
+  const flow = pending.get(id);
+  if (!flow) return;
+  clearTimeout(flow.timer);
+  flow.tunnel?.close();
+  pending.delete(id);
+}
+function tunnelView(flow) {
+  return { url: flow.tunnel.url, command: flow.tunnel.command, until: flow.until };
+}
 const locks = new Map();
 async function withAccount(id, action) {
   const job = (locks.get(id) ?? Promise.resolve()).catch(() => {}).then(action);
   locks.set(id, job);
   try { return await job; } finally { if (locks.get(id) === job) locks.delete(id); }
 }
-function snapshot() {
+function snapshot(browser) {
   return {
     providers: [...providers].map(([id, p]) => {
       const account = state.accounts[id];
-      return { id, name: p.name, account: account?.label, hasClient: !!(state.clients?.[id]?.clientId || account?.clientId),
+      const flow = pending.get(id);
+      const tunnel = flow?.tunnel && flow.browser === browser && flow.until > Date.now() && !flow.tunnel.received ? tunnelView(flow) : undefined;
+      return { id, name: p.name, account: account?.label, tunnel, hasClient: !!(state.clients?.[id]?.clientId || account?.clientId),
         status: account?.reauth ? 'reconnect' : account ? 'connected' : 'disconnected' };
     }),
     skills: [...skills].map(([id, s]) => ({ id, name: s.name, description: s.description, enabled: state.skills[id] === true })),
@@ -54,7 +67,7 @@ function checkProvider(id) {
   if (!providers.has(id)) throw new Problem(400, 'Unknown plugin.');
 }
 async function admin(op, b) {
-  if (op === 'status') return snapshot();
+  if (op === 'status') return snapshot(b.browser);
   if (op === 'skill') {
     if (!skills.has(b.id) || typeof b.enabled !== 'boolean') throw new Problem(400, 'Unknown skill.');
     save(next => { next.skills[b.id] = b.enabled; });
@@ -65,7 +78,7 @@ async function admin(op, b) {
   return withAccount(id, async () => {
     const old = state.accounts[id];
     if (op === 'disconnect') {
-      pending.delete(id);
+      forget(id);
       save(next => {
         if (id === 'drive' && !next.clients?.drive && old?.kind === 'oauth') {
           (next.clients ??= {}).drive = { clientId: old.clientId, secret: old.secret };
@@ -79,26 +92,37 @@ async function admin(op, b) {
       if (!/^[\w-]+\.apps\.googleusercontent\.com$/.test(clientId)) throw new Problem(400, 'Enter a Google web application client ID.');
       const secret = string(b.secret, 2048, 'OAuth client secret required.');
       save(next => { (next.clients ??= {}).drive = { clientId, secret }; });
-      pending.delete(id);
+      forget(id);
       return snapshot();
     }
-    if (op === 'begin') {
+    if (op === 'begin' || op === 'tunnel') {
+      const previous = pending.get(id);
+      if (previous?.until > Date.now() && (previous.tunnel || op === 'tunnel')) throw new Problem(409, 'A sign-in is already in progress.');
+      const profile = op === 'tunnel' ? tunnelProfile(id, b.origin) : undefined;
+      const redirect = profile?.redirect.href ?? b.redirect;
+      const browser = string(b.browser, 128, 'Sign-in expired or belongs to another browser.');
       const saved = state.clients?.[id] ?? old;
       const account = {
         kind: 'oauth', clientId: string(b.clientId || saved?.clientId, 1024, 'OAuth client ID required.'),
         secret: string(b.secret || ((!b.clientId || b.clientId === saved?.clientId) && saved?.secret), 2048, 'OAuth client secret required.'),
       };
-      const flow = begin(id, account.clientId, b.redirect);
-      pending.set(id, { ...flow, account, redirect: b.redirect, browser: b.browser, until: Date.now() + 600_000 });
-      setTimeout(() => { if (pending.get(id)?.state === flow.state) pending.delete(id); }, 600_000).unref();
-      return { url: flow.url };
+      const flow = { ...begin(id, account.clientId, redirect), account, redirect, browser, until: Date.now() + 600_000 };
+      forget(id);
+      if (profile) flow.tunnel = await openCallback({ profile, directory: path.dirname(socket),
+        hostDirectory: process.env.AOP_PLUGIN_HOST_SOCKET_DIR || path.dirname(socket), authorization: flow.url, state: flow.state, until: flow.until });
+      flow.timer = setTimeout(() => forget(id), Math.max(1, flow.until - Date.now())).unref();
+      pending.set(id, flow);
+      return flow.tunnel ? tunnelView(flow) : { url: flow.url };
     }
-    if (op === 'finish') {
+    if (op === 'cancel' || op === 'finish') {
       const flow = pending.get(id);
-      if (!flow || flow.until < Date.now() || flow.state !== b.state || flow.browser !== b.browser) throw new Problem(400, 'Sign-in expired or belongs to another browser.');
-      pending.delete(id);
-      if (!b.code) throw new Problem(400, 'Sign-in was cancelled.');
-      const token = await exchange(id, flow.account, { grant_type: 'authorization_code', code: string(b.code, 4096, 'Invalid code.'),
+      if (!flow || flow.until <= Date.now() || flow.browser !== b.browser) throw new Problem(400, 'Sign-in expired or belongs to another browser.');
+      if (op === 'cancel' && flow.tunnel) { forget(id); return snapshot(); }
+      if (op !== 'finish' || (!flow.tunnel && flow.state !== b.state)) throw new Problem(400, 'Sign-in expired or belongs to another browser.');
+      const code = flow.tunnel ? flow.tunnel.redeem(b.receipt) : b.code;
+      forget(id);
+      if (!code) throw new Problem(400, 'Sign-in was cancelled.');
+      const token = await exchange(id, flow.account, { grant_type: 'authorization_code', code: string(code, 4096, 'Invalid code.'),
         redirect_uri: flow.redirect, code_verifier: flow.verifier });
       if (!token.refresh) throw new Problem(400, 'Offline access was not granted. Reconnect this account.');
       const label = await identity(id, token.access);
@@ -183,4 +207,5 @@ if (existing) {
   if (!existing.isSocket()) throw Error('Unexpected file at ' + path.basename(socket));
   unlinkSync(socket);
 }
+removeStaleCallbacks(path.dirname(socket));
 server.listen(socket, () => chmodSync(socket, 0o600));

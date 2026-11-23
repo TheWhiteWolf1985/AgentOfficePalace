@@ -9,7 +9,7 @@ const unavailable = 'Plugin & Skills service unavailable.';
 export class PluginError extends Error {
   constructor(readonly status: number, message: string) { super(message); }
 }
-type Operation = 'admin/status' | 'admin/skill' | 'admin/client' | 'admin/begin' | 'admin/finish' | 'admin/disconnect' | 'worker/list' | 'worker/use';
+type Operation = 'admin/status' | 'admin/skill' | 'admin/client' | 'admin/begin' | 'admin/tunnel' | 'admin/cancel' | 'admin/finish' | 'admin/disconnect' | 'worker/list' | 'worker/use';
 
 function directory() {
   const root = dockerRoot();
@@ -35,7 +35,7 @@ async function reconcile() {
   const name = 'aop-plugins-' + owner;
   const revision = createHash('sha256').update(source).update(image).update('1');
   const entries = await readdir(path.join(source, 'skills'), { withFileTypes: true });
-  const files = ['service.mjs', 'providers.mjs', ...entries.filter(e => e.isDirectory()).map(e => 'skills/' + e.name + '/SKILL.md').sort()];
+  const files = ['service.mjs', 'providers.mjs', 'auth-tunnel.mjs', ...entries.filter(e => e.isDirectory()).map(e => 'skills/' + e.name + '/SKILL.md').sort()];
   for (const file of files) {
     revision.update(file);
     try { revision.update(await readFile(path.join(source, file))); }
@@ -61,7 +61,8 @@ async function reconcile() {
   await docker(['run', '-d', '--pull=never', '--name', name, '--label', ownerLabel + '=' + owner,
     '--label', revisionLabel + '=' + version, '--restart', 'unless-stopped', '--read-only', '--cap-drop=ALL',
     '--security-opt', 'no-new-privileges', '--memory', '192m', '--cpus', '0.5', '--pids-limit', '64',
-    '--log-driver', 'local', '--mount', 'type=bind,src=' + source + ',dst=/app,readonly',
+    '--log-driver', 'local', '--env', 'AOP_PLUGIN_HOST_SOCKET_DIR=' + path.join(root, 'socket'),
+    '--mount', 'type=bind,src=' + source + ',dst=/app,readonly',
     '--mount', 'type=bind,src=' + path.join(root, 'data') + ',dst=/data',
     '--mount', 'type=bind,src=' + path.join(root, 'socket') + ',dst=/run/office',
     '--entrypoint', 'node', image, '/app/service.mjs']);

@@ -8,6 +8,7 @@ import { isSecure, sameOrigin, readBody, send } from '../util.js';
 
 const api = '/api/plugins';
 const callback = api + '/callback/';
+const tunnelCookie = 'aop_auth_flow';
 const callbackHeaders = { 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer', 'Content-Security-Policy': "default-src 'none'; frame-ancestors 'none'" };
 
 export const pluginsRoute: Route = {
@@ -15,19 +16,22 @@ export const pluginsRoute: Route = {
   async handle(ctx, { req, res, session, path, url }) {
     if (!ctx.meOf(session.account?.id).admin) return send(res, 403, { error: 'Administrator access required' });
     const returning = path !== api;
+    const cookies = parseCookies(req.headers.cookie);
     try {
       if (req.method === 'GET' && returning) {
         const id = path.slice(callback.length);
-        const browser = parseCookies(req.headers.cookie)['aop_plugin_' + id];
+        const tunneled = url.searchParams.has('receipt');
+        const cookieName = tunneled ? tunnelCookie : 'aop_plugin_' + id;
+        const browser = cookies[cookieName];
         if (!browser) return send(res, 400, { error: 'Sign-in expired or belongs to another browser.' }, callbackHeaders);
-        await pluginCall('admin/finish', { id, browser, state: url.searchParams.get('state'), code: url.searchParams.get('code') });
+        await pluginCall('admin/finish', { id, browser, receipt: url.searchParams.get('receipt'), state: url.searchParams.get('state'), code: url.searchParams.get('code') });
         res.writeHead(200, { ...callbackHeaders, 'content-type': 'text/plain; charset=utf-8',
-          'Set-Cookie': 'aop_plugin_' + id + '=; HttpOnly; SameSite=Lax; Path=' + path + '; Max-Age=0' })
+          'Set-Cookie': cookieName + '=; HttpOnly; SameSite=Lax; Path=' + (tunneled ? api : path) + '; Max-Age=0' })
           .end('Account collegato. Puoi chiudere questa scheda e tornare a Plugin & Skills.');
         return;
       }
       if (req.method === 'GET') {
-        try { return send(res, 200, await pluginCall('admin/status')); }
+        try { return send(res, 200, await pluginCall('admin/status', { browser: cookies[tunnelCookie] })); }
         catch (error) {
           if (error instanceof PluginError && error.status === 503) void startPluginService().catch(() => {});
           throw error;
@@ -45,6 +49,15 @@ export const pluginsRoute: Route = {
       let b;
       try { b = JSON.parse(await readBody(req, 32768)); } catch { return send(res, 400, { error: 'Invalid request.' }); }
       switch (b?.action) {
+        case 'prepare-tunnel': {
+          if (b.id !== 'drive' || googleDriveSignInOrigin(origin.origin) === origin.origin) break;
+          const browser = randomBytes(32).toString('base64url');
+          const result = await pluginCall('admin/tunnel', { id: b.id, origin: origin.origin, browser });
+          return send(res, 200, result, { 'set-cookie': tunnelCookie + '=' + browser + '; Path=' + api + '; HttpOnly; Secure; SameSite=Lax; Max-Age=600' });
+        }
+        case 'cancel-tunnel':
+          return send(res, 200, await pluginCall('admin/cancel', { id: b.id, browser: cookies[tunnelCookie] }),
+            { 'set-cookie': tunnelCookie + '=; Path=' + api + '; HttpOnly; Secure; SameSite=Lax; Max-Age=0' });
         case 'skill': return send(res, 200, await pluginCall('admin/skill', { id: b.id, enabled: b.enabled }));
         case 'disconnect': return send(res, 200, await pluginCall('admin/disconnect', { id: b.id }));
         case 'drive-client': return send(res, 200, await pluginCall('admin/client', { id: 'drive', clientId: b.clientId, secret: b.secret }));
@@ -63,6 +76,11 @@ export const pluginsRoute: Route = {
       }
       return send(res, 400, { error: 'Unknown operation.' });
     } catch (error) {
+      if (returning && error instanceof PluginError && error.message === 'Sign-in was cancelled.') {
+        res.writeHead(200, { ...callbackHeaders, 'content-type': 'text/plain; charset=utf-8' })
+          .end('Accesso annullato. Puoi chiudere questa scheda e tornare a Plugin & Skills.');
+        return;
+      }
       return send(res, error instanceof PluginError ? error.status : 503,
         { error: error instanceof PluginError ? error.message : 'Plugin & Skills service unavailable.' }, callbackHeaders);
     }
