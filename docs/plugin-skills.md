@@ -15,6 +15,8 @@ Attiva **PDF e OCR** in **Impostazioni → Plugin & Skills**. L'attivazione vale
 
 La skill usa `pdf.text`, `pdf.ocr` e `pdf.render` su una pagina alla volta, numerata da 1. Ogni risposta indica il numero totale di pagine. Il riconoscimento usa italiano e inglese insieme, oppure una lingua scelta con `ita` o `eng`. La dimensione massima per documento è 16 MiB. Il container elabora una pagina per volta e, se occupato, invita a riprovare. L'agente può confrontare la trascrizione con l'immagine originale prima di salvare il Markdown nel proprio workspace. La libreria Documenti lo mostra sul piano dell'agente.
 
+Quando invii un messaggio dal terminale di una scrivania Codex, Office indica all'agente come consultare il catalogo condiviso. Anche una chat aperta prima dell'attivazione può usare lo stesso catalogo tramite il client in `/office-bridge/office-workers.mjs`. Per un'anteprima quel client accetta `--save-image` con il percorso di un nuovo file JPEG temporaneo.
+
 ## Collegare gli account
 
 **Google Drive.** L’amministratore abilita la Drive API nel proprio progetto Google Cloud, configura il consenso e crea un client OAuth di tipo **Applicazione web**. Registra esattamente l’URI indicato in **Plugin & Skills → Google Drive → Configurazione applicazione Google**. Inserisci client ID e client secret in Office e premi **Applica**. Questa configurazione rimane sulla VM anche quando scolleghi l’account. Se il progetto Google è in modalità test, aggiungi l’account agli utenti di test. [Configurazione OAuth di Google](https://developers.google.com/identity/protocols/oauth2/web-server)

@@ -2,6 +2,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import http from 'node:http';
+import { mkdtemp, readFile, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import type { AddressInfo } from 'node:net';
 import path from 'node:path';
 import { createInterface } from 'node:readline';
@@ -16,6 +18,23 @@ import type { GhPull, WorkerInfo } from '../src/shared/protocol.js';
 const SCRIPT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'bin', 'office-workers.js');
 const ENV = { AGENT_OFFICE_HOOK_URL: 'http://127.0.0.1:4455/', AGENT_OFFICE_WORKER_ID: 'w1', AGENT_OFFICE_HOOK_TOKEN: 'tok' };
 const OFFICE = { url: 'http://127.0.0.1:4455', worker: 'w1', token: 'tok' };
+
+test('the CLI can view a shared tool preview without dumping base64 or overwriting a file', async t => {
+  const dir = await mkdtemp(path.join(tmpdir(), 'office-preview-'));
+  t.after(() => rm(dir, { recursive: true, force: true }));
+  const file = path.join(dir, 'page.jpg');
+  const args = ['use', 'pdf.render', '{"page":2,"file":"doc.pdf"}', '--save-image', file];
+  const bytes = Buffer.from([0xff, 0xd8, 0xff, 0xd9]);
+  const output: string[] = [];
+  const io = { env: ENV, fetch: async () => Response.json({ page: 2, pages: 4, image: {
+    mimeType: 'image/jpeg', data: bytes.toString('base64'),
+  } }), out: (line: string) => output.push(line), err: () => {} };
+  assert.equal(await main(args, io), 0);
+  assert.deepEqual(await readFile(file), bytes);
+  assert.deepEqual(JSON.parse(output[0]), { page: 2, pages: 4, file });
+  assert.notEqual(await main(args, io), 0);
+  assert.notEqual(await main([...args.slice(0, -1), file + '2'], { ...io, fetch: async () => Response.json({ text: 'only' }) }), 0);
+});
 
 function worker(id: string, more: Partial<WorkerInfo> = {}): WorkerInfo {
   return {

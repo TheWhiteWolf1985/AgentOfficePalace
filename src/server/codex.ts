@@ -1,4 +1,4 @@
-import { chmodSync, mkdirSync, writeFileSync } from 'node:fs';
+import { chmodSync, mkdirSync, renameSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import type { AgentEffort } from '../shared/providers.js';
 
@@ -143,10 +143,22 @@ export function codexModelArgs(args: string[], model?: string, effort?: AgentEff
 export function writeCodexHook(dataDir: string): string {
   mkdirSync(dataDir, { recursive: true, mode: 0o700 });
   const file = path.join(dataDir, 'agent-office-codex-hook.cjs');
-  writeFileSync(file, CODEX_HOOK_SOURCE, { mode: 0o600 });
-  chmodSync(file, 0o600);
+  writeFileSync(file + '.tmp', CODEX_HOOK_SOURCE, { mode: 0o600 });
+  chmodSync(file + '.tmp', 0o600);
+  renameSync(file + '.tmp', file);
   return file;
 }
+
+const officeToolInstructions = [
+  'Office plugins and skills run in the shared Plugin & Skills container.',
+  'For PDFs, OCR, scans, attachments or connected services, first call agent-office.list_office_tools.',
+  'Read the matching skill and invoke its operations with agent-office.use_office_tool. Pass the original attachment path.',
+  'If this session lacks those MCP tools, run node /office-bridge/office-workers.mjs tools,',
+  'then node /office-bridge/office-workers.mjs use NAME followed by the JSON arguments as one quoted argument.',
+  'For a CLI preview add --save-image /tmp/UNIQUE.jpg, then view the saved image.',
+  'Save requested Markdown under /workspace for this floor’s Documenti.',
+  'If the catalogue or required tool is unavailable, report it. Do not download, unpack or install substitute tools in the agent.',
+].join(' ');
 
 /** The helper only reads bounded hook stdin and the worker bridge environment. */
 export const CODEX_HOOK_SOURCE = String.raw`'use strict';
@@ -217,6 +229,13 @@ process.stdin.on('end', async () => {
         const text = typeof input.last_assistant_message === 'string' ? input.last_assistant_message.trim() : '';
         const reply = text.length > MAX_TEXT ? text.slice(0, MAX_TEXT - 16) + ' […]' : text;
         await post('/office/workers/reply?worker=' + encodeURIComponent(worker), { requestId: ack.requestId, reply });
+      }
+      if (event === 'UserPromptSubmit') {
+        // This hook runs for existing terminals too, including those with an older cached MCP tool list.
+        process.stdout.write(JSON.stringify({ hookSpecificOutput: {
+          hookEventName: event, additionalContext: ${JSON.stringify(officeToolInstructions)},
+        } }));
+        return;
       }
       return finish(true);
     }

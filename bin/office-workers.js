@@ -8,7 +8,7 @@
 // build step, no dependencies.
 
 import { request } from 'node:http';
-import { realpathSync } from 'node:fs';
+import { realpathSync, writeFileSync } from 'node:fs';
 import { createInterface } from 'node:readline';
 import { fileURLToPath } from 'node:url';
 
@@ -34,6 +34,7 @@ const USAGE = `Usage:
   office-workers pr --none [--worker <name|id>] take that pull request off the worker again
   office-workers tools                          list shared plugins and enabled skills
   office-workers use NAME [JSON]                call a shared tool or read a skill
+                     [--save-image PATH]        save the returned preview to a new JPEG file
   office-workers mcp                            serve these as MCP tools on stdio`;
 
 /** A mistake in how the command was called: the usage is shown with it. */
@@ -93,8 +94,10 @@ export function parseArgs(argv) {
     return { cmd: 'mcp' };
   }
   if (cmd === 'tools' && !rest.length) return { cmd };
-  if (cmd === 'use' && rest.length >= 1 && rest.length <= 2) {
-    return { cmd, name: rest[0], arguments: JSON.parse(rest[1] ?? '{}') };
+  if (cmd === 'use') {
+    const { opts, words } = options(rest, ['--save-image'], []);
+    if (words.length < 1 || words.length > 2) throw new UsageError('use NAME [JSON] [--save-image PATH]');
+    return { cmd, name: words[0], arguments: JSON.parse(words[1] ?? '{}'), saveImage: opts['--save-image'] };
   }
   if (cmd === 'list' || cmd === 'ls') {
     const { opts, words } = options(rest, [], ['--json']);
@@ -458,7 +461,7 @@ export async function handleMcp(msg, io) {
     { ...TOOLS.find(t => t.name === 'tell_worker'), description: 'Delegate a task to a colleague on this floor and receive their final answer. If pending, use list_workers with its requestId.' },
   ] : TOOLS;
   const tools = [...workerTools, {
-    name: 'list_office_tools', description: 'Discover the plugins and skills currently enabled for the whole office, including the arguments for each tool.',
+    name: 'list_office_tools', description: 'Start here for PDF attachments, OCR, document skills or connected services. List the tools enabled for the whole office and their arguments.',
     annotations: { readOnlyHint: true, openWorldHint: false },
     inputSchema: { type: 'object', properties: {}, additionalProperties: false },
   }, {
@@ -558,7 +561,13 @@ export async function main(argv, io = {}) {
     }
     officeEnv(env);
     if (cmd.cmd === 'tools' || cmd.cmd === 'use') {
-      out(JSON.stringify(await call(cmd.cmd, { name: cmd.name, arguments: cmd.arguments }, ctx), null, 2));
+      const result = await call(cmd.cmd, { name: cmd.name, arguments: cmd.arguments }, ctx);
+      if (cmd.saveImage) {
+        const { image, ...metadata } = result;
+        if (image?.mimeType !== 'image/jpeg' || typeof image.data !== 'string') throw Error('This operation did not return a JPEG preview.');
+        writeFileSync(cmd.saveImage, Buffer.from(image.data, 'base64'), { flag: 'wx', mode: 0o600 });
+        out(JSON.stringify({ ...metadata, file: cmd.saveImage }));
+      } else out(JSON.stringify(result, null, 2));
       return 0;
     }
     const prompt = async () => {
