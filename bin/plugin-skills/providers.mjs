@@ -70,7 +70,7 @@ export function begin(id, clientId, redirect) {
     code_challenge_method: 'S256' }).toString();
   if (id === 'drive') {
     url.searchParams.set('access_type', 'offline');
-    url.searchParams.set('prompt', 'consent');
+    url.searchParams.set('prompt', 'select_account consent');
   }
   return { url: url.href, verifier, state };
 }

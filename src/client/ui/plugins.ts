@@ -1,4 +1,5 @@
 import { remoteText, t } from '../../shared/i18n';
+import { googleDriveSignInOrigin } from '../../shared/google-drive-oauth';
 import { connectionButton as button, connectionField as field } from './connections-client';
 import { h } from './dom';
 
@@ -45,16 +46,63 @@ export function pluginsPanel() {
     const view = await request<Catalogue>(input);
     if (!closed) { render(view); message.textContent = t('Settings applied'); }
   }
+  function googleAccount(p: Provider) {
+    const origin = googleDriveSignInOrigin(location.origin);
+    const client = h('input', { autocomplete: 'off', maxlength: 1024 });
+    const secret = h('input', { autocomplete: 'new-password', type: 'password', maxlength: 2048 });
+    const setup = h('details', { open: !p.hasClient }, h('summary', {}, t('Google application setup')),
+      h('p.setting-note', {}, t('Enable the Drive API and register a web application with this redirect URL.')),
+      h('code', {}, origin + '/api/plugins/callback/drive'),
+      h('p', {}, h('a', { href: 'https://console.cloud.google.com/auth/clients', target: '_blank', rel: 'noopener noreferrer' }, 'Google Cloud Console')),
+      field('Client ID', client), field('Client secret', secret),
+      button(t('Apply'), () => run(async () => {
+        await change({ action: 'drive-client', clientId: client.value.trim(), secret: secret.value });
+        secret.value = '';
+      })));
+    if (origin !== location.origin) {
+      return h('div', {}, setup,
+        h('details', { open: p.hasClient }, h('summary', {}, t('Sign in with Google')),
+          h('p.setting-note', {}, t('For this IP address, open an SSH tunnel on the computer where you will sign in. Replace USER with your VM SSH username.')),
+          h('code', {}, 'ssh -NT -o ExitOnForwardFailure=yes -L 127.0.0.1:4600:127.0.0.1:4600 USER@' + location.hostname),
+          h('p', {}, h('a.btn', { href: origin + '/lite', target: '_blank', rel: 'noopener noreferrer' }, t('Open local Office'))),
+          h('p.setting-note', {}, t('In local Office, open Settings → Plugin & Skills and select Sign in with Google. Close the tunnel after consent.'))));
+    }
+    const login = button(t('Sign in with Google'), () => {
+      // Open on the user's click; async requests otherwise trigger popup blockers.
+      const popup = window.open('about:blank', '_blank');
+      if (popup) popup.opener = null;
+      return run(async () => {
+        try {
+          const result = await request<{ url: string }>({ action: 'begin', id: 'drive' });
+          if (closed) { popup?.close(); return; }
+          waiting = true;
+          const link = h('a', { href: result.url, target: '_blank', rel: 'noopener noreferrer' }, t('Open sign-in page'));
+          message.replaceChildren(link);
+          if (popup && !popup.closed) popup.location.replace(result.url);
+        } catch (error) { popup?.close(); throw error; }
+      });
+    });
+    login.disabled = !p.hasClient;
+    return h('div', {}, setup, login);
+  }
   function provider(p: Provider) {
+    const panel = h('section.setting', {}, h('h4', {}, p.name),
+      h('p.setting-note', {}, t(p.id === 'drive' ? 'Find files and read Google Docs or text documents.' : 'Find designs and read their details and links.')),
+      h('p', {}, t(labels[p.status]), p.account ? ' · ' + p.account : ''),
+      p.id === 'drive' ? googleAccount(p) : canvaAccount(p));
+    if (p.status !== 'disconnected') panel.append(button(t('Disconnect account'), () => {
+      if (window.confirm(t('Disconnect this account for all agents?'))) return run(() => change({ action: 'disconnect', id: p.id }));
+    }));
+    return panel;
+  }
+  function canvaAccount(p: Provider) {
     const redirect = location.origin + '/api/plugins/callback/' + p.id;
     const client = h('input', { autocomplete: 'off', type: 'text', maxlength: 1024 });
     const secret = h('input', { autocomplete: 'new-password', type: 'password', maxlength: 2048 });
     const options = h('details', {}, h('summary', {}, t('OAuth application')),
       field('Client ID', client), field('Client secret', secret),
       h('p.setting-note', {}, t('Register this redirect URL with the provider.'), ' ', h('code', {}, redirect)));
-    const ipOnly = location.hostname.startsWith('[') || /^\d+\.\d+\.\d+\.\d+$/.test(location.hostname);
-    const driveOnLan = p.id === 'drive' && ipOnly && location.hostname !== '127.0.0.1' && location.hostname !== '[::1]';
-    options.open = !p.hasClient && !driveOnLan;
+    options.open = !p.hasClient;
     const form = h('details', {}, h('summary', {}, t(p.status === 'disconnected' ? 'Connect account' : 'Reconnect account')), options);
     const authorize = button(t('Sign in with provider'), () => run(async () => {
       const result = await request<{ url: string }>({ action: 'begin', id: p.id, clientId: client.value.trim(), secret: secret.value });
@@ -65,28 +113,8 @@ export function pluginsPanel() {
       message.replaceChildren(link);
       link.focus();
     }));
-    if (driveOnLan) options.remove();
-    else form.append(authorize);
-    if (p.id === 'drive') {
-      const file = h('input', { type: 'file', accept: '.json,application/json' });
-      form.append(h('details', { open: driveOnLan }, h('summary', {}, t('Use a Google service account')),
-        h('p.setting-note', {}, t('For a private LAN, share the desired Drive folder with the service account, then select its JSON key.')),
-        field(t('Service account JSON'), file), button(t('Connect service account'), () => run(async () => {
-          const selected = file.files?.[0];
-          if (!selected || selected.size > 16_384) throw Error(t('Select a service account JSON file.'));
-          let credential;
-          try { credential = JSON.parse(await selected.text()); } catch { throw Error(t('Invalid service account key.')); }
-          await change({ action: 'service', credential });
-          file.value = '';
-        }))));
-    }
-    const panel = h('section.setting', {}, h('h4', {}, p.name),
-      h('p.setting-note', {}, t(p.id === 'drive' ? 'Find files and read Google Docs or text documents.' : 'Find designs and read their details and links.')),
-      h('p', {}, t(labels[p.status]), p.account ? ' · ' + p.account : ''), form);
-    if (p.status !== 'disconnected') panel.append(button(t('Disconnect account'), () => {
-      if (window.confirm(t('Disconnect this account for all agents?'))) return run(() => change({ action: 'disconnect', id: p.id }));
-    }));
-    return panel;
+    form.append(authorize);
+    return form;
   }
   function render(view: Catalogue) {
     body.replaceChildren(...view.providers.map(provider), h('h4', {}, t('Skills')),

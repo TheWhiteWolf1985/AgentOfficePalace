@@ -4,8 +4,8 @@ import { chmodSync, lstatSync, readdirSync, readFileSync, renameSync, unlinkSync
 import { accessGrant, begin, exchange, identity, invoke, operations, Problem, providers, string } from './providers.mjs';
 
 process.umask(0o077);
-const data = '/data/accounts.json';
-const socket = '/run/office/plugins.sock';
+const data = path.join(process.env.AOP_PLUGIN_DATA_DIR || '/data', 'accounts.json');
+const socket = process.env.AOP_PLUGIN_SOCKET || '/run/office/plugins.sock';
 let state;
 try { state = JSON.parse(readFileSync(data, 'utf8')); }
 catch (error) {
@@ -44,7 +44,7 @@ function snapshot() {
   return {
     providers: [...providers].map(([id, p]) => {
       const account = state.accounts[id];
-      return { id, name: p.name, account: account?.label, hasClient: !!account?.clientId,
+      return { id, name: p.name, account: account?.label, hasClient: !!(state.clients?.[id]?.clientId || account?.clientId),
         status: account?.reauth ? 'reconnect' : account ? 'connected' : 'disconnected' };
     }),
     skills: [...skills].map(([id, s]) => ({ id, name: s.name, description: s.description, enabled: state.skills[id] === true })),
@@ -66,24 +66,27 @@ async function admin(op, b) {
     const old = state.accounts[id];
     if (op === 'disconnect') {
       pending.delete(id);
-      save(next => { delete next.accounts[id]; });
+      save(next => {
+        if (id === 'drive' && !next.clients?.drive && old?.kind === 'oauth') {
+          (next.clients ??= {}).drive = { clientId: old.clientId, secret: old.secret };
+        }
+        delete next.accounts[id];
+      });
       return snapshot();
     }
-    if (op === 'service' && id === 'drive') {
-      const k = b.credential;
-      if (k?.type !== 'service_account') throw new Problem(400, 'Invalid service account key.');
-      const account = { kind: 'service', email: string(k.client_email, 320, 'Invalid service account key.'),
-        key: string(k.private_key, 8192, 'Invalid service account key.') };
-      const token = await exchange(id, account, accessGrant(account));
-      const label = await identity(id, token.access);
-      save(next => { next.accounts[id] = { ...account, ...token, label }; });
+    if (op === 'client' && id === 'drive') {
+      const clientId = string(b.clientId, 1024, 'OAuth client ID required.');
+      if (!/^[\w-]+\.apps\.googleusercontent\.com$/.test(clientId)) throw new Problem(400, 'Enter a Google web application client ID.');
+      const secret = string(b.secret, 2048, 'OAuth client secret required.');
+      save(next => { (next.clients ??= {}).drive = { clientId, secret }; });
       pending.delete(id);
       return snapshot();
     }
     if (op === 'begin') {
+      const saved = state.clients?.[id] ?? old;
       const account = {
-        kind: 'oauth', clientId: string(b.clientId || old?.clientId, 1024, 'OAuth client ID required.'),
-        secret: string(b.secret || ((!b.clientId || b.clientId === old?.clientId) && old?.secret), 2048, 'OAuth client secret required.'),
+        kind: 'oauth', clientId: string(b.clientId || saved?.clientId, 1024, 'OAuth client ID required.'),
+        secret: string(b.secret || ((!b.clientId || b.clientId === saved?.clientId) && saved?.secret), 2048, 'OAuth client secret required.'),
       };
       const flow = begin(id, account.clientId, b.redirect);
       pending.set(id, { ...flow, account, redirect: b.redirect, browser: b.browser, until: Date.now() + 600_000 });

@@ -1,6 +1,7 @@
 import { randomBytes } from 'node:crypto';
 import { TLSSocket } from 'node:tls';
 import { parseCookies } from '../../auth.js';
+import { googleDriveSignInOrigin } from '../../../shared/google-drive-oauth.js';
 import { PluginError, pluginCall, startPluginService } from '../../plugin-service.js';
 import type { Route } from '../router.js';
 import { isSecure, sameOrigin, readBody, send } from '../util.js';
@@ -46,12 +47,16 @@ export const pluginsRoute: Route = {
       switch (b?.action) {
         case 'skill': return send(res, 200, await pluginCall('admin/skill', { id: b.id, enabled: b.enabled }));
         case 'disconnect': return send(res, 200, await pluginCall('admin/disconnect', { id: b.id }));
-        case 'service': return send(res, 200, await pluginCall('admin/service', { id: 'drive', credential: b.credential }));
+        case 'drive-client': return send(res, 200, await pluginCall('admin/client', { id: 'drive', clientId: b.clientId, secret: b.secret }));
         case 'begin': {
           if (b.id !== 'drive' && b.id !== 'canva') break;
+          if (b.id === 'drive' && googleDriveSignInOrigin(origin.origin) !== origin.origin) {
+            return send(res, 400, { error: 'Open Office through localhost or the registered HTTPS domain to sign in with Google.' });
+          }
           const browser = randomBytes(32).toString('base64url');
           const path = callback + b.id;
-          const result = await pluginCall('admin/begin', { id: b.id, clientId: b.clientId, secret: b.secret, redirect: origin.origin + path, browser });
+          const app = b.id === 'canva' ? { clientId: b.clientId, secret: b.secret } : {};
+          const result = await pluginCall('admin/begin', { id: b.id, ...app, redirect: origin.origin + path, browser });
           return send(res, 200, result, { 'set-cookie': 'aop_plugin_' + b.id + '=' + browser + '; Path=' + path +
             '; HttpOnly; SameSite=Lax; Max-Age=600' + (origin.protocol === 'https:' ? '; Secure' : '') });
         }

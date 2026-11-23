@@ -9,7 +9,7 @@ const unavailable = 'Plugin & Skills service unavailable.';
 export class PluginError extends Error {
   constructor(readonly status: number, message: string) { super(message); }
 }
-type Operation = 'admin/status' | 'admin/skill' | 'admin/service' | 'admin/begin' | 'admin/finish' | 'admin/disconnect' | 'worker/list' | 'worker/use';
+type Operation = 'admin/status' | 'admin/skill' | 'admin/client' | 'admin/begin' | 'admin/finish' | 'admin/disconnect' | 'worker/list' | 'worker/use';
 
 function directory() {
   const root = dockerRoot();
