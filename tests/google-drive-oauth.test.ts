@@ -1,14 +1,20 @@
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
-import { mkdtemp, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises';
 import http from 'node:http';
+import type { AddressInfo } from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import { pathToFileURL } from 'node:url';
 import { setTimeout as delay } from 'node:timers/promises';
 import { googleDriveSignInOrigin } from '../src/shared/google-drive-oauth.js';
+import { Auth } from '../src/server/auth.js';
+import type { Accounts } from '../src/server/accounts.js';
+import { requestHandler } from '../src/server/http/router.js';
+import { pluginsRoute } from '../src/server/http/routes/plugins.js';
+import type { Ctx } from '../src/server/office/context.js';
 
 test('Drive suggests a loopback redirect for LAN IPs and keeps the registered origin for domains and localhost', () => {
   for (const origin of ['https://192.168.1.144', 'https://[fd00::10]:8833']) {
@@ -21,7 +27,9 @@ test('Drive suggests a loopback redirect for LAN IPs and keeps the registered or
 
 test('Drive connects the selected user with PKCE, requires the initiating browser and keeps the client for the next login', { skip: process.platform === 'win32' }, async t => {
   const dir = await mkdtemp(path.join(os.tmpdir(), 'aop-drive-'));
-  const socket = path.join(dir, 'p.sock');
+  const socketDir = path.join(dir, 'plugin-skills', 'socket');
+  await mkdir(socketDir, { recursive: true });
+  const socket = path.join(socketDir, 'plugins.sock');
   // Drive is simulated only at its HTTPS boundary. Run the real broker, state store and refresh logic.
   const preload = path.join(dir, 'provider.mjs');
   await writeFile(preload, [
@@ -106,9 +114,9 @@ test('Drive connects the selected user with PKCE, requires the initiating browse
     assert.equal(r.status, 200);
     const plan = r.data, local = new URL(plan.url);
     assert.equal(local.origin + local.pathname, redirect);
-    const files = (await readdir(dir)).filter(n => /^auth-.*\.sock$/.test(n));
+    const files = (await readdir(socketDir)).filter(n => /^auth-.*\.sock$/.test(n));
     assert.equal(files.length, 1);
-    const file = path.join(dir, files[0]!);
+    const file = path.join(socketDir, files[0]!);
     assert.equal((await stat(file)).mode & 0o777, 0o600);
     assert.ok(plan.command.includes('127.0.0.1:4600:' + file));
     async function forward(target: string, method = 'GET', host = local.host) {
@@ -166,10 +174,65 @@ test('Drive connects the selected user with PKCE, requires the initiating browse
     assert.equal((await call('admin/finish', { id, receipt, browser })).data.error, 'Sign-in was cancelled.');
     assert.equal((await call('admin/status')).data.providers[0].account, 'reader@example.org');
   });
+  await t.test('Office behind the IP proxy completes OAuth using only its login cookie', async t => {
+    const prior = process.env.AGENT_OFFICE_CODEX_RUNTIME;
+    process.env.AGENT_OFFICE_CODEX_RUNTIME = dir;
+    t.after(() => {
+      if (prior === undefined) delete process.env.AGENT_OFFICE_CODEX_RUNTIME;
+      else process.env.AGENT_OFFICE_CODEX_RUNTIME = prior;
+    });
+    const auth = new Auth(Buffer.alloc(32), Buffer.alloc(16), 'fixture', { sharedPassword: true } as Accounts);
+    const ctx = { auth, cfg: { trustProxy: true }, meOf: () => ({ admin: true }), services: { lookup: () => undefined } } as unknown as Ctx;
+    const server = http.createServer(requestHandler(ctx, [pluginsRoute]));
+    server.listen(0, '127.0.0.1');
+    await once(server, 'listening');
+    t.after(() => server.close());
+    const port = (server.address() as AddressInfo).port;
+    const host = '192.0.2.1', first = auth.issue(), second = auth.issue();
+    function office(token: string, target: string, input?: object) {
+      return new Promise<{ status: number; text: string }>((resolve, reject) => {
+        const req = http.request({ port, hostname: '127.0.0.1', path: target, method: input ? 'POST' : 'GET', agent: false,
+          headers: { host, origin: 'https://' + host, 'x-forwarded-proto': 'https', cookie: 'ao_session=' + token } }, res => {
+          let text = ''; res.setEncoding('utf8').on('data', chunk => { text += chunk; });
+          res.on('end', () => resolve({ status: res.statusCode!, text }));
+        });
+        req.on('error', reject); req.end(input ? JSON.stringify(input) : undefined);
+      });
+    }
+    const api = '/api/plugins';
+    const opened = await office(first, api, { action: 'prepare-tunnel', id });
+    assert.equal(opened.status, 200);
+    const plan = JSON.parse(opened.text);
+    assert.equal(JSON.parse((await office(first, api)).text).providers[0].tunnel.url, plan.url);
+    assert.equal(JSON.parse((await office(second, api)).text).providers[0].tunnel, undefined);
+    assert.equal((await office(second, api, { action: 'cancel-tunnel', id })).status, 400);
+    const file = (await readdir(socketDir)).find(n => n.startsWith('auth-'))!;
+    async function redirectFromSocket(target: URL) {
+      return new Promise<URL>((resolve, reject) => {
+        const req = http.get({ socketPath: path.join(socketDir, file), path: target.pathname + target.search,
+          headers: { host: target.host }, agent: false }, res => {
+          res.resume();
+          if (res.statusCode !== 303 || !res.headers.location) return reject(Error('Expected browser redirect'));
+          resolve(new URL(res.headers.location));
+        });
+        req.on('error', reject);
+      });
+    }
+    const google = await redirectFromSocket(new URL(plan.url));
+    const back = new URL(google.searchParams.get('redirect_uri')!);
+    back.searchParams.set('state', google.searchParams.get('state')!);
+    back.searchParams.set('code', google.searchParams.get('code_challenge')!);
+    const receipt = await redirectFromSocket(back);
+    const target = receipt.pathname + receipt.search;
+    assert.equal((await office(second, target)).status, 400);
+    assert.equal((await office(first, target)).status, 200);
+    assert.equal((await office(first, target)).status, 400);
+    assert.equal(JSON.parse((await office(first, api)).text).providers[0].status, 'connected');
+  });
   await t.test('deadline closes the callback and releases the provider for the next request', async () => {
     await writeFile(path.join(dir, 'expire'), '');
     const a = await prepare();
-    for (let i = 0; i < 120 && (await readdir(dir)).includes(path.basename(a.file)); i++) await delay(25);
+    for (let i = 0; i < 120 && (await readdir(socketDir)).includes(path.basename(a.file)); i++) await delay(25);
     await assert.rejects(stat(a.file), { code: 'ENOENT' });
     assert.equal((await call('admin/status', { browser })).data.providers[0].tunnel, undefined);
     await start();
