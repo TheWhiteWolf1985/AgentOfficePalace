@@ -8,6 +8,7 @@ import type { WorkerInfo } from '../../shared/protocol.js';
 import type { Ctx } from '../office/context.js';
 import { str } from '../office/input.js';
 import { readBody, send } from '../http/util.js';
+import { pluginCall, PluginError } from '../plugin-service.js';
 
 /**
  * Pull request `n` on a floor, for a worker to have as its own: one that's open, or merged and still
@@ -54,6 +55,21 @@ export async function officeWorkers(ctx: Ctx, req: http.IncomingMessage, res: ht
     return w && workerRow(w, view, me.id);
   };
   const action = url.pathname.slice('/office/workers'.length);
+  if (req.method === 'POST' && (action === '/tools' || action === '/use')) {
+    let input;
+    try { input = JSON.parse(await readBody(req, 32_768)); }
+    catch { return send(res, 400, { error: 'Invalid request.' }); }
+    try {
+      // These fixed operations can only discover or use the shared catalogue, never manage credentials.
+      const result = action === '/tools' ? await pluginCall('worker/list') :
+        await pluginCall('worker/use', { name: input?.name, arguments: input?.arguments });
+      return send(res, 200, result);
+    } catch (e) {
+      const status = e instanceof PluginError ? e.status : 503;
+      // A rejected provider token is distinct from the worker's own Office authentication.
+      return send(res, status === 401 ? 409 : status, { error: e instanceof PluginError ? e.message : 'Plugin & Skills service unavailable.' });
+    }
+  }
   if (req.method === 'GET' && !action) {
     const list = peers();
     const free = nextFreeSeat((id) => floor.workers.deskOccupied(id), floor.plan.wing);

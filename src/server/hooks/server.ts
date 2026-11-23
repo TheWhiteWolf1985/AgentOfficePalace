@@ -99,7 +99,7 @@ export async function startHookServer(ctx: Ctx): Promise<{ hookServer: http.Serv
     renameSync(dest + '.tmp', dest);
     const local = http.createServer((req, res) => {
       const route = req.url?.split('?')[0];
-      if ((req.method === 'GET' && route === '/office/workers') || (req.method === 'POST' && ['/office/workers/tell', '/office/workers/result', '/office/workers/reply'].includes(route ?? ''))) {
+      if ((req.method === 'GET' && route === '/office/workers') || (req.method === 'POST' && ['/office/workers/tell', '/office/workers/result', '/office/workers/reply', '/office/workers/tools', '/office/workers/use'].includes(route ?? ''))) {
         const url = new URL(req.url!, 'http://localhost');
         void officeWorkers(ctx, req, res, url, true).catch(() => send(res, 500, { error: 'Delivery failed' }));
         return;

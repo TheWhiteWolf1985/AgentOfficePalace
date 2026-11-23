@@ -196,7 +196,8 @@ export const MCP_NAME = 'agent-office';
 /** What it needs from the worker's environment; Codex hands an MCP server only what it's told to. */
 const MCP_ENV = ['AGENT_OFFICE_HOOK_URL', 'AGENT_OFFICE_WORKER_ID', 'AGENT_OFFICE_HOOK_TOKEN'];
 /** Its tools that only look, which Claude Code workers may call without asking. */
-export const MCP_READ_ONLY = [`mcp__${MCP_NAME}__list_workers`];
+const sharedTools = ['list_office_tools', 'use_office_tool'];
+export const MCP_READ_ONLY = ['list_workers', ...sharedTools].map(tool => `mcp__${MCP_NAME}__${tool}`);
 
 /**
  * Writes Claude Code's --mcp-config file for the MCP server (bin/office-workers.js `mcp`, run by the
@@ -214,7 +215,8 @@ export function writeClaudeMcpConfig(dataDir: string, script: string): string {
 export function codexMcpArgs(script: string, docker = false): string[] {
   // TOML basic strings and arrays read JSON's.
   const key = `mcp_servers.${MCP_NAME}`;
-  return ['-c', `${key}.command=${JSON.stringify(docker ? 'node' : process.execPath)}`, '-c', `${key}.args=${JSON.stringify([script, 'mcp'])}`, '-c', `${key}.env_vars=${JSON.stringify(docker ? ['AGENT_OFFICE_HOOK_SOCKET', ...MCP_ENV.slice(1)] : MCP_ENV)}`];
+  return ['-c', `${key}.command=${JSON.stringify(docker ? 'node' : process.execPath)}`, '-c', `${key}.args=${JSON.stringify([script, 'mcp'])}`, '-c', `${key}.env_vars=${JSON.stringify(docker ? ['AGENT_OFFICE_HOOK_SOCKET', ...MCP_ENV.slice(1)] : MCP_ENV)}`,
+    ...sharedTools.flatMap(tool => ['-c', `${key}.tools.${tool}.approval_mode="approve"`])];
 }
 
 /** OpenCode's `mcp` config entry for the MCP server; OpenCode hands it its environment. */

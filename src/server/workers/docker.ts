@@ -49,7 +49,7 @@ export function dockerPrefix(): string[] {
   return ['--host', 'unix://' + file];
 }
 const cliEnv = () => ({ PATH: '/usr/local/bin:/usr/bin:/bin', LANG: 'C.UTF-8' });
-async function docker(args: string[]) {
+export async function docker(args: string[]) {
   try { return (await exec('docker', [...dockerPrefix(), ...args], { env: cliEnv(), timeout: 30000, maxBuffer: 1024 * 1024 })).stdout.trim(); }
   catch (e) {
     // execFile's error message includes argv, including the worker hook token. Only expose the daemon's diagnostic.

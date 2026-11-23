@@ -159,7 +159,7 @@ test('answers MCP: the handshake, its tools, and a call', async () => {
   assert.equal((await handleMcp({ jsonrpc: '2.0', id: 2, method: 'initialize', params: { protocolVersion: '1999-01-01' } }, io))?.result.protocolVersion, '2025-11-25');
   assert.equal(await handleMcp({ jsonrpc: '2.0', method: 'notifications/initialized' }, io), undefined);
   const tools = await handleMcp({ jsonrpc: '2.0', id: 3, method: 'tools/list' }, io);
-  assert.deepEqual(tools?.result.tools.map((t: { name: string }) => t.name), ['list_workers', 'hire_worker', 'send_home', 'tell_worker', 'link_pr']);
+  assert.deepEqual(tools?.result.tools.map((t: { name: string }) => t.name), ['list_workers', 'hire_worker', 'send_home', 'tell_worker', 'link_pr', 'list_office_tools', 'use_office_tool']);
   const linking = { env: ENV, fetch: (async (_url: unknown, init?: RequestInit) => new Response(JSON.stringify({ ok: true, worker: { name: 'Bolt', pr: { number: Number(JSON.parse(String(init?.body)).pr), state: 'open' }, merged: false } }))) as typeof fetch };
   const linked = await handleMcp({ jsonrpc: '2.0', id: 9, method: 'tools/call', params: { name: 'link_pr', arguments: { worker: 'Bolt', pr: 7 } } }, linking);
   assert.deepEqual(linked?.result, { content: [{ type: 'text', text: 'Bolt: PR #7 open' }] });
@@ -299,18 +299,20 @@ test('reads send-home and hire requests', () => {
 
 test("Codex is told to pass the office's variables on to the MCP server", () => {
   const args = codexMcpArgs('/opt/app/bin/office-workers.js');
-  assert.deepEqual(args.filter((_, i) => i % 2 === 0), ['-c', '-c', '-c']);
+  assert.deepEqual(args.filter((_, i) => i % 2 === 0), ['-c', '-c', '-c', '-c', '-c']);
   assert.deepEqual(args.filter((_, i) => i % 2 === 1), [
     `mcp_servers.agent-office.command=${JSON.stringify(process.execPath)}`,
     'mcp_servers.agent-office.args=["/opt/app/bin/office-workers.js","mcp"]',
     'mcp_servers.agent-office.env_vars=["AGENT_OFFICE_HOOK_URL","AGENT_OFFICE_WORKER_ID","AGENT_OFFICE_HOOK_TOKEN"]',
+    'mcp_servers.agent-office.tools.list_office_tools.approval_mode="approve"',
+    'mcp_servers.agent-office.tools.use_office_tool.approval_mode="approve"',
   ]);
 });
 
-test('a container exposes only authenticated floor peer tools', async () => {
+test('a container exposes peer and shared catalogue tools without worker administration', async () => {
   const io = { env: { AGENT_OFFICE_HOOK_SOCKET: '/office-bridge/hooks.sock' }, fetch };
   const list = await handleMcp({ jsonrpc: '2.0', id: 1, method: 'tools/list' }, io);
-  assert.deepEqual(list.result.tools.map((t: { name: string }) => t.name), ['list_workers', 'tell_worker']);
+  assert.deepEqual(list.result.tools.map((t: { name: string }) => t.name), ['list_workers', 'tell_worker', 'list_office_tools', 'use_office_tool']);
   assert.ok(list.result.tools[0].inputSchema.properties.requestId);
   const call = await handleMcp({ jsonrpc: '2.0', id: 2, method: 'tools/call', params: { name: 'hire_worker' } }, io);
   assert.equal(call.error.code, -32602);
