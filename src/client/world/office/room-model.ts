@@ -21,13 +21,10 @@ function load(name: ModelName) {
   return asset.scene;
 }
 
-/** Convert exported glTF UVs once. Canvas and video consumers use the same convention as PlaneGeometry. */
+/** The office GLB supplies PlaneGeometry-compatible UVs for canvas and video. */
 function surface(root: THREE.Object3D, name: string) {
   const face = required(root, 'superficie_' + name);
   if (!(face instanceof THREE.Mesh)) throw new Error('Office surface has no geometry: ' + name);
-  face.geometry = face.geometry.clone();
-  const uv = face.geometry.getAttribute('uv');
-  for (let i = 0; i < uv.count; i++) uv.setY(i, 1 - uv.getY(i));
   face.material = new THREE.MeshBasicMaterial({ color: name === 'tv' ? '#1b1d2e' : '#ffffff', toneMapped: false });
   face.castShadow = face.receiveShadow = false;
   return face;

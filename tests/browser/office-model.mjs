@@ -42,7 +42,16 @@ test('all office levels use the closed Blender room, live surfaces and persisten
       const floor = office.colliders.find(c => c.minX <= -18 && c.maxX >= 18 && c.minZ <= -13 && c.maxZ >= 13 && c.top === 0);
       const ceiling = office.colliders.find(c => c.bottom === 6.8 && c.minX === -18 && c.maxX === 18);
       const faceNames = ['issues', 'pulls', 'queue', 'services', 'tv', 'riunioni', 'targa_riunioni', 'lavagna_condivisa'];
-      const faces = faceNames.map(n => office.group.getObjectByName('superficie_' + n)?.isMesh);
+      const faces = faceNames.map(name => {
+        const face = office.group.getObjectByName('superficie_' + name);
+        const { position, uv } = face.geometry.attributes;
+        for (let i = 0; i < position.count; i++) {
+          if (uv.getX(i) !== Number(position.getX(i) > 0) || uv.getY(i) !== Number(position.getY(i) > 0)) {
+            throw Error('Canvas or video would be mirrored on ' + name);
+          }
+        }
+        return face.isMesh;
+      });
       const shelf = office.interactables.find(i => i.kind === 'bookshelf');
       const bagCount = office.colliders.length;
       const added = office.setBeanbags(new Set(['beanbag-7'])).length;
