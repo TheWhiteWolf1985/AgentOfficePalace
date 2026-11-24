@@ -203,26 +203,23 @@ test('gets up off a beanbag to the side when something stands in front of it', (
   for (const c of [bean, crate]) assert.ok(!overlaps(c, player.pos.x, player.pos.z), `stood inside something at ${player.pos.toArray()}`);
 });
 
-test('gets up off the balcony bench onto the deck, clear of the bench', (t) => {
-  const deck: Collider = { ...BALCONY, bottom: -SLAB, top: 0 };
-  const bench: Collider = { minX: -10, maxX: -8, minZ: BALCONY.minZ, maxZ: BALCONY.minZ + 0.55, top: 0.49 };
-  const { player, keys, frames } = controller(t, [deck, bench]);
-  for (const i of [0, 1]) {
-    player.sit(seatPlace(SEATING_BY_ID.get('bench')!, i));
-    keys('KeyS');
-    frames(1);
+test('all three couch places allow the user to stand on the office floor', t => {
+  const couch: Collider = { minX: 10, maxX: 11, minZ: -2.2, maxZ: 2.2, top: 0.47 };
+  const { player, keys, frames } = controller(t, [officeFloor, couch]);
+  for (const i of [0, 1, 2]) {
+    player.sit(seatPlace(SEATING_BY_ID.get('couch')!, i));
+    keys('KeyS'); frames(1);
     assert.equal(player.seat, null);
-    assert.ok(!overlaps(bench, player.pos.x, player.pos.z), `stood inside the bench at ${player.pos.toArray()}`);
-    keys();
-    frames(30);
-    assert.equal(player.pos.y, 0, 'still on the balcony');
+    assert.ok(!overlaps(couch, player.pos.x, player.pos.z));
+    keys(); frames(30);
+    assert.equal(player.pos.y, 0);
   }
 });
 
 test('seat places are only the ones the office has', () => {
   assert.equal(seatAt('couch:2')?.seatId, 'couch');
   assert.equal(seatAt('loft-couch:1')?.y, LOFT.y);
-  for (const bad of ['couch:3', 'couch:', 'couch', 'sofa:0', 'couch:-1', 'couch:1.5', '']) assert.equal(seatAt(bad), undefined, bad);
+  for (const bad of ['couch:3', 'couch:', 'couch', 'sofa:0', 'couch:-1', 'couch:1.5', 'bench:0', 'stool-1:0', '']) assert.equal(seatAt(bad), undefined, bad);
 });
 
 test('movement effects combine while preserving the strongest landing shake', () => {

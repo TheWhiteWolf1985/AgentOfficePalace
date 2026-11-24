@@ -1,0 +1,47 @@
+{
+  "esito": "PASS",
+  "geometria_materiali_uv_immagini_base_identici": true,
+  "live_base": {
+    "sha256": "fc388faa8fd1620862172364b5fa6714981c3e96ecf208d9af6d822428891d5b",
+    "mesh_objects": 477,
+    "material_count": 84
+  },
+  "delivery_base": {
+    "sha256": "fc388faa8fd1620862172364b5fa6714981c3e96ecf208d9af6d822428891d5b",
+    "mesh_objects": 477,
+    "material_count": 84
+  },
+  "finizioni_vetri_ali_alternative": [
+    "Mesh_39.001",
+    "Mesh_40.001",
+    "Mesh_41.001",
+    "Mesh_34.001",
+    "Mesh_35.001",
+    "Mesh_36.001",
+    "Mesh_37.001",
+    "Mesh_38.001",
+    "Mesh_42.001",
+    "Mesh_43.001",
+    "Mesh_54.001",
+    "Mesh_64.001",
+    "Mesh_55.001",
+    "Mesh_56.001",
+    "Mesh_49.001",
+    "Mesh_50.001",
+    "Mesh_51.001",
+    "Mesh_52.001",
+    "Mesh_53.001",
+    "Mesh_57.001",
+    "Mesh_58.001",
+    "Mesh_65.001",
+    "Mesh_66.001",
+    "Mesh_59.001",
+    "Mesh_60.001",
+    "Mesh_61.001",
+    "Mesh_62.001",
+    "Mesh_63.001",
+    "Mesh_67.001",
+    "Mesh_68.001"
+  ],
+  "pulizia": "Solo riferimenti senza geometria ed elementi gia rimossi; chiusura_piani_superiori ridondante esclusa"
+}

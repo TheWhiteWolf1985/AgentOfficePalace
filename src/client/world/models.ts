@@ -28,7 +28,16 @@ import { toon } from './toon';
 // script in blender/scripts/ (blender/README.md has the conventions they keep); add it here by name.
 // Builders request the assets they need before taking a copy with model().
 
+import officeBaseUrl from '../../../sala_ufficio/geometria/ufficio_base.glb?url';
+import officeWingOneUrl from '../../../sala_ufficio/geometria/varianti/ala_1.glb?url';
+import officeWingTwoUrl from '../../../sala_ufficio/geometria/varianti/ala_2.glb?url';
+import officeOverflowUrl from '../../../sala_ufficio/geometria/varianti/posti_aggiuntivi.glb?url';
+
 const MODELS = {
+  office_base: { url: officeBaseUrl },
+  office_wing_one: { url: officeWingOneUrl },
+  office_wing_two: { url: officeWingTwoUrl },
+  office_overflow: { url: officeOverflowUrl },
   atrium: { url: atriumUrl },
   server_room: { url: serverRoomUrl },
   server_room_exterior: { url: serverRoomExteriorUrl },
@@ -123,7 +132,7 @@ export async function loadModel(name: ModelName): Promise<Model> {
 
 /** Shared spaces need their own geometry and the meeting-room exterior visible on the tower. */
 export const COMMON_MODELS: readonly ModelName[] = ['atrium', 'conference_room', 'server_room_exterior', 'reception_a', 'reception_b'];
-export const OFFICE_MODELS: readonly ModelName[] = [...COMMON_MODELS, 'desk_props', 'lounge', 'plants'];
+export const OFFICE_MODELS: readonly ModelName[] = [...COMMON_MODELS, 'office_base', 'office_wing_one', 'office_wing_two', 'office_overflow'];
 export function avatarModels(look: Look): ModelName[] {
   const hair = avatarHairstyle(look);
   return [avatarModel(look) === 'female' ? 'human_female' : 'human_base', ...(hair === 'bald' ? [] : [`hair_${hair}` as ModelName])];

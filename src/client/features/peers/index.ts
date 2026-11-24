@@ -3,7 +3,6 @@ import * as THREE from 'three';
 import { sameLook } from '../../../shared/avatar';
 import { seatOn } from '../../../shared/maps';
 import type { PeerInfo } from '../../../shared/protocol';
-import { gripOf, type Grip } from '../climbing/controller';
 import type { Ctx } from '../../core/context';
 import type { CoreState } from '../../core/ctx';
 import { noOutline } from '../../core/outline';
@@ -32,8 +31,6 @@ export interface RemotePeer {
   stepT: number;
   /** How fast they're going (m/s), evened out: at a run, their feet say so. */
   speed: number;
-  /** On the ladder or a pole, going by where they are. */
-  grip: Grip | null;
 }
 
 export function installPeers(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'worlds' | 'walking' | 'hud'>) {
@@ -62,7 +59,7 @@ export function installPeers(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'worl
         person.root.position.set(peer.x, peer.y, peer.z);
         scene.add(person.root);
         noOutline(person.root);
-        r = { person, target: new THREE.Vector3(peer.x, peer.y, peer.z), rotY: peer.rotY, moving: false, label: '', look: { ...peer.look }, stepT: 0, speed: 0, grip: null };
+        r = { person, target: new THREE.Vector3(peer.x, peer.y, peer.z), rotY: peer.rotY, moving: false, label: '', look: { ...peer.look }, stepT: 0, speed: 0 };
         remotes.set(id, r);
       }
       const label = `${peer.name}|${peer.voice ? (peer.muted ? 'm' : 'v') : '-'}|${peer.color}`;
@@ -113,13 +110,8 @@ export function installPeers(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'worl
       // On their feet if they're standing on something: the floor, a desk, a stair, the loft.
       const ground = groundAt(player.colliders, p.x, p.z, p.y);
       const airborne = !sat && p.y > ground + 0.05;
-      // Or holding on to the ladder or a pole; off a pole onto the mat, the firehouse bell rings.
-      const holding = sat || core.upTop || core.atLobby || !inOffice() ? null : gripOf(p, office.stack.poles(), ground);
-      if (r.grip === 'pole' && !holding && Math.abs(p.y) < 0.2) sound.poleLanding(6, { x: pos.x, y: 0.5, z: pos.z });
-      r.grip = holding;
-      r.person.setGrip(holding);
       const walking = !sat && p.moving && !airborne;
-      r.person.update(dt, t, walking || (holding === 'ladder' && p.moving), airborne && !holding && Math.abs(pos.y - r.target.y) > 0.01);
+      r.person.update(dt, t, walking, airborne && Math.abs(pos.y - r.target.y) > 0.01);
       // Their walk cycle takes a step every π/11 seconds, and every π/14 at a run, as yours does.
       if (dt > 0) r.speed += (Math.min(RUN_SPEED * 2, Math.hypot(pos.x - fromX, pos.z - fromZ) / dt) - r.speed) * Math.min(1, dt * 5);
       const running = r.speed > RUN_SPEED;

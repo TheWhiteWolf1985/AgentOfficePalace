@@ -7,7 +7,6 @@ import { t as uiText } from '../../shared/i18n';
  */
 import { FLOOR, WALL_T, inElevator, roofDrop, serverDrop, streetBelow } from '../../shared/layout';
 import { LOBBY, ROOF, SERVER_ROOM, isFixedFloor } from '../../shared/rooftop';
-import type { Arrival, Grip } from '../features/climbing/controller';
 import { preloadModels } from '../world/models';
 import { lastSpot, store } from '../state';
 import { $, clip, closeAllModals, modalOpen, toast } from '../ui/dom';
@@ -26,19 +25,16 @@ declare module '../world/types' {
   }
 }
 
-export type TravelParts = Pick<Parts, 'stage' | 'worlds' | 'place' | 'walking' | 'seating' | 'climbing' | 'rooftop' | 'atrium' | 'serverRoom' | 'hanging' | 'floorStatus' | 'arrival'>;
+export type TravelParts = Pick<Parts, 'stage' | 'worlds' | 'place' | 'walking' | 'seating' | 'rooftop' | 'atrium' | 'serverRoom' | 'hanging' | 'floorStatus' | 'arrival'>;
 
 /** Registers what follows the building's floors (store 'floors'). */
 export function installTravel(ctx: Ctx, core: CoreState, parts: TravelParts) {
   const { player, office, net, sound, sky, camera } = ctx;
   const { inOffice, plan } = parts.worlds;
-  const { placeInCar, downstairs, indoors, standingAt, unstick } = parts.place;
+  const { placeInCar, downstairs } = parts.place;
 
   let wingsShown = '';
-  /**
-   * The ladder and the poles go where there are floors to go to from this one, and the building is as
-   * tall as there are floors, with the street as far down as this one is up.
-   */
+  /** Move the surrounding tower and street relative to the active office. */
   function syncStack() {
     const floors = builtFloors();
     if (core.upTop || core.atLobby || core.atServer) {
@@ -47,18 +43,12 @@ export function installTravel(ctx: Ctx, core: CoreState, parts: TravelParts) {
     }
     if (!officeLoaded(office)) return;
     const index = floors.findIndex((f) => f.id === store.floor);
-    // Up on the roof there's no ladder or pole to take: nothing above, nothing below.
-    const up = store.floor === ROOF ? undefined : floors[index + 1]?.name;
-    const down = index > 0 ? floors[index - 1]?.name : undefined;
     const count = index < 0 ? 1 : floors.length;
     const wings = floorWings(floors);
-
     player.street = streetBelow(index);
-    const s = office.stack.state;
-    const same = s.index === Math.max(0, index) && s.count === count && s.up === up && s.down === down;
-    if (same && wings.join() === wingsShown) return;
-    wingsShown = wings.join();
-    if (!same) office.stack.set({ index: Math.max(0, index), count, up, down });
+    const shown = [index, count, ...wings].join();
+    if (wingsShown === shown) return;
+    wingsShown = shown;
     office.setLevel(Math.max(0, index), count, wings);
   }
   store.on('floors', syncStack);
@@ -90,7 +80,6 @@ export function installTravel(ctx: Ctx, core: CoreState, parts: TravelParts) {
     hint: (it) => {
       const f = store.currentFloor();
       const n = store.floors.length;
-      if (officeLoaded(office) && it === office.garageLift.interactable) return { k: `garage|${f?.name}|${n}`, parts: [hintTitle(uiText('🛗 Elevator')), aside(f ? uiText`Garage · up to ${clip(f.name, 24)}` : uiText('Garage')), key('E', uiText('Choose a floor'))] };
       return { k: `${f?.name}|${n}`, parts: [hintTitle(uiText('🛗 Elevator')), f ? aside(uiText`${f.name} · ${n} floor${n === 1 ? '' : 's'}`) : '', key('E', n > 1 ? uiText('Choose a floor') : uiText('Floors & projects'))] };
     },
     use: onE(() => showElevator()),
@@ -101,7 +90,7 @@ export function installTravel(ctx: Ctx, core: CoreState, parts: TravelParts) {
     if (core.atServer) return parts.serverRoom.serverRoom()?.elevator;
     if (core.atLobby) return parts.atrium.atrium()?.elevator;
     const roof = parts.rooftop.roof();
-    return core.upTop && roof ? roof.elevator : downstairs() ? office.garageLift : office.elevator;
+    return core.upTop && roof ? roof.elevator : office.elevator;
   }
 
   /**
@@ -116,6 +105,7 @@ export function installTravel(ctx: Ctx, core: CoreState, parts: TravelParts) {
     const garage = false;
     const floorId = garage ? (core.upTop || !store.floor ? builtFloors()[0]?.id : store.floor) : to;
     if (core.trip || !floorId || (floorId === store.floor && garage === downstairs())) return;
+    if (!keepWalking) parts.walking.stopWalkingTo();
     closeAllModals();
     stopForTrip();
     const inside = inElevator(player.pos.x, player.pos.z);
@@ -169,36 +159,6 @@ export function installTravel(ctx: Ctx, core: CoreState, parts: TravelParts) {
     }, 450);
   }
 
-  /** Straight to another floor from the floor list: a blink, and you're standing in the same spot there. */
-  function switchFloor(floorId: string, keepWalking = false): void {
-    if (core.upTop || core.atLobby || core.atServer || isFixedFloor(floorId)) return ride(floorId);
-    if (core.trip || floorId === store.floor) return;
-    // Outside, the same spot on another floor looks just like this one: the elevator brings you in
-    // to that floor instead, into its car.
-    if (!indoors()) {
-      if (!keepWalking) parts.walking.stopWalkingTo();
-      return ride(floorId, keepWalking);
-    }
-    closeAllModals();
-    stopForTrip();
-    if (player.seat) parts.seating.standUp();
-    // The floor list isn't a window, so nothing else stops a walk over to someone on this floor.
-    if (!keepWalking) parts.walking.stopWalkingTo();
-    core.trip = { floor: floorId, how: 'switch', timer: window.setTimeout(tripFailed, 10_000) };
-    player.enabled = false;
-    player.clearKeys();
-    fade(true, true);
-    setTimeout(() => net.send({ t: 'floor.go', floor: floorId, at: standingAt(floorId) }), 170);
-  }
-
-  /** Through the ceiling up the ladder, or through the floor down one: the lights dip as you pass. */
-  function travel(floorId: string, how: Grip, at: Arrival) {
-    if (core.trip) return;
-    core.trip = { floor: floorId, how, timer: window.setTimeout(tripFailed, 10_000) };
-    fade(true, true);
-    setTimeout(() => net.send({ t: 'floor.go', floor: floorId, at }), 170);
-  }
-
   /** The floor never came (it's gone, or the office is unreachable): back where you were. */
   function tripFailed() {
     const t = core.trip;
@@ -206,7 +166,6 @@ export function installTravel(ctx: Ctx, core: CoreState, parts: TravelParts) {
     core.trip = null;
     fade(false);
     if (t.how === 'elevator') lift()?.setOpen(!!store.floor);
-    if (t.how === 'ladder' || t.how === 'pole') parts.climbing.climber.abort();
     player.enabled = !modalOpen();
   }
 
@@ -273,17 +232,10 @@ export function installTravel(ctx: Ctx, core: CoreState, parts: TravelParts) {
       // The doors stand open, the way the last one out left them.
       lift()?.setOpen(true);
       player.enabled = !modalOpen();
-      if (!core.upTop && !core.atLobby && !core.atServer) unstick();
-      return;
-    }
-    if (how !== 'elevator') {
-      player.enabled = !modalOpen();
-      if (how === 'switch') unstick();
-      else parts.climbing.climber.arrived();
       return;
     }
     doorsOpen();
   }
 
-  return { syncStack, takenAway, showElevator, lift, ride, switchFloor, travel, setPlace, arrive, cancelTrip: tripFailed };
+  return { syncStack, takenAway, showElevator, lift, ride, switchFloor: ride, setPlace, arrive, cancelTrip: tripFailed };
 }

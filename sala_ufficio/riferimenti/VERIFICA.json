@@ -1,0 +1,138 @@
+{
+  "esito": "PASS",
+  "modelli": {
+    "ufficio_base": {
+      "nodes": 714,
+      "meshes": 364,
+      "triangles_unique_geometry": 37348,
+      "images": 12,
+      "sha256": "5e0a4f685b8b45473f1b831dd39703160656333217a50e1da9740dd66d71527f"
+    },
+    "ala_1": {
+      "nodes": 68,
+      "meshes": 45,
+      "triangles_unique_geometry": 5170,
+      "images": 2,
+      "sha256": "997b12762c8905ac0081d3b669258ecc4c8a7e937da79697579586ba73c3e775"
+    },
+    "ala_2": {
+      "nodes": 116,
+      "meshes": 67,
+      "triangles_unique_geometry": 6944,
+      "images": 2,
+      "sha256": "194083312e3a34feec0dbc49e4919a6c44d835b0be82abf04cf746d12f30502b"
+    },
+    "cartello_esempio": {
+      "nodes": 7,
+      "meshes": 3,
+      "triangles_unique_geometry": 360,
+      "images": 1,
+      "sha256": "cb33a2e4c34b431e57674ca519b478e56e81f3752b1ebfb33e9039b1fc34f1ed"
+    },
+    "collegamenti_intermedio": {
+      "nodes": 121,
+      "meshes": 104,
+      "triangles_unique_geometry": 5182,
+      "images": 5,
+      "sha256": "3513604d88f2c7813779298691bcd9ff1d6a15a93578b159c60ab0b75cf61087"
+    },
+    "collegamenti_primo": {
+      "nodes": 76,
+      "meshes": 64,
+      "triangles_unique_geometry": 3001,
+      "images": 3,
+      "sha256": "a7b9ad03e3c9d61613fae03ec5628383f11adff7fbc6ee203c9e748bffb557d6"
+    },
+    "collegamenti_ultimo": {
+      "nodes": 96,
+      "meshes": 84,
+      "triangles_unique_geometry": 3791,
+      "images": 4,
+      "sha256": "5967c779cb6ac4e7386fcc2f770a1d7018ba8ef03404af4883695dca3d233c25"
+    },
+    "cornici_campione": {
+      "nodes": 18,
+      "meshes": 12,
+      "triangles_unique_geometry": 204,
+      "images": 0,
+      "sha256": "4799f99308b42d08e68d22c2b18138886d5865ae68322a061897f869a0f31504"
+    },
+    "indicatore_libero": {
+      "nodes": 3,
+      "meshes": 2,
+      "triangles_unique_geometry": 24,
+      "images": 0,
+      "sha256": "f00f33996787c6500cfd409c3743cbd55327e3238077c2f8044309a10d3c5197"
+    },
+    "portatile_agente": {
+      "nodes": 8,
+      "meshes": 6,
+      "triangles_unique_geometry": 198,
+      "images": 1,
+      "sha256": "45fdcdf815a6febabb4f57d13d6900ac69c6eab0db4ac0cf9adddf96198f179a"
+    },
+    "posti_aggiuntivi": {
+      "nodes": 133,
+      "meshes": 60,
+      "triangles_unique_geometry": 12192,
+      "images": 0,
+      "sha256": "29b3a0db539960ad3c251ca50cf7fd3dcfbf73f14cf77d1be63bd3ea172c578c"
+    }
+  },
+  "numero_glb": 11,
+  "integrita": "NON_PRESENTE_DURANTE_PREPARAZIONE",
+  "approvazione_artistica": "APPROVATO_DA_JURI",
+  "runtime": "NON_ESEGUITO",
+  "blender_checks": "PASS",
+  "blender": "5.3.0",
+  "desk_anchors_checked": 64,
+  "dynamic_uv_surfaces_checked": 8,
+  "packed_images_checked": 27,
+  "reimport": {
+    "ufficio_base": {
+      "esito": "PASS",
+      "nodes": 714
+    },
+    "ala_1": {
+      "esito": "PASS",
+      "nodes": 68
+    },
+    "ala_2": {
+      "esito": "PASS",
+      "nodes": 116
+    },
+    "cartello_esempio": {
+      "esito": "PASS",
+      "nodes": 7
+    },
+    "collegamenti_intermedio": {
+      "esito": "PASS",
+      "nodes": 121
+    },
+    "collegamenti_primo": {
+      "esito": "PASS",
+      "nodes": 76
+    },
+    "collegamenti_ultimo": {
+      "esito": "PASS",
+      "nodes": 96
+    },
+    "cornici_campione": {
+      "esito": "PASS",
+      "nodes": 18
+    },
+    "indicatore_libero": {
+      "esito": "PASS",
+      "nodes": 3
+    },
+    "portatile_agente": {
+      "esito": "PASS",
+      "nodes": 8
+    },
+    "posti_aggiuntivi": {
+      "esito": "PASS",
+      "nodes": 133
+    }
+  },
+  "manual_visual_review": "PASS: osservate tutte le sei viste aggiornate il23novembre2026"
+}

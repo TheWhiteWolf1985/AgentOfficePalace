@@ -1,14 +1,13 @@
 /** Where you arrive and where you stand, to restore your place on a later visit. */
-import { ELEVATOR, ELEVATOR_CAR, FLOOR, POLE, SLAB, STOREY, WALL_HEIGHT, inElevator, inWing } from '../../shared/layout';
+import { ELEVATOR, ELEVATOR_CAR, FLOOR, SLAB, WALL_HEIGHT, inElevator, inWing } from '../../shared/layout';
 import { LOBBY, LOBBY_NAME, ROOF, ROOF_NAME, SERVER_ROOM, SERVER_ROOM_NAME } from '../../shared/rooftop';
-import type { Arrival } from '../features/climbing/controller';
 import { rememberSpot, store, type Spot } from '../state';
 import type { Ctx } from './context';
 import type { CoreState } from './ctx';
 import { builtFloors } from './floors';
 import type { Parts } from './parts';
 
-export function installPlace(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'worlds' | 'seating' | 'climbing'>) {
+export function installPlace(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'worlds' | 'seating'>) {
   const { player } = ctx;
 
   /** In the car, facing out through the doors: where you are when you arrive on a floor, or down in the `garage`. */
@@ -45,7 +44,7 @@ export function installPlace(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'worl
 
   /** Where you're standing, to come back to (see lastSpot): nowhere while you're between floors, or climbing between them. */
   function spotHere(): Spot | null {
-    if (!store.floor || core.trip || parts.climbing.climber.active) return null;
+    if (!store.floor || core.trip) return null;
     // Sitting, it's where you'd get up to; in a car, where you'd get out.
     const at = player.standingSpot() ?? player.pos;
     const name = store.floor === SERVER_ROOM ? SERVER_ROOM_NAME : store.floor === LOBBY ? LOBBY_NAME : store.floor === ROOF ? ROOF_NAME : (store.currentFloor()?.name ?? '');
@@ -57,28 +56,5 @@ export function installPlace(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'worl
     if (s) rememberSpot(s);
   }
 
-  /**
-   * Where you are, to arrive at the same spot on floor `to`. Down on the street (or the steps to it),
-   * that's the street there too, adjusted for the destination floor's height.
-   */
-  function standingAt(to: string): Arrival {
-    const floors = builtFloors();
-    const from = floors.findIndex((f) => f.id === store.floor);
-    const there = floors.findIndex((f) => f.id === to);
-    const below = player.pos.y < -SLAB - 0.05 && from >= 0 && there >= 0;
-    return { x: player.pos.x, y: below ? player.pos.y + (from - there) * STOREY : player.pos.y, z: player.pos.z, rotY: player.facing };
-  }
-
-  /** Arrived in a spot that's a pole's hole on this floor: step out of it, the way in. */
-  function unstick() {
-    const { office } = ctx;
-    if (!office.stack.polesGoDown()) return;
-    const p = player.pos;
-    const spot = office.stack.poles().find((s) => Math.max(Math.abs(p.x - s.x), Math.abs(p.z - s.z)) <= POLE.rail + 0.35);
-    if (!spot) return;
-    const out = POLE.rail + 0.7;
-    p.set(spot.x + Math.sin(spot.open) * out, Math.max(0, p.y), spot.z + Math.cos(spot.open) * out);
-  }
-
-  return { placeInCar, downstairs, indoors, placeAt, spotHere, saveSpot, standingAt, unstick };
+  return { placeInCar, downstairs, indoors, placeAt, spotHere, saveSpot };
 }

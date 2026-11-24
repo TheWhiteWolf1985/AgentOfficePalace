@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { Raycaster, Vector3, type Mesh, type MeshToonMaterial } from 'three';
 import { BUILDING, CAMPUS_TREES, GROUNDS, onGrounds, PAVEMENT, ROAD_INNER } from '../src/shared/ground.js';
 import { BALCONY, EXIT_STAIRS, WING, wingMinZ } from '../src/shared/layout.js';
-import { wayHome } from '../src/shared/nav.js';
+import { walkOff } from '../src/shared/nav.js';
 import { DESKS } from '../src/shared/layout.js';
 import { arrivalSpot, spotFrom } from '../src/server/office/input.js';
 import { buildCompanyGround } from '../src/client/world/outside.js';
@@ -46,7 +46,7 @@ test('the small pedestrian perimeter is solid on all four sides without blocking
     assert.ok(onGrounds(body.pos.x, body.pos.z), 'cannot leave the company lot');
   }
   const body = { pos: new Vector3(0, 0, 0), colliders, grounded: true, stepOffset: 0 };
-  for (const [x, z] of wayHome(DESKS[0]).slice(-3)) {
+  for (const [x, z] of walkOff([GROUNDS.minX + 1, GROUNDS.maxZ - 2]).slice(-2)) {
     assert.ok(onGrounds(x, z));
     assert.equal(blockerAt(body, x, z, 0), null, `${x},${z} exit stays clear`);
   }

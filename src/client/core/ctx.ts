@@ -4,7 +4,6 @@
  */
 import type * as THREE from 'three';
 import type { CarriedIssue } from '../../shared/protocol';
-import type { Grip } from '../features/climbing/controller';
 import { store } from '../state';
 import type { Interactable } from '../world/types';
 import type { Ctx, OfficeInteraction, StopWhy, Trip } from './context';
@@ -12,7 +11,7 @@ import type { Parts } from './parts';
 import { Activities, Hooks, Interactions, Keys, Messages, Ticks, Usables, View } from './registry';
 
 /** What you can be in the middle of, in the order it gets keys, has the hint bar and stops in (see Activities). */
-const ACTIVITY_ORDER = ['hanger', 'climber'];
+const ACTIVITY_ORDER = ['hanger'];
 
 /** The office's own state: what the ctx hands out about where you are and what you hold, and what its own parts keep between frames. */
 export interface CoreState {
@@ -112,7 +111,7 @@ export function createCtx(parts: Parts): { ctx: Ctx; core: CoreState } {
     ticks: new Ticks(),
     activities: new Activities<StopWhy, KeyboardEvent, HTMLElement>(ACTIVITY_ORDER),
     interactions: new Interactions<OfficeInteraction>(),
-    view: new View<Grip>(),
+    view: new View<never>(),
     usables: new Usables<Interactable, THREE.Object3D>(),
     windowOpened: new Hooks(),
   };

@@ -23,7 +23,7 @@ export interface IdleAgent {
 
 /** The board agents waiting by their boards in `w`. */
 export function idleAgentsIn(w: World): IdleAgent[] {
-  return w.plan.stations.map((def) => {
+  return w.plan.stations.filter(def => w.desks.has(def.id)).map((def) => {
     const kind = def.station!;
     const agent = STATION_AGENT[kind];
     const model = new Worker(agent.name, agent.color);

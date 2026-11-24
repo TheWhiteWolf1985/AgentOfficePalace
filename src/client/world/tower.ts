@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { BALCONY, BALCONY_DOOR, ELEVATOR, ELEVATOR_FRONT, EXIT_DOOR, FLOOR, SLAB, STOREY, SERVER_ROOM_STOREY, STREET_Y, WALL_HEIGHT, WALL_T, WINDOWS, WING, wingMinZ, wingRowZ, type Opening, type Side } from '../../shared/layout';
+import { ELEVATOR, ELEVATOR_FRONT, FLOOR, SLAB, STOREY, SERVER_ROOM_STOREY, STREET_Y, WALL_HEIGHT, WALL_T, WINDOWS, WING, wingMinZ, wingRowZ, type Opening, type Side } from '../../shared/layout';
 import type { Collider } from './types';
 import type { Fixture } from './office/fixture';
 import { exteriorModel } from './exterior-models';
@@ -71,11 +71,7 @@ export function buildTower(colliders: Collider[], night: NightParts, roomModel =
   const band = flat('#e8a87c');
   const frame = toon('#ffffff');
   const alu = toon('#aab4be');
-  const ink = toon('#3d405b');
-  const wood = toon('#c98b5a');
-  const deck = toon('#e8a87c');
   const cornice = toon('#fffaf3');
-  const behind = flat('#2b2d42');
   const concrete = flat('#d3d6dd');
   // Glass you can't see into; at night some of it glows, as though someone upstairs is still at it.
   const dark = toon('#a9d8f5');
@@ -87,7 +83,6 @@ export function buildTower(colliders: Collider[], night: NightParts, roomModel =
     return m;
   });
   const glint = new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.35, depthWrite: false });
-  const railGlass = new THREE.MeshBasicMaterial({ color: '#d6f1ff', transparent: true, opacity: 0.14, depthWrite: false, side: THREE.DoubleSide });
 
   let built: THREE.Object3D[] = [];
   let mine: Collider[] = [];
@@ -140,31 +135,6 @@ export function buildTower(colliders: Collider[], night: NightParts, roomModel =
     g.add(mesh(new THREE.BoxGeometry(F * (door ? 1 : 0.8), h - 2 * F, 0.08), edge, 0, mid, -0.05, false));
     if (!door) g.add(mesh(new THREE.BoxGeometry(w + 0.2, 0.06, 0.16), frame, 0, y0 + o.y0 - 0.03, 0.06, false));
     parts.add(onFace(g, o.wall, o.u));
-  };
-
-  /** The balcony off a floor `y0` up: its deck, and a railing with glass in it round the three open sides. */
-  const balcony = (parts: THREE.Group, y0: number) => {
-    const { minX, maxX, minZ, maxZ } = BALCONY;
-    const w = maxX - minX;
-    const d = maxZ - minZ;
-    parts.add(mesh(new THREE.BoxGeometry(w, SLAB - 0.01, d), deck, (minX + maxX) / 2, y0 - SLAB / 2 - 0.005, (minZ + maxZ) / 2, false));
-    const railH = 1.05;
-    const inset = 0.06;
-    const sides: [number, number, number, number][] = [
-      [minX + inset, maxZ - inset, maxX - inset, maxZ - inset],
-      [minX + inset, minZ, minX + inset, maxZ - inset],
-      [maxX - inset, minZ, maxX - inset, maxZ - inset],
-    ];
-    for (const [x0, z0, x1, z1] of sides) {
-      const len = Math.hypot(x1 - x0, z1 - z0);
-      const alongX = z0 === z1;
-      const n = Math.ceil(len / 1.6);
-      for (let i = 0; i <= n; i++) parts.add(mesh(new THREE.BoxGeometry(0.06, railH, 0.06), ink, x0 + ((x1 - x0) * i) / n, y0 + railH / 2, z0 + ((z1 - z0) * i) / n, false));
-      parts.add(mesh(alongX ? new THREE.BoxGeometry(len + 0.1, 0.07, 0.12) : new THREE.BoxGeometry(0.12, 0.07, len + 0.1), wood, (x0 + x1) / 2, y0 + railH + 0.02, (z0 + z1) / 2, false));
-      const pane = mesh(new THREE.PlaneGeometry(len - 0.1, railH - 0.2), railGlass, (x0 + x1) / 2, y0 + (railH - 0.2) / 2 + 0.08, (z0 + z1) / 2, false);
-      pane.rotation.y = alongX ? 0 : Math.PI / 2;
-      parts.add(pane);
-    }
   };
 
   /** A cornice round the top of the building, `top` up: along each wall, and out past it at both corners so the four meet. */
@@ -262,22 +232,11 @@ export function buildTower(colliders: Collider[], night: NightParts, roomModel =
       const y0 = k*STOREY-reference;
       for (const side of Object.keys(FACES) as Side[]) {
         const holes: Opening[] = WINDOWS.filter((o) => o.wall === side);
-        if (side === 'south') holes.push(BALCONY_DOOR);
-        // Only the bottom floor has a way out on the west side; its door stands in the hole (see world/office/shell.ts).
-        if (side === 'west' && k === 0) holes.push(EXIT_DOOR);
         facade(parts, side, y0, holes);
       }
       for (const o of WINDOWS) glazing(parts, o, y0, false);
-      glazing(parts, BALCONY_DOOR, y0, true);
-      balcony(parts, y0);
       const wing = wings[k] ?? 0;
       if (wing > 0) bay(parts, y0, wing, k + 1 < count ? (wings[k + 1] ?? 0) : 0, k > 0 ? (wings[k - 1] ?? 0) : 0);
-      if (k === 0) {
-        // Dark behind the exit door, through its porthole.
-        const back = mesh(new THREE.PlaneGeometry(EXIT_DOOR.width, EXIT_DOOR.y1), behind, FLOOR.minX - 0.02, y0 + EXIT_DOOR.y1 / 2, EXIT_DOOR.u, false);
-        back.rotation.y = -Math.PI / 2;
-        parts.add(back);
-      }
     }
     // On top, a cornice, and the shared meeting room over it; but up on the roof, it's the roof's own.
     if (index < count) {

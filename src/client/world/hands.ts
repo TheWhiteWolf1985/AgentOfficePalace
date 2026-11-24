@@ -14,7 +14,6 @@ export interface HandsInput {
 
   jitter: number;
   /** Holding on to the ladder (hand over hand, in time with walkPhase) or a fire pole (both hands on it, off to the left). */
-  grip?: 'ladder' | 'pole' | null;
 }
 
 const CLASSIC = { x: 0.25, y: -0.185, z: -0.44, rx: 0.2, ry: 0.22, rz: -0.25 } as const;
@@ -52,8 +51,6 @@ export class Hands {
   private last: { yaw: number; pitch: number } | null = null;
   private air = 0;
   private walk = 0;
-  private ladderK = 0;
-  private poleK = 0;
   /** Each light, and how bright it is where it's brightest. */
   private lights: [THREE.Light, number][] = [];
   private lightLevel = 1;
@@ -174,9 +171,7 @@ export class Hands {
       this.sway.y += (ty - this.sway.y) * Math.min(1, dt * 10);
     }
     this.last = { yaw: s.yaw, pitch: s.pitch };
-    this.air += ((s.airborne && !s.grip ? 1 : 0) - this.air) * Math.min(1, dt * 8);
-    this.ladderK += ((s.grip === 'ladder' ? 1 : 0) - this.ladderK) * Math.min(1, dt * 10);
-    this.poleK += ((s.grip === 'pole' ? 1 : 0) - this.poleK) * Math.min(1, dt * 10);
+    this.air += ((s.airborne ? 1 : 0) - this.air) * Math.min(1, dt * 8);
     this.walk += ((s.walking ? 1 : 0) - this.walk) * Math.min(1, dt * 8);
 
     const breathe = Math.sin(t * 1.7) * 0.004;
@@ -209,27 +204,6 @@ export class Hands {
       p.z -= 0.03 * carry;
       arm.group.rotation.z += side * 0.35 * carry;
       this.classic(arm, carry);
-    }
-    // Up the ladder, hand over hand; round a pole, both hands on it, one over the other.
-    const climb = Math.sin(s.walkPhase);
-    for (const [arm, side] of [
-      [this.right, 1],
-      [this.left, -1],
-    ] as const) {
-      const g = arm.group;
-      const lk = this.ladderK;
-      g.position.x += (side * 0.19 - g.position.x) * lk;
-      g.position.y += (0.06 + side * climb * 0.09 - g.position.y) * lk;
-      g.position.z += (-0.46 - g.position.z) * lk;
-      g.rotation.x += -0.55 * lk;
-      // The pole's a little to your left: the left hand on it, the right reaching across to it from
-      // below, its sleeve angled away so it doesn't cross your view.
-      const pk = this.poleK;
-      g.position.x += ((side > 0 ? 0.03 : -0.18) - g.position.x) * pk;
-      g.position.y += ((side > 0 ? 0.02 : -0.04) - g.position.y) * pk;
-      g.position.z += ((side > 0 ? -0.56 : -0.47) - g.position.z) * pk;
-      g.rotation.x += (side > 0 ? 0.45 : 0.25) * pk;
-      g.rotation.y += (side > 0 ? 0.55 : 0) * pk;
     }
     // The card rides along with the hands, coming up from below as you take it; so does the book.
     this.holder.position.set(this.sway.x + step * 0.008, this.sway.y + breathe + bounce + this.air * 0.05 - 0.115 - 0.3 * (1 - carry), -0.5);

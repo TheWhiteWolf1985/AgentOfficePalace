@@ -76,11 +76,8 @@ export function installLoop(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'stage
     me.root.position.copy(player.pos);
     me.root.position.y += player.stepOffset;
     me.root.rotation.y = player.facing;
-    // Holding on to the ladder or a pole (see ctx.view).
-    const grip = ctx.view.grip();
-    me.setGrip(grip);
     if (visual) {
-      me.update(visual.dt, t, (player.moving && player.grounded) || (grip === 'ladder' && player.moving), !player.grounded && !grip && !ctx.activities.any('hidesHands'), player.effects.speed, player.view !== 'third');
+      me.update(visual.dt, t, player.moving && player.grounded, !player.grounded && !ctx.activities.any('hidesHands'), player.effects.speed, player.view !== 'third');
       me.setVoiceLevel(voice.inVoice ? voice.localLevel : 0);
     }
     const firstPerson = player.view === 'first';
@@ -91,7 +88,7 @@ export function installLoop(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'stage
     const ownBody = firstPerson && !ctx.activities.any('takesCamera') && !ctx.activities.any('hidesHands');
     (firstBody ??= new FirstPersonBody(me.rig)).set(ownBody, camera);
     me.root.visible = ownBody || ctx.activities.any('takesCamera') || (!firstPerson && camera.position.distanceTo(headPos.set(player.pos.x, player.pos.y + 1.3, player.pos.z)) > 1.5);
-    if (visual && firstPerson && !ctx.activities.any('hidesHands')) hands.update(visual.dt, t, { yaw: player.camYaw, pitch: player.lookPitch, walkPhase: player.walkPhase, walking: player.moving && player.grounded, airborne: !player.grounded, jitter: player.effects.jitter, grip });
+    if (visual && firstPerson && !ctx.activities.any('hidesHands')) hands.update(visual.dt, t, { yaw: player.camYaw, pitch: player.lookPitch, walkPhase: player.walkPhase, walking: player.moving && player.grounded, airborne: !player.grounded, jitter: player.effects.jitter });
     // Activities such as sliding down a pole can widen the field of view.
 
     const fov = ctx.view.fov(FOV);
@@ -149,9 +146,6 @@ export function installLoop(ctx: Ctx, core: CoreState, parts: Pick<Parts, 'stage
     const { departures, arrivals } = parts.views;
     if (!core.upTop && !core.atLobby && !core.atServer) {
       ctx.world().update(t, dt, [player.pos, ...[...remotes.values()].map((r) => r.person.root.position), ...departures.positions(), ...arrivals.positions()]);
-      if (ctx.inOffice()) {
-        office.stack.update(dt, [{ x: player.pos.x, y: player.pos.y, z: player.pos.z, grip: ctx.view.grip() }, ...[...remotes.values()].map((r) => ({ x: r.person.root.position.x, y: r.person.root.position.y, z: r.person.root.position.z, grip: r.grip }))], camera.position);
-      }
     }
     if (visual) {
       ctx.dust.update(visual.dt, camera);

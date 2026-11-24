@@ -11,7 +11,7 @@ export interface Spot {
   z: number;
 }
 
-type Zone = 'floor' | 'stairs' | 'loft' | 'balcony' | 'outside';
+type Zone = 'floor' | 'stairs' | 'loft' | 'outside';
 
 const STAIRS_Z = (STAIRS.minZ + STAIRS.maxZ) / 2;
 /** Just inside the boss's office door at the top of the stairs, and just off the bottom step. */
@@ -25,10 +25,6 @@ const WAY_DOWN: Record<Zone, { x: number; z: number }[]> = {
   floor: [],
   stairs: [STAIRS_FOOT],
   loft: [STAIRS_TOP, STAIRS_FOOT],
-  balcony: [
-    { x: BALCONY_DOOR.u, z: FLOOR.maxZ + WALL_T + 0.6 },
-    { x: BALCONY_DOOR.u, z: FLOOR.maxZ - 0.7 },
-  ],
   outside: [],
 };
 
@@ -36,7 +32,7 @@ function zoneOf(p: Spot, wing: number): Zone {
   // The back office is more of the office floor, through where the north wall was.
   if (p.y > -1 && p.y < 0.5 && inWing(p.x, p.z, wing)) return 'floor';
   if (p.y < -1 || p.x < FLOOR.minX || p.x > FLOOR.maxX || p.z < FLOOR.minZ) return 'outside';
-  if (p.z > FLOOR.maxZ) return p.x >= BALCONY.minX && p.x <= BALCONY.maxX ? 'balcony' : 'outside';
+  if (p.z > FLOOR.maxZ) return 'outside';
   if (p.x > LOFT.minX && p.z > LOFT.minZ && p.y > LOFT.y - 0.5) return 'loft';
   // Off the office floor's map, which has the stairs down as a wall.
   if (p.x > STAIRS.fromX - 0.1 && p.x < STAIRS.toX + 0.1 && p.z > STAIRS.minZ - 0.1 && p.y > 0.05) return 'stairs';
