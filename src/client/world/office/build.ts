@@ -57,7 +57,7 @@ export function buildOffice(resources: OfficeResources = { group: new THREE.Grou
   group.add(tower.group, street);
   const fixtures = wallFixtures();
   return { ...resources, ...room, elevator, signs, fixtures: () => fixtures,
-    setProjectName: name => elevator.setSign('🛗 ' + name),
+    setProjectName: name => elevator.setSign(name),
     setLevel(index, count, wings = []) {
       street.position.y = night.street = streetBelow(index);
       tower.set(index, count, wings);

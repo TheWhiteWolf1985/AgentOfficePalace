@@ -145,6 +145,8 @@ export function buildElevator(height = WALL_HEIGHT, imported?: THREE.Object3D): 
     });
   }
   function bindCar(car: THREE.Object3D) {
+    // The r06 model bakes "Ufficio" onto this plane. The live floor name occupies the same spot.
+    car.getObjectByName('Mesh_450')?.removeFromParent();
     group.add(car);
     return ['anta_ascensore_sx', 'anta_ascensore_dx'].map((name, i) => {
       const leaf = car.getObjectByName(name);
@@ -168,6 +170,7 @@ export function buildElevator(height = WALL_HEIGHT, imported?: THREE.Object3D): 
       sign.geometry.dispose();
     }
     sign = textPlane(text, { bg: '#2b2d42', color: '#fffaf3', size: 64, border: '#fffaf3' });
+    sign.name = 'elevator-floor-sign';
     const { width: sw, height: sh } = sign.geometry.parameters;
     // As big as fits over the doors (in the garage, under its low ceiling too).
     sign.scale.multiplyScalar(Math.min(1.6, (width + 0.6) / sw, (header - 0.2) / sh));

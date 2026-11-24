@@ -25,6 +25,17 @@ test('all office levels use the closed Blender room, live surfaces and persisten
       const { buildOffice } = await import('/src/client/world/office/build.ts');
       await preloadModels(OFFICE_MODELS);
       const office = buildOffice();
+      const drawn = [];
+      const context = CanvasRenderingContext2D.prototype;
+      const fillText = context.fillText;
+      context.fillText = function (text, ...args) { drawn.push(text); return fillText.call(this, text, ...args); };
+      try {
+        for (const name of ['TEST', 'Ufficio contabilità']) {
+          office.setProjectName(name);
+          if (!drawn.includes(name) || office.elevator.group.getObjectsByProperty('name', 'elevator-floor-sign').length !== 1 ||
+              office.elevator.group.getObjectByName('Mesh_450')) throw Error('Incorrect elevator sign for ' + name);
+        }
+      } finally { context.fillText = fillText; }
       const actual = [];
       const anchor = office.desks.get('desk-17').seatAnchor;
       for (const i of [0, 1, 2]) {
