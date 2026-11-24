@@ -3,7 +3,7 @@
 // An office floor built out into the back office (see WING) has more of it to get round: the office's
 // helpers take how many rows it's built out (`wing`), and each level gets a grid of its own.
 
-import { BALCONY, BALCONY_DOOR, BEANBAGS, BOOKSHELF, DESK_SIZE, ELEVATOR, ELEVATOR_FRONT, EXIT_DOOR, EXIT_STAIRS, FLOOR, GONG, KIOSK, LADDER, LOFT, MEETING_ROOM, MEETING_SEATS, MEETING_TABLE, PARACHUTE, POLE, POLES, ROAD, STAIRS, STATIONS, WHITEBOARD, WING, builtDesks, plantsAt, wingLevel, wingMinZ, type DeskDef } from './layout.js';
+import { BEANBAGS, BOOKSHELF, DESK_SIZE, ELEVATOR, ELEVATOR_FRONT, FLOOR, KIOSK, LOFT, MEETING_ROOM, MEETING_SEATS, MEETING_TABLE, ROAD, STAIRS, WHITEBOARD, WING, builtDesks, plantsAt, wingLevel, wingMinZ, type DeskDef } from './layout.js';
 import { GROUNDS } from './ground.js';
 
 export type Pt = [number, number];
@@ -69,27 +69,14 @@ function obstacles(wing: number): Obstacles {
   for (const x of [LOFT.minX + 0.15, (LOFT.minX + LOFT.maxX) / 2]) circles.push([x, LOFT.minZ + 0.15, 0.14]);
   rects.push([STAIRS.fromX, STAIRS.toX, STAIRS.minZ - 0.1, STAIRS.maxZ]);
   rects.push([ELEVATOR.x - ELEVATOR.width / 2, ELEVATOR.x + ELEVATOR.width / 2, FLOOR.minZ, ELEVATOR_FRONT]);
-  // The gong's frame, as features/gong/world.ts puts it.
-  rects.push([GONG.x - GONG.width / 2 - 0.12, GONG.x + GONG.width / 2 + 0.3, GONG.z - 0.3, GONG.z + 0.3]);
   // The whiteboard on its wheels, as features/whiteboard/world.ts puts it.
   rects.push([WHITEBOARD.x - WHITEBOARD.width / 2 - 0.2, WHITEBOARD.x + WHITEBOARD.width / 2 + 0.2, WHITEBOARD.z - 0.48, WHITEBOARD.z + 0.48]);
   // The bookshelf against the south wall, as features/bookshelf/world.ts puts it.
   rects.push([BOOKSHELF.x - BOOKSHELF.width / 2 - 0.04, BOOKSHELF.x + BOOKSHELF.width / 2 + 0.04, BOOKSHELF.z - BOOKSHELF.depth / 2 - 0.03, FLOOR.maxZ]);
-  // The ladder up the west wall, and the fire poles: a hole with a railing round it, or a landing mat.
-
-  rects.push([FLOOR.minX, FLOOR.minX + 0.3, LADDER.z - LADDER.width / 2 - 0.05, LADDER.z + LADDER.width / 2 + 0.05]);
-  for (const p of POLES) rects.push([p.x - POLE.rail - 0.05, p.x + POLE.rail + 0.05, p.z - POLE.rail - 0.05, p.z + POLE.rail + 0.05]);
   // The overflow bean bags and their lap desks. They're only out while every desk is taken, but they
 
   for (const b of BEANBAGS) {
     const corners = [deskPoint(b, -0.62, -1.1), deskPoint(b, 0.62, -1.1), deskPoint(b, -0.62, 0.64), deskPoint(b, 0.62, 0.64)];
-    const xs = corners.map(([x]) => x);
-    const zs = corners.map(([, z]) => z);
-    rects.push([Math.min(...xs), Math.max(...xs), Math.min(...zs), Math.max(...zs)]);
-  }
-  // The board agents' kiosks, and the agent standing behind each one.
-  for (const k of STATIONS) {
-    const corners = [deskPoint(k, -KIOSK.width / 2, -KIOSK.depth / 2), deskPoint(k, KIOSK.width / 2, -KIOSK.depth / 2), deskPoint(k, -KIOSK.width / 2, KIOSK.stand + 0.35), deskPoint(k, KIOSK.width / 2, KIOSK.stand + 0.35)];
     const xs = corners.map(([x]) => x);
     const zs = corners.map(([, z]) => z);
     rects.push([Math.min(...xs), Math.max(...xs), Math.min(...zs), Math.max(...zs)]);
@@ -384,12 +371,6 @@ class Heap {
 
 // ---- Sent home ----------------------------------------------------------------------------------
 
-/** Just inside the exit door, in the west wall. */
-const EXIT: Pt = [FLOOR.minX + 0.45, EXIT_DOOR.u];
-/** Just inside the balcony doors, in the south wall. */
-const BALCONY_IN: Pt = [BALCONY_DOOR.u, FLOOR.maxZ - 0.45];
-/** Down the middle of the steps outside it. */
-const STEPS_X = (EXIT_STAIRS.minX + EXIT_STAIRS.maxX) / 2;
 /** Along the near sidewalk, between the lot and the trees planted in it. */
 const SIDEWALK_Z = ROAD.minZ - 1.7;
 /** How far west along the sidewalk they get before they're gone. */
@@ -398,33 +379,16 @@ const WALK_OFF_X = GROUNDS.minX + 4;
 /** Where a worker called to a meeting comes in: out of the elevator. */
 const IN_FROM: Pt = [ELEVATOR.x, ELEVATOR_FRONT + 0.5];
 
+export function wayToLift(seat: DeskDef, wing = 0, from?: Pt): Pt[] {
+  return from ? route(from, IN_FROM, wing) : officeNav(wing).wayFrom(seat, IN_FROM);
+}
+
 /**
  * A worker's walk in to its seat when it's called to a meeting: out of the elevator and round the
  * furniture to beside its chair (the last point), on whichever side is the shorter way, where it hops on.
  */
 export function wayIn(seat: DeskDef, wing = 0): Pt[] {
   return officeNav(wing).wayTo(IN_FROM, seat);
-}
-
-/**
- * A worker's walk out of the building once it's sent home. The first point is where it hops down,
- * beside its chair (or its bean bag) on whichever side is the shorter way out; then round the
- * furniture to the exit door in the west wall, across the landing outside, down the steps to the
- * street and off along the sidewalk.
- */
-export function wayHome(seat: DeskDef, wing = 0, from?: Pt): Pt[] {
-  const inside = from ? route(from, EXIT, wing) : officeNav(wing).wayFrom(seat, EXIT);
-  const { landingZ1, steps, run } = EXIT_STAIRS;
-  return [...inside, [STEPS_X, EXIT_DOOR.u], ...walkOff([STEPS_X, landingZ1 + (steps - 1) * run + 0.6])];
-}
-
-/**
- * The same walk on a floor above the bottom one, which has no exit door: round the furniture to the
- * balcony doors, out across the balcony and up to its railing (PARACHUTE.jump), where it goes over.
- */
-export function wayToBalcony(seat: DeskDef, wing = 0, from?: Pt): Pt[] {
-  const inside = from ? route(from, BALCONY_IN, wing) : officeNav(wing).wayFrom(seat, BALCONY_IN);
-  return [...inside, [BALCONY_DOOR.u, BALCONY.minZ + 0.4], [PARACHUTE.jump.x, PARACHUTE.jump.z]];
 }
 
 /** From `from`, down on the street, over to the near sidewalk and off along it to the west, where they're gone. */

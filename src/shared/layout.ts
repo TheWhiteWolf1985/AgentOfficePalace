@@ -272,7 +272,7 @@ export const MACHINE_MONITOR = { x: FLOOR.minX, y: 2.2, z: -6, width: 2.3, heigh
  * south wall between the middle window and the balcony doors, facing into the room (-z). `width`
  * runs along the wall.
  */
-export const BOOKSHELF = { x: -6.5, z: FLOOR.maxZ - 0.21, width: 1.7, depth: 0.42, height: 2.3 } as const;
+export const BOOKSHELF = { x: -4, z: FLOOR.maxZ - 0.21, width: 5.1, depth: 0.42, height: 2.3 } as const;
 
 export const SPAWN = { x: 8, z: 7 } as const;
 
@@ -285,7 +285,6 @@ export const PLANTS: readonly (readonly [x: number, z: number, scale: number])[]
   [17.2, -12.2, 1.5],
   [17.2, 12.2, 1.3],
   [-17.2, 8.5, 1.2],
-  [14.2, -12.2, 1.1],
   [-6, 0, 1],
   [3.5, 0, 0.9],
   [8.5, 5, 1.1],
@@ -440,10 +439,6 @@ export const SEATING: SeatDef[] = [
   // Up in the boss office: the couch against the east wall, and the chair at the big desk, facing the glass.
   { id: 'loft-couch', label: uiText('🛋️ Couch'), x: LOFT.maxX - 0.65, y: LOFT.y, z: (LOFT.minZ + LOFT.maxZ) / 2, rotY: -Math.PI / 2, places: [-0.5, 0.5], hips: 0.5, depth: -0.05, out: 0.9 },
   { id: 'boss-chair', label: uiText("🪑 Boss's chair"), x: (LOFT.minX + LOFT.maxX) / 2 + 0.5, y: LOFT.y, z: (LOFT.minZ + LOFT.maxZ) / 2 + 0.7, rotY: Math.PI, places: [0], hips: 0.62, depth: -0.05, out: -0.8 },
-  // Out on the balcony: the bench under the window, looking out over the street, and a stool either side of the bistro table.
-  { id: 'bench', label: uiText('🪑 Bench'), x: -9, y: 0, z: BALCONY.minZ + 0.3, rotY: 0, places: [-0.5, 0.5], hips: 0.47, depth: 0, out: 0.8 },
-  { id: 'stool-1', label: uiText('🪑 Stool'), x: -0.6, y: 0, z: (BALCONY.minZ + BALCONY.maxZ) / 2 + 0.2, rotY: Math.PI / 2, places: [0], hips: 0.5, depth: 0, out: -0.7 },
-  { id: 'stool-2', label: uiText('🪑 Stool'), x: 1, y: 0, z: (BALCONY.minZ + BALCONY.maxZ) / 2 + 0.2, rotY: -Math.PI / 2, places: [0], hips: 0.5, depth: 0, out: -0.7 },
   ...CONFERENCE_SEATING,
   ...ATRIUM_SEATING,
   ...SERVER_ROOM_SEATING,
@@ -524,36 +519,3 @@ export function elevatorSpot(): { x: number; z: number } {
 export function inElevator(x: number, z: number): boolean {
   return x > ELEVATOR_CAR.minX && x < ELEVATOR_CAR.maxX && z > ELEVATOR_CAR.minZ && z < ELEVATOR_CAR.maxZ;
 }
-
-/**
- * The ladder to the floors above and below: against the west wall at `z`, up through a hatch in the
- * ceiling and down through one in the floor (every floor has it in the same spot, one long shaft).
- * You climb it at `x`, facing the wall; `hatch` is the hole in the floor and the ceiling.
- */
-export const LADDER = {
-  z: 0,
-  width: 0.62,
-  x: FLOOR.minX + 0.62,
-  hatch: { minX: FLOOR.minX, maxX: FLOOR.minX + 1, minZ: -0.5, maxZ: 0.5 },
-  /** How far in from the wall the trapdoor starts: the ladder goes through a slot along the wall. */
-  slot: 0.24,
-} as const;
-
-/** Where a fire pole can be. `open` is the way into its hole, where its railing has a gap (0 = +z, like rotY). */
-export interface PoleSpot {
-  x: number;
-  z: number;
-  open: number;
-}
-
-/**
- * The fire pole, slid down to the floor below. It goes the whole way down the building, through a hole
- * in every floor but the bottom one (where there's a mat to land on): it takes you down one floor, and
- * on a floor with another below you swing off it through the railing, ready to go again.
- */
-export const POLES: readonly PoleSpot[] = [
-  // Out in the open between the desks and the lounge, where you step out of the elevator.
-  { x: 6.8, z: 1.6, open: Math.PI },
-];
-/** A pole's hole in the floor, the railing round it, and how far from the pole you hang on. */
-export const POLE = { hole: 0.68, rail: 0.9, grip: 0.4, radius: 0.055 } as const;

@@ -16,6 +16,7 @@ import { openAccounts } from '../../ui/accounts';
 import { openBoard } from '../../ui/boards';
 import { openCharacter } from '../../ui/character';
 import { $ } from '../../ui/dom';
+import { openExpand } from '../../ui/floorplan';
 import { toggleFloorMenu } from '../../ui/floormenu';
 import { openHelp } from '../../ui/hud';
 import { mountHud } from '../../ui/menu';
@@ -41,7 +42,7 @@ export function installHud(ctx: Ctx, core: CoreState, parts: HudParts) {
   // The project in the corner is the floor you're on; click it for the list of floors to go to.
   $('project').addEventListener('click', () => {
     if (!store.floor) return travel.showElevator();
-    toggleFloorMenu($('project'), { go: travel.switchFloor, indoors: () => (!inOffice() && !core.upTop) || parts.place.indoors(), elevator: travel.showElevator, roof: () => travel.ride(ROOF) });
+    toggleFloorMenu($('project'), { go: travel.switchFloor, expand: () => openExpand(ctx.net), elevator: travel.showElevator, roof: () => travel.ride(ROOF) });
   });
 
   // ---- The HUD: a few buttons on the top bar, everything else in the ☰ menu ----------------------------

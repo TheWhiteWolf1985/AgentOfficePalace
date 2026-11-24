@@ -6,15 +6,13 @@ import type { FloorInfo } from '../../shared/protocol';
 import { store } from '../state';
 import { h } from './dom';
 
-// The floor list that drops down from the project in the corner: every floor of the building, top
-// floor first. Picking one takes you straight there, to the same spot in the office you're standing
-// in now (from outside it, into that floor's elevator). Adding a project is still the elevator's job.
+// Building directory. Every destination uses the elevator.
 
 export interface FloorMenuOptions {
-  /** Go to that floor, staying where you are in the office (from outside it, by elevator). */
+  /** Ride to the selected floor. */
   go(floorId: string): void;
-  /** Whether you're inside the office, where going to a floor keeps you on the same spot. */
-  indoors(): boolean;
+  /** Open the current office's expansion controls. */
+  expand?(): void;
   /** Open the elevator's panel, to add a project. */
   elevator(): void;
   /** Up to the shared meeting room, by elevator; null on a map with no roof to go up to. */
@@ -51,7 +49,7 @@ export function toggleFloorMenu(anchor: HTMLElement, opts: FloorMenuOptions): vo
     }
     const btn = h(
       'button.floor-item',
-      { type: 'button', role: 'menuitem', class: isHere ? 'here' : '', disabled: isHere || f.cloning, title: isHere ? uiText("You're on this floor") : f.cloning ? uiText('Still being cloned') : opts.indoors() ? uiText`Go to ${f.name}, right where you're standing` : uiText`Go to ${f.name}, in its elevator` },
+      { type: 'button', role: 'menuitem', class: isHere ? 'here' : '', disabled: isHere || f.cloning, title: isHere ? uiText("You're on this floor") : f.cloning ? uiText('Still being cloned') : uiText`Go to ${f.name}, in its elevator` },
       h('span.floor-no', { style: `background:${p.trim}` }, String(i + 1)),
       h('span.floor-text', {}, h('span.floor-name', {}, f.name), h('span.floor-sub', {}, where || (f.repo ?? f.dir))),
       h('span.floor-stats', {}, ...stats),
@@ -98,6 +96,11 @@ export function toggleFloorMenu(anchor: HTMLElement, opts: FloorMenuOptions): vo
       h('span.floor-no', { style: 'background:#2b2d42' }, '🗄️'),
       h('span.floor-text', {}, h('span.floor-name', {}, SERVER_ROOM_NAME), h('span.floor-sub', {}, inServer ? uiText('you are here') : uiText('Server room · technical floor'))));
     server.addEventListener('click', () => { if (!inServer) { close(); opts.go(SERVER_ROOM); } });
+    if (here >= 0 && opts.expand) {
+      const expand = h('button.floor-item', { type: 'button', role: 'menuitem' }, uiText('🏢 Back office'));
+      expand.addEventListener('click', () => { close(); opts.expand!(); });
+      items.push(expand);
+    }
     const count = floors.length + 3;
     el.replaceChildren(h('div.floor-menu-head', {}, uiText`🏢 ${count} floor${count === 1 ? '' : 's'}`), ...(opts.roof ? [roof] : []), server, ...items, lobby, add);
   };

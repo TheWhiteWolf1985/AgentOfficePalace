@@ -10,7 +10,7 @@ import { idleAgentsIn } from './stations';
 
 export function createWorlds(ctx: Ctx) {
   const { office } = ctx;
-  const world = officeWorld(office, () => office.stack.state.index > 0, () => officeWing());
+  const world = officeWorld(office, () => officeWing());
   let idle: ReturnType<typeof idleAgentsIn> | undefined;
   function officeWing(): number {
     return store.floor !== ROOF ? store.floorPlan.wing : 0;

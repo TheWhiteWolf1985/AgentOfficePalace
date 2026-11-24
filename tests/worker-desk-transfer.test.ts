@@ -5,7 +5,7 @@ import { Arrivals } from '../src/client/features/workers/leaving.js';
 import type { Worker } from '../src/client/world/character/worker.js';
 import type { DeskView } from '../src/client/world/types.js';
 import { DESKS, WING_DESKS, type DeskDef } from '../src/shared/layout.js';
-import { officeNav, wayHome, wayToBalcony, type Pt } from '../src/shared/nav.js';
+import { officeNav, wayToLift, type Pt } from '../src/shared/nav.js';
 
 function seat(def: DeskDef, scene: THREE.Object3D): DeskView {
   const seatAnchor = new THREE.Group();
@@ -47,5 +47,5 @@ test('desk transfers walk, retarget without jumping, and settle at the latest se
 
 test('removing a walking agent starts its exit route at its current position', () => {
   const here: Pt = [0, 0];
-  for (const exit of [wayHome, wayToBalcony]) assert.deepEqual(exit(DESKS[0], 0, here)[0], here);
+  assert.deepEqual(wayToLift(DESKS[0], 0, here)[0], here);
 });

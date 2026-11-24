@@ -20,9 +20,9 @@ declare module '../types' {
     boardMeshes: Record<keyof typeof BOARDS, THREE.Mesh>;
     tvScreen: THREE.Mesh;
     /** The monitor on the west wall showing how busy the office's machine is (features/boards/machine.ts). */
-    machineScreen: THREE.Mesh;
+    machineScreen?: THREE.Mesh;
 
-    plants: THREE.Group[];
+    plants?: THREE.Group[];
   }
 }
 

@@ -84,7 +84,7 @@ export function buildWhiteboard(): WhiteboardStand {
 declare module '../../world/types' {
   interface OfficeHandles {
     /** The rolling whiteboard everyone draws on together. */
-    whiteboard: WhiteboardStand;
+    whiteboard: Pick<WhiteboardStand, 'show' | 'fit'>;
   }
 }
 

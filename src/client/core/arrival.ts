@@ -7,7 +7,7 @@ import { t as uiText } from '../../shared/i18n';
  * sign-ins a newcomer is greeted with.
  */
 import { ATRIUM_DATA } from '../../shared/atrium-data';
-import { SLAB, inElevator } from '../../shared/layout';
+import { FLOOR, WALL_HEIGHT, inWing, inElevator } from '../../shared/layout';
 import { LOBBY, LOBBY_NAME, ROOF, ROOF_NAME, SERVER_ROOM, SERVER_ROOM_NAME, isFixedFloor } from '../../shared/rooftop';
 import { renderTitle } from '../shared/title';
 import { lastFloor, lastSpot, store, type Spot } from '../state';
@@ -77,12 +77,16 @@ export function installArrival(ctx: Ctx, core: CoreState, parts: ArrivalParts) {
       travel.setPlace();
       travel.syncStack();
       const aboveLobby = core.atLobby && mine.y >= ATRIUM_DATA.height;
-      if (lastSpot() && !aboveLobby && !(inElevator(mine.x, mine.z) || pastTheWing(mine, parts.worlds.officeWing())) && player.fits(mine.x, mine.z, mine.y)) {
+      // Older clients may have saved a balcony, a ladder shaft or an exterior landing.
+      const validOffice = !inOffice() || (mine.y >= -0.05 && mine.y < WALL_HEIGHT &&
+        ((mine.x >= FLOOR.minX && mine.x <= FLOOR.maxX && mine.z >= FLOOR.minZ && mine.z <= FLOOR.maxZ) ||
+          inWing(mine.x, mine.z, parts.worlds.officeWing())));
+      if (lastSpot() && validOffice && !aboveLobby && !(inElevator(mine.x, mine.z) || pastTheWing(mine, parts.worlds.officeWing())) && player.fits(mine.x, mine.z, mine.y)) {
         placeAt(mine);
         travel.arrive('back');
       } else {
         // The car you were in (or nearest): the garage's, if you were down there.
-        placeInCar(mine, !core.upTop && mine.y < -SLAB - 1);
+        placeInCar(mine);
         travel.arrive();
       }
       floorWentWhileAway(wasOn);

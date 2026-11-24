@@ -18,7 +18,6 @@ import { clip } from '../../ui/dom';
 import { openIssue } from '../../ui/pull';
 import { openServices } from '../../ui/services';
 import { BoardTexture, QueueBoardTexture, ServicesBoardTexture } from './world';
-import { MachineTexture } from './machine';
 import { MeetingBoardTexture, MeetingSignTexture } from './meeting';
 import type { World } from '../../world/world';
 
@@ -146,9 +145,6 @@ export function installBoards(ctx: Ctx, deps: BoardsDeps) {
     },
     use: onE(() => deps.showQueue()),
   });
-  // The machine monitor on the west wall.
-  const machine = lazyResource(() => new MachineTexture());
-  mountBoard(() => office.machineScreen, () => machine.get().texture, () => machine.peek()?.render(store.machine), ['machine']);
   // The meeting room: its output as it's written on the back wall, and how it's going on the door.
   const meetingBoard = lazyResource(() => new MeetingBoardTexture());
   mountBoard(() => office.meetingBoard, () => meetingBoard.get().texture, () => meetingBoard.peek()?.render(store.meeting), ['meeting']);

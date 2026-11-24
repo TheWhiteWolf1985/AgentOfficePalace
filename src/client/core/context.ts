@@ -6,7 +6,6 @@
 import type * as THREE from 'three';
 import type { MapPlan } from '../../shared/maps';
 import type { CarriedIssue, GhIssue, ServerMsg } from '../../shared/protocol';
-import type { Grip } from '../features/climbing/controller';
 import type { DeskKey } from '../interaction';
 import type { Net } from '../net';
 import type { PlayerController } from '../player';
@@ -46,7 +45,7 @@ export interface Hint {
 export type StopWhy = 'start' | 'taken' | 'trip' | 'map' | 'walk' | 'errand' | 'desk';
 
 /** How you're going to another floor: by elevator, straight there from the floor list, or by the ladder or a pole. */
-export type TripKind = 'elevator' | 'switch' | Grip;
+export type TripKind = 'elevator';
 
 /**
  * A trip under way: the lights are down (and by elevator the doors are shut) until the next floor
@@ -128,7 +127,7 @@ export interface Ctx {
   readonly activities: Activities<StopWhy, KeyboardEvent, HTMLElement>;
   readonly interactions: Interactions<OfficeInteraction>;
   /** What what you're doing makes of you and your view each frame (see ViewEffect). */
-  readonly view: View<Grip>;
+  readonly view: View<never>;
 
   readonly usables: Usables<Interactable, THREE.Object3D>;
 

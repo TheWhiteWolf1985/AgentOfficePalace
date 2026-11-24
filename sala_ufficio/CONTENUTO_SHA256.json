@@ -1,0 +1,138 @@
+{
+  "schema": "aop.delivery.inventory.v1",
+  "version": "2026-11-23-r06",
+  "files": {
+    "AGENTS.md": {
+      "bytes": 972,
+      "sha256": "f6fa81ce9fed0b65496ec8dd3efbee8419f3a4073667903c95b05847eed24d22"
+    },
+    "geometria/ufficio_base.glb": {
+      "bytes": 3075556,
+      "sha256": "5e0a4f685b8b45473f1b831dd39703160656333217a50e1da9740dd66d71527f"
+    },
+    "geometria/varianti/ala_1.glb": {
+      "bytes": 303248,
+      "sha256": "997b12762c8905ac0081d3b669258ecc4c8a7e937da79697579586ba73c3e775"
+    },
+    "geometria/varianti/ala_2.glb": {
+      "bytes": 412076,
+      "sha256": "194083312e3a34feec0dbc49e4919a6c44d835b0be82abf04cf746d12f30502b"
+    },
+    "geometria/varianti/cartello_esempio.glb": {
+      "bytes": 62464,
+      "sha256": "cb33a2e4c34b431e57674ca519b478e56e81f3752b1ebfb33e9039b1fc34f1ed"
+    },
+    "geometria/varianti/collegamenti_intermedio.glb": {
+      "bytes": 354336,
+      "sha256": "3513604d88f2c7813779298691bcd9ff1d6a15a93578b159c60ab0b75cf61087"
+    },
+    "geometria/varianti/collegamenti_primo.glb": {
+      "bytes": 208828,
+      "sha256": "a7b9ad03e3c9d61613fae03ec5628383f11adff7fbc6ee203c9e748bffb557d6"
+    },
+    "geometria/varianti/collegamenti_ultimo.glb": {
+      "bytes": 282664,
+      "sha256": "5967c779cb6ac4e7386fcc2f770a1d7018ba8ef03404af4883695dca3d233c25"
+    },
+    "geometria/varianti/cornici_campione.glb": {
+      "bytes": 31040,
+      "sha256": "4799f99308b42d08e68d22c2b18138886d5865ae68322a061897f869a0f31504"
+    },
+    "geometria/varianti/indicatore_libero.glb": {
+      "bytes": 4004,
+      "sha256": "f00f33996787c6500cfd409c3743cbd55327e3238077c2f8044309a10d3c5197"
+    },
+    "geometria/varianti/portatile_agente.glb": {
+      "bytes": 46004,
+      "sha256": "45fdcdf815a6febabb4f57d13d6900ac69c6eab0db4ac0cf9adddf96198f179a"
+    },
+    "geometria/varianti/posti_aggiuntivi.glb": {
+      "bytes": 383244,
+      "sha256": "29b3a0db539960ad3c251ca50cf7fd3dcfbf73f14cf77d1be63bd3ea172c578c"
+    },
+    "INTEGRAZIONE.md": {
+      "bytes": 4934,
+      "sha256": "4780fdd6676afc124844ec7fbc3528474bed7bce996e7bb490854e02790e969b"
+    },
+    "PROMPT_BLENDER.md": {
+      "bytes": 1067,
+      "sha256": "65722fce2911e19ba4ae854e1dd04b1d9cb1a197bd3cbd224dee4452e1de0b88"
+    },
+    "README_INIZIA_QUI.md": {
+      "bytes": 3686,
+      "sha256": "1b53aff0ae2bc9257318eeef423e064eb8e192aa9cfb30d880410b31344c5be2"
+    },
+    "riferimenti/ancore_scrivanie.json": {
+      "bytes": 15328,
+      "sha256": "2e3b5531a77a17a6e5cd3523b47a8e79bd17a4f8861a0d4fb0411cc103d0cf5f"
+    },
+    "riferimenti/GRUPPI_EXPORT.json": {
+      "bytes": 31923,
+      "sha256": "c6573a8d08b8fee286480d99587bd4e8183691e5f9538baf04c224969a57d0b0"
+    },
+    "riferimenti/layout_ufficio.json": {
+      "bytes": 241305,
+      "sha256": "8bab837bd1de3d08029031a376b779dd4ce539001527f88bdca79a0fa24134b8"
+    },
+    "riferimenti/REVISIONE.txt": {
+      "bytes": 110,
+      "sha256": "0bfb7cd2ea4ab98a2edcf2104283e03f7906539df7c0016846251e8268ebd343"
+    },
+    "riferimenti/VERIFICA.json": {
+      "bytes": 3740,
+      "sha256": "b6ef54f1217960123c660fc044776b1a8ec4669c79025a0b564a1fd70209e4ad"
+    },
+    "riferimenti/viste/vista_capo_ufficio.png": {
+      "bytes": 1311802,
+      "sha256": "3207b4d2e95a9adfd13fd0ce1c9ed8c0becc891960251e8b0c84bcddd5c78f2f"
+    },
+    "riferimenti/viste/vista_documenti.png": {
+      "bytes": 1264812,
+      "sha256": "8c6f07000df0480180e214dac20d60a46e9f0401d5be4d80b4d23af1c3b0132b"
+    },
+    "riferimenti/viste/vista_facciata.png": {
+      "bytes": 1268753,
+      "sha256": "0a42898cc32147741296e882670d8ac5d95414dcae6813ab878e6ec233eebf50"
+    },
+    "riferimenti/viste/vista_generale.png": {
+      "bytes": 1430270,
+      "sha256": "6bc1b68ed09e8a01d4dfc70425632d2b9b9a45bdd341c342f7757cba1022424d"
+    },
+    "riferimenti/viste/vista_pianta.png": {
+      "bytes": 1336049,
+      "sha256": "4ee8c8cd15870289c265c44395dfa27b785566831872cf55f54d9c8edf63a5dd"
+    },
+    "riferimenti/viste/vista_scrivanie.png": {
+      "bytes": 1399279,
+      "sha256": "acf1caf4e774703e36ae6bb2db29727c4c02e53ab569ca0d72131bd5141b0a93"
+    },
+    "strumenti/esporta.py": {
+      "bytes": 3154,
+      "sha256": "fa8b993a9ef0b0acdc0d4dc344e2ddcb972692c9c3ec393bd3f6f9299c8633f4"
+    },
+    "strumenti/snapshot.py": {
+      "bytes": 2060,
+      "sha256": "43f9282b678f8c9fcebcfc4f0bab797144e74de04e165f2d3587b02a51156fb9"
+    },
+    "strumenti/verifica_consegna.py": {
+      "bytes": 6431,
+      "sha256": "991aba0977f8d16aa207b6ecd1842438cffdc3c8c96e1d739d9638979127fa60"
+    },
+    "strumenti/viste.py": {
+      "bytes": 2665,
+      "sha256": "07fa1e53c0bf4a9a5a4ada6345d5f92ba9a5d75bfc5cb0d7fc102e36ef95dd9c"
+    },
+    "ufficio.blend": {
+      "bytes": 2881325,
+      "sha256": "dcdc66b99ae656965c0e1536c09ff0be11de2818a0b9440985651aff3683e88c"
+    },
+    "ufficio.manifest.json": {
+      "bytes": 1216189,
+      "sha256": "f0edb2969ae730dbc8193401ae184bebe33f563fb31ffa950d6d560ad6a33992"
+    },
+    "verifiche/CONFRONTO_SCENA.json": {
+      "bytes": 1167,
+      "sha256": "ac9a85fb5e07d042213b5b3b51bcc819632a1bce61bffc4174511d272749636f"
+    }
+  }
+}

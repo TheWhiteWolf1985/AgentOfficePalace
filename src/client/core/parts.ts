@@ -18,7 +18,6 @@ import type { Dust } from '../world/dust';
 import type { installBoards } from '../features/boards';
 import type { installBookshelf } from '../features/bookshelf';
 import type { installCarrying } from '../features/carrying';
-import type { installClimbing } from '../features/climbing';
 import type { installGallery, installHanging } from '../features/hanging';
 import type { installHud } from '../features/hud';
 import type { installMeeting } from '../features/meeting';
@@ -89,7 +88,6 @@ export interface Parts {
   atrium: Made<typeof installAtrium>;
   serverRoom: Made<typeof installServerRoom>;
   hanging: Made<typeof installHanging>;
-  climbing: Made<typeof installClimbing>;
   peers: Made<typeof installPeers>;
   walking: Made<typeof installWalking>;
   views: Made<typeof installWorkerViews>;

@@ -3,7 +3,6 @@ import { construction } from './construction';
 import type { GongWhy } from '../../shared/protocol';
 import { birdsong, nightCrickets, startRoomTone, startWind } from './ambience';
 import { ding } from './alerts';
-import { bonk, hatch, poleLanding, rung, slide, twirl } from '../features/climbing/sound';
 import { AudioCore, type Listener } from './core';
 import { gong } from '../features/gong/sound';
 import { needsYou } from '../features/needsyou/sound';
@@ -117,32 +116,6 @@ export class OfficeSound {
   /** Someone else's footstep, on the office floor unless `y` says where else. */
   stepAt(x: number, z: number, y = 0, pace = 0) {
     this.feet.stepAt({ x, y, z }, pace);
-  }
-
-  // ---- The ladder, the fire poles (features/climbing, features/workers) ------------
-
-  rung(soft = false) {
-    rung(this.a, soft);
-  }
-
-  hatch(at: Pos, open: boolean) {
-    hatch(this.a, at, open);
-  }
-
-  bonk() {
-    bonk(this.a);
-  }
-
-  slide(seconds = 1.6) {
-    slide(this.a, seconds);
-  }
-
-  twirl() {
-    twirl(this.a);
-  }
-
-  poleLanding(speed: number, at?: Pos) {
-    poleLanding(this.a, speed, at);
   }
 
   construction(at: Pos) { construction(this.a, at); }

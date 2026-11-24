@@ -149,7 +149,7 @@ export function buildGong(at: { x: number; y?: number; z: number; rotY?: number 
 declare module '../../world/types' {
   interface OfficeHandles {
     /** The merge gong by the PR board. */
-    gong: Gong;
+    gong?: Gong;
   }
 }
 

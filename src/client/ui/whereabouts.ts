@@ -27,7 +27,7 @@ export function whereabouts(p: PeerInfo): string | undefined {
   if (p.y > -1 && inWing(p.x, p.z, WING.rows)) return uiText('🏗️ in the back office');
   // Down on the street, or out the back door on the stairs down to it.
   if (p.y < -1 || p.x < FLOOR.minX || p.x > FLOOR.maxX || p.z < FLOOR.minZ) return uiText('🚶 outside');
-  if (p.z > FLOOR.maxZ) return p.x >= BALCONY.minX && p.x <= BALCONY.maxX ? uiText('🌇 on the balcony') : uiText('🚶 outside');
+  if (p.z > FLOOR.maxZ) return uiText('🚶 outside');
   if (p.y > LOFT.y - 0.5 && p.x > LOFT.minX && p.z > LOFT.minZ) return uiText("👔 in the boss's office");
   if (p.x > MEETING_ROOM.minX && p.z > MEETING_ROOM.minZ) return uiText('🤝 in the meeting room');
   return undefined;
