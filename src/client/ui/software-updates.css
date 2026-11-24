@@ -2,3 +2,4 @@
 .software-updates .btn { margin: .4rem .6rem .4rem 0; }
 .software-updates .release-notes { white-space: pre-wrap; overflow-wrap: anywhere; }
 .office-update-badge { position: fixed; right: 1rem; bottom: 3.25rem; z-index: 15; max-width: calc(100vw - 2rem); }
+.lite-main > .office-update-badge { position: static; margin: 0 0 .75rem; }

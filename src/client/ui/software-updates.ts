@@ -119,7 +119,9 @@ export function watchUpdates(open: () => void) {
       badge = h('button.btn.office-update-badge', { type: 'button', onclick: () => {
         seen = label; sessionStorage.removeItem('agent-office.update-completed'); badge?.remove(); open();
       } }, label);
-      document.body.append(badge);
+      const liteMain = document.querySelector('body.lite .lite-main');
+      if (liteMain) liteMain.prepend(badge);
+      else document.body.append(badge);
     } catch { /* Try again when the tab regains focus or at the next interval. */ }
     finally { checking = false; }
   }
