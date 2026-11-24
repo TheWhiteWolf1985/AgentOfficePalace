@@ -5,7 +5,7 @@
 Dalla shell root del nodo Proxmox VE amd64 esegui il comando del candidato:
 
 ```bash
-script=$(curl -fsSL https://github.com/TheWhiteWolf1985/AgentOfficePalace/releases/download/v0.1.300-rc.5/proxmox.sh) && bash -c "$script"
+script=$(curl -fsSL https://github.com/TheWhiteWolf1985/AgentOfficePalace/releases/download/v0.1.301-rc.6/proxmox.sh) && bash -c "$script"
 ```
 
 Lo script propone ID libero, nome, storage e bridge e aspetta conferma. Puoi scegliere un nome diverso quando nel cluster esiste giÃ  `agent-office-palace`. Crea una VM Debian 13 ufficiale con 4 vCPU, 16 GiB RAM, disco da 30 GiB, DHCP e avvio automatico. Il nodo deve poter raggiungere Debian Cloud e GitHub. La VM deve poter raggiungere i repository Debian e GitHub. Il piccolo secondo disco contiene la configurazione del primo avvio, senza password.
@@ -19,7 +19,7 @@ Per un'installazione non interattiva passa `--yes` e, se necessario, `--vmid`, `
 Il punto di partenza Ã¨ una VM Debian 13 amd64 con systemd, rete in uscita e accesso root. Per una macchina con due agenti puoi partire dalla configurazione di prova con 4 vCPU, 16 GiB di RAM e 30 GiB di disco. Lascia spazio aggiuntivo per workspace e immagini. Lancia il comando nella console della VM. Il comando seguente installa lo stesso candidato su Debian già predisposta.
 
 ```bash
-apt-get update && apt-get install -y ca-certificates curl && curl -fLsS https://github.com/TheWhiteWolf1985/AgentOfficePalace/releases/download/v0.1.300-rc.5/install.sh -o /root/agent-office-install.sh && bash /root/agent-office-install.sh
+apt-get update && apt-get install -y ca-certificates curl && curl -fLsS https://github.com/TheWhiteWolf1985/AgentOfficePalace/releases/download/v0.1.301-rc.6/install.sh -o /root/agent-office-install.sh && bash /root/agent-office-install.sh
 ```
 
 Per trasportare una consegna, copia nella stessa cartella `install.sh`, `agent-office-release.py`, `release.json`, `agent-office-linux-amd64.tgz` e `codex-agent-linux-amd64.tgz`. Dalla cartella esegui `bash ./install.sh "$PWD"`. Per i prerequisiti Debian serve accesso ai repository APT o a un mirror aziendale. Node 22, dipendenze applicative e immagine Codex sono giÃ  nella consegna.

@@ -38,11 +38,17 @@ python3 deploy/codex-agent/seccomp.py > "$work/package/distribution/codex-seccom
 tar -C "$work/package" -czf "$out/agent-office-linux-amd64.tgz" .
 image="aop-codex:release-$commit"
 docker build --tag "$image" deploy/codex-agent
-docker run --rm --entrypoint /bin/sh "$image" -ec 'codex --version; bwrap --version; rg --pcre2-version'
+docker run --rm --network=none --entrypoint /bin/sh "$image" -ec '
+  test ! -e /root/.codex
+  test ! -e /root/.git-credentials
+  test ! -e /root/.ssh/authorized_keys
+  test -z "$(ls -A /workspace)"
+  codex --version; bwrap --version; rg --pcre2-version'
 plugin=$(node --input-type=module -e "import {pluginImageTag} from './dist/server/server/plugin-service.js'; console.log(await pluginImageTag('bin/plugin-skills'))")
 docker build --tag "$plugin" bin/plugin-skills
 docker run --rm --network=none --entrypoint /bin/sh "$plugin" -ec 'pdfinfo -v; tesseract --list-langs | grep -qx ita; tesseract --list-langs | grep -qx eng'
 docker save "$image" "$plugin" | gzip -1 > "$out/codex-agent-linux-amd64.tgz"
+python3 deploy/debian/check-images.py "$out/codex-agent-linux-amd64.tgz"
 cp deploy/debian/{agent-office-release.py,install.sh} "$out/"
 python3 - "$out" "$version" "$commit" "$image" "$plugin" <<'PY'
 import hashlib, json, sys, tarfile

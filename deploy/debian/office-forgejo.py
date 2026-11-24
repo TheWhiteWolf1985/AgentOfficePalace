@@ -72,7 +72,12 @@ def prepare(ip):
         raise ValueError('Home Forgejo inattesa')
     CONFIG.parent.mkdir(mode=0o750, exist_ok=True)
     os.chown(CONFIG.parent, 0, account.pw_gid)
+    CONFIG.parent.chmod(0o750)  # cloud-init deliberately runs with umask 077
+    binary = PROGRAM / 'distribution/forgejo'
     if not CONFIG.exists():
+        def secret(kind):
+            return subprocess.check_output(['runuser', '-u', 'forgejo', '--', binary, 'generate', 'secret', kind],
+                                           text=True, cwd=HOME).strip()
         save(CONFIG, f"""APP_NAME = Agent Office Palace
 RUN_USER = forgejo
 RUN_MODE = prod
@@ -92,9 +97,9 @@ OFFLINE_MODE = true
 [security]
 INSTALL_LOCK = true
 SECRET_KEY = {secrets.token_hex(32)}
-INTERNAL_TOKEN = {secrets.token_urlsafe(64)}
+INTERNAL_TOKEN = {secret('INTERNAL_TOKEN')}
 [oauth2]
-JWT_SECRET = {secrets.token_urlsafe(48)}
+JWT_SECRET = {secret('JWT_SECRET')}
 [service]
 DISABLE_REGISTRATION = true
 REQUIRE_SIGNIN_VIEW = true
@@ -104,7 +109,6 @@ DEFAULT_PRIVATE = private
 ENABLED = false
 """, 0o640)
     os.chown(CONFIG, 0, account.pw_gid)
-    binary = PROGRAM / 'distribution/forgejo'
     save(UNIT, f"""[Unit]
 Description=Forgejo privato di Agent Office Palace
 After=network.target

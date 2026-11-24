@@ -10,6 +10,7 @@ import pwd
 import re
 import secrets
 import shutil
+import sqlite3
 import subprocess
 import sys
 import tarfile
@@ -287,6 +288,28 @@ def docker():
     return ['runuser', '-u', USER, '--', 'docker', '--host', f'unix:///run/user/{uid}/aop-docker.sock']
 
 
+def check_first_install():
+    runtime = HOME / 'codex-runtime'
+    if any((HOME / 'projects').glob('*')) or any((runtime / 'workers').glob('*')) or any(runtime.rglob('auth.json')):
+        raise ValueError('Dati di uffici o accessi agenti inattesi al primo avvio')
+    with sqlite3.connect('file:/var/lib/forgejo/data/forgejo.db?mode=ro', uri=True) as db:
+        if db.execute('SELECT COUNT(*) FROM repository').fetchone()[0] != 0:
+            raise ValueError('Repository Forgejo inattesi al primo avvio')
+    expected = 'aop-plugins-' + hashlib.sha256(str(runtime / 'plugin-skills').encode()).hexdigest()[:24]
+    for _ in range(45):
+        names = output(*docker(), 'ps', '-a', '--format', '{{.Names}}').splitlines()
+        if names and names != [expected]:
+            raise ValueError('Container inattesi al primo avvio')
+        if names and (runtime / 'plugin-skills/socket/plugins.sock').is_socket():
+            break
+        time.sleep(1)
+    else:
+        raise ValueError('Container condiviso Plugin & Skills non pronto')
+    accounts = runtime / 'plugin-skills/data/accounts.json'
+    if accounts.exists() and json.loads(accounts.read_text()).get('accounts'):
+        raise ValueError('Connettori personali inattesi al primo avvio')
+
+
 def stage(release):
     target = release.target
     if target.exists():
@@ -440,6 +463,8 @@ def main():
             rejected.unlink(missing_ok=True)
             if a.action == 'install':
                 install_proxy()
+                if not active:
+                    check_first_install()
                 link(TOOL, ROOT / 'current/distribution' / MANAGER)
                 run('systemctl', 'enable', SERVICE)
                 run('systemctl', 'enable', '--now', TIMER)
