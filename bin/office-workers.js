@@ -32,6 +32,8 @@ const USAGE = `Usage:
                                                 desk, from the worker's own branch, or by a Claude
                                                 Code worker running gh pr create
   office-workers pr --none [--worker <name|id>] take that pull request off the worker again
+  office-workers tools                          list shared plugins and enabled skills
+  office-workers use NAME [JSON]                call a shared tool or read a skill
   office-workers mcp                            serve these as MCP tools on stdio`;
 
 /** A mistake in how the command was called: the usage is shown with it. */
@@ -43,9 +45,9 @@ export const EFFORTS = ['low', 'medium', 'high', 'xhigh', 'max'];
 /** How long the office may take to come back when it's restarting (a dev reload, an upgrade). */
 const RETRY_MS = 6000;
 /** Sending several workers home waits on git for each; hiring may fetch from GitHub first. */
-const TIMEOUT_MS = { list: 15_000, tell: 15_000, pr: 45_000, hire: 90_000, home: 300_000 };
+const TIMEOUT_MS = { list: 15_000, tell: 15_000, result: 5000, reply: 15_000, pr: 45_000, hire: 90_000, home: 300_000, tools: 5000, use: 26_000 };
 /** Where each call goes, under /office/workers. */
-const PATHS = { list: '', hire: '', home: '/home', tell: '/tell', pr: '/pr' };
+const PATHS = { list: '', hire: '', home: '/home', tell: '/tell', result: '/result', reply: '/reply', pr: '/pr', tools: '/tools', use: '/use' };
 
 /**
  * Reads `--flag value` and `--flag=value` options, and the words that aren't options.
@@ -89,6 +91,10 @@ export function parseArgs(argv) {
   if (cmd === 'mcp') {
     if (rest.length) throw new UsageError(`mcp takes no arguments (got ${rest.join(' ')})`);
     return { cmd: 'mcp' };
+  }
+  if (cmd === 'tools' && !rest.length) return { cmd };
+  if (cmd === 'use' && rest.length >= 1 && rest.length <= 2) {
+    return { cmd, name: rest[0], arguments: JSON.parse(rest[1] ?? '{}') };
   }
   if (cmd === 'list' || cmd === 'ls') {
     const { opts, words } = options(rest, [], ['--json']);
@@ -158,7 +164,7 @@ export function officeEnv(env) {
 
 /**
  * The HTTP request for one of the office's worker calls.
- * @param {'list' | 'hire' | 'home' | 'tell' | 'pr'} what
+ * @param {'list' | 'hire' | 'home' | 'tell' | 'result' | 'reply' | 'pr' | 'tools' | 'use'} what
  * @param {{ url: string, worker: string, token: string }} office
  * @param {Record<string, unknown>} [body]
  * @returns {{ method: string, url: string, headers: Record<string, string>, body?: string, timeout: number }}
@@ -168,7 +174,8 @@ export function buildRequest(what, office, body) {
   url.searchParams.set('worker', office.worker);
   const headers = { authorization: `Bearer ${office.token}` };
   if (what === 'list') return { method: 'GET', url: url.href, headers, timeout: TIMEOUT_MS.list };
-  return { method: 'POST', url: url.href, headers: { ...headers, 'content-type': 'application/json' }, body: JSON.stringify(body ?? {}), timeout: TIMEOUT_MS[what] };
+  const timeout = what === 'use' && body?.arguments?.file ? 50_000 : TIMEOUT_MS[what];
+  return { method: 'POST', url: url.href, headers: { ...headers, 'content-type': 'application/json' }, body: JSON.stringify(body ?? {}), timeout };
 }
 
 /** Why the office turned a request down, in words. */
@@ -207,7 +214,7 @@ async function send(req, fetchImpl) {
 
 /**
  * Makes one call to the office; resolves to what it answered, or throws with why it said no.
- * @param {'list' | 'hire' | 'home' | 'tell' | 'pr'} what
+ * @param {'list' | 'hire' | 'home' | 'tell' | 'result' | 'reply' | 'pr' | 'tools' | 'use'} what
  * @param {Record<string, unknown> | undefined} body
  * @param {{ env: Record<string, string | undefined>, fetch: typeof fetch }} io
  */
@@ -279,6 +286,19 @@ export function formatLinked(answer) {
 const MCP_VERSIONS = ['2025-11-25', '2025-06-18', '2025-03-26', '2024-11-05'];
 
 const WORKER_NOTE = 'A worker is named by its name (e.g. "Mochi") or its id, as list_workers shows them.';
+
+const requestIdField = { type: 'string', description: 'The office request ID.' };
+async function awaitReply(id, io) {
+  const until = Date.now() + 20_000;
+  for (;;) {
+    const r = await call('result', { requestId: id }, io);
+    if (r.status === 'answered') return { text: JSON.stringify({ requestId: id, status: 'answered', reply: r.reply }) };
+    if (r.status === 'failed') return { text: r.error, isError: true };
+    if (r.status !== 'pending') throw Error('Unknown reply status');
+    if (Date.now() >= until) return { text: JSON.stringify({ requestId: id, status: 'pending', next: 'Call list_workers with this requestId until answered. Do not resend the task.' }) };
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }
+}
 
 export const TOOLS = [
   {
@@ -385,7 +405,19 @@ const INSTRUCTIONS =
 /** Runs a tool; resolves to its text, and whether nothing it was asked came off, or throws with why it failed. */
 async function runTool(name, args, io) {
   const a = args && typeof args === 'object' ? args : {};
-  if (name === 'list_workers') return { text: JSON.stringify(await call('list', undefined, io), null, 1) };
+  if (name === 'list_office_tools') return { text: JSON.stringify(await call('tools', {}, io)) };
+  if (name === 'use_office_tool') {
+    const result = await call('use', a, io);
+    if (result?.image?.mimeType === 'image/jpeg' && typeof result.image.data === 'string') {
+      const { image, ...detail } = result;
+      return { text: JSON.stringify(detail), image };
+    }
+    return { text: JSON.stringify(result) };
+  }
+  if (name === 'list_workers') {
+    if (io.env.AGENT_OFFICE_HOOK_SOCKET && a.requestId) return awaitReply(a.requestId, io);
+    return { text: JSON.stringify(await call('list', undefined, io), null, 1) };
+  }
   if (name === 'hire_worker') {
     const answer = await call('hire', a, io);
     const w = answer.worker ?? {};
@@ -397,7 +429,12 @@ async function runTool(name, args, io) {
     return { text: formatHome(answer, a.merged === true), isError: results.some((r) => r.error) && !results.some((r) => r.went || r.skipped) };
   }
   if (name === 'tell_worker') {
-    const answer = await call('tell', a, io);
+    const tracked = !!io.env.AGENT_OFFICE_HOOK_SOCKET;
+    const answer = await call('tell', tracked ? { ...a, expectReply: true } : a, io);
+    if (tracked) {
+      if (!answer.requestId) throw Error('Office accepted delivery but did not return a request ID');
+      return awaitReply(answer.requestId, io);
+    }
     return { text: `Told ${answer.worker?.name ?? a.worker}.` };
   }
   if (name === 'link_pr') return { text: formatLinked(await call('pr', a, io)) };
@@ -415,7 +452,19 @@ export async function handleMcp(msg, io) {
   }
   if (!('id' in msg)) return undefined;
   const ok = (result) => ({ jsonrpc: '2.0', id: msg.id, result });
-  const tools = io.env.AGENT_OFFICE_HOOK_SOCKET ? TOOLS.filter(t => ['list_workers', 'tell_worker'].includes(t.name)) : TOOLS;
+  const workerTools = io.env.AGENT_OFFICE_HOOK_SOCKET ? [
+    { ...TOOLS[0], description: TOOLS[0].description + ' With requestId, wait for the final answer to your delegated request.',
+      inputSchema: { type: 'object', properties: { requestId: requestIdField }, additionalProperties: false } },
+    { ...TOOLS.find(t => t.name === 'tell_worker'), description: 'Delegate a task to a colleague on this floor and receive their final answer. If pending, use list_workers with its requestId.' },
+  ] : TOOLS;
+  const tools = [...workerTools, {
+    name: 'list_office_tools', description: 'Start here for PDF attachments, OCR, document skills or connected services. List the tools enabled for the whole office and their arguments.',
+    annotations: { readOnlyHint: true, openWorldHint: false },
+    inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+  }, {
+    name: 'use_office_tool', description: 'Call an operation from list_office_tools by its exact name, or retrieve the instructions for a listed skill.',
+    inputSchema: { type: 'object', properties: { name: { type: 'string' }, arguments: { type: 'object' } }, required: ['name'], additionalProperties: false },
+  }];
   switch (msg.method) {
     case 'initialize': {
       const asked = msg.params?.protocolVersion;
@@ -423,7 +472,8 @@ export async function handleMcp(msg, io) {
         protocolVersion: MCP_VERSIONS.includes(asked) ? asked : MCP_VERSIONS[0],
         capabilities: { tools: { listChanged: false } },
         serverInfo: { name: 'agent-office', title: 'Agent Office', version: '1.0.0' },
-        instructions: io.env.AGENT_OFFICE_HOOK_SOCKET ? 'Named office colleagues are real agents on this floor. Use list_workers then tell_worker with the exact colleague ID. Never substitute an internal subagent. Delivery is not completion. Each colleague writes to a separate /workspace visible in the floor bookshelf.' : INSTRUCTIONS,
+        instructions: (io.env.AGENT_OFFICE_HOOK_SOCKET ? 'Named office colleagues are real agents on this floor. Use list_workers then tell_worker with the exact colleague ID. Never substitute an internal subagent. If pending, use list_workers with the returned requestId until answered. For incoming office requests simply give your final answer normally and the office returns it to the sender. Each colleague writes to a separate /workspace visible in the floor bookshelf.' : INSTRUCTIONS) +
+          ' For a task involving a connected service or a shared skill, discover the current catalogue with list_office_tools, then use_office_tool.',
       });
     }
     case 'ping':
@@ -434,8 +484,10 @@ export async function handleMcp(msg, io) {
       const name = msg.params?.name;
       if (!tools.some((t) => t.name === name)) return { jsonrpc: '2.0', id: msg.id, error: { code: -32602, message: `Unknown tool: ${name}` } };
       try {
-        const { text, isError } = await runTool(name, msg.params?.arguments, io);
-        return ok({ content: [{ type: 'text', text }], ...(isError ? { isError: true } : {}) });
+        const { text, image, isError } = await runTool(name, msg.params?.arguments, io);
+        const content = [{ type: 'text', text }];
+        if (image) content.push({ type: 'image', ...image });
+        return ok({ content, ...(isError ? { isError: true } : {}) });
       } catch (e) {
         return ok({ content: [{ type: 'text', text: e.message }], isError: true });
       }
@@ -505,6 +557,10 @@ export async function main(argv, io = {}) {
       return 0;
     }
     officeEnv(env);
+    if (cmd.cmd === 'tools' || cmd.cmd === 'use') {
+      out(JSON.stringify(await call(cmd.cmd, { name: cmd.name, arguments: cmd.arguments }, ctx), null, 2));
+      return 0;
+    }
     const prompt = async () => {
       if (cmd.prompt !== undefined) return String(cmd.prompt);
       if (stdin.isTTY) throw new UsageError(`Give the prompt on stdin (office-workers ${cmd.cmd} … <<'EOF' … EOF) or with --prompt "…"`);

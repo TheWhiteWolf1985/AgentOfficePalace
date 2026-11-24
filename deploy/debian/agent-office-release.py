@@ -104,6 +104,8 @@ class Release:
                 or not re.fullmatch('[a-f0-9]{40}', m['commit']) or not re.fullmatch('sha256:[a-f0-9]{64}', m['image'])
                 or any(not SHA.fullmatch(m['sha256'][name]) for name in [ARCHIVE, IMAGE, MANAGER])):
             raise ValueError('Manifest della release non valido')
+        if 'pluginTag' in m and not re.fullmatch('aop-plugin-skills:[a-f0-9]{64}', m['pluginTag']):
+            raise ValueError('Tag immagine plugin non valido')
         self.target = ROOT / 'releases' / ('v' + m['version'])
         if self.target.is_dir():
             installed = json.loads((self.target / 'release.json').read_text())
@@ -269,7 +271,14 @@ def install_proxy():
         if mask:
             run('systemctl', 'unmask', '--runtime', 'nginx.service')
     proxy = ROOT / 'current/distribution/agent-office-proxy.py'
-    run(sys.executable, proxy)
+    helper = proxy.with_name('office-forgejo.py')
+    address = output('ip', '-j', '-4', 'route', 'get', '192.0.2.1')
+    ip = json.loads(address)[0]['prefsrc']
+    run(sys.executable, helper, 'prepare', ip)
+    run(sys.executable, proxy, '--yes', '--ip', ip, '--forgejo')
+    run(sys.executable, helper, 'connect', ip)
+    if not healthy():
+        raise RuntimeError('Office non pronto dopo la configurazione dei piani')
     link(Path('/usr/local/sbin/agent-office-proxy'), proxy)
 
 
@@ -304,10 +313,11 @@ def stage(release):
         run('runuser', '-u', USER, '--', app / 'bin/node', '-e', "require('@lydell/node-pty')", cwd=app)
         (app / 'distribution' / MANAGER).chmod(0o755)
         image = release.manifest['image']
-        if subprocess.run([*docker(), 'image', 'inspect', image], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode:
+        images = [image] + ([release.manifest['pluginTag']] if 'pluginTag' in release.manifest else [])
+        if subprocess.run([*docker(), 'image', 'inspect', *images], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode:
             with release.asset(IMAGE, tmp).open('rb') as stream:
                 run(*docker(), 'load', stdin=stream)
-            run(*docker(), 'image', 'inspect', '--format', '{{.Id}}', image)
+            run(*docker(), 'image', 'inspect', '--format', '{{.Id}}', *images)
         atomic(app / 'release.env', f'AGENT_OFFICE_CODEX_IMAGE={image}\nAGENT_OFFICE_CODEX_SECCOMP={target}/distribution/codex-seccomp.json\n')
         atomic(app / 'release.json', json.dumps(release.manifest) + '\n')
         app.chmod(0o755)

@@ -16,6 +16,7 @@ import { Decor } from './decor.js';
 import { FloorPlanStore } from './floorplan.js';
 import { dockerWorkspace } from './workers/docker.js';
 import { Docs } from './docs.js';
+import { PeerRequests } from './peer-requests.js';
 import { Whiteboard } from './whiteboard.js';
 import { MeetingRoom } from './meetings.js';
 import { Worktrees, type WorktreeCleanup } from './worktrees.js';
@@ -116,6 +117,7 @@ export class Floor {
   readonly meetings: MeetingRoom;
   /** The bookshelf: the project's Markdown files (see docs.ts). */
   readonly docs: Docs;
+  readonly peerRequests: PeerRequests;
   private workerShelves = new Map<string, Docs>();
 
   workspaceShelves(accountId?: string) {
@@ -153,6 +155,7 @@ export class Floor {
     excludeFromGit(def.dir);
     this.project = projectInfo(def.dir, def.name, ctx.agentCmd, ctx.agentArgs);
     this.docs = new Docs(def.dir);
+    this.peerRequests = new PeerRequests(dataDir);
 
     this.plan = new FloorPlanStore(dataDir);
 

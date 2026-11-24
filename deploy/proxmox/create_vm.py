@@ -55,6 +55,7 @@ done
 phase=installazione
 progress "$phase"
 python3 ./agent-office-release.py install --from-dir "$work"
+@PAUSE@
 phase=https
 progress "$phase"
 ip=$(cat /etc/agent-office-proxy/address)
@@ -189,7 +190,9 @@ def main():
         seed = work / 'seed'
         seed.mkdir()
         (seed / 'meta-data').write_text(f'instance-id: {uuid.uuid4()}\nlocal-hostname: {name}\n')
-        (seed / 'user-data').write_text(GUEST_SETUP.replace('@BASE@', base).replace('@HASH@', args.manifest_hash))
+        pause = 'agent-office-release pause' if '-rc.' in args.tag else ''
+        (seed / 'user-data').write_text(GUEST_SETUP.replace('@BASE@', base).replace('@HASH@', args.manifest_hash)
+                                        .replace('@PAUSE@', pause))
         iso = work / 'seed.raw'
         run('genisoimage', '-quiet', '-R', '-J', '-V', 'CIDATA', '-o', str(iso), str(seed))
         # qm create reserves the ID cluster-wide; never reconfigure or destroy an existing VM.
@@ -208,6 +211,8 @@ def main():
                   'Log nel guest: /var/log/cloud-init-output.log', file=sys.stderr)
             raise
     print(f'VM {vmid} pronta: https://{ip}/')
+    print(f'Forgejo privato: https://{ip}:8443/ (utente forgejo-admin)')
+    print(f'Password Forgejo dal nodo: qm guest exec {vmid} -- cat /etc/agent-office-release/forgejo/admin-password')
     print(f'Password applicativa dal nodo: qm guest exec {vmid} -- grep ^AGENT_OFFICE_PASSWORD= /etc/agent-office-palace.env')
 
 

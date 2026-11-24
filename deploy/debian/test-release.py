@@ -37,6 +37,29 @@ class ProxyTest(unittest.TestCase):
         self.assertEqual(proxy.forgejo_settings(result, '10.8.6.5'), result)
 
 
+class PackageBoundaryTest(unittest.TestCase):
+    def test_rejects_runtime_identity_and_private_paths_in_compressed_assets(self):
+        import gzip
+        import runpy
+        policy = runpy.run_path(str(Path(__file__).with_name('check-delivery.py')))
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for name in policy['TOP'] - {'bin', 'dist'}:
+                (root / name).write_text('test')
+            (root / 'bin').mkdir()
+            public = root / 'dist/public'
+            public.mkdir(parents=True)
+            policy['check'](root, set())
+            secret = public / 'auth.json'
+            secret.write_text('{}')
+            with self.assertRaises(ValueError):
+                policy['check'](root, set())
+            secret.unlink()
+            (public / 'model.glb.gz').write_bytes(gzip.compress(b'C:/Users/example/Documents/export'))
+            with self.assertRaises(ValueError):
+                policy['check'](root, set())
+
+
 class ReleaseTest(unittest.TestCase):
     def setUp(self):
         tmp = tempfile.TemporaryDirectory()

@@ -13,7 +13,9 @@ import { openPromptEditor, rewrittenPrompts } from './prompts';
 import { outsideSetting } from './settings-sky';
 import { choiceRow } from './settings-rows';
 import { languageSelect } from './language';
+import { floorManagementPanel } from './floor-management';
 import { connectionsPanel } from './connections';
+import { pluginsPanel } from './plugins';
 import { receptionSignPanel } from '../features/reception-sign/ui';
 import { agentManagementPanel } from './agent-management';
 import { loadGraphics, saveGraphics, type GraphicsQuality, type RenderRate } from '../graphics-settings';
@@ -26,7 +28,7 @@ const VIEWS: [ViewMode, string, string][] = [
 const WEBHOOK_NAME: Record<WebhookKind, string> = { slack: 'Slack', discord: 'Discord', other: uiText('a webhook') };
 
 /** The categories down the side of ⚙️ Settings. */
-export type SettingsPane = 'you' | 'language' | 'graphics' | 'sound' | 'notify' | 'building' | 'atrium-logo' | 'workers' | 'connections' | 'management';
+export type SettingsPane = 'you' | 'language' | 'graphics' | 'sound' | 'notify' | 'building' | 'atrium-logo' | 'workers' | 'connections' | 'management' | 'floors' | 'plugins';
 
 const PANES: { id: SettingsPane; icon: string; label: string; blurb: string }[] = [
   { id: 'language', icon: '🌐', label: uiText('Language'), blurb: uiText('Choose the language of this interface.') },
@@ -35,10 +37,12 @@ const PANES: { id: SettingsPane; icon: string; label: string; blurb: string }[] 
   { id: 'sound', icon: '🔊', label: uiText('Sound & voice'), blurb: uiText('How loud the office is for you, and how voice chat works.') },
   { id: 'notify', icon: '🔔', label: uiText('Notifications'), blurb: uiText('Hear about a worker that needs someone, or finished, while you’re somewhere else.') },
   { id: 'building', icon: '🏢', label: uiText('Building'), blurb: uiText('The sky and where new floors are cloned.') },
+  { id: 'floors', icon: '🗂️', label: uiText('Floor management'), blurb: uiText('Office repositories and workspace folders.') },
   { id: 'atrium-logo', icon: '🖼️', label: uiText('Atrium logo'), blurb: uiText('Centered text or your company logo, visible to everyone in the building.') },
   { id: 'workers', icon: '🤖', label: uiText('Workers'), blurb: uiText('What workers start on, how many run at once, when they go home and what the office tells them.') },
   { id: 'management', icon: '👥', label: uiText('Agent management'), blurb: uiText('Individual agents, properties and repository identities across all offices.') },
   { id: 'connections', icon: '🔗', label: uiText('GitHub and Forgejo'), blurb: uiText('Servers, accounts and remote repositories.') },
+  { id: 'plugins', icon: '🧩', label: 'Plugin & Skills', blurb: uiText('Connected tools and skills are available to every agent.') },
 ];
 
 /** Who a setting is for, shown by its name: some are yours alone, some the whole office's. */
@@ -475,6 +479,8 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
   signOut.addEventListener('click', () => { if (canDismiss()) onSignOut(); });
   const character = h('button.btn', { type: 'button' }, uiText('🧍 Your character'));
   const connections = store.me.admin ? connectionsPanel() : undefined;
+  const plugins = store.me.admin ? pluginsPanel() : undefined;
+  const floors = store.me.admin ? floorManagementPanel() : undefined;
   const managementActions = h('div.agent-management-actions');
   const management = store.me.admin ? agentManagementPanel(managementActions, true) : undefined;
   const receptionSign = receptionSignPanel();
@@ -483,7 +489,9 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
       setting(uiText('Visual quality'), 'device', qualityRow, h('p.setting-note', {}, uiText('High preserves the current appearance. Balanced reduces resolution and shadow detail. Economy also disables shadows and outlines.'))),
       setting(uiText('Rendering frequency'), 'device', rateRow, h('p.setting-note', {}, uiText('The limit affects only drawing the 3D world. Collaboration and audio continue normally. The world behind an open dialog is drawn at 15 FPS.'))),
     ],
+    floors: [floors?.element ?? h('p', {}, uiText('Administrator access required'))],
     connections: [connections?.element ?? h('p', {}, uiText('Administrator access required'))],
+    plugins: [plugins?.element ?? h('p', {}, uiText('Administrator access required'))],
     management: [management?.element ?? h('p', {}, uiText('Administrator access required'))],
     'atrium-logo': [receptionSign.element],
     language: [setting(uiText('Language'), 'you',
@@ -528,11 +536,13 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
   }
   const show = (id: SettingsPane) => {
     lastPane = id;
-    apply.element.hidden = ['atrium-logo', 'connections', 'management'].includes(id);
+    apply.element.hidden = ['atrium-logo', 'connections', 'management', 'floors', 'plugins'].includes(id);
     managementActions.hidden = id !== 'management';
+    if (id === 'floors') floors?.load();
+    if (id === 'plugins') void plugins?.load();
     if (id === 'management') management?.load();
     if (id === 'atrium-logo') receptionSign.load();
-    el.classList.toggle('settings-wide', id === 'connections' || id === 'management');
+    el.classList.toggle('settings-wide', ['floors', 'connections', 'management', 'plugins'].includes(id));
     for (const [t, tab] of tabs) {
       tab.classList.toggle('on', t === id);
       tab.setAttribute('aria-selected', String(t === id));
@@ -562,12 +572,12 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
   const offLimit = [store.on('machine', paintLimit), store.on('me', paintLimit)];
   const offDir = [store.on('projectsDir', paintDir), store.on('me', paintDir)];
   const offPrompts = [store.on('prompts', paintAgent), store.on('prompts', paintPrompts), store.on('me', paintAgent), store.on('me', paintPrompts)];
-  const canDismiss = () => (management?.canDismiss() ?? true) && apply.canDismiss();
+  const canDismiss = () => (floors?.canDismiss() ?? true) && (management?.canDismiss() ?? true) && apply.canDismiss();
   const modal = openModal(el, {
     canDismiss,
     doing: uiText('⚙️ in settings'),
     onClose: () => {
-      connections?.dispose(); management?.dispose();
+      connections?.dispose(); management?.dispose(); floors?.dispose(); plugins?.dispose();
       receptionSign.dispose();
       offNotify();
       sky?.off();

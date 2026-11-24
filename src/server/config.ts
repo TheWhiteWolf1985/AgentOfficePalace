@@ -163,7 +163,7 @@ Options:
 
 Started in a terminal, the office opens in your browser already signed in, with
 a link that works once. Only this machine can reach it unless you pass --host.
-For the supported Debian application deployment, see deploy/debian/README.md.
+For the supported Debian application deployment, see deploy/debian/DISTRIBUZIONE.md.
 
 Voice and screen sharing need a secure context: use https (a reverse proxy,
 --tls-cert/--tls-key or --self-signed) unless everyone is on localhost.

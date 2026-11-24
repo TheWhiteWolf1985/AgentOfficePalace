@@ -118,9 +118,20 @@ export class Auth {
   }
 
   fromRequest(req: IncomingMessage): Session | undefined {
+    return this.verify(this.requestToken(req));
+  }
+
+  /** Bind plugin consent to this specific Office login without giving the broker a login credential. */
+  pluginBrowserBinding(req: IncomingMessage): string | undefined {
+    const token = this.requestToken(req);
+    if (!token || !this.verify(token)) return undefined;
+    return createHmac('sha256', this.accountKey).update('plugin-oauth\0').update(token).digest('base64url');
+  }
+
+  private requestToken(req: IncomingMessage): string | undefined {
     const cookies = parseCookies(req.headers.cookie), name = cookieName(req);
-    if (Object.hasOwn(cookies, name)) return this.verify(cookies[name]);
-    if (this.isSecureSibling(req)) return this.verify(cookies[`${COOKIE_NAME}_${this.secureSibling!.primary}`]);
+    if (Object.hasOwn(cookies, name)) return cookies[name];
+    if (this.isSecureSibling(req)) return cookies[`${COOKIE_NAME}_${this.secureSibling!.primary}`];
     return undefined;
   }
 

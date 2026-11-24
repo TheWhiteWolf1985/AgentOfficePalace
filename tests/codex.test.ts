@@ -9,6 +9,7 @@ import {
   CODEX_HOOK_EVENTS,
   codexAtEmptyPrompt,
   codexHookArgs,
+  dockerCodexConfig,
   codexModelArgs,
   normalizeCodexHook,
   validateCodexHook,
@@ -147,4 +148,15 @@ test('resumed Codex is ready only at its empty visible prompt', () => {
   assert.equal(codexAtEmptyPrompt('login required\nEnter your code:'), false);
   assert.equal(codexAtEmptyPrompt('Approve this command?\n1. Yes\n2. No'), false);
   assert.equal(codexAtEmptyPrompt('Ask Codex to do anything in documentation'), false);
+  const composer = '› Ask Codex to do anything';
+  for (const overlay of ['loading', 'Trust this folder?\n› 1. Trust and continue', 'Hooks need review\n› 1. Review hooks']) {
+    assert.equal(codexAtEmptyPrompt(composer + '\n' + overlay), false);
+  }
+});
+
+test('Docker preconfigures exactly its workspace and the Office lifecycle hooks', () => {
+  const lines = dockerCodexConfig().trim().split('\n');
+  assert.equal(lines.shift(), 'projects."/workspace".trust_level = "trusted"');
+  assert.deepEqual(lines, CODEX_HOOK_EVENTS.map(event =>
+    `hooks.${event}=[{hooks=[{type="command",command="'/usr/local/bin/node' '/office-bridge/agent-office-codex-hook.cjs' '${event}'",timeout=3}]}]`));
 });

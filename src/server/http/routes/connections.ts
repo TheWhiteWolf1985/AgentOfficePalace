@@ -4,6 +4,7 @@ import { mkdtemp, mkdir, rmdir } from 'node:fs/promises';
 import { TLSSocket } from 'node:tls';
 import { deviceState, dockerRoot, loginContainer, serialWorker } from '../../workers/docker.js';
 import { codexAccounts } from '../../workers/docker-accounts.js';
+import { changeFloor, floorManagement, hasFloorForge } from '../../managed-floors.js';
 import { DESKS } from '../../../shared/layout.js';
 import { connections, repositoryName, checkedId } from '../../connections/store.js';
 import { RemoteApi } from '../../connections/api.js';
@@ -30,6 +31,7 @@ export const connectionsRoute: Route = {
     const store = connections();
     try {
       if (req.method === 'GET') {
+        if (url.searchParams.has('floor-management')) return send(res, 200, floorManagement(ctx));
         if (url.searchParams.has('login')) return send(res, 200, await githubLoginState(checkedId(url.searchParams.get('login'))));
         const floors = [...ctx.floors.values()].map(f => ({ id: f.id, name: f.def.name, dir: f.def.dir,
           project: { ...f.project, agentProviders: managedProviders(f.project.agentProviders) }, workers: f.workers.list() }));
@@ -39,6 +41,10 @@ export const connectionsRoute: Route = {
       }
       const body = JSON.parse(await readBody(req, 65536));
       switch (body.action) {
+        case 'floor-create':
+        case 'floor-update':
+        case 'floor-delete':
+          return send(res, 200, await changeFloor(ctx, body.action, body, session.account?.name ?? 'admin'));
         case 'server': return send(res, 200, store.putServer(body));
         case 'account': return send(res, 200, store.putAccount(body));
         case 'remove': {
@@ -51,6 +57,7 @@ export const connectionsRoute: Route = {
         case 'login': return send(res, 200, startGithubLogin(checkedId(body.serverId), String(body.name ?? '')));
         case 'cancel-login': cancelGithubLogin(checkedId(body.flow)); return send(res, 200, { ok: true });
         case 'container-office': {
+          if (hasFloorForge()) return send(res, 200, await changeFloor(ctx, 'floor-create', body, session.account?.name ?? 'admin'));
           if (!dockerRoot()) throw Error('Docker non configurato');
           const name = String(body.name ?? '').trim();
           if (!name || name.length > 80 || /[\x00-\x1f]/.test(name)) throw Error('Nome ufficio non valido');

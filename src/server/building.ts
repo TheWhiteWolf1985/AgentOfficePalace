@@ -7,17 +7,8 @@ import type { CloneProgress, ProjectsDirState, RepoChoice } from '../shared/prot
 import { CloneRun, dropLog, whyCloneFailed, type CloneEnd, type CloneRunOptions } from './clone.js';
 import { gh } from './github.js';
 
-/** A floor as floors.json keeps it. */
-export interface FloorDef {
-  id: string;
-  name: string;
-  /** owner/name on GitHub. */
-  repo?: string;
-  dir: string;
-  palette: number;
-  addedBy: string;
-  addedAt: number;
-}
+import { writeFloorRegistry, type FloorDef } from './floor-registry.js';
+export type { FloorDef } from './floor-registry.js';
 
 /** A projects folder picked in ⚙️ Settings (or with --projects), as projects-folder.json keeps it. */
 interface PickedDir {
@@ -148,12 +139,22 @@ export class Building {
   }
 
   /** Register a checkout cloned through an explicitly selected Git service. */
-  attach(dir: string, name: string, repo: string, by: string): FloorDef {
+  attach(dir: string, name: string, repo: string, by: string, forgejoId?: number): FloorDef {
     if (this.defs.length >= MAX_FLOORS || this.defs.some((d) => path.resolve(d.dir) === path.resolve(dir))) throw Error('Ufficio gia presente o edificio pieno');
     const def = this.newDef(name.slice(0, 100), repo, dir, by);
-    this.defs.push(def);
-    this.save();
+    if (forgejoId !== undefined) def.forgejoId = forgejoId;
+    this.saveDefinitions([...this.defs, def]);
     return def;
+  }
+
+  replace(def: FloorDef) {
+    if (!this.defs.some(f => f.id === def.id)) throw Error('Piano non trovato');
+    this.saveDefinitions(this.defs.map(f => f.id === def.id ? def : f));
+  }
+
+  private saveDefinitions(defs: FloorDef[]) {
+    writeFloorRegistry(this.file, defs);
+    this.defs = defs;
   }
 
   /** Floors on their way: shown in the elevator, but nobody can ride there yet. */
@@ -274,12 +275,11 @@ export class Building {
   remove(id: string, by = '?'): FloorDef | string {
     const def = this.defs.find((d) => d.id === id);
     if (!def) return this.pendingFloor(id) ? "That floor is still being cloned — stop it, or take it off once it's there" : 'No such floor';
-    this.defs = this.defs.filter((d) => d !== def);
+    this.saveDefinitions(this.defs.filter((d) => d !== def));
     if (this.isLocal(id)) {
       this.localId = undefined;
       this.setLocalOff({ dir: def.dir, by, at: Date.now() });
     }
-    this.save();
     return def;
   }
 
@@ -414,6 +414,7 @@ export class Building {
           id: s.id,
           name: typeof s.name === 'string' && s.name ? s.name.slice(0, 100) : path.basename(s.dir),
           repo: normalizeRepo(s.repo),
+          ...(Number.isSafeInteger(s.forgejoId) ? { forgejoId: s.forgejoId } : {}),
           dir: s.dir,
           palette: Number.isInteger(s.palette) && (s.palette as number) >= 0 ? (s.palette as number) : 0,
           addedBy: typeof s.addedBy === 'string' ? s.addedBy : '?',
@@ -459,7 +460,7 @@ export class Building {
 
   private save() {
     try {
-      writeFileSync(this.file, JSON.stringify(this.defs, null, 2), { mode: 0o600 });
+      writeFloorRegistry(this.file, this.defs);
     } catch (err) {
       console.error(`agent-office: couldn't save the floors: ${(err as Error).message}`);
     }

@@ -14,15 +14,20 @@ fi
 work=$(mktemp -d)
 trap 'rm -rf -- "$work"' EXIT
 args=()
+tag='@RELEASE_TAG@'
+manifest_hash='@MANIFEST_SHA256@'
 if [[ $# == 1 ]]; then
   src=$(realpath "$1")
   cp "$src/release.json" "$src/agent-office-release.py" "$work/"
   args=(--from-dir "$src")
 else
   repo=https://github.com/TheWhiteWolf1985/AgentOfficePalace/releases
-  curl --fail --silent --show-error --location --proto '=https' "$repo/latest/download/release.json" -o "$work/release.json"
-  tag=$(python3 -c 'import json,re,sys;v=json.load(open(sys.argv[1]))["version"];assert re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+",v);print("v"+v)' "$work/release.json")
-  curl --fail --silent --show-error --location --proto '=https' "$repo/download/$tag/agent-office-release.py" -o "$work/agent-office-release.py"
+  for file in release.json agent-office-release.py agent-office-linux-amd64.tgz codex-agent-linux-amd64.tgz; do
+    curl --fail --silent --show-error --location --retry 3 --proto '=https' --proto-redir '=https' "$repo/download/$tag/$file" -o "$work/$file"
+  done
+  args=(--from-dir "$work")
 fi
+printf '%s  %s\n' "$manifest_hash" "$work/release.json" | sha256sum -c -
 (cd "$work" && python3 -c 'import hashlib,json; f="agent-office-release.py"; assert hashlib.sha256(open(f,"rb").read()).hexdigest()==json.load(open("release.json"))["sha256"][f], "Checksum installatore errato"')
 python3 "$work/agent-office-release.py" install "${args[@]}"
+if [[ $tag == *-rc.* ]]; then agent-office-release pause; fi

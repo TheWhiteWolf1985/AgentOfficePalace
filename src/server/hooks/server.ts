@@ -4,7 +4,7 @@ import http from 'node:http';
 import { connect } from 'node:net';
 import { chmodSync, copyFileSync, renameSync, lstatSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { writeCodexHook } from '../codex.js';
+import { dockerCodexConfig, writeCodexHook } from '../codex.js';
 import { binScript } from '../workers/process.js';
 import { dockerRoot } from '../workers/docker.js';
 import type { Ctx } from '../office/context.js';
@@ -39,10 +39,15 @@ export async function startHookServer(ctx: Ctx): Promise<{ hookServer: http.Serv
     }
     const token = (req.headers.authorization ?? '').replace(/^Bearer\s+/i, '');
     const workerId = url.searchParams.get('worker') ?? '';
-    const workers = ctx.workerFloor(workerId)?.workers;
-    if (!workers) return send(res, 401, {});
+    const floor = ctx.workerFloor(workerId);
+    if (!floor) return send(res, 401, {});
+    const workers = floor.workers;
     const event = url.searchParams.get('event') ?? '';
     const ok = workers.handleProviderHook(route as AgentProvider, workerId, token, event, payload);
+    if (ok && route === 'codex' && workers.get(workerId)?.runtime === 'docker' && payload && typeof payload === 'object') {
+      const requestId = floor.peerRequests.hook(workerId, workers.ownerOf(workerId), event, payload);
+      return send(res, 200, { requestId });
+    }
     send(res, ok ? 200 : 401, {});
   });
   // Workers' terminals outlive a restart of the office (see ptys.ts) with this address in their
@@ -84,12 +89,17 @@ export async function startHookServer(ctx: Ctx): Promise<{ hookServer: http.Serv
     }
     const script = binScript('office-workers.js');
     if (!script) throw Error('Missing office-workers command');
+    const configDir = path.join(bridge, 'codex-system');
+    mkdirSync(configDir, { recursive: true, mode: 0o700 });
+    const config = path.join(configDir, 'config.toml');
+    writeFileSync(config + '.tmp', dockerCodexConfig(), { mode: 0o600 });
+    renameSync(config + '.tmp', config);
     const dest = path.join(bridge, 'office-workers.mjs');
     copyFileSync(script, dest + '.tmp');
     renameSync(dest + '.tmp', dest);
     const local = http.createServer((req, res) => {
       const route = req.url?.split('?')[0];
-      if ((req.method === 'GET' && route === '/office/workers') || (req.method === 'POST' && route === '/office/workers/tell')) {
+      if ((req.method === 'GET' && route === '/office/workers') || (req.method === 'POST' && ['/office/workers/tell', '/office/workers/result', '/office/workers/reply', '/office/workers/tools', '/office/workers/use'].includes(route ?? ''))) {
         const url = new URL(req.url!, 'http://localhost');
         void officeWorkers(ctx, req, res, url, true).catch(() => send(res, 500, { error: 'Delivery failed' }));
         return;

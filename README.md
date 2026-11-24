@@ -11,7 +11,7 @@ Applicazione collaborativa con frontend TypeScript/Three.js e backend Node.js. C
 - Account, ruoli e preferenze personali; collegamenti GitHub/Forgejo.
 - Profili grafici, caricamento differito e risorse statiche compresse.
 
-Ogni agente Codex dispone di un proprio container Docker rootless e di un workspace persistente. Per installare il software su una VM Debian 13 amd64, seguire la [guida alla distribuzione stabile](deploy/debian/DISTRIBUZIONE.md).
+Ogni agente Codex dispone di un proprio container Docker rootless e di un workspace persistente. Per installare il software su una VM Debian 13 amd64, seguire la [guida all’installazione](deploy/debian/DISTRIBUZIONE.md).
 
 ## Sviluppo e verifiche
 
@@ -30,13 +30,12 @@ Per lo sviluppo interattivo: `npm run dev`. Per avviare la build compilata:
 node bin/agent-office.js --home /percorso/dati --host 127.0.0.1 --port 4600 --no-open
 ```
 
-Impostare `AGENT_OFFICE_PASSWORD` nell'ambiente del processo oppure configurare gli account dell'applicazione. Dati, credenziali e configurazioni locali restano esterni al checkout. I dettagli dell'avvio nativo usato dal progetto sono in [deploy/debian/README.md](deploy/debian/README.md); le opzioni applicative in [docs/configuration.md](docs/configuration.md). Per voce e schermo al di fuori di localhost è richiesto un contesto HTTPS sicuro.
+Impostare `AGENT_OFFICE_PASSWORD` nell'ambiente del processo oppure configurare gli account dell'applicazione. Dati, credenziali e configurazioni locali restano esterni al checkout. Le istruzioni per la VM sono in [deploy/debian/DISTRIBUZIONE.md](deploy/debian/DISTRIBUZIONE.md); le opzioni applicative in [docs/configuration.md](docs/configuration.md). Per voce e schermo al di fuori di localhost è richiesto un contesto HTTPS sicuro.
 
 Forgejo ospita lo sviluppo. Il branch GitHub `main` ne rispecchia il codice e il branch `release` identifica le versioni distribuite. Nelle installazioni gestite il timer Debian controlla le release stabili. L'istanza di sviluppo può continuare a usare il checkout e i deploy di prova.
 
 ## Repository e documentazione
 
-- Forgejo: `ssh://git@192.168.1.8/Juri/AgentOfficePalace.git`.
 - GitHub: `git@github.com:TheWhiteWolf1985/AgentOfficePalace.git`.
 - [Struttura del codice](docs/code-layout.md), [funzionamento](docs/how-it-works.md), [funzioni](docs/features.md) e [comandi](docs/controls.md).
 - [Atrio](docs/atrium.md), [Sala server](docs/server-room.md), [Sala riunioni](docs/conference-room.md), [avatar](docs/user-character.md), [prestazioni](docs/performance.md) e [connessioni](docs/connections.md).

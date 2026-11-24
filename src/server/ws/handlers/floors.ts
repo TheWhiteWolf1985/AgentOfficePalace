@@ -4,6 +4,7 @@ import type { FloorClientMsg } from '../../../shared/protocol.js';
 import { LOBBY, ROOF, SERVER_ROOM } from '../../../shared/rooftop.js';
 import { arrivalSpot, str } from '../../office/input.js';
 import type { HandlerMap, ViewPieces } from './types.js';
+import { hasFloorForge } from '../../managed-floors.js';
 
 export const projectView: ViewPieces['project'] = (_ctx, floor) => floor?.project ?? null;
 
@@ -26,6 +27,7 @@ export const floorHandlers = {
     );
   },
   'floor.add'(ctx, c, msg) {
+    if (hasFloorForge()) return ctx.warn(c, 'Aprire Impostazioni → Gestione piani per aggiungere un ufficio');
     const who = c.peer.name;
     const repo = str(msg.repo, 200);
     void ctx.building
@@ -61,6 +63,7 @@ export const floorHandlers = {
     const who = c.peer.name;
     // Everyone's workers on it stop: admins do it.
     if (!ctx.meOf(c.accountId).admin) return ctx.warn(c, 'Only admins can take a floor off the building');
+    if (hasFloorForge()) return ctx.warn(c, 'Aprire Gestione piani per scegliere se conservare il repository');
     const id = str(msg.floor, 64);
     const r = ctx.building.remove(id, who);
     if (typeof r === 'string') return ctx.warn(c, r);

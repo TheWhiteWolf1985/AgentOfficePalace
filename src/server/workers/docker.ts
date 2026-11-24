@@ -38,6 +38,7 @@ export function dockerWorkspace(id: string): string | undefined {
   return undefined;
 }
 export const dockerHome = (id: string) => path.join(paths(id).home, '.codex');
+export const dockerDrops = (id: string) => paths(id).drops;
 export function dockerDrop(id: string, name: string, type: string, body: Buffer) {
   const p = paths(id);
   const file = new DropStore(dockerRoot()!).save(id, name, type, body);
@@ -49,8 +50,8 @@ export function dockerPrefix(): string[] {
   return ['--host', 'unix://' + file];
 }
 const cliEnv = () => ({ PATH: '/usr/local/bin:/usr/bin:/bin', LANG: 'C.UTF-8' });
-async function docker(args: string[]) {
-  try { return (await exec('docker', [...dockerPrefix(), ...args], { env: cliEnv(), timeout: 30000, maxBuffer: 1024 * 1024 })).stdout.trim(); }
+export async function docker(args: string[], timeout = 30_000) {
+  try { return (await exec('docker', [...dockerPrefix(), ...args], { env: cliEnv(), timeout, maxBuffer: 1024 * 1024 })).stdout.trim(); }
   catch (e) {
     // execFile's error message includes argv, including the worker hook token. Only expose the daemon's diagnostic.
     const diagnostic = String((e as {stderr?: string}).stderr || '').trim().split('\n').at(-1);
@@ -125,6 +126,7 @@ export async function prepareContainer(info: WorkerInfo, project: string, token:
       '--mount', 'type=bind,src=' + p.home + ',dst=' + p.home,
       '--mount', 'type=bind,src=' + p.drops + ',dst=/office-drops,readonly',
       '--mount', 'type=bind,src=' + p.bridge + ',dst=/office-bridge,readonly',
+      '--mount', 'type=bind,src=' + path.join(p.bridge, 'codex-system') + ',dst=/etc/codex,readonly',
       '--env', 'HOME=' + p.home, '--env', 'CODEX_HOME=' + dockerHome(info.id),
       '--env', 'TERM=xterm-256color', '--env', 'AGENT_OFFICE_WORKER_ID=' + info.id,
       '--env', 'AGENT_OFFICE_HOOK_TOKEN=' + token, '--env', 'AGENT_OFFICE_HOOK_SOCKET=/office-bridge/hooks.sock',

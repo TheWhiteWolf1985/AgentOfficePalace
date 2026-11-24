@@ -13,6 +13,7 @@ import { serviceRoutes } from './services.js';
 import { receptionSignRoute } from './reception-sign.js';
 import { connectionsRoute } from './connections.js';
 import { preferencesRoute } from './preferences.js';
+import { pluginsRoute } from './plugins.js';
 
 export const routes: readonly Route[] = [
   // Anyone.
@@ -34,6 +35,7 @@ export const routes: readonly Route[] = [
   serverRoomRoute,
   preferencesRoute,
   connectionsRoute,
+  pluginsRoute,
   receptionSignRoute,
   agentRoutes.models,
   agentRoutes.queueTargets,

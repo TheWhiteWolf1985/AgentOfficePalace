@@ -1,10 +1,17 @@
-import { chmodSync, mkdirSync, writeFileSync } from 'node:fs';
+import { chmodSync, mkdirSync, renameSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import type { AgentEffort } from '../shared/providers.js';
 
 /** A resumed Codex session can reach its empty prompt without sending SessionStart. */
 export function codexAtEmptyPrompt(screen: string): boolean {
-  return /(?:^|\n)\s*[›>]\s*Ask Codex to do anything\s*(?:\n|$)/.test(screen);
+  return /(?:^|\n)\s*[›>]\s*Ask Codex to do anything\s*(?:\n|$)/.test(screen)
+    && !/^\s*loading(?:…|\.\.\.)?\s*$/im.test(screen) && !codexStartupDialog(screen);
+}
+
+/** A visible first-run dialog can temporarily cover an already rendered composer. */
+export function codexStartupDialog(screen: string): boolean {
+  return (/Trust this folder\?/i.test(screen) && /1\.\s*Trust and continue/i.test(screen))
+    || (/Hooks need review/i.test(screen) && /1\.\s*Review hooks/i.test(screen));
 }
 
 export const CODEX_HOOK_EVENTS = [
@@ -95,14 +102,24 @@ function shellQuote(value: string): string {
  * Build the CLI config overrides for all lifecycle hooks. The command is encoded as a TOML basic
  * string so paths containing spaces remain valid; the command itself is shell-quoted.
  */
-export function codexHookArgs(hookPath: string, node = process.execPath): string[] {
-  const args: string[] = [];
-  for (const event of CODEX_HOOK_EVENTS) {
+function codexHookSettings(hookPath: string, node: string): string[] {
+  return CODEX_HOOK_EVENTS.map(event => {
     const command = [node, hookPath, event].map(shellQuote).join(' ');
-    const config = `hooks.${event}=[{hooks=[{type="command",command=${JSON.stringify(command)},timeout=3}]}]`;
-    args.push('-c', config);
-  }
-  return args;
+    return `hooks.${event}=[{hooks=[{type="command",command=${JSON.stringify(command)},timeout=3}]}]`;
+  });
+}
+
+export function codexHookArgs(hookPath: string, node = process.execPath): string[] {
+  return codexHookSettings(hookPath, node).flatMap(setting => ['-c', setting]);
+}
+
+/** System configuration for the private workspace and the read-only Office bridge in Docker. */
+export function dockerCodexConfig(): string {
+  return [
+    'projects."/workspace".trust_level = "trusted"',
+    ...codexHookSettings('/office-bridge/agent-office-codex-hook.cjs', '/usr/local/bin/node'),
+    '',
+  ].join('\n');
 }
 
 /**
@@ -126,10 +143,22 @@ export function codexModelArgs(args: string[], model?: string, effort?: AgentEff
 export function writeCodexHook(dataDir: string): string {
   mkdirSync(dataDir, { recursive: true, mode: 0o700 });
   const file = path.join(dataDir, 'agent-office-codex-hook.cjs');
-  writeFileSync(file, CODEX_HOOK_SOURCE, { mode: 0o600 });
-  chmodSync(file, 0o600);
+  writeFileSync(file + '.tmp', CODEX_HOOK_SOURCE, { mode: 0o600 });
+  chmodSync(file + '.tmp', 0o600);
+  renameSync(file + '.tmp', file);
   return file;
 }
+
+const officeToolInstructions = [
+  'Office plugins and skills run in the shared Plugin & Skills container.',
+  'For PDFs, OCR, scans, attachments or connected services, first call agent-office.list_office_tools.',
+  'Read the matching skill and invoke its operations with agent-office.use_office_tool. Pass the original attachment path.',
+  'If MCP tools are deferred, search for the agent-office tools. If the two tools are missing from this session,',
+  'tell the user to stop and start this agent from Settings > Agent management after the current turn, so Codex reloads the office tools.',
+  'The sandboxed shell is not a substitute for MCP. Do not request elevated permissions for a connector.',
+  'Save requested Markdown under /workspace for this floor’s Documenti.',
+  'If the catalogue or required tool is unavailable, report it. Do not download, unpack or install substitute tools in the agent.',
+].join(' ');
 
 /** The helper only reads bounded hook stdin and the worker bridge environment. */
 export const CODEX_HOOK_SOURCE = String.raw`'use strict';
@@ -182,10 +211,33 @@ process.stdin.on('end', async () => {
     url.searchParams.set('worker', worker);
     url.searchParams.set('event', event);
     if (socket) {
-      const req = require('node:http').request({ socketPath: socket, path: url.pathname + url.search,
-        method: 'POST', headers: { authorization: 'Bearer ' + token, 'content-type': 'application/json' },
-        signal: AbortSignal.timeout(2000) }, res => { res.resume(); finish(res.statusCode === 200); });
-      req.on('error', () => finish(false)); req.end(JSON.stringify(body)); return;
+      const signal = AbortSignal.timeout(2000);
+      const post = (path, data) => new Promise((resolve, reject) => {
+        const req = require('node:http').request({ socketPath: socket, path, method: 'POST', signal,
+          headers: { authorization: 'Bearer ' + token, 'content-type': 'application/json' } }, async res => {
+          try {
+            let text = '';
+            for await (const chunk of res) { text += chunk; if (text.length > 2048) throw Error('Invalid hook response'); }
+            if (res.statusCode !== 200) throw Error('Hook refused');
+            resolve(JSON.parse(text || '{}'));
+          } catch (err) { reject(err); }
+        });
+        req.on('error', reject); req.end(JSON.stringify(data));
+      });
+      const ack = await post(url.pathname + url.search, body);
+      if (event === 'Stop' && typeof ack.requestId === 'string') {
+        const text = typeof input.last_assistant_message === 'string' ? input.last_assistant_message.trim() : '';
+        const reply = text.length > MAX_TEXT ? text.slice(0, MAX_TEXT - 16) + ' […]' : text;
+        await post('/office/workers/reply?worker=' + encodeURIComponent(worker), { requestId: ack.requestId, reply });
+      }
+      if (event === 'UserPromptSubmit') {
+        // This hook runs for existing terminals too, including those with an older cached MCP tool list.
+        process.stdout.write(JSON.stringify({ hookSpecificOutput: {
+          hookEventName: event, additionalContext: ${JSON.stringify(officeToolInstructions)},
+        } }));
+        return;
+      }
+      return finish(true);
     }
     const response = await fetch(url, {
       method: 'POST',

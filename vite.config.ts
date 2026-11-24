@@ -37,7 +37,16 @@ function excalidrawFonts(): Plugin {
 export default defineConfig({
   root: resolve(import.meta.dirname, 'src/client'),
   publicDir: resolve(import.meta.dirname, 'src/client/public'),
-  plugins: [excalidrawFonts()],
+  plugins: [excalidrawFonts(), {
+    name: 'office-whiteboard-local-storage',
+    enforce: 'pre',
+    transform(code, id) {
+      // Office stores whiteboards itself. Drop the upstream demo Firebase configuration.
+      if (id.includes('/@excalidraw/excalidraw/') && code.includes('VITE_APP_FIREBASE_CONFIG')) {
+        return code.replace(/VITE_APP_FIREBASE_CONFIG:'\{[^']*\}'/g, "VITE_APP_FIREBASE_CONFIG:'{}'");
+      }
+    },
+  }],
   define: {
     __EXCALIDRAW_ASSETS__: JSON.stringify(EXCALIDRAW_ASSETS),
   },

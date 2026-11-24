@@ -22,6 +22,8 @@ magic, version, length = struct.unpack_from('<4sII', asset)
 assert magic == b'glTF' and version == 2 and length == len(asset)
 json_size = struct.unpack_from('<I', asset, 12)[0]
 gltf = json.loads(asset[20:20 + json_size])
+for scene in gltf.get('scenes', []):
+    scene.get('extras', {}).pop('atrio_output', None)
 nodes = gltf['nodes']
 by_name = {n['name']: i for i, n in enumerate(nodes)}
 removed = set()

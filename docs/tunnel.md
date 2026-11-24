@@ -35,7 +35,7 @@ The **🌐 Services** board in the office shows the command for the way you came
 
 ## Application command
 
-Use the command from the verified compiled application package or checkout; see [the native deployment](../deploy/debian/README.md). No agent CLI or host provisioning is installed by this command.
+Use the command from the verified compiled application package or checkout; see [the native deployment](../deploy/debian/DISTRIBUZIONE.md). No agent CLI or host provisioning is installed by this command.
 
 ## Signing in
 

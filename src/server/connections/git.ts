@@ -23,6 +23,7 @@ export function gitEnvironment(store: ConnectionsStore, accountId: string, repos
 export function workerConnections(dir: string, workerId: string, env: Record<string, string>): void {
   const store = connections(), selected = store.selected(dir, workerId);
   if (!selected) return;
+  if (selected.account.id === process.env.AGENT_OFFICE_FLOOR_READER) return;
   for (const key of Object.keys(env)) if (/^(GH_HOST|GH_TOKEN|GITHUB_TOKEN|GH_ENTERPRISE_TOKEN|GITHUB_ENTERPRISE_TOKEN|AGENT_OFFICE_REMOTE_|GIT_CONFIG_)/.test(key)) delete env[key];
   Object.assign(env, gitEnvironment(store, selected.account.id, selected.binding.repository));
   env.GIT_CONFIG_VALUE_1 = execFileSync('git', ['-C', dir, 'remote', 'get-url', 'origin'], { encoding: 'utf8', timeout: 5000 }).trim();
