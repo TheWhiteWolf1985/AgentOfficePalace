@@ -124,7 +124,8 @@ jobs:
           test "$(jq -er .commit delivery/release.json)" = "$GITHUB_SHA"
           if [[ "$GITHUB_REF_TYPE" == tag ]]; then
             [[ "$GITHUB_REF_NAME" == "$TAG"-rc.* ]]
-            gh release create "$GITHUB_REF_NAME" delivery/* --verify-tag --prerelease --latest=false --title "$GITHUB_REF_NAME" --notes "Candidato Proxmox e Debian per il collaudo."
+            git for-each-ref --format='%(contents)' "refs/tags/$GITHUB_REF_NAME" > "$RUNNER_TEMP/release-notes"
+            gh release create "$GITHUB_REF_NAME" delivery/* --verify-tag --prerelease --latest=false --title "$GITHUB_REF_NAME" --notes-file "$RUNNER_TEMP/release-notes"
             exit 0
           fi
           git merge-base --is-ancestor "$GITHUB_SHA" origin/main

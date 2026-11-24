@@ -33,6 +33,7 @@ MANAGER = 'agent-office-release.py'
 TIMER = APP + '-update.timer'
 SERVICE = APP + '.service'
 TAG = re.compile(r'v[0-9]+\.[0-9]+\.[0-9]+')
+PUBLIC_TAG = re.compile(TAG.pattern + r'(?:-rc\.[1-9][0-9]*)?')
 SHA = re.compile(r'[a-f0-9]{64}')
 SLOT = re.compile(TAG.pattern + r'(?:-[a-f0-9]{64})?')
 
@@ -75,7 +76,7 @@ class Redirect(urllib.request.HTTPRedirectHandler):
 
 
 class Release:
-    def __init__(self, offline):
+    def __init__(self, offline, tag=None):
         self.directory = offline
         if offline:
             self.manifest = json.loads((offline / 'release.json').read_text())
@@ -85,20 +86,25 @@ class Release:
             token = ETC / 'github-token'
             if token.exists():
                 self.headers['Authorization'] = 'Bearer ' + token.read_text().strip()
-            with self.get(f'https://api.github.com/repos/{REPO}/releases/latest') as r:
+            if tag is not None and not PUBLIC_TAG.fullmatch(tag):
+                raise ValueError('Tag di aggiornamento non valido')
+            endpoint = 'tags/' + tag if tag else 'latest'
+            with self.get(f'https://api.github.com/repos/{REPO}/releases/{endpoint}') as r:
                 release = json.load(r)
-            if release['draft'] or release['prerelease'] or not TAG.fullmatch(release['tag_name']):
-                raise ValueError('Release stabile non valida')
+            if (release['draft'] or not PUBLIC_TAG.fullmatch(release['tag_name'])
+                    or release['prerelease'] != ('-rc.' in release['tag_name'])
+                    or (release['tag_name'] != tag if tag else release['prerelease'])):
+                raise ValueError('Release pubblicata non valida')
             self.assets = {a['name']: a for a in release['assets']}
             if 'release.json' not in self.assets:
                 raise ValueError('La release pubblicata precede il nuovo installatore Debian')
             with self.get(self.assets['release.json']['url'], binary=True) as r:
                 raw = r.read()
             expected = self.assets['release.json'].get('digest')
-            if expected and expected != 'sha256:' + hashlib.sha256(raw).hexdigest():
+            if (expected or tag) and expected != 'sha256:' + hashlib.sha256(raw).hexdigest():
                 raise ValueError('Checksum del manifest non valido')
             self.manifest = json.loads(raw)
-            if release['tag_name'] != 'v' + self.manifest['version']:
+            if release['tag_name'].split('-')[0] != 'v' + self.manifest['version'] or self.manifest.get('tag', release['tag_name']) != release['tag_name']:
                 raise ValueError('Versione del pacchetto diversa dal tag')
         m = self.manifest
         if (m['schema'] != 1 or m['platform'] != 'debian13-amd64' or not TAG.fullmatch('v' + m['version'])
@@ -363,6 +369,12 @@ def healthy():
     return False
 
 
+def prepare_dashboard(target):
+    helper = target / 'distribution/office-updates.py'
+    if helper.is_file():
+        run(sys.executable, '-I', helper, 'install')
+
+
 def start(target):
     link(ROOT / 'current', target)
     if subprocess.run(['systemctl', 'is-failed', '--quiet', SERVICE]).returncode == 0:
@@ -457,6 +469,7 @@ def main():
             if a.action == 'install':
                 prepare_host()
             stage(release)
+            prepare_dashboard(release.target)
             try:
                 activate(release.target)
             except Exception:

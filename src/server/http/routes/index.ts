@@ -13,6 +13,7 @@ import { serviceRoutes } from './services.js';
 import { receptionSignRoute } from './reception-sign.js';
 import { connectionsRoute } from './connections.js';
 import { preferencesRoute } from './preferences.js';
+import { updateActivity, updatesRoute } from './updates.js';
 import { pluginsRoute } from './plugins.js';
 
 export const routes: readonly Route[] = [
@@ -25,6 +26,7 @@ export const routes: readonly Route[] = [
   authRoutes.link,
   authRoutes.logout,
   pageRoutes.health,
+  updateActivity,
   pageRoutes.assets,
   pageRoutes.login,
   pageRoutes.claim,
@@ -36,6 +38,7 @@ export const routes: readonly Route[] = [
   preferencesRoute,
   connectionsRoute,
   pluginsRoute,
+  updatesRoute,
   receptionSignRoute,
   agentRoutes.models,
   agentRoutes.queueTargets,

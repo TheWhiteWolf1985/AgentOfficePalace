@@ -21,6 +21,7 @@ import { toggleFloorMenu } from '../../ui/floormenu';
 import { openHelp } from '../../ui/hud';
 import { mountHud } from '../../ui/menu';
 import { openServices } from '../../ui/services';
+import { watchUpdates } from '../../ui/software-updates';
 import { openSettings, type SettingsPane } from '../../ui/settings';
 import { needsSigningIn, openSignIns } from '../../ui/signins';
 import { openWhiteboard } from '../whiteboard/ui';
@@ -171,6 +172,7 @@ export function installHud(ctx: Ctx, core: CoreState, parts: HudParts) {
     });
   }
 
+  watchUpdates(() => showSettings('updates'));
   return { hud, showSettings, editProfile };
 }
 import { secureMediaUrl } from '../../secure-media';

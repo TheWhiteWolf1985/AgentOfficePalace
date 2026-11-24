@@ -2,6 +2,7 @@ import type { AgentAppearance } from '../shared/agent-appearance';
 import { bootstrapProfile } from './bootstrap-profile';
 import { spaceCapabilities } from '../shared/space-capabilities';
 import './i18n';
+import { watchUpdates } from './ui/software-updates';
 import { openLanguageSettings } from './ui/language';
 import { t as uiText } from '../shared/i18n';
 // The 2D view (/lite): the office without the 3D, for a phone or a computer the 3D office is too
@@ -314,7 +315,8 @@ $('btn-issues').addEventListener('click', () => { if (store.project) openBoard('
 $('btn-pulls').addEventListener('click', () => { if (store.project) openBoard('pulls', net, boardActions()); });
 $('btn-queue').addEventListener('click', () => { if (store.project) openQueue(net, { openTerminal: openWorker }); });
 $('btn-new').addEventListener('click', () => sendToWorker(uiText('✨ New task')));
-$('btn-settings').addEventListener('click', openLanguageSettings);
+$('btn-settings').addEventListener('click', () => openLanguageSettings());
+watchUpdates(() => openLanguageSettings('updates'));
 
 function renderNav() {
   const project = spaceCapabilities(store.floor, !!store.project).project;

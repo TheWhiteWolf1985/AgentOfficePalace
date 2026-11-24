@@ -24,6 +24,7 @@ node -p 'process.release.sourceUrl' > "$work/package/node-source-url"
 curl --fail --silent --show-error --location --proto '=https' "https://raw.githubusercontent.com/nodejs/node/$(node --version)/LICENSE" -o "$work/package/NODE-LICENSE"
 mkdir -p "$work/package/distribution"
 cp deploy/debian/agent-office-release.py "$work/package/distribution/"
+install -m644 deploy/debian/office-updates.py "$work/package/distribution/"
 install -m755 deploy/debian/agent-office-proxy.py "$work/package/distribution/agent-office-proxy.py"
 install -m644 deploy/debian/{office-forgejo.py,register-reader.mjs} "$work/package/distribution/"
 forgejo=forgejo-17.0.2-linux-amd64
@@ -51,7 +52,7 @@ docker save "$image" "$plugin" | gzip -1 > "$out/codex-agent-linux-amd64.tgz"
 python3 deploy/debian/check-images.py "$out/codex-agent-linux-amd64.tgz"
 cp deploy/debian/{agent-office-release.py,install.sh} "$out/"
 python3 - "$out" "$version" "$commit" "$image" "$plugin" <<'PY'
-import hashlib, json, sys, tarfile
+import hashlib, json, os, sys, tarfile
 from pathlib import Path
 out, version, commit, image_tag, plugin = sys.argv[1:]
 root = Path(out)
@@ -74,6 +75,7 @@ for name in ('agent-office-linux-amd64.tgz', 'codex-agent-linux-amd64.tgz', 'age
         assets[name] = hashlib.file_digest(f, 'sha256').hexdigest()
 manifest = dict(schema=1, version=version, commit=commit, platform='debian13-amd64', image=image, sha256=assets)
 manifest['pluginTag'] = plugin
+manifest['tag'] = os.environ.get('PREVIEW_TAG') or 'v' + version
 (root / 'release.json').write_text(json.dumps(manifest, indent=2) + '\n')
 PY
 python3 deploy/proxmox/make-launcher.py "${PREVIEW_TAG:-v$version}" "$out"

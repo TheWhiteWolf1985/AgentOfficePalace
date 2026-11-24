@@ -15,6 +15,8 @@ import { choiceRow } from './settings-rows';
 import { languageSelect } from './language';
 import { floorManagementPanel } from './floor-management';
 import { connectionsPanel } from './connections';
+import { PANES, type SettingsPane } from './settings-panes';
+import { updatesPanel, updatesTitle } from './software-updates';
 import { pluginsPanel } from './plugins';
 import { receptionSignPanel } from '../features/reception-sign/ui';
 import { agentManagementPanel } from './agent-management';
@@ -27,23 +29,7 @@ const VIEWS: [ViewMode, string, string][] = [
 
 const WEBHOOK_NAME: Record<WebhookKind, string> = { slack: 'Slack', discord: 'Discord', other: uiText('a webhook') };
 
-/** The categories down the side of ⚙️ Settings. */
-export type SettingsPane = 'you' | 'language' | 'graphics' | 'sound' | 'notify' | 'building' | 'atrium-logo' | 'workers' | 'connections' | 'management' | 'floors' | 'plugins';
-
-const PANES: { id: SettingsPane; icon: string; label: string; blurb: string }[] = [
-  { id: 'language', icon: '🌐', label: uiText('Language'), blurb: uiText('Choose the language of this interface.') },
-  { id: 'you', icon: '🧍', label: uiText('You'), blurb: uiText('How you look, how you see the office, and how you’re signed in.') },
-  { id: 'graphics', icon: '🖥️', label: uiText('Graphics'), blurb: uiText('Balance visual detail and rendering load on this device.') },
-  { id: 'sound', icon: '🔊', label: uiText('Sound & voice'), blurb: uiText('How loud the office is for you, and how voice chat works.') },
-  { id: 'notify', icon: '🔔', label: uiText('Notifications'), blurb: uiText('Hear about a worker that needs someone, or finished, while you’re somewhere else.') },
-  { id: 'building', icon: '🏢', label: uiText('Building'), blurb: uiText('The sky and where new floors are cloned.') },
-  { id: 'floors', icon: '🗂️', label: uiText('Floor management'), blurb: uiText('Office repositories and workspace folders.') },
-  { id: 'atrium-logo', icon: '🖼️', label: uiText('Atrium logo'), blurb: uiText('Centered text or your company logo, visible to everyone in the building.') },
-  { id: 'workers', icon: '🤖', label: uiText('Workers'), blurb: uiText('What workers start on, how many run at once, when they go home and what the office tells them.') },
-  { id: 'management', icon: '👥', label: uiText('Agent management'), blurb: uiText('Individual agents, properties and repository identities across all offices.') },
-  { id: 'connections', icon: '🔗', label: uiText('GitHub and Forgejo'), blurb: uiText('Servers, accounts and remote repositories.') },
-  { id: 'plugins', icon: '🧩', label: 'Plugin & Skills', blurb: uiText('Connected tools and skills are available to every agent.') },
-];
+export type { SettingsPane } from './settings-panes';
 
 /** Who a setting is for, shown by its name: some are yours alone, some the whole office's. */
 type Scope = 'you' | 'floor' | 'office' | 'device';
@@ -479,6 +465,7 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
   signOut.addEventListener('click', () => { if (canDismiss()) onSignOut(); });
   const character = h('button.btn', { type: 'button' }, uiText('🧍 Your character'));
   const connections = store.me.admin ? connectionsPanel() : undefined;
+  const updates = store.me.admin ? updatesPanel() : undefined;
   const plugins = store.me.admin ? pluginsPanel() : undefined;
   const floors = store.me.admin ? floorManagementPanel() : undefined;
   const managementActions = h('div.agent-management-actions');
@@ -491,6 +478,7 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
     ],
     floors: [floors?.element ?? h('p', {}, uiText('Administrator access required'))],
     connections: [connections?.element ?? h('p', {}, uiText('Administrator access required'))],
+    updates: updates ? [updates.element] : [],
     plugins: [plugins?.element ?? h('p', {}, uiText('Administrator access required'))],
     management: [management?.element ?? h('p', {}, uiText('Administrator access required'))],
     'atrium-logo': [receptionSign.element],
@@ -528,7 +516,8 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
   const nav = h('nav.settings-nav', { role: 'tablist', 'aria-orientation': 'vertical', 'aria-label': uiText('Settings') });
   const tabs = new Map<SettingsPane, HTMLButtonElement>();
   const bodies = new Map<SettingsPane, HTMLElement>();
-  for (const p of PANES) {
+  const visiblePanes = updates ? [...PANES, { id: 'updates' as const, icon: '⬇️', label: updatesTitle(), blurb: '' }] : PANES;
+  for (const p of visiblePanes) {
     const tab = h('button.settings-tab', { type: 'button', role: 'tab', onclick: () => show(p.id) }, h('span.icon', { 'aria-hidden': 'true' }, p.icon), h('span', {}, p.label)) as HTMLButtonElement;
     tabs.set(p.id, tab);
     nav.append(tab);
@@ -536,9 +525,10 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
   }
   const show = (id: SettingsPane) => {
     lastPane = id;
-    apply.element.hidden = ['atrium-logo', 'connections', 'management', 'floors', 'plugins'].includes(id);
+    apply.element.hidden = ['atrium-logo', 'connections', 'management', 'floors', 'plugins', 'updates'].includes(id);
     managementActions.hidden = id !== 'management';
     if (id === 'floors') floors?.load();
+    if (id === 'updates') updates?.load(); else updates?.dispose();
     if (id === 'plugins') void plugins?.load();
     if (id === 'management') management?.load();
     if (id === 'atrium-logo') receptionSign.load();
@@ -557,8 +547,8 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
     const step = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key];
     if (!step) return;
     e.preventDefault();
-    const i = PANES.findIndex((p) => p.id === lastPane);
-    const next = PANES[(i + step + PANES.length) % PANES.length].id;
+    const i = visiblePanes.findIndex((p) => p.id === lastPane);
+    const next = visiblePanes[(i + step + visiblePanes.length) % visiblePanes.length].id;
     show(next);
     tabs.get(next)!.focus();
   });
@@ -578,6 +568,7 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
     doing: uiText('⚙️ in settings'),
     onClose: () => {
       connections?.dispose(); management?.dispose(); floors?.dispose(); plugins?.dispose();
+      updates?.dispose();
       receptionSign.dispose();
       offNotify();
       sky?.off();
@@ -587,7 +578,8 @@ export function openSettings(net: Net, settings: Settings, onChange: (s: Setting
       offPrompts.forEach((off) => off());
     },
   });
-  show(first ?? lastPane);
+  const selected = first ?? lastPane;
+  show(tabs.has(selected) ? selected : 'you');
   close.addEventListener('click', () => { if (canDismiss()) modal.close(); });
   character.addEventListener('click', () => {
     onCharacter();

@@ -20,6 +20,50 @@ proxy = importlib.util.module_from_spec(proxy_spec)
 proxy_spec.loader.exec_module(proxy)
 
 
+gui_spec = importlib.util.spec_from_file_location('office_updates', Path(__file__).with_name('office-updates.py'))
+gui = importlib.util.module_from_spec(gui_spec)
+gui_spec.loader.exec_module(gui)
+
+
+class GraphicalUpdateTest(unittest.TestCase):
+    def test_catalog_skips_drafts_old_formats_and_malformed_tags(self):
+        def row(tag, draft=False, complete=True):
+            return dict(tag_name=tag, prerelease='-rc.' in tag, draft=draft, body=tag,
+                        assets=[{'name': a} for a in (manager.ARCHIVE, manager.IMAGE, 'release.json')] if complete else [])
+        rows = [row('v0.1.310-rc.12'), row('v0.1.309'), row('v0.1.310-rc.2'), row('v0.1.399', True),
+                row('latest'), row('v0.1.402', complete=False)]
+        self.assertEqual(gui.newest(rows, 'stable')['tag'], 'v0.1.309')
+        self.assertEqual(gui.newest(rows, 'preview')['tag'], 'v0.1.310-rc.12')
+        self.assertEqual(gui.newest(rows + [row('v0.1.310')], 'preview')['tag'], 'v0.1.310')
+
+    def test_saved_channel_job_and_exact_target(self):
+        tag = 'v0.1.307-rc.9'
+        listing = {'latest': {'tag': tag, 'notes': 'Nuovi uffici'}}
+        with tempfile.TemporaryDirectory() as tmp, patch.object(gui, 'ETC', Path(tmp)), \
+                patch.object(gui, 'installed', return_value='v0.1.306-rc.8'), patch.object(gui, 'catalog', return_value=listing), \
+                patch.object(gui.release, 'run') as start:
+            self.assertEqual(gui.request({'action':'status'})['channel'], 'stable')
+            self.assertEqual(gui.request({'action':'channel','channel':'preview'})['channel'], 'preview')
+            with self.assertRaises(ValueError):
+                gui.request({'action':'apply','tag':'v0.1.308-rc.10'})
+            self.assertEqual(gui.request({'action':'apply','tag':tag})['job']['phase'], 'waiting')
+            gui.request({'action':'apply','tag':tag})
+            start.assert_called_once()
+            with self.assertRaises(ValueError):
+                gui.request({'action':'channel','channel':'stable'})
+
+    def test_busy_agent_defers_and_unreachable_activity_never_restarts_office(self):
+        import io
+        with tempfile.TemporaryDirectory() as tmp, patch.object(gui, 'ETC', Path(tmp)):
+            (Path(tmp) / 'activity.env').write_text('AOP_RELEASE_PROBE=abc')
+            with patch.object(gui.urllib.request, 'urlopen', side_effect=[io.BytesIO(b'{"busy":1}'), io.BytesIO(b'{"busy":0}')]), patch.object(gui.time, 'sleep') as pause:
+                gui.wait_idle()
+                pause.assert_called_once()
+            with patch.object(gui.urllib.request, 'urlopen', side_effect=OSError):
+                with self.assertRaises(OSError):
+                    gui.wait_idle()
+
+
 class ExplicitUpdateTest(unittest.TestCase):
     def test_explicit_update_requires_a_manual_local_delivery(self):
         import contextlib

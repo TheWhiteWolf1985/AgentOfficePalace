@@ -4,6 +4,8 @@ import { settingsApply } from './settings-apply';
 import { h, openModal } from './dom';
 import { floorManagementPanel } from './floor-management';
 import { connectionsPanel } from './connections';
+import { updatesPanel, updatesTitle } from './software-updates';
+import { store } from '../state';
 import { pluginsPanel } from './plugins';
 import { agentManagementPanel } from './agent-management';
 
@@ -14,26 +16,28 @@ export function languageSelect(onChange: (language: string) => void): HTMLSelect
 }
 
 /** The lite view has no 3D settings panel, but shares the same language choice. */
-export function openLanguageSettings(): void {
+export function openLanguageSettings(first: 'language' | 'updates' = 'language'): void {
   const body = h('div.body');
   const managementActions = h('div.agent-management-actions');
   const apply = settingsApply();
   const language = languageSelect(apply.refresh);
   apply.add({ dirty: () => language.value !== getLanguage(), apply: () => chooseLanguage(language.value) });
   let panel: { element: HTMLElement; dispose(): void; canDismiss?(): boolean } | undefined;
-  const show = (kind: 'language' | 'connections' | 'management' | 'floors' | 'plugins') => {
+  const show = (kind: 'language' | 'connections' | 'management' | 'floors' | 'plugins' | 'updates') => {
     if (panel?.canDismiss && !panel.canDismiss()) return;
     apply.element.hidden = kind !== 'language';
     panel?.dispose(); panel = undefined;
     if (kind === 'language') body.replaceChildren(h('label', {}, t('Language'), language), h('p.setting-note', {}, t('Changing language reloads this page. Your agents keep working.')));
     else if (kind === 'floors') { const floors = floorManagementPanel(); panel = floors; body.replaceChildren(floors.element); floors.load(); }
+    else if (kind === 'updates') { const updates = updatesPanel(); panel = updates; body.replaceChildren(updates.element); updates.load(); }
     else if (kind === 'plugins') { const plugins = pluginsPanel(); panel = plugins; body.replaceChildren(plugins.element); void plugins.load(); }
     else { panel = kind === 'connections' ? connectionsPanel() : agentManagementPanel(managementActions); body.replaceChildren(panel.element); }
   };
   const nav = h('nav.connection-tabs', {}, ...([['language', 'Language'], ['floors', 'Floor management'], ['management', 'Agent management'], ['connections', 'GitHub and Forgejo'], ['plugins', 'Plugin & Skills']] as const).map(([key, label]) => {
     const button = h('button.btn', { type: 'button', onclick: () => show(key) }, t(label)); return button;
   }));
-  show('language');
+  if (store.me.admin) nav.append(h('button.btn', { type: 'button', onclick: () => show('updates') }, updatesTitle()));
+  show(first === 'updates' && store.me.admin ? 'updates' : 'language');
   openModal(h('div.modal.language-settings', { role: 'dialog', 'aria-label': t('Settings'), style: 'width:min(1000px,calc(100vw - 32px))' }, h('header', {}, h('h2', {}, t('⚙️ Settings'))), nav, body, managementActions, apply.element),
     { canDismiss: () => (panel?.canDismiss?.() ?? true) && apply.canDismiss(), doing: t('⚙️ in settings'), onClose: () => panel?.dispose() });
 }
