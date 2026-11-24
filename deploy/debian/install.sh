@@ -6,8 +6,17 @@ if [[ $EUID != 0 || $ID != debian || $VERSION_ID != 13 || $(dpkg --print-archite
   echo 'Eseguire come root dentro una VM Debian 13 amd64 avviata con systemd.' >&2
   exit 2
 fi
-if [[ $# -gt 1 ]]; then echo "Uso: bash install.sh [cartella-consegna]" >&2; exit 2; fi
-if ! command -v python3 >/dev/null || ! command -v curl >/dev/null || [[ ! -s /etc/ssl/certs/ca-certificates.crt ]]; then
+action=install
+if [[ ${1:-} == --update ]]; then
+  shift
+  action=update
+  if [[ ! -f /opt/agent-office-palace/.managed ]]; then
+    echo 'Aggiornamento disponibile solo per una VM già installata.' >&2
+    exit 2
+  fi
+fi
+if [[ $# -gt 1 ]]; then echo "Uso: bash install.sh [--update] [cartella-consegna]" >&2; exit 2; fi
+if [[ $action == install ]] && { ! command -v python3 >/dev/null || ! command -v curl >/dev/null || [[ ! -s /etc/ssl/certs/ca-certificates.crt ]]; }; then
   apt-get update
   DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends python3 curl ca-certificates
 fi
@@ -29,5 +38,9 @@ else
 fi
 printf '%s  %s\n' "$manifest_hash" "$work/release.json" | sha256sum -c -
 (cd "$work" && python3 -c 'import hashlib,json; f="agent-office-release.py"; assert hashlib.sha256(open(f,"rb").read()).hexdigest()==json.load(open("release.json"))["sha256"][f], "Checksum installatore errato"')
-python3 "$work/agent-office-release.py" install "${args[@]}"
-if [[ $tag == *-rc.* ]]; then agent-office-release pause; fi
+if [[ $action == update ]]; then
+  python3 "$work/agent-office-release.py" update "${args[@]}" --explicit-release
+else
+  python3 "$work/agent-office-release.py" install "${args[@]}"
+  if [[ $tag == *-rc.* ]]; then agent-office-release pause; fi
+fi

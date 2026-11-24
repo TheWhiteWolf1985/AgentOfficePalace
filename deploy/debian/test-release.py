@@ -20,6 +20,20 @@ proxy = importlib.util.module_from_spec(proxy_spec)
 proxy_spec.loader.exec_module(proxy)
 
 
+class ExplicitUpdateTest(unittest.TestCase):
+    def test_explicit_update_requires_a_manual_local_delivery(self):
+        import contextlib
+        import io
+        import sys
+        for args in (['update'], ['install', '--from-dir', '/tmp/kit'],
+                     ['update', '--scheduled', '--from-dir', '/tmp/kit']):
+            with self.subTest(args=args), patch.object(sys, 'argv', ['manager', *args, '--explicit-release']), contextlib.redirect_stderr(io.StringIO()) as error:
+                with self.assertRaises(SystemExit) as result:
+                    manager.main()
+                self.assertEqual(result.exception.code, 2)
+                self.assertIn('--explicit-release richiede', error.getvalue())
+
+
 class ProxyTest(unittest.TestCase):
     def test_selects_assigned_route_source_and_rejects_nonlocal_override(self):
         interfaces = json.dumps([{'addr_info': [{'family': 'inet', 'scope': 'global', 'local': '10.8.6.5'}]}])

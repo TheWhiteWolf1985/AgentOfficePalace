@@ -411,7 +411,10 @@ def main():
     parser.add_argument('action', choices=['install', 'update', 'status', 'pause', 'resume', 'rollback'], nargs='?', default='install')
     parser.add_argument('--scheduled', action='store_true', help=argparse.SUPPRESS)
     parser.add_argument('--from-dir', type=Path, help='Cartella di consegna con release.json e archivi')
+    parser.add_argument('--explicit-release', action='store_true', help='Applica una consegna verificata mantenendo la pausa degli aggiornamenti automatici')
     a = parser.parse_args()
+    if a.explicit_release and (a.action != 'update' or not a.from_dir or a.scheduled):
+        parser.error('--explicit-release richiede update --from-dir in modalità manuale')
     distro = Path('/etc/os-release').read_text()
     if (os.geteuid() or os.uname().machine != 'x86_64' or not re.search('^ID="?debian"?$', distro, re.M)
             or not re.search('^VERSION_ID="?13"?$', distro, re.M) or not Path('/run/systemd/system').is_dir()):
@@ -440,7 +443,7 @@ def main():
             atomic(ETC / 'paused', '1\n')
             activate(prev)
         else:
-            if a.action == 'update' and (ETC / 'paused').exists():
+            if a.action == 'update' and (ETC / 'paused').exists() and not a.explicit_release:
                 print('Aggiornamenti in pausa')
                 return
             release = Release(a.from_dir)
