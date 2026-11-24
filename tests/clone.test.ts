@@ -29,7 +29,7 @@ case "$1 $2" in
 esac
 `;
 
-const fast = { clone: { tickMs: 50, stallMs: 1500 } };
+const fast = { clone: { tickMs: 50 } };
 
 function office(t: { after(fn: () => void): void }) {
   const root = mkdtempSync(path.join(tmpdir(), 'agent-office-clone-'));
@@ -123,7 +123,7 @@ test('a clone shows how far along it is, then becomes a floor', async (t) => {
 test("a clone that goes quiet is stopped as stalled, and one that can't sign in says why", async (t) => {
   const { dataDir, projects, running } = office(t);
   process.env.FAKE_GH_HANG = '1';
-  const building = new Building(dataDir, projects, fast);
+  const building = new Building(dataDir, projects, { clone: { tickMs: 50, stallMs: 1500 } });
   const r = building.add('acme/game', 'Sam', () => {});
   const pid = await running();
   assert.match(String(await r), /stalled/);
@@ -140,7 +140,7 @@ test("a clone that goes quiet is stopped as stalled, and one that can't sign in 
 test('a clone can be stopped by an admin or whoever added it', async (t) => {
   const { dataDir, projects, running } = office(t);
   process.env.FAKE_GH_HANG = '1';
-  const building = new Building(dataDir, projects, { clone: { tickMs: 50 } });
+  const building = new Building(dataDir, projects, fast);
   let id = '';
   const r = building.add('acme/game', 'Sam', (def) => (id = def.id), 'sam-account');
   const pid = await running();
