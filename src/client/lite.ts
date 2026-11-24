@@ -316,7 +316,7 @@ $('btn-pulls').addEventListener('click', () => { if (store.project) openBoard('p
 $('btn-queue').addEventListener('click', () => { if (store.project) openQueue(net, { openTerminal: openWorker }); });
 $('btn-new').addEventListener('click', () => sendToWorker(uiText('✨ New task')));
 $('btn-settings').addEventListener('click', () => openLanguageSettings());
-watchUpdates(() => openLanguageSettings('updates'));
+watchUpdates(document.querySelector('.lite-main')!, () => openLanguageSettings('updates'));
 
 function renderNav() {
   const project = spaceCapabilities(store.floor, !!store.project).project;

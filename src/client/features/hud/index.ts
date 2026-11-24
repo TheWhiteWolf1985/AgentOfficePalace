@@ -172,7 +172,7 @@ export function installHud(ctx: Ctx, core: CoreState, parts: HudParts) {
     });
   }
 
-  watchUpdates(() => showSettings('updates'));
+  watchUpdates(document.getElementById('update-notice')!, () => showSettings('updates'));
   return { hud, showSettings, editProfile };
 }
 import { secureMediaUrl } from '../../secure-media';

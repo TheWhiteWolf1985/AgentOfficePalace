@@ -97,7 +97,7 @@ export function updatesPanel() {
 }
 
 /** One light check per visible client interval; the host shares its GitHub cache across all clients. */
-export function watchUpdates(open: () => void) {
+export function watchUpdates(host: Element, open: () => void) {
   let badge: HTMLElement | undefined, last = 0, checking = false, seen = '';
   async function check() {
     if (!store.me.admin) { badge?.remove(); badge = undefined; last = 0; return; }
@@ -119,9 +119,7 @@ export function watchUpdates(open: () => void) {
       badge = h('button.btn.office-update-badge', { type: 'button', onclick: () => {
         seen = label; sessionStorage.removeItem('agent-office.update-completed'); badge?.remove(); open();
       } }, label);
-      const liteMain = document.querySelector('body.lite .lite-main');
-      if (liteMain) liteMain.prepend(badge);
-      else document.body.append(badge);
+      host.prepend(badge);
     } catch { /* Try again when the tab regains focus or at the next interval. */ }
     finally { checking = false; }
   }
