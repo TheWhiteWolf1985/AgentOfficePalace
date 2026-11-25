@@ -4,8 +4,14 @@ import { connectionButton as button, connectionField as field } from './connecti
 import { h } from './dom';
 
 type SignInTunnel = { url: string; command: string; until: number };
-type Provider = { id: 'drive' | 'canva'; name: string; account?: string; hasClient: boolean; clientIssue?: string; tunnel?: SignInTunnel; status: 'connected' | 'disconnected' | 'reconnect' };
+type Provider = { id: 'drive' | 'canva' | 'linkedin' | 'heygen'; name: string; account?: string; hasClient: boolean; clientIssue?: string; tunnel?: SignInTunnel; status: 'connected' | 'disconnected' | 'reconnect' };
 type Catalogue = { providers: Provider[]; skills: { id: string; name: string; description: string; enabled: boolean }[] };
+const descriptions = {
+  drive: 'Find files and read Google Docs or text documents.',
+  canva: 'Find designs and read their details and links.',
+  heygen: 'Verify access to HeyGen with your web account.',
+  linkedin: 'Read the connected LinkedIn member profile.',
+};
 const labels = { connected: 'Connected', disconnected: 'Disconnected', reconnect: 'Reconnect this account.' };
 
 async function request<T>(input?: object): Promise<T> {
@@ -63,7 +69,11 @@ export function pluginsPanel() {
         await change({ action: 'drive-client', clientId: client.value.trim(), secret: secret.value });
         secret.value = '';
       })));
-    if (origin !== location.origin) {
+    return h('div', {}, setup, sharedSignIn(p, ready));
+  }
+  function sharedSignIn(p: Provider, ready: boolean) {
+    const loginLabel = t(p.id === 'heygen' ? 'Sign in with HeyGen' : 'Sign in with Google');
+    if (googleDriveSignInOrigin(location.origin) !== location.origin) {
       const controls = h('div');
       function show(session?: SignInTunnel) {
         if (!session) {
@@ -78,7 +88,7 @@ export function pluginsPanel() {
         const command = h('textarea', { readOnly: true, rows: 3, 'aria-label': 'PowerShell' });
         command.value = session.command;
         const expiryTime = new Date(session.until).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        const signIn = h('a.btn', { href: session.url, target: '_blank', rel: 'noopener noreferrer' }, t('Sign in with Google'));
+        const signIn = h('a.btn', { href: session.url, target: '_blank', rel: 'noopener noreferrer' }, loginLabel);
         signIn.addEventListener('click', () => { waiting = true; });
         controls.replaceChildren(
           h('p', {}, t('Run this command in PowerShell on this computer. Enter your VM SSH username when prompted.')),
@@ -86,22 +96,22 @@ export function pluginsPanel() {
             try { await navigator.clipboard.writeText(session!.command); message.textContent = t('Command copied.'); }
             catch { command.focus(); command.select(); message.textContent = t('Press Ctrl+C to copy the command.'); }
           }),
-          h('p', {}, t('When PowerShell shows Tunnel-OK, continue with Google in this browser.')),
+          h('p', {}, t('When PowerShell shows Tunnel-OK, continue signing in from this browser.')),
           signIn, button(t('Cancel sign-in'), () => run(() => change({ action: 'cancel-tunnel', id: p.id }))),
           h('p.setting-note', {}, t('The tunnel closes after sign-in or cancellation. Expires at'), ' ', expiryTime));
         clearTimeout(expiry);
         expiry = setTimeout(() => { if (!closed) void load(); }, Math.max(1, session.until - Date.now() + 100));
       }
       show(p.tunnel);
-      return h('div', {}, setup, controls);
+      return controls;
     }
-    const login = button(t('Sign in with Google'), () => {
+    const login = button(loginLabel, () => {
       // Open on the user's click; async requests otherwise trigger popup blockers.
       const popup = window.open('about:blank', '_blank');
       if (popup) popup.opener = null;
       return run(async () => {
         try {
-          const result = await request<{ url: string }>({ action: 'begin', id: 'drive' });
+          const result = await request<{ url: string }>({ action: 'begin', id: p.id });
           if (closed) { popup?.close(); return; }
           waiting = true;
           const link = h('a', { href: result.url, target: '_blank', rel: 'noopener noreferrer' }, t('Open sign-in page'));
@@ -111,19 +121,19 @@ export function pluginsPanel() {
       });
     });
     login.disabled = !ready;
-    return h('div', {}, setup, login);
+    return login;
   }
   function provider(p: Provider) {
     const panel = h('section.setting', {}, h('h4', {}, p.name),
-      h('p.setting-note', {}, t(p.id === 'drive' ? 'Find files and read Google Docs or text documents.' : 'Find designs and read their details and links.')),
+      h('p.setting-note', {}, t(descriptions[p.id])),
       h('p', {}, t(labels[p.status]), p.account ? ' · ' + p.account : ''),
-      p.id === 'drive' ? googleAccount(p) : canvaAccount(p));
+      p.id === 'drive' ? googleAccount(p) : p.id === 'heygen' ? sharedSignIn(p, true) : oauthAccount(p));
     if (p.status !== 'disconnected') panel.append(button(t('Disconnect account'), () => {
       if (window.confirm(t('Disconnect this account for all agents?'))) return run(() => change({ action: 'disconnect', id: p.id }));
     }));
     return panel;
   }
-  function canvaAccount(p: Provider) {
+  function oauthAccount(p: Provider) {
     const redirect = location.origin + '/api/plugins/callback/' + p.id;
     const client = h('input', { autocomplete: 'off', type: 'text', maxlength: 1024 });
     const secret = h('input', { autocomplete: 'new-password', type: 'password', maxlength: 2048 });

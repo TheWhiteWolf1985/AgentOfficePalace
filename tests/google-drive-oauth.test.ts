@@ -41,6 +41,20 @@ test('Drive connects the selected user with PKCE, requires the initiating browse
     "import { createHash } from 'node:crypto';",
     "import assert from 'node:assert/strict';",
     'globalThis.fetch = async (url, options) => {',
+    "  if (url instanceof URL && url.hostname === 'mcp.heygen.com') {",
+    "    const endpoint='https://mcp.heygen.com/mcp/v1/', issuer=url.origin;",
+    "    if (url.pathname.endsWith('/register')) return Response.json({client_id:'office'});",
+    "    if (url.pathname.includes('oauth-protected-resource')) return Response.json({resource:endpoint,authorization_servers:[issuer]});",
+    "    if (url.pathname.includes('oauth-authorization-server')) return Response.json({issuer,authorization_endpoint:issuer+'/authorize',token_endpoint:issuer+'/token',registration_endpoint:issuer+'/register'});",
+    "    if (!options.body) return new Response(null,{status:405});",
+    "    const msg=JSON.parse(options.body);assert.equal(options.headers.Authorization,'Bearer heygen-test');",
+    "    if(msg.method==='notifications/initialized')return new Response(null,{status:202});",
+    "    assert.ok(['initialize','tools/list'].includes(msg.method));",
+    "    return Response.json({jsonrpc:'2.0',id:msg.id,result:msg.id===1?{protocolVersion:'2025-06-18',capabilities:{tools:{}}}:{tools:[]}});",
+    "  }",
+    "  if (url === 'https://mcp.heygen.com/token') return Response.json({access_token:'heygen-test',refresh_token:'offline-test',expires_in:3600});",
+    "  if (url === 'https://www.linkedin.com/oauth/v2/accessToken') return Response.json({access_token:'member',expires_in:1});",
+    "  if (url === 'https://api.linkedin.com/v2/userinfo') return Response.json({sub:'member-id',name:'Marta'});",
     "  if (url === 'https://oauth2.googleapis.com/token') {",
     '    const b = options.body;',
     "    assert.equal(b.get('client_id'), 'demo.apps.googleusercontent.com');",
@@ -78,6 +92,34 @@ test('Drive connects the selected user with PKCE, requires the initiating browse
     try { await call('admin/status'); break; }
     catch (error) { if (tries >= 120 || child.exitCode !== null) throw error; await delay(25); }
   }
+  await t.test('LinkedIn login without refresh expires, leaves the catalogue and can be disconnected', async () => {
+    const id = 'linkedin', browser = 'member-browser';
+    const started = await call('admin/begin', {id, browser, redirect:'https://office.example.org/api/plugins/callback/linkedin', clientId:'office', secret:'fixture'});
+    assert.equal(started.status,200);
+    const state = new URL(started.data.url).searchParams.get('state');
+    assert.equal((await call('admin/finish',{id,browser:'another',state,code:'fixture'})).status,400);
+    assert.equal((await call('admin/finish',{id,browser,state,code:'fixture'})).status,200);
+    assert.equal((await call('worker/use',{name:'linkedin.profile'})).data.name,'Marta');
+    assert.equal((await call('worker/use',{name:'linkedin.publish'})).status,404);
+    await delay(1050);
+    assert.equal((await call('admin/status')).data.providers.find((p: any) => p.id === id).status,'reconnect');
+    assert.equal((await call('worker/list')).data.tools.some((tool: any) => tool.name === 'linkedin.profile'),false);
+    assert.equal((await call('worker/use',{name:'linkedin.profile'})).status,409);
+    assert.equal((await call('admin/disconnect',{id})).status,200);
+  });
+  await t.test('HeyGen shared sign-in connects the broker and exposes only the connection check', async () => {
+    const id = 'heygen', browser = 'marketing-browser';
+    const result = await call('admin/begin',{id,browser,redirect:'https://office.example.org/api/plugins/callback/heygen'});
+    assert.equal(result.status,200);
+    const state = new URL(result.data.url).searchParams.get('state');
+    assert.equal((await call('admin/finish',{id,browser:'other',state,code:'ok'})).status,400);
+    assert.equal((await call('admin/finish',{id,browser,state,code:'ok'})).status,200);
+    assert.doesNotMatch(JSON.stringify((await call('admin/status')).data),/heygen-test|offline-test/);
+    assert.deepEqual((await call('worker/list')).data.tools.map((tool: any) => tool.name), ['heygen.status']);
+    assert.equal((await call('worker/use',{name:'heygen.status'})).data.connected,true);
+    assert.equal((await call('admin/disconnect',{id})).status,200);
+    assert.equal((await call('worker/use',{name:'heygen.status'})).status,409);
+  });
   const id = 'drive', browser = 'browser-one', redirect = 'http://127.0.0.1:4600/api/plugins/callback/drive';
   const login = { id, browser, redirect };
   await t.test('a saved URL explains the setup issue, blocks consent and can be repaired with the secret alone', async () => {

@@ -5,7 +5,9 @@ Apri **Impostazioni → Plugin & Skills** in Office 3D o Lite con un account amm
 | Collegamento | Operazioni disponibili nella prima versione |
 | --- | --- |
 | Google Drive | Ricerca per nome, elenco paginato, lettura di Google Docs e di file di testo o Markdown fino a 256 KiB |
-| Canva | Ricerca ed elenco paginato dei progetti, lettura dei dettagli e dei collegamenti di un progetto |
+| Canva | Profilo collegato, ricerca dei progetti e lettura dei dettagli e dei collegamenti |
+| HeyGen | Verifica del collegamento al servizio MCP con l’account web |
+| LinkedIn | Nome e identificativo del membro che ha collegato l’account |
 | Revisione Markdown | Istruzioni condivise per controllare struttura, collegamenti e fonti, attivabili dalla pagina |
 | PDF e OCR | Estrazione del testo nativo, riconoscimento di scansioni in italiano e inglese, anteprima della pagina originale |
 
@@ -34,13 +36,17 @@ Il container crea un socket Unix privato e temporaneo per quel callback OAuth. I
 
 **Canva.** Registra l’indirizzo di ritorno mostrato nella pagina presso il fornitore. Usa un’app con accesso utente e gli ambiti `profile:read` e `design:meta:read`. Inserisci client ID e client secret, premi **Accedi al servizio** e apri la pagina di accesso. Torna alla scheda Office dopo il consenso. [Autenticazione Canva](https://www.canva.dev/docs/connect/authentication/)
 
-**Scollega account** elimina il collegamento locale per tutti gli agenti. Per revocare anche l’autorizzazione presso il fornitore usa la gestione accessi di Google o Canva. Ricollegando un account, il precedente rimane operativo fino alla verifica della nuova identità.
+**HeyGen.** Premi **Accedi con HeyGen**. Su una VM raggiunta tramite IP, prepara prima il tunnel mostrato nella scheda. Al primo accesso il container registra il proprio callback presso HeyGen e apre il consenso dell’account web. Dopo il collegamento gli agenti possono chiedere «Verifica il collegamento HeyGen» (`heygen.status`). La verifica legge il catalogo remoto. [Accesso MCP HeyGen](https://www.heygen.com/model-context-protocol)
+
+**LinkedIn.** Nella tua app LinkedIn abilita il prodotto *Sign In with LinkedIn using OpenID Connect*, registra l’URL di ritorno indicato da Office e inserisci client ID e client secret nella scheda. Con il consenso `openid profile` gli agenti possono usare `linkedin.profile`. Se LinkedIn rilascia solo un token a scadenza, Office mostra **Ricollega account** quando scade. [Accesso LinkedIn](https://learn.microsoft.com/en-us/linkedin/consumer/integrations/self-serve/sign-in-with-linkedin-v2)
+
+**Scollega account** elimina il collegamento locale per tutti gli agenti. Per revocare anche l’autorizzazione presso il fornitore usa la gestione accessi del rispettivo fornitore. Ricollegando un account, il precedente rimane operativo fino alla verifica della nuova identità.
 
 ## Container e aggiornamenti
 
 Office esegue tutte le skill e tutti i connettori in un unico container Docker rootless dedicato. Un'eccezione richiede un limite tecnico documentato e l'autorizzazione esplicita del gestore dell'istanza. Il pacchetto in `bin/plugin-skills/` costruisce l'immagine `aop-plugin-skills`, che include il servizio, le skill, Poppler, Tesseract e i modelli linguistici. Alla prima costruzione Docker scarica la base e i pacchetti Debian. Office riusa l'immagine locale finché il pacchetto resta identico. Il container dispone di 1 CPU, 512 MiB di RAM e 64 processi e usa la politica di riavvio Docker `unless-stopped`. I programmi per i PDF girano con un utente separato e ricevono il file attraverso lo standard input. Office verifica l'identità dell'agente e inoltra i byte del solo file richiesto.
 
-Il servizio comunica con Office attraverso un socket Unix privato. La directory `$AGENT_OFFICE_CODEX_RUNTIME/plugin-skills/data/` conserva le credenziali e le attivazioni anche quando il container viene ricreato. Va protetta nei backup della singola installazione. L’immagine distribuibile contiene il catalogo iniziale. La VM effettua le chiamate a Google e Canva via Internet.
+Il servizio comunica con Office attraverso un socket Unix privato. La directory `$AGENT_OFFICE_CODEX_RUNTIME/plugin-skills/data/` conserva le credenziali e le attivazioni anche quando il container viene ricreato. Va protetta nei backup della singola installazione. L’immagine distribuibile contiene il catalogo iniziale. La VM effettua le chiamate ai fornitori collegati via Internet.
 
 Il server MCP `agent-office` espone `list_office_tools` per scoprire il catalogo e `use_office_tool` per eseguire un’operazione o leggere una skill attiva. Gli agenti con la sola CLI hanno i comandi equivalenti `office-workers tools` e `office-workers use`. La prima introduzione di questi strumenti in una sessione che ha già caricato la precedente versione del server MCP richiede il riavvio della sessione a turno concluso. Le successive attivazioni dalla pagina sono consultabili nella stessa sessione.
 

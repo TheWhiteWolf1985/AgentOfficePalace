@@ -3,6 +3,7 @@ import path from 'node:path';
 import { chmodSync, lstatSync, readdirSync, readFileSync, renameSync, unlinkSync, writeFileSync } from 'node:fs';
 import { accessGrant, begin, exchange, googleSecretIssue, identity, invoke, operations, Problem, providers, string } from './providers.mjs';
 import { openCallback, removeStaleCallbacks, tunnelProfile } from './auth-tunnel.mjs';
+import { heygenClient } from './heygen.mjs';
 import { pdfTools, processPdf } from './pdf.mjs';
 
 process.umask(0o077);
@@ -52,6 +53,9 @@ async function withAccount(id, action) {
   locks.set(id, job);
   try { return await job; } finally { if (locks.get(id) === job) locks.delete(id); }
 }
+function needsLogin(account) {
+  return !!account && (account.reauth || (account.kind === 'oauth' && !account.refresh && account.expires <= Date.now()));
+}
 function snapshot(browser) {
   return {
     providers: [...providers].map(([id, p]) => {
@@ -61,7 +65,7 @@ function snapshot(browser) {
       const flow = pending.get(id);
       const tunnel = flow?.tunnel && flow.browser === browser && flow.until > Date.now() && !flow.tunnel.received ? tunnelView(flow) : undefined;
       return { id, name: p.name, account: account?.label, tunnel, hasClient: !!client?.clientId, clientIssue,
-        status: account?.reauth ? 'reconnect' : account ? 'connected' : 'disconnected' };
+        status: needsLogin(account) ? 'reconnect' : account ? 'connected' : 'disconnected' };
     }),
     skills: [...skills].map(([id, s]) => ({ id, name: s.name, description: s.description, enabled: state.skills[id] === true })),
   };
@@ -108,7 +112,7 @@ async function admin(op, b) {
       const redirect = profile?.redirect.href ?? b.redirect;
       const browser = string(b.browser, 128, 'Sign-in expired or belongs to another browser.');
       const saved = state.clients?.[id] ?? old;
-      const account = {
+      const account = id === 'heygen' ? await heygenClient(redirect, saved) : {
         kind: 'oauth', clientId: string(b.clientId || saved?.clientId, 1024, 'OAuth client ID required.'),
         secret: string(b.secret || ((!b.clientId || b.clientId === saved?.clientId) && saved?.secret), 2048, 'OAuth client secret required.'),
       };
@@ -116,7 +120,8 @@ async function admin(op, b) {
         const issue = googleSecretIssue(account.secret, account.clientId);
         if (issue) throw new Problem(400, issue);
       }
-      const flow = { ...begin(id, account.clientId, redirect), account, redirect, browser, until: Date.now() + 600_000 };
+      if (id === 'heygen') save(next => { (next.clients ??= {}).heygen = account; });
+      const flow = { ...begin(id, account.clientId, redirect, id === 'heygen' ? account : undefined), account, redirect, browser, until: Date.now() + 600_000 };
       forget(id);
       if (profile) flow.tunnel = await openCallback({ profile, directory: path.dirname(socket),
         hostDirectory: process.env.AOP_PLUGIN_HOST_SOCKET_DIR || path.dirname(socket), authorization: flow.url, state: flow.state, until: flow.until });
@@ -134,7 +139,7 @@ async function admin(op, b) {
       if (!code) throw new Problem(400, 'Sign-in was cancelled.');
       const token = await exchange(id, flow.account, { grant_type: 'authorization_code', code: string(code, 4096, 'Invalid code.'),
         redirect_uri: flow.redirect, code_verifier: flow.verifier });
-      if (!token.refresh) throw new Problem(400, 'Offline access was not granted. Reconnect this account.');
+      if (!token.refresh && (id === 'drive' || id === 'canva')) throw new Problem(400, 'Offline access was not granted. Reconnect this account.');
       const label = await identity(id, token.access);
       save(next => { next.accounts[id] = { ...flow.account, ...token, label }; });
       return { connected: true };
@@ -146,8 +151,8 @@ async function admin(op, b) {
 async function getAccess(id) {
   return withAccount(id, async () => {
     const account = state.accounts[id];
-    if (!account || account.reauth) throw new Problem(409, 'The plugin is disconnected.');
-    if (account.expires > Date.now() + 60_000) return account.access;
+    if (!account || needsLogin(account)) throw new Problem(409, 'The plugin is disconnected.');
+    if (account.expires > Date.now() + 60_000 || (account.kind === 'oauth' && !account.refresh)) return account.access;
     try {
       const token = await exchange(id, account, accessGrant(account));
       save(next => Object.assign(next.accounts[id], token));
@@ -160,7 +165,7 @@ async function getAccess(id) {
 }
 async function worker(op, b) {
   if (op === 'list') return {
-    tools: operations.filter(tool => { const a = state.accounts[tool.name.split('.')[0]]; return a && !a.reauth; })
+    tools: operations.filter(tool => { const a = state.accounts[tool.name.split('.')[0]]; return a && !needsLogin(a); })
       .concat(skills.has('pdf-ocr') && state.skills['pdf-ocr'] ? pdfTools : []),
     skills: [...skills].filter(([id]) => state.skills[id]).map(([id, s]) => ({ name: 'skill.' + id, description: s.description })),
   };

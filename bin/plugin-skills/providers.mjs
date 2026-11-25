@@ -1,8 +1,8 @@
 import { createHash, randomBytes, sign } from 'node:crypto';
 
-export class Problem extends Error {
-  constructor(status, message) { super(message); this.status = status; }
-}
+import { Problem, readLimited } from './provider-http.mjs';
+import { heygenStatus } from './heygen.mjs';
+export { Problem };
 
 const driveApi = 'https://www.googleapis.com/drive/v3';
 const canvaApi = 'https://api.canva.com/rest/v1';
@@ -10,6 +10,11 @@ export const providers = new Map([
   ['drive', {
     name: 'Google Drive', authorize: 'https://accounts.google.com/o/oauth2/v2/auth',
     token: 'https://oauth2.googleapis.com/token', scope: 'https://www.googleapis.com/auth/drive.readonly',
+  }],
+  ['heygen', { name: 'HeyGen' }],
+  ['linkedin', {
+    name: 'LinkedIn', authorize: 'https://www.linkedin.com/oauth/v2/authorization',
+    token: 'https://www.linkedin.com/oauth/v2/accessToken', scope: 'openid profile',
   }],
   ['canva', {
     name: 'Canva', authorize: 'https://www.canva.com/api/oauth/authorize',
@@ -27,23 +32,6 @@ export function googleSecretIssue(secret, clientId) {
   if (typeof secret !== 'string' || !secret.trim()) return 'OAuth client secret required.';
   if (/^https?:\/\//i.test(secret.trim())) return 'The Google client secret field contains a web address. Paste the full client secret from Google Cloud.';
   if (secret.trim() === clientId || /[*•●]{3,}/u.test(secret)) return 'Paste the full client secret for this Google web application.';
-}
-
-const maxBytes = 256 * 1024;
-async function readLimited(response) {
-  const reader = response.body.getReader();
-  let size = 0;
-  const chunks = [];
-  try {
-    while (true) {
-      const { value, done } = await reader.read();
-      if (done) break;
-      size += value.byteLength;
-      if (size > maxBytes) throw new Problem(413, 'The document exceeds the reading limit (256 KiB).');
-      chunks.push(Buffer.from(value));
-    }
-    return Buffer.concat(chunks).toString('utf8');
-  } finally { await reader.cancel().catch(() => {}); }
 }
 
 async function remote(url, options, plain = false) {
@@ -71,14 +59,15 @@ async function remote(url, options, plain = false) {
   }
 }
 
-export function begin(id, clientId, redirect) {
-  const spec = providers.get(id);
+export function begin(id, clientId, redirect, spec = providers.get(id)) {
   const verifier = randomBytes(64).toString('base64url');
   const state = randomBytes(32).toString('base64url');
   const url = new URL(spec.authorize);
   url.search = new URLSearchParams({ client_id: clientId, redirect_uri: redirect, response_type: 'code',
     scope: spec.scope, state, code_challenge: createHash('sha256').update(verifier).digest('base64url'),
     code_challenge_method: 'S256' }).toString();
+  if (!spec.scope) url.searchParams.delete('scope');
+  if (id === 'heygen') url.searchParams.set('resource', spec.resource);
   if (id === 'drive') {
     url.searchParams.set('access_type', 'offline');
     url.searchParams.set('prompt', 'select_account consent');
@@ -90,14 +79,15 @@ export async function exchange(id, account, params) {
   const body = new URLSearchParams(params);
   const headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
   if (account.kind !== 'service') {
-    if (id === 'canva') headers.Authorization = 'Basic ' + Buffer.from(account.clientId + ':' + account.secret).toString('base64');
+    if (id === 'heygen') { body.set('client_id', account.clientId); body.set('resource', account.resource); }
+    else if (id === 'canva') headers.Authorization = 'Basic ' + Buffer.from(account.clientId + ':' + account.secret).toString('base64');
     else { body.set('client_id', account.clientId); body.set('client_secret', account.secret); }
   }
   if (id === 'drive' && account.kind !== 'service') {
     const issue = googleSecretIssue(account.secret, account.clientId);
     if (issue) throw new Problem(400, issue);
   }
-  const result = await remote(providers.get(id).token, { method: 'POST', headers, body });
+  const result = await remote(id === 'heygen' ? account.token : providers.get(id).token, { method: 'POST', headers, body });
   if (!result.access_token || !Number.isFinite(result.expires_in)) throw new Problem(502, 'Invalid token response.');
   return { access: result.access_token, expires: Date.now() + result.expires_in * 1000, refresh: result.refresh_token || account.refresh };
 }
@@ -115,7 +105,14 @@ export function accessGrant(account) {
 }
 
 const get = (url, access, plain) => remote(url, { headers: { Authorization: 'Bearer ' + access } }, plain);
+async function linkedInProfile(access) {
+  const data = await get('https://api.linkedin.com/v2/userinfo', access);
+  return { id: string(data.sub, 320, 'Account identity unavailable.'), name: string(data.name || data.given_name || data.sub, 320, 'Account identity unavailable.') };
+}
+
 export async function identity(id, access) {
+  if (id === 'heygen') return (await heygenStatus(access)).provider;
+  if (id === 'linkedin') return (await linkedInProfile(access)).name;
   if (id === 'drive') {
     const data = await get(driveApi + '/about?fields=user(emailAddress,displayName)', access);
     return string(data.user?.emailAddress || data.user?.displayName, 320, 'Account identity unavailable.');
@@ -128,10 +125,16 @@ export async function identity(id, access) {
 export const operations = [
   { name: 'drive.search', description: 'List or search accessible files by name. Optional query and pageToken (strings).' },
   { name: 'drive.read', description: 'Read one Google Doc or text/Markdown file up to 256 KiB. Required fileId (string).' },
+  { name: 'heygen.status', description: 'Verify the shared HeyGen connection. No arguments. Does not generate a video.' },
+  { name: 'linkedin.profile', description: 'Read the name and ID of the connected LinkedIn member. No arguments.' },
   { name: 'canva.search', description: 'List or search designs by title. Optional query and pageToken (strings).' },
+  { name: 'canva.profile', description: 'Read the display name of the connected Canva account. No arguments.' },
   { name: 'canva.get', description: 'Read design metadata and links. Required designId (string).' },
 ];
 export async function invoke(name, args, access) {
+  if (name === 'canva.profile') return { name: await identity('canva', access) };
+  if (name === 'heygen.status') return heygenStatus(access);
+  if (name === 'linkedin.profile') return linkedInProfile(access);
   if (name === 'drive.search' || name === 'canva.search') {
     const drive = name === 'drive.search';
     const url = new URL(drive ? driveApi + '/files' : canvaApi + '/designs');
@@ -144,6 +147,7 @@ export async function invoke(name, args, access) {
     if (args.pageToken !== undefined) url.searchParams.set(drive ? 'pageToken' : 'continuation', string(args.pageToken, 4096, 'Invalid page token.'));
     return get(url, access);
   }
+  if (name !== 'drive.read' && name !== 'canva.get') throw new Problem(404, 'Tool unavailable.');
   const drive = name === 'drive.read';
   const id = drive ? args.fileId : args.designId;
   if (typeof id !== 'string' || !/^[\w-]{1,256}$/.test(id)) throw new Problem(400, 'Invalid item ID.');

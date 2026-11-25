@@ -10,7 +10,7 @@ const callback = api + '/callback/';
 const callbackHeaders = { 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer', 'Content-Security-Policy': "default-src 'none'; frame-ancestors 'none'" };
 
 export const pluginsRoute: Route = {
-  path: [api, callback + 'drive', callback + 'canva'], auth: 'session',
+  path: [api, callback + 'drive', callback + 'canva', callback + 'linkedin', callback + 'heygen'], auth: 'session',
   async handle(ctx, { req, res, session, path, url }) {
     if (!ctx.meOf(session.account?.id).admin) return send(res, 403, { error: 'Administrator access required' });
     const returning = path !== api;
@@ -44,7 +44,7 @@ export const pluginsRoute: Route = {
       try { b = JSON.parse(await readBody(req, 32768)); } catch { return send(res, 400, { error: 'Invalid request.' }); }
       switch (b?.action) {
         case 'prepare-tunnel': {
-          if (b.id !== 'drive' || googleDriveSignInOrigin(origin.origin) === origin.origin) break;
+          if (!['drive', 'heygen'].includes(b.id) || googleDriveSignInOrigin(origin.origin) === origin.origin) break;
           const result = await pluginCall('admin/tunnel', { id: b.id, origin: origin.origin, browser });
           return send(res, 200, result);
         }
@@ -54,12 +54,13 @@ export const pluginsRoute: Route = {
         case 'disconnect': return send(res, 200, await pluginCall('admin/disconnect', { id: b.id }));
         case 'drive-client': return send(res, 200, await pluginCall('admin/client', { id: 'drive', clientId: b.clientId, secret: b.secret }));
         case 'begin': {
-          if (b.id !== 'drive' && b.id !== 'canva') break;
+          if (!['drive', 'canva', 'linkedin', 'heygen'].includes(b.id)) break;
+          if (b.id === 'heygen' && googleDriveSignInOrigin(origin.origin) !== origin.origin) return send(res, 400, { error: 'Prepare the sign-in tunnel first.' });
           if (b.id === 'drive' && googleDriveSignInOrigin(origin.origin) !== origin.origin) {
             return send(res, 400, { error: 'Open Office through localhost or the registered HTTPS domain to sign in with Google.' });
           }
           const path = callback + b.id;
-          const app = b.id === 'canva' ? { clientId: b.clientId, secret: b.secret } : {};
+          const app = (b.id === 'canva' || b.id === 'linkedin') ? { clientId: b.clientId, secret: b.secret } : {};
           const result = await pluginCall('admin/begin', { id: b.id, ...app, redirect: origin.origin + path, browser });
           return send(res, 200, result);
         }

@@ -6,7 +6,7 @@ import path from 'node:path';
 import { Problem } from './providers.mjs';
 
 // Only reviewed OAuth return addresses belong here. This module is private to the broker.
-const profiles = new Map([['drive', new URL('http://127.0.0.1:4600/api/plugins/callback/drive')]]);
+const profiles = new Map(['drive', 'heygen'].map(id => [id, new URL('http://127.0.0.1:4600/api/plugins/callback/' + id)]));
 const filename = /^auth-[a-f0-9]{16}\.sock$/;
 const quote = value => "'" + value.replaceAll("'", "''") + "'";
 
