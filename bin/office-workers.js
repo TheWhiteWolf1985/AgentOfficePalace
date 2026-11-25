@@ -7,6 +7,8 @@
 // same as an MCP server on stdio, which the office hands the agents that take one. Plain Node, no
 // build step, no dependencies.
 
+import { createRequire } from 'node:module';
+const require = createRequire(import.meta.url);
 import { request } from 'node:http';
 import { realpathSync } from 'node:fs';
 import { createInterface } from 'node:readline';
@@ -45,9 +47,9 @@ export const EFFORTS = ['low', 'medium', 'high', 'xhigh', 'max'];
 /** How long the office may take to come back when it's restarting (a dev reload, an upgrade). */
 const RETRY_MS = 6000;
 /** Sending several workers home waits on git for each; hiring may fetch from GitHub first. */
-const TIMEOUT_MS = { list: 15_000, tell: 15_000, result: 5000, reply: 15_000, pr: 45_000, hire: 90_000, home: 300_000, tools: 5000, use: 26_000 };
+const TIMEOUT_MS = { list: 15_000, tell: 15_000, result: 5000, reply: 15_000, pr: 45_000, hire: 90_000, home: 300_000, repository: 30000, tools: 5000, use: 26_000 };
 /** Where each call goes, under /office/workers. */
-const PATHS = { list: '', hire: '', home: '/home', tell: '/tell', result: '/result', reply: '/reply', pr: '/pr', tools: '/tools', use: '/use' };
+const PATHS = { list: '', hire: '', home: '/home', tell: '/tell', result: '/result', reply: '/reply', pr: '/pr', repository: '/repository', tools: '/tools', use: '/use' };
 
 /**
  * Reads `--flag value` and `--flag=value` options, and the words that aren't options.
@@ -164,7 +166,7 @@ export function officeEnv(env) {
 
 /**
  * The HTTP request for one of the office's worker calls.
- * @param {'list' | 'hire' | 'home' | 'tell' | 'result' | 'reply' | 'pr' | 'tools' | 'use'} what
+ * @param {'list' | 'hire' | 'home' | 'tell' | 'result' | 'reply' | 'pr' | 'repository' | 'tools' | 'use'} what
  * @param {{ url: string, worker: string, token: string }} office
  * @param {Record<string, unknown>} [body]
  * @returns {{ method: string, url: string, headers: Record<string, string>, body?: string, timeout: number }}
@@ -214,7 +216,7 @@ async function send(req, fetchImpl) {
 
 /**
  * Makes one call to the office; resolves to what it answered, or throws with why it said no.
- * @param {'list' | 'hire' | 'home' | 'tell' | 'result' | 'reply' | 'pr' | 'tools' | 'use'} what
+ * @param {'list' | 'hire' | 'home' | 'tell' | 'result' | 'reply' | 'pr' | 'repository' | 'tools' | 'use'} what
  * @param {Record<string, unknown> | undefined} body
  * @param {{ env: Record<string, string | undefined>, fetch: typeof fetch }} io
  */
@@ -406,6 +408,12 @@ const INSTRUCTIONS =
 async function runTool(name, args, io) {
   const a = args && typeof args === 'object' ? args : {};
   if (name === 'list_office_tools') return { text: JSON.stringify(await call('tools', {}, io)) };
+  if (name === 'office_repository' && io.env.AGENT_OFFICE_HOOK_SOCKET) {
+    const result = await call('repository', a, io);
+    if (a.operation === 'info' && result.login && io.env === process.env)
+      result.gitRemote = await require('./office-forgejo.cjs').configure(result.login);
+    return { text: JSON.stringify(result) };
+  }
   if (name === 'use_office_tool') {
     const result = await call('use', a, io);
     if (result?.image?.mimeType === 'image/jpeg' && typeof result.image.data === 'string') {
@@ -457,6 +465,10 @@ export async function handleMcp(msg, io) {
       inputSchema: { type: 'object', properties: { requestId: requestIdField }, additionalProperties: false } },
     { ...TOOLS.find(t => t.name === 'tell_worker'), description: 'Delegate a task to a colleague on this floor and receive their final answer. If pending, use list_workers with its requestId.' },
   ] : TOOLS;
+  if (io.env.AGENT_OFFICE_HOOK_SOCKET) workerTools.push({
+    name:'office_repository', description:'Use info to configure the personal Git remote and see your role. Push a work branch with git. Supervisors and chiefs can open and review PRs, only chiefs merge after approval of the current commit.',
+    inputSchema:{type:'object',properties:{operation:{enum:['info','read','open','approve','reject','merge']},number:{type:'integer'},sha:{type:'string'},title:{type:'string'},body:{type:'string'},head:{type:'string'}},required:['operation'],additionalProperties:false}
+  });
   const tools = [...workerTools, {
     name: 'list_office_tools', description: 'Start here for PDF attachments, OCR, document skills or connected services. List the tools enabled for the whole office and their arguments.',
     annotations: { readOnlyHint: true, openWorldHint: false },
@@ -472,7 +484,7 @@ export async function handleMcp(msg, io) {
         protocolVersion: MCP_VERSIONS.includes(asked) ? asked : MCP_VERSIONS[0],
         capabilities: { tools: { listChanged: false } },
         serverInfo: { name: 'agent-office', title: 'Agent Office', version: '1.0.0' },
-        instructions: (io.env.AGENT_OFFICE_HOOK_SOCKET ? 'Named office colleagues are real agents on this floor. Use list_workers then tell_worker with the exact colleague ID. Never substitute an internal subagent. If pending, use list_workers with the returned requestId until answered. For incoming office requests simply give your final answer normally and the office returns it to the sender. Each colleague writes to a separate /workspace visible in the floor bookshelf.' : INSTRUCTIONS) +
+        instructions: (io.env.AGENT_OFFICE_HOOK_SOCKET ? 'Named office colleagues are real agents on this floor. Use list_workers then tell_worker with the exact colleague ID. Never substitute an internal subagent. If pending, use list_workers with the returned requestId until answered. For incoming office requests simply give your final answer normally and the office returns it to the sender. Each colleague writes to a separate /workspace visible in the floor bookshelf. For Git collaboration use office_repository info for your role and personal Git remote. Submit a work branch, review the exact SHA and repeat review after changes.' : INSTRUCTIONS) +
           ' For a task involving a connected service or a shared skill, discover the current catalogue with list_office_tools, then use_office_tool.',
       });
     }
@@ -553,6 +565,10 @@ export async function main(argv, io = {}) {
     }
     // Starts even without the office's variables, so the agent hears why each tool fails.
     if (cmd.cmd === 'mcp') {
+      if (env.AGENT_OFFICE_HOOK_SOCKET && env === process.env) {
+        require('./office-forgejo.cjs').relay(env);
+        void call('repository',{operation:'info'},ctx).then(r => require('./office-forgejo.cjs').configure(r.login)).catch(() => {});
+      }
       await serveMcp(ctx, stdin, io.stdout ?? process.stdout);
       return 0;
     }

@@ -8,6 +8,7 @@ import type { WorkerInfo } from '../../shared/protocol.js';
 import type { Ctx } from '../office/context.js';
 import { str } from '../office/input.js';
 import { readBody, send } from '../http/util.js';
+import { workerRepository } from '../worker-repository.js';
 import path from 'node:path';
 import { dockerDrops, dockerWorkspace } from '../workers/docker.js';
 import { pluginCall, pluginFile, PluginError } from '../plugin-service.js';
@@ -49,6 +50,11 @@ export async function officeWorkers(ctx: Ctx, req: http.IncomingMessage, res: ht
   if (!floor || !me) return send(res, 401, { error: 'Send your own AGENT_OFFICE_WORKER_ID as ?worker= and AGENT_OFFICE_HOOK_TOKEN as the bearer token' });
   if (socket && me.runtime !== 'docker') return send(res, 403, { error: 'Container identity required' });
   const restricted = me.runtime === 'docker';
+  const action = url.pathname.slice('/office/workers'.length);
+  if (action === '/git' || action === '/repository') {
+    if (!socket || !restricted) return send(res,403,{error:'Identità container richiesta'});
+    return workerRepository(req,res,url,me.id,floor.def);
+  }
   const peers = () => floor.workers.list().filter(w => !restricted || (w.runtime === 'docker' && w.kind === 'agent' && floor.workers.ownerOf(w.id) === floor.workers.ownerOf(me.id)));
   const who = me.name;
   const view: PullsView = { pulls: floor.github.pulls.items, tasks: floor.queue.state().tasks, pullsOf: (id) => ctx.floors.get(id)?.github.pulls.items };
@@ -56,7 +62,6 @@ export async function officeWorkers(ctx: Ctx, req: http.IncomingMessage, res: ht
     const w = floor.workers.get(id);
     return w && workerRow(w, view, me.id);
   };
-  const action = url.pathname.slice('/office/workers'.length);
   if (req.method === 'POST' && (action === '/tools' || action === '/use')) {
     let input;
     try { input = JSON.parse(await readBody(req, 32_768)); }

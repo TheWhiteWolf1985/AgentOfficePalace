@@ -164,6 +164,7 @@ export class WorkerManager {
       [...this.workers.values()].map(async (w) => {
         const saved = w.saved;
         w.saved = undefined;
+        if (process.env.AGENT_OFFICE_FORGEJO_AGENT_ADMIN && w.info.runtime !== 'docker') return;
         const adopted = saved && (await this.host.attach(saved.ptyId));
         if (adopted) this.adopt(w, adopted, saved);
       }),
@@ -235,6 +236,8 @@ export class WorkerManager {
     if (kind === 'agent' && provider === undefined) ({ provider, model, effort } = this.officeDefault);
     const selectedProvider = kind === 'agent' ? provider : undefined;
     const container = selectedProvider === 'codex' && !!dockerRoot();
+    if (process.env.AGENT_OFFICE_FORGEJO_AGENT_ADMIN && !container)
+      return 'Con le identità Forgejo attive serve un container isolato per ogni agente';
     if (container && (worktree || meeting || repos.length)) return 'Codex Docker usa una copia privata del progetto. Per questa prova scegli una scrivania con worktree disattivato.';
     const modelError = validateWorkerModel(kind, selectedProvider, model);
     if (modelError) return modelError;
@@ -647,6 +650,10 @@ export class WorkerManager {
 
   private launch(w: Worker, prompt: string | undefined, resumeSessionId: string | undefined) {
     const { info } = w;
+    if (process.env.AGENT_OFFICE_FORGEJO_AGENT_ADMIN && info.runtime !== 'docker') {
+      startFailed(this.ctx, w, 'Per usare questo server occorre un agente in container');
+      return;
+    }
     // Its folder was deleted meanwhile: it waits, marked lost, for someone to rebuild it or send it home.
     if (this.worktrees.checkLost(w)) {
       clockWork(info, 'exited');

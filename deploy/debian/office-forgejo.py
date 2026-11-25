@@ -157,10 +157,36 @@ def tokens(password, state, pending):
         save(pending, json.dumps(state))
 
 
+def agent_admin(restart=True):
+    """A separate service credential for the private identity manager."""
+    key = STATE / 'agent-admin-token'
+    drop = DROP.with_name('66-agent-forgejo.conf')
+    updated = False
+    if not key.exists():
+        password = (STATE / 'admin-password').read_text().strip()
+        route = '/users/' + ADMIN + '/tokens'
+        for item in api('GET', route, ADMIN, password):
+            if item['name'] == 'office-agent-provision':
+                api('DELETE', route + '/' + str(item['id']), ADMIN, password)
+        token = api('POST', route, ADMIN, password, {'name': 'office-agent-provision', 'scopes': ['write:admin', 'read:user']})
+        save(key, token['sha1'] + '\n')
+        updated = True
+    text = f'[Service]\nLoadCredential=agent-forgejo-admin:{key}\nEnvironment=AGENT_OFFICE_FORGEJO_AGENT_ADMIN=%d/agent-forgejo-admin\n'
+    if not drop.exists() or drop.read_text() != text:
+        drop.parent.mkdir(exist_ok=True)
+        save(drop, text, 0o644)
+        updated = True
+    if updated:
+        subprocess.run(['systemctl', 'daemon-reload'], check=True)
+        if restart:
+            subprocess.run(['systemctl', 'restart', 'agent-office-palace'], check=True)
+
+
 def connect(ip):
     pending = STATE / 'setup.json'
     if (STATE / 'ready').exists():
         pending.unlink(missing_ok=True)
+        agent_admin()
         return
     bootstrap = STATE / 'admin-password'
     if not bootstrap.exists():
@@ -212,6 +238,7 @@ def connect(ip):
                f'Environment=AGENT_OFFICE_FLOOR_READER={reader}\nEnvironment=NODE_EXTRA_CA_CERTS={ca}\n', 0o644)
     subprocess.run(['systemctl', 'daemon-reload'], check=True)
     subprocess.run(['systemctl', 'restart', 'agent-office-palace'], check=True)
+    agent_admin()
     save(STATE / 'ready', '1\n')
     pending.unlink()
 
@@ -220,7 +247,10 @@ if __name__ == '__main__':
     import ipaddress
     os.umask(0o077)
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action', choices=['prepare', 'connect'])
+    parser.add_argument('action', choices=['prepare', 'connect', 'agent-admin'])
     parser.add_argument('ip', type=ipaddress.IPv4Address)
     args = parser.parse_args()
-    (prepare if args.action == 'prepare' else connect)(str(args.ip))
+    if args.action == 'agent-admin':
+        agent_admin(restart=False)
+    else:
+        (prepare if args.action == 'prepare' else connect)(str(args.ip))

@@ -3,6 +3,7 @@ import { confirmDialog } from './prompt';
 import { agentAppearancePicker } from './agent-appearance';
 import { t, remoteText } from '../../shared/i18n';
 import type { ConnectionsView, ConnectionFloor, CodexAccounts } from '../../shared/connections';
+import type { AgentForgeView } from '../../shared/forgejo-agent';
 import type { WorkerInfo } from '../../shared/protocol';
 import { DESKS, WING_DESKS } from '../../shared/layout';
 import { settingsApply } from './settings-apply';
@@ -10,6 +11,13 @@ import { h, STATUS_LABEL } from './dom';
 import { agentFields, modelBadge } from './provider';
 import { connectionRequest as request, loadConnections, connectionField as field, connectionSelect as select, connectionButton as button } from './connections-client';
 
+function forgeFields(current?: AgentForgeView, legacy = false) {
+  const tenure = select(t('Agent type'), [...(legacy && !current ? [{id:'',name:t('Choose agent type')}] : []),
+    {id:'permanent',name:t('Permanent')},{id:'temporary',name:t('Temporary')}], current?.tenure ?? (legacy ? '' : 'permanent'));
+  const role = select(t('Office role'), [{id:'operator',name:t('Operator')},{id:'supervisor',name:t('Lead operator')},
+    {id:'chief',name:t('Office chief')}],current?.role ?? 'operator');
+  return { tenure, role, fields:[field(t('Agent type'),tenure),field(t('Office role'),role)], value:() => ({tenure:tenure.value,role:role.value}) };
+}
 function accountLabel(account?: CodexAccounts['active']): string {
   if (!account || account === 'unknown') return t('Could not verify');
   if (account === 'stopped') return t('Container stopped');
@@ -57,6 +65,7 @@ export function agentManagementPanel(actions: HTMLElement, lazy = false) {
     resetForm();
     const floor = select(t('Office'), data.floors.map(f => ({ id: f.id, name: f.name })));
     const appearance = agentAppearancePicker();
+    const forge = forgeFields();
     releaseForm = appearance.dispose;
     const label = h('input', { maxlength: 80, placeholder: t('Office name') }) as HTMLInputElement;
     body.replaceChildren(button(t('Back to all agents'), list), h('h3', {}, t('Create Codex agent')));
@@ -68,12 +77,12 @@ export function agentManagementPanel(actions: HTMLElement, lazy = false) {
     }
     const engine = agentFields({ ...data.floors[0].project, agentProviders: ['codex'] }, 'create-codex', { provider: 'codex' });
     const prompt = h('textarea', { maxlength: 20000, rows: 3 }) as HTMLTextAreaElement;
-    body.append(field(t('Office'), floor), engine.element, field(t('Initial instructions'), prompt), appearance.element,
+    body.append(field(t('Office'), floor), ...forge.fields, engine.element, field(t('Initial instructions'), prompt), appearance.element,
       h('p.setting-note', {}, t('The agent starts at a free desk with a private copy of the committed project.')),
       button(t('Create Codex agent'), () => run(async () => {
         if (!engine.valid()) throw Error(t('Check the engine fields'));
         const { model, effort } = engine.choice();
-        const result = await request('container-create', { floorId: floor.value, model, effort, prompt: prompt.value.trim() || undefined, appearance: appearance.value() });
+        const result = await request('container-create', { floorId: floor.value, assignment: forge.value(), model, effort, prompt: prompt.value.trim() || undefined, appearance: appearance.value() });
         const id = floor.value;
         await reload();
         const f = data.floors.find(f => f.id === id);
@@ -127,7 +136,33 @@ export function agentManagementPanel(actions: HTMLElement, lazy = false) {
     for (const event of ['input', 'change', 'click']) props.addEventListener(event, apply.refresh);
     const binding = bindingFor(floor);
     const identity = h('div.connection-card', {}, h('h4', {}, t('Repository identity')));
-    if (binding) {
+    if (worker.runtime === 'docker') {
+      let current = data.forgeAccounts?.[worker.id];
+      const forge = forgeFields(current,true);
+      const note = h('p',{role:'status'});
+      const retry = button(t('Retry Forgejo access'), () => run(async () => {
+        if (!current) return;
+        await saveForge({tenure:current.tenure,role:current.role});
+      }));
+      const paint = () => {
+        note.textContent = current?.status === 'ready' ? current.username + ' · ' + current.repository :
+          current?.status === 'pending' ? t('Forgejo access pending') + ' · ' + (current.error ?? '') :
+          current ? t('No personal Forgejo access') : t('Choose the type and role for this existing agent');
+        retry.hidden = current?.status !== 'pending';
+      };
+      const saveForge = async (assignment: {tenure:string;role:string}) => {
+        const result = await request('agent-forge', {floorId:floor.id, workerId:worker.id,assignment});
+        current = result.access;
+        (data.forgeAccounts ??= {})[worker.id] = result.access;
+        paint();
+      };
+      let savedForge = JSON.stringify(forge.value());
+      apply.add({dirty:() => savedForge !== JSON.stringify(forge.value()),
+        validate:() => { if (!forge.tenure.value) throw Error(t('Choose agent type')); },
+        apply:async () => { await saveForge(forge.value()); savedForge = JSON.stringify(forge.value()); }});
+      forge.tenure.addEventListener('change',apply.refresh); forge.role.addEventListener('change',apply.refresh);
+      identity.append(...forge.fields,note,retry); paint();
+    } else if (binding) {
       const serverId = data.accounts.find((a) => a.id === binding.accountId)?.serverId;
       const assigned = binding.agents[worker.id];
       const account = select(t('Specific account'), [{ id: '', name: t('Use the office account') }, ...data.accounts.filter((a) => a.serverId === serverId && a.verifiedAt)], assigned?.accountId);
@@ -152,7 +187,7 @@ export function agentManagementPanel(actions: HTMLElement, lazy = false) {
       [t('Identifier'), worker.id], [t('Office'), floor.name], [t('Type'), worker.kind], [t('Status'), STATUS_LABEL[worker.status]], [t('Session'), worker.sessionId ?? '—'],
       [t('Worktree'), worker.worktree?.path ?? '—'], [t('Branch'), worker.worktree?.branch ?? floor.project.branch ?? '—'], [t('Created by'), worker.createdBy], [t('Activity'), worker.activity ?? '—'],
     ].flatMap(([key, value]) => [h('dt', {}, key), h('dd', {}, value)])));
-    body.replaceChildren(button(t('Back to all agents'), () => { if (canLeave()) void run(reload); }), h('h3', {}, floor.name + ' · ' + worker.name), props, ...(worker.runtime ? [] : [identity]), details);
+    body.replaceChildren(button(t('Back to all agents'), () => { if (canLeave()) void run(reload); }), h('h3', {}, floor.name + ' · ' + worker.name), props, identity, details);
     if (worker.runtime === 'docker') {
       const action = (operation: string, extra = {}) => request('container', { floorId: floor.id, workerId: worker.id, operation, ...extra });
       const key = h('input', { type: 'password', autocomplete: 'off', spellcheck: false }) as HTMLInputElement;

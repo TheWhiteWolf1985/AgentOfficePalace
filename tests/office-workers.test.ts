@@ -321,7 +321,7 @@ test("Codex is told to pass the office's variables on to the MCP server", () => 
 test('a container exposes peer and shared catalogue tools without worker administration', async () => {
   const io = { env: { AGENT_OFFICE_HOOK_SOCKET: '/office-bridge/hooks.sock' }, fetch };
   const list = await handleMcp({ jsonrpc: '2.0', id: 1, method: 'tools/list' }, io);
-  assert.deepEqual(list.result.tools.map((t: { name: string }) => t.name), ['list_workers', 'tell_worker', 'list_office_tools', 'use_office_tool']);
+  assert.deepEqual(list.result.tools.map((t: { name: string }) => t.name), ['list_workers', 'tell_worker', 'office_repository', 'list_office_tools', 'use_office_tool']);
   assert.ok(list.result.tools[0].inputSchema.properties.requestId);
   const call = await handleMcp({ jsonrpc: '2.0', id: 2, method: 'tools/call', params: { name: 'hire_worker' } }, io);
   assert.equal(call.error.code, -32602);

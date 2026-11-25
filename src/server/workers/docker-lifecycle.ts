@@ -1,3 +1,4 @@
+import { retireForge, serializeForge } from '../forgejo-agents.js';
 import { codexMcpArgs } from '../office-workers.js';
 import { codexModelArgs } from '../codex.js';
 import { prepareContainer, serialWorker, stopContainer, retireContainer } from './docker.js';
@@ -72,7 +73,7 @@ export class DockerWorkers {
   async retire(id: string) {
     if (this.stopping.has(id)) throw Error('Operazione già in corso');
     this.stopping.add(id);
-    try { return await serialWorker(id, () => retireContainer(id)); }
+    try { return await serializeForge(async () => { await retireForge(id); return serialWorker(id, () => retireContainer(id)); }); }
     finally { this.stopping.delete(id); }
   }
 }

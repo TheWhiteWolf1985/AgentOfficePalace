@@ -12,7 +12,7 @@ PRIVATE = re.compile(rb'-----BEGIN (?:RSA |EC |OPENSSH |DSA |ENCRYPTED )?PRIVATE
                      rb'sk-(?:proj-|svcacct-)[A-Za-z0-9_-]{36,}|ya29\.[A-Za-z0-9_-]{40,}|'
                      rb'AIza[0-9A-Za-z_-]{35}|GOCSPX-[A-Za-z0-9_-]{22,}')
 FORBIDDEN = {'.git', '.ssh', '.codex', '.agent-office', '.config', 'auth.json', 'accounts.json',
-             'connections.json', 'workers.json', 'floors.json', 'floor.json', 'sessions', 'authorized_keys',
+             'connections.json', 'forgejo-identities', 'agent-admin-token', 'workers.json', 'floors.json', 'floor.json', 'sessions', 'authorized_keys',
              'known_hosts', '.git-credentials', '.npmrc', '.netrc', '.docker', 'id_ed25519', 'id_rsa'}
 PERSONAL_PATH = re.compile(rb'(?:[A-Z]:[\\/]+Users[\\/]+(?!Public\b|Default\b)[\w.-]+[\\/]+(?:Documents|AppData)|'
                            rb'192\.168\.1\.(?:6|8|144)(?:[:/]\d|/[\w-]))', re.I)

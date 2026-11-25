@@ -116,3 +116,47 @@ test('a late refresh cannot discard text being edited', async t => {
   assert.equal(await name.inputValue(), 'Bozza in corso');
   assert.ok(await apply.isEnabled());
 });
+
+test('agent management assigns existing agents explicitly and retries pending access', async t => {
+  const page = await browser.newPage();
+  t.after(()=>page.close());
+  const id='aabbccddeeff';
+  const worker={id,kind:'agent',provider:'codex',runtime:'docker',name:'Pixel',color:'#123456',
+    deskId:'desk-1',status:'offline',paused:true,createdAt:1,createdBy:'QA',cols:80,rows:25,viewers:[],viewerIds:[]};
+  const floor={id:'docs',name:'Documenti',workers:[worker],project:{agentProviders:['codex']}};
+  const posts=[];
+  await page.route('**/api/connections*',async route=>{
+    if (route.request().method()==='GET') return route.fulfill({json:{floors:[floor],codexDocker:true,accounts:[],bindings:[],codexAccounts:{},forgeAccounts:{}}});
+    const input=route.request().postDataJSON(); posts.push(input);
+    if (input.action === 'container-create') return route.fulfill({status:201,json:{workerId:id}});
+    const access=posts.length===1 ? {...input.assignment,status:'pending',error:'Forgejo offline'} :
+      {...input.assignment,status:'ready',username:'aop-pixel',repository:'uffici/documenti'};
+    return route.fulfill({json:{access}});
+  });
+  await page.route('**/roles-panel',r=>r.fulfill({contentType:'text/html',body:`<body><footer></footer><script type="module">
+    import { agentManagementPanel } from '/src/client/ui/agent-management.ts';
+    const panel=agentManagementPanel(document.querySelector('footer')); document.body.prepend(panel.element);
+    </script></body>`}));
+  await page.goto(vite.resolvedUrls.local[0]+'roles-panel');
+  await page.getByRole('button',{name:'Edit properties'}).click();
+  assert.equal(await page.getByLabel('Agent type').inputValue(),'');
+  await page.getByLabel('Agent type').selectOption('permanent');
+  await page.getByLabel('Office role').selectOption('supervisor');
+  assert.deepEqual(posts,[]);
+  await page.getByRole('button',{name:'Apply',exact:true}).click();
+  await page.getByText(/Forgejo offline/).waitFor();
+  await page.getByRole('button',{name:'Retry Forgejo access'}).click();
+  await page.getByText('aop-pixel · uffici/documenti').waitFor();
+  assert.equal(posts.length,2); assert.deepEqual(posts[0],posts[1]);
+  assert.deepEqual(posts[0],{action:'agent-forge',workerId:id,floorId:'docs',assignment:{role:'supervisor',tenure:'permanent'}});
+  await page.getByRole('button',{name:'Back to all agents'}).click();
+  await page.getByRole('button',{name:'Create Codex agent'}).click();
+  assert.equal(await page.getByLabel('Agent type').inputValue(),'permanent');
+  await page.getByLabel('Agent type').selectOption('temporary');
+  await page.getByLabel('Office role').selectOption('operator');
+  await page.getByRole('button',{name:'Create Codex agent'}).click();
+  await page.getByRole('button',{name:'Back to all agents'}).waitFor();
+  await page.waitForFunction(()=>document.body.textContent.includes('Editable properties'));
+  assert.equal(posts[2].action,'container-create');
+  assert.deepEqual(posts[2].assignment,{tenure:'temporary',role:'operator'});
+});

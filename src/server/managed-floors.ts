@@ -1,3 +1,4 @@
+import { assignForge, floorIdentities, retireForge, serializeForge } from './forgejo-agents.js';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, renameSync, rmSync, writeFileSync } from 'node:fs';
@@ -168,6 +169,7 @@ async function update(ctx: Ctx, body: Input) {
     await verifyGit(store, cfg.readerAccountId, target.full_name);
   }
   const next = { ...old, name, dir, ...(target && { repo: target.full_name, forgejoId: target.id }) };
+  const identities = target ? floorIdentities(old.id) : [];
   let visitors: [string, Client][] = [];
   const returnVisitors = (opened: Floor) => {
     for (const [id, c] of visitors) if (ctx.clients.get(id) === c && c.peer.floor === LOBBY) ctx.goToFloor(c, opened);
@@ -185,6 +187,7 @@ async function update(ctx: Ctx, body: Input) {
     current(ctx, body); canMove();
     available(floor, ctx);
     if (move) destination(ctx, dir);
+    for (const agent of identities) await retireForge(agent.id, true);
     visitors = [...ctx.clients].filter(([, c]) => c.peer.floor === old.id);
     for (const [, c] of visitors) ctx.toLobby(c);
     floor.shutdown(!move); ctx.floors.delete(old.id); stopped = true;
@@ -217,6 +220,7 @@ async function update(ctx: Ctx, body: Input) {
     if (move && previous) store.unbind(old.dir);
     ctx.floorsChanged();
     returnVisitors(opened);
+    for (const agent of identities) await assignForge(agent.id, next, agent);
     return { floorId: old.id, ...(move && { retained: old.dir }) };
   } catch (error) {
     if (stopped) {
@@ -232,6 +236,7 @@ async function update(ctx: Ctx, body: Input) {
       const opened = ctx.openFloor(old); ctx.floorsChanged();
       if (opened) returnVisitors(opened);
     }
+    for (const agent of identities) await assignForge(agent.id, old, agent);
     if (installedCopy) throw Error((error as Error).message + '.' + retainFailedWorkspace(dir));
     throw error;
   } finally { if (stage) rmSync(stage, { recursive: true, force: true }); }
@@ -246,8 +251,10 @@ async function remove(ctx: Ctx, body: Input, who: string) {
     if (ctx.building.list().some(f => f.id !== def.id && same(f.repo, def.repo))) throw Error('Repository utilizzato da un altro piano');
     const repo: Repository | undefined = await forge(cfg, '/repos/' + repoPath(cfg, def.repo));
     if (repo && (repo.id !== def.forgejoId || !repo.private || !same(repo.full_name, def.repo))) throw Error('Identità del repository cambiata');
+    for (const agent of floorIdentities(def.id)) await retireForge(agent.id);
     if (repo) await forge(cfg, '/repos/' + def.repo, 'DELETE');
   }
+  if (!body.deleteRemote) for (const agent of floorIdentities(def.id)) await retireForge(agent.id);
   const removed = ctx.building.remove(def.id, who);
   if (typeof removed === 'string') throw Error(removed);
   const floor = ctx.floors.get(def.id);
@@ -256,13 +263,10 @@ async function remove(ctx: Ctx, body: Input, who: string) {
   ctx.floorsChanged();
   return { ok: true, retained: def.dir };
 }
-let tail: Promise<unknown> = Promise.resolve();
 export function changeFloor(ctx: Ctx, action: 'floor-create' | 'floor-update' | 'floor-delete', body: Input, who: string) {
-  const result = tail.then(async () => {
+  return serializeForge(async () => {
     if (action === 'floor-create') return create(ctx, body, who);
     if (action === 'floor-update') return update(ctx, body);
     return remove(ctx, body, who);
   });
-  tail = result.catch(() => undefined);
-  return result;
 }

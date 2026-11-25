@@ -470,6 +470,9 @@ def main():
                 prepare_host()
             stage(release)
             prepare_dashboard(release.target)
+            if a.action == 'update' and (ETC / 'forgejo/ready').is_file():
+                helper = release.target / 'distribution/office-forgejo.py'
+                run(sys.executable, helper, 'agent-admin', '127.0.0.1')
             try:
                 activate(release.target)
             except Exception:

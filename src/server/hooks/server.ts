@@ -97,9 +97,13 @@ export async function startHookServer(ctx: Ctx): Promise<{ hookServer: http.Serv
     const dest = path.join(bridge, 'office-workers.mjs');
     copyFileSync(script, dest + '.tmp');
     renameSync(dest + '.tmp', dest);
+    const forgeScript = binScript('office-forgejo.cjs');
+    if (!forgeScript) throw Error('Missing office-forgejo command');
+    copyFileSync(forgeScript, path.join(bridge, 'office-forgejo.cjs.tmp'));
+    renameSync(path.join(bridge,'office-forgejo.cjs.tmp'),path.join(bridge,'office-forgejo.cjs'));
     const local = http.createServer((req, res) => {
       const route = req.url?.split('?')[0];
-      if ((req.method === 'GET' && route === '/office/workers') || (req.method === 'POST' && ['/office/workers/tell', '/office/workers/result', '/office/workers/reply', '/office/workers/tools', '/office/workers/use'].includes(route ?? ''))) {
+      if (route === '/office/workers/git' || route === '/office/workers/repository' || (req.method === 'GET' && route === '/office/workers') || (req.method === 'POST' && ['/office/workers/tell', '/office/workers/result', '/office/workers/reply', '/office/workers/tools', '/office/workers/use'].includes(route ?? ''))) {
         const url = new URL(req.url!, 'http://localhost');
         void officeWorkers(ctx, req, res, url, true).catch(() => send(res, 500, { error: 'Delivery failed' }));
         return;
