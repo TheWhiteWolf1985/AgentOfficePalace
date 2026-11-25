@@ -16,7 +16,8 @@ async function approvedHead(remote: ReturnType<typeof workerForge>, number: numb
 export async function repositoryOperation(id: string, floor: FloorDef, input: Record<string,unknown>) {
   const remote = workerForge(id, floor);
   const { operation } = input;
-  if (operation === 'info') return { login: remote.login, repository: remote.full, role: remote.role, remote: 'http://127.0.0.1:19462/office.git' };
+  if (operation === 'info') return { login: remote.login, repository: remote.full, role: remote.role,
+    defaultBranch: (await remote.api('')).default_branch, remote: 'http://127.0.0.1:19462/office.git' };
   const number = input.number;
   if (operation !== 'open' && (!Number.isSafeInteger(number) || Number(number) < 1)) throw Error('Numero PR non valido');
   if (operation === 'read') {

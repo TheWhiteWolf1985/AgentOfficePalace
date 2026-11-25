@@ -409,6 +409,10 @@ async function runTool(name, args, io) {
   const a = args && typeof args === 'object' ? args : {};
   if (name === 'list_office_tools') return { text: JSON.stringify(await call('tools', {}, io)) };
   if (name === 'office_repository' && io.env.AGENT_OFFICE_HOOK_SOCKET) {
+    if (a.operation === 'checkout' || a.operation === 'push') {
+      const identity = await call('repository', {operation:'info'}, io);
+      return { text: JSON.stringify(await require('./office-forgejo.cjs').transfer(io.env, identity, a)) };
+    }
     const result = await call('repository', a, io);
     if (a.operation === 'info' && result.login && io.env === process.env)
       result.gitRemote = await require('./office-forgejo.cjs').configure(result.login);
@@ -466,8 +470,8 @@ export async function handleMcp(msg, io) {
     { ...TOOLS.find(t => t.name === 'tell_worker'), description: 'Delegate a task to a colleague on this floor and receive their final answer. If pending, use list_workers with its requestId.' },
   ] : TOOLS;
   if (io.env.AGENT_OFFICE_HOOK_SOCKET) workerTools.push({
-    name:'office_repository', description:'Use info to configure the personal Git remote and see your role. Push a work branch with git. Supervisors and chiefs can open and review PRs, only chiefs merge after approval of the current commit.',
-    inputSchema:{type:'object',properties:{operation:{enum:['info','read','open','approve','reject','merge']},number:{type:'integer'},sha:{type:'string'},title:{type:'string'},body:{type:'string'},head:{type:'string'}},required:['operation'],additionalProperties:false}
+    name:'office_repository', description:'Use checkout for a local Git bundle of main or the requested head branch. Clone or fetch this bundle locally. To publish, commit on a work branch, run git bundle create /workspace/NAME.bundle BRANCH and call push with bundle (basename), head (branch), sha (exact commit). Use this tool for remote transfers. Leads and chiefs can open and review PRs; only chiefs merge an approved SHA.',
+    inputSchema:{type:'object',properties:{operation:{enum:['info','checkout','push','read','open','approve','reject','merge']},number:{type:'integer'},sha:{type:'string'},title:{type:'string'},body:{type:'string'},head:{type:'string'},bundle:{type:'string'}},required:['operation'],additionalProperties:false}
   });
   const tools = [...workerTools, {
     name: 'list_office_tools', description: 'Start here for PDF attachments, OCR, document skills or connected services. List the tools enabled for the whole office and their arguments.',
@@ -484,7 +488,7 @@ export async function handleMcp(msg, io) {
         protocolVersion: MCP_VERSIONS.includes(asked) ? asked : MCP_VERSIONS[0],
         capabilities: { tools: { listChanged: false } },
         serverInfo: { name: 'agent-office', title: 'Agent Office', version: '1.0.0' },
-        instructions: (io.env.AGENT_OFFICE_HOOK_SOCKET ? 'Named office colleagues are real agents on this floor. Use list_workers then tell_worker with the exact colleague ID. Never substitute an internal subagent. If pending, use list_workers with the returned requestId until answered. For incoming office requests simply give your final answer normally and the office returns it to the sender. Each colleague writes to a separate /workspace visible in the floor bookshelf. For Git collaboration use office_repository info for your role and personal Git remote. Submit a work branch, review the exact SHA and repeat review after changes.' : INSTRUCTIONS) +
+        instructions: (io.env.AGENT_OFFICE_HOOK_SOCKET ? 'Named office colleagues are real agents on this floor. Use list_workers then tell_worker with the exact colleague ID. Never substitute an internal subagent. If pending, use list_workers with the returned requestId until answered. For incoming office requests simply give your final answer normally and the office returns it to the sender. Each colleague writes to a separate /workspace visible in the floor bookshelf. For remote Git use office_repository checkout to obtain a local bundle and clone or fetch it in the sandbox. Commit on a work branch, create /workspace/NAME.bundle from the named branch, then publish with office_repository push and the exact SHA. For review use checkout with the PR head branch and check the SHA. Repeat review after changes.' : INSTRUCTIONS) +
           ' For a task involving a connected service or a shared skill, discover the current catalogue with list_office_tools, then use_office_tool.',
       });
     }

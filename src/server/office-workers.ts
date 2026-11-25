@@ -215,8 +215,9 @@ export function writeClaudeMcpConfig(dataDir: string, script: string): string {
 export function codexMcpArgs(script: string, docker = false): string[] {
   // TOML basic strings and arrays read JSON's.
   const key = `mcp_servers.${MCP_NAME}`;
+  const approvedTools = docker ? [...sharedTools, 'office_repository'] : sharedTools;
   return ['-c', `${key}.command=${JSON.stringify(docker ? 'node' : process.execPath)}`, '-c', `${key}.args=${JSON.stringify([script, 'mcp'])}`, '-c', `${key}.env_vars=${JSON.stringify(docker ? ['AGENT_OFFICE_HOOK_SOCKET', ...MCP_ENV.slice(1)] : MCP_ENV)}`,
-    ...sharedTools.flatMap(tool => ['-c', `${key}.tools.${tool}.approval_mode="approve"`])];
+    ...approvedTools.flatMap(tool => ['-c', `${key}.tools.${tool}.approval_mode="approve"`])];
 }
 
 /** OpenCode's `mcp` config entry for the MCP server; OpenCode hands it its environment. */

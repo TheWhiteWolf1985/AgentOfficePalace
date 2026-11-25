@@ -316,6 +316,11 @@ test("Codex is told to pass the office's variables on to the MCP server", () => 
     'mcp_servers.agent-office.tools.list_office_tools.approval_mode="approve"',
     'mcp_servers.agent-office.tools.use_office_tool.approval_mode="approve"',
   ]);
+  const docker = codexMcpArgs('/office-bridge/office-workers.mjs', true);
+  assert.deepEqual(docker.filter(value => value.includes('office_repository')), [
+    'mcp_servers.agent-office.tools.office_repository.approval_mode="approve"',
+  ]);
+  assert.ok(!docker.some(value => /sandbox|network_access|approval_policy|default_tools_approval/.test(value)));
 });
 
 test('a container exposes peer and shared catalogue tools without worker administration', async () => {

@@ -115,11 +115,13 @@ for i in $(seq 1 100); do grep -q 'Operatore' /tmp/mcp-out && break; sleep 0.1; 
 grep -q 'Operatore' /tmp/mcp-out
 exec 3>&-
 wait "$mcp"
+node /office-bridge/check-transfer.cjs
 `;
     const asset=path.resolve('bin');
     await promisify(execFile)('docker',[...docker,'run','--rm','--pull=never','--read-only','--network=none','--cap-drop=ALL',
       '--tmpfs','/tmp','--tmpfs','/workspace','-v',asset+'/office-workers.js:/office-bridge/office-workers.mjs:ro',
       '-v',asset+'/office-forgejo.cjs:/office-bridge/office-forgejo.cjs:ro','-v',sock+':/office-bridge/hooks.sock:ro',
+      '-v',path.resolve('tests/fixtures/check-transfer.cjs')+':/office-bridge/check-transfer.cjs:ro',
       '-e','AGENT_OFFICE_HOOK_SOCKET=/office-bridge/hooks.sock','-e','AGENT_OFFICE_WORKER_ID='+operatorId,'-e','AGENT_OFFICE_HOOK_TOKEN=test',
       '--entrypoint','/bin/sh',image,'-c','mkfifo /tmp/mcp-in; '+command],{timeout:60000});
   }
