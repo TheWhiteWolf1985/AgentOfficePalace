@@ -116,6 +116,8 @@ export function codexHookArgs(hookPath: string, node = process.execPath): string
 /** System configuration for the private workspace and the read-only Office bridge in Docker. */
 export function dockerCodexConfig(): string {
   return [
+    // Office upgrades the CLI with the container image.
+    'check_for_update_on_startup = false',
     'projects."/workspace".trust_level = "trusted"',
     ...codexHookSettings('/office-bridge/agent-office-codex-hook.cjs', '/usr/local/bin/node'),
     '',
