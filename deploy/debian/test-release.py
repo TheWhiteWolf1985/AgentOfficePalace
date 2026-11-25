@@ -26,6 +26,20 @@ gui_spec.loader.exec_module(gui)
 
 
 class GraphicalUpdateTest(unittest.TestCase):
+    def test_candidate_install_prepares_identities_only_for_managed_forgejo(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / 'forgejo').mkdir()
+            with patch.object(gui, 'ETC', root), patch.object(gui, 'UNIT', root), patch.object(gui.release, 'run') as run:
+                gui.install()
+                provision = (gui.sys.executable, '-I', Path(gui.__file__).with_name('office-forgejo.py'), 'agent-admin', '127.0.0.1')
+                self.assertNotIn(provision, [c.args for c in run.call_args_list])
+                (root / 'forgejo/ready').touch()
+                run.reset_mock()
+                gui.install()
+                self.assertEqual(run.call_args_list[0].args, provision)
+                self.assertEqual([c.args for c in run.call_args_list].count(provision), 1)
+
     def test_catalog_skips_drafts_old_formats_and_malformed_tags(self):
         def row(tag, draft=False, complete=True):
             return dict(tag_name=tag, prerelease='-rc.' in tag, draft=draft, body=tag,
