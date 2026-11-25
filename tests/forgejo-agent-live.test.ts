@@ -31,10 +31,14 @@ test('disposable Forgejo: two private offices, personal identities and protected
   process.env.AGENT_OFFICE_FORGEJO_AGENT_ADMIN = path.join(dir,'manager');
   const userToken = await api('/users/roleqa/tokens','POST',{name:'roleqa-'+nonce,scopes:['write:admin','read:user']});
   writeFileSync(process.env.AGENT_OFFICE_FORGEJO_AGENT_ADMIN,userToken.sha1,{mode:0o600});
-  await api('/orgs','POST',{username:org,visibility:'private'});
-  writeFileSync(process.env.AGENT_OFFICE_FLOOR_FORGEJO,JSON.stringify({url,organization:org,token:(await api('/users/roleqa/tokens','POST',{name:'qa-manager-'+nonce,scopes:['read:user','write:organization','write:repository']})).sha1}),{mode:0o600});
-  const repo = await api('/orgs/'+org+'/repos','POST',{name:'documents',private:true,auto_init:true,default_branch:'main'});
-  const other = await api('/orgs/'+org+'/repos','POST',{name:'other',private:true,auto_init:true});
+  const owner = 'floors-' + nonce, password = randomBytes(32).toString('hex');
+  await api('/admin/users','POST',{username:owner,email:owner+'@office.invalid',password,must_change_password:false});
+  const ownerAuth = 'Basic ' + Buffer.from(owner + ':' + password).toString('base64');
+  await api('/orgs','POST',{username:org,visibility:'private'},ownerAuth);
+  const manager = await api('/users/'+owner+'/tokens','POST',{name:'qa-manager',scopes:['read:user','write:organization','write:repository']},ownerAuth);
+  writeFileSync(process.env.AGENT_OFFICE_FLOOR_FORGEJO,JSON.stringify({url,organization:org,token:manager.sha1}),{mode:0o600});
+  const repo = await api('/orgs/'+org+'/repos','POST',{name:'documents',private:true,auto_init:true,default_branch:'main'},ownerAuth);
+  const other = await api('/orgs/'+org+'/repos','POST',{name:'other',private:true,auto_init:true},ownerAuth);
   const floor = {id:'docs',repo:repo.full_name,forgejoId:repo.id,name:'Documenti',dir,palette:0,addedAt:Date.now(),addedBy:'QA'};
   const people = new Map();
   const staff = [];
@@ -127,7 +131,8 @@ wait "$mcp"
   git(op,'-C','work','push','origin','HEAD:refs/heads/publish');
   const revised=git(op,'-C','work','rev-parse','HEAD').trim();
   await assert.rejects(chief.api(route+'/merge','POST',{Do:'merge',head_commit_id:first}));
-  await assert.rejects(chief.api(route+'/merge','POST',{Do:'merge',head_commit_id:revised}));
+  // Office validates the exact SHA even while Forgejo is processing its push queue.
+  await assert.rejects(repositoryOperation(people.get('chief').id,floor,{operation:'merge',number:final.number,sha:revised}));
   for (let i=0;i<40;i++) {
     const reviews=await lead.api(route+'/reviews');
     if (reviews.some((r:{dismissed:boolean})=>r.dismissed)) break;
@@ -136,6 +141,22 @@ wait "$mcp"
   await repositoryOperation(staff[6].id,floor,{operation:'approve',number:final.number,sha:revised,body:'Analisi completata'});
   await repositoryOperation(staff[7].id,floor,{operation:'approve',number:final.number,sha:revised,body:'Revisione editoriale completata'});
   await assert.rejects(repositoryOperation(staff[7].id,floor,{operation:'merge',number:final.number,sha:revised}));
+  // Simulate a new head during Forgejo's background check. The retry must not send another merge.
+  const fetchForge = globalThis.fetch;
+  let mergeAttempts = 0;
+  const busy = t.mock.method(globalThis,'fetch',(input: string,init?: RequestInit) => {
+    const requestPath = new URL(input).pathname;
+    if (requestPath.endsWith(route + '/merge') && init?.method === 'POST') {
+      mergeAttempts++;
+      return Promise.resolve(Response.json({message:'Please try again later'},{status:405}));
+    }
+    if (mergeAttempts && requestPath.endsWith(route)) return Promise.resolve(Response.json({state:'open',head:{sha:first}}));
+    return fetchForge(input,init);
+  });
+  try {
+    await assert.rejects(repositoryOperation(people.get('chief').id,floor,{operation:'merge',number:final.number,sha:revised}),/revisione della PR è cambiata/);
+    assert.equal(mergeAttempts,1);
+  } finally { busy.mock.restore(); }
   await repositoryOperation(people.get('chief').id,floor,{operation:'merge',number:final.number,sha:revised});
   const temp = randomBytes(6).toString('hex');
   assert.equal((await assignForge(temp,floor,{role:'chief',tenure:'temporary'})).username,undefined);

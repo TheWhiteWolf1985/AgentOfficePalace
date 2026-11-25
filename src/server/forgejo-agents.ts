@@ -53,10 +53,15 @@ function adminAuth() {
   if (!file || !existsSync(file)) throw Error('Credenziale di gestione degli utenti Forgejo da configurare');
   return 'token ' + readFileSync(file, 'utf8').trim();
 }
+export class ForgejoMergePending extends Error {}
 async function api(cfg: Config, endpoint: string, method = 'GET', body?: object, auth = 'token ' + cfg.token, missing = false) {
   const res = await fetch(cfg.url + '/api/v1' + endpoint, { method, redirect: 'error', signal: AbortSignal.timeout(15000),
     headers: { Authorization: auth, 'Content-Type': 'application/json' }, body: body && JSON.stringify(body) });
   if (missing && res.status === 404) return;
+  if (res.status === 405 && method === 'POST' && endpoint.endsWith('/merge')) {
+    const detail = await res.json().catch(() => null);
+    if (detail?.message === 'Please try again later') throw new ForgejoMergePending('Forgejo sta verificando la PR. Riprovare tra poco.');
+  }
   if (!res.ok) throw Error('Forgejo ' + method + ' ' + endpoint + ' (HTTP ' + res.status + ')');
   const data = await res.text();
   return data ? JSON.parse(data) : undefined;
@@ -84,8 +89,14 @@ async function team(cfg: Config, repo: string, repoId: number, role: ForgeRole) 
   const name = teamName(repoId, role), description = 'Agent Office Palace / ' + repoId + ' / ' + role;
   const units: Record<string,string> = { 'repo.code': 'write' };
   if (role !== 'operator') units['repo.pulls'] = role === 'chief' ? 'write' : 'read';
-  const search = await api(cfg, '/orgs/' + cfg.organization + '/teams/search?q=' + name);
-  let t = search.data.find((x: { name: string }) => x.name === name);
+  // Team search omits teams the non-admin organization owner has not joined.
+  const teams = '/orgs/' + cfg.organization + '/teams';
+  let t;
+  for (let page = 1; !t; page++) {
+    const entries = await api(cfg, teams + '?limit=50&page=' + page);
+    if (!entries.length) break;
+    t = entries.find((entry: { name: string }) => entry.name === name);
+  }
   if (!t) t = await api(cfg, '/orgs/' + cfg.organization + '/teams', 'POST', { name, description, units_map: units, can_create_org_repo: false, includes_all_repositories: false });
   if (!t || !Number.isSafeInteger(t.id) || t.description !== description || t.includes_all_repositories || t.can_create_org_repo || t.permission === 'admin' ||
     Object.entries(t.units_map ?? {}).some(([k,v]) => v !== 'none' && v !== units[k]) || Object.entries(units).some(([k,v]) => t.units_map?.[k] !== v))

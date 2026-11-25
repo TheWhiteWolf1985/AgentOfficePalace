@@ -1,8 +1,9 @@
 import http from 'node:http';
 import https from 'node:https';
+import { setTimeout as delay } from 'node:timers/promises';
 import type { FloorDef } from './building.js';
 import { readBody, send } from './http/util.js';
-import { workerForge } from './forgejo-agents.js';
+import { ForgejoMergePending, workerForge } from './forgejo-agents.js';
 
 async function approvedHead(remote: ReturnType<typeof workerForge>, number: number, sha: string) {
   for (let page = 1; ; page++) {
@@ -32,16 +33,26 @@ export async function repositoryOperation(id: string, floor: FloorDef, input: Re
   }
   if (typeof input.sha !== 'string' || !/^[a-f0-9]{40,64}$/.test(input.sha)) throw Error('Specificare il commit esatto della revisione');
   if (operation === 'merge' && remote.role !== 'chief') throw Error('Il merge è riservato al Capo ufficio');
-  const pr = await remote.api('/pulls/' + number);
-  if (pr.state !== 'open' || pr.head.sha !== input.sha) throw Error('La revisione della PR è cambiata');
-  if (operation === 'approve' || operation === 'reject') {
-    await remote.api('/pulls/' + number + '/reviews', 'POST', { event: operation === 'approve' ? 'APPROVED' : 'REQUEST_CHANGES',
-      commit_id: input.sha, body: String(input.body ?? '').slice(0,16000) });
-  } else if (operation === 'merge') {
-    if (!await approvedHead(remote, Number(number), input.sha))
-      throw Error('Serve una revisione approvata sul commit corrente');
-    await remote.api('/pulls/' + number + '/merge', 'POST', { Do:'merge', head_commit_id: input.sha });
-  } else throw Error('Operazione Forgejo non valida');
+  const route = '/pulls/' + number;
+  for (let attempt = 0; ; attempt++) {
+    const pr = await remote.api(route);
+    if (pr.state !== 'open' || pr.head.sha !== input.sha) throw Error('La revisione della PR è cambiata');
+    if (operation === 'approve' || operation === 'reject') {
+      await remote.api(route + '/reviews', 'POST', { event: operation === 'approve' ? 'APPROVED' : 'REQUEST_CHANGES',
+        commit_id: input.sha, body: String(input.body ?? '').slice(0,16000) });
+      break;
+    }
+    if (operation !== 'merge') throw Error('Operazione Forgejo non valida');
+    if (!await approvedHead(remote, Number(number), input.sha)) throw Error('Serve una revisione approvata sul commit corrente');
+    try {
+      await remote.api(route + '/merge', 'POST', { Do:'merge', head_commit_id:input.sha });
+      break;
+    } catch (error) {
+      // Only Forgejo's explicit "try again later" can be retried. Recheck the head and approvals after the delay.
+      if (!(error instanceof ForgejoMergePending) || attempt >= 6) throw error;
+      await delay(Math.min(250 * 2 ** attempt, 2000));
+    }
+  }
   return { number, head: input.sha, operation };
 }
 export async function workerRepository(req: http.IncomingMessage, res: http.ServerResponse, url: URL, id: string, floor: FloorDef) {
