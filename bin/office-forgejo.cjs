@@ -2,13 +2,29 @@
 const http = require('node:http');
 const { once } = require('node:events');
 const { constants, createWriteStream } = require('node:fs');
-const { copyFile, mkdtemp, open, rm } = require('node:fs/promises');
+const { copyFile, mkdtemp, open, readdir, readFile, rm, statfs } = require('node:fs/promises');
 const { pipeline } = require('node:stream/promises');
 const { randomUUID } = require('node:crypto');
 const path = require('node:path');
 const { execFile } = require('node:child_process');
 const git = require('node:util').promisify(execFile);
 const port = 19462;
+const scratch = '/tmp/office-git';
+const scratchLimit = 4 * 1024 ** 3;
+// Separate a restarted MCP process from an older process which happened to have the same PID.
+async function processStart(pid) {
+  const stat = await readFile('/proc/' + pid + '/stat', 'utf8');
+  return stat.slice(stat.lastIndexOf(')') + 2).split(' ')[19];
+}
+async function discardAbandoned() {
+  for (const name of await readdir(scratch)) {
+    const match = /^transfer-(\d+)-(\d+)-[a-zA-Z0-9]{6}$/.exec(name);
+    if (!match) continue;
+    try { if (await processStart(match[1]) === match[2]) continue; }
+    catch (error) { if (error.code !== 'ENOENT') throw error; }
+    await rm(path.join(scratch, name), {recursive:true, force:true});
+  }
+}
 const origin = 'http://127.0.0.1:' + port + '/office.git';
 function relay(env, listenPort = port) {
   const server = http.createServer((req, res) => {
@@ -58,10 +74,19 @@ async function transfer(env, identity, input) {
       typeof input.bundle !== 'string' || !/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,100}\.bundle$/.test(input.bundle)))
     throw Error('Per il push servono branch di lavoro, SHA e nome del bundle in /workspace');
   const ref = 'refs/heads/' + branch;
-  const dir = await mkdtemp('/tmp/office-git-');
+  // Fail closed for old containers and missing mounts, even on hosts with a writable /tmp.
+  const disk = await statfs(scratch);
+  if (disk.type !== 0xef53 || disk.blocks * disk.bsize > scratchLimit ||
+      disk.blocks * disk.bsize < scratchLimit * 0.9) throw Error('Volume Git privato da 4 GiB non disponibile');
+  await discardAbandoned();
+  const freeDisk = await statfs(scratch);
+  const host = await statfs('/workspace');
+  const available = fs => fs.bavail * fs.bsize;
+  if (!available(host) || !available(freeDisk)) throw Error('Spazio su disco insufficiente per il trasferimento Git');
+  const dir = await mkdtemp(path.join(scratch, 'transfer-' + process.pid + '-' + await processStart(process.pid) + '-'));
   const run = (...args) => git('/usr/bin/git', ['-c','core.hooksPath=/dev/null','-c','protocol.allow=never',
     '-c','protocol.http.allow=always','-c','protocol.file.allow=always','-c','fetch.fsckObjects=true', ...args], {
-    cwd:dir, timeout:90000, env:{PATH:'/usr/bin:/bin', HOME:dir, GIT_CONFIG_NOSYSTEM:'1',
+    cwd:dir, timeout:30 * 60_000, env:{PATH:'/usr/bin:/bin', HOME:dir, TMPDIR:dir, GIT_CONFIG_NOSYSTEM:'1',
       GIT_CONFIG_GLOBAL:'/dev/null', GIT_TERMINAL_PROMPT:'0', GIT_NO_REPLACE_OBJECTS:'1', LC_ALL:'C'},
   });
   let server;
@@ -77,6 +102,7 @@ async function transfer(env, identity, input) {
       try {
         const stat = await file.stat();
         if (!stat.isFile() || stat.nlink !== 1) throw Error('Il bundle deve essere un file regolare del workspace');
+        if (stat.size > Math.min(available(freeDisk), available(host))) throw Error('Spazio temporaneo insufficiente per il bundle Git');
         await pipeline(file.createReadStream(), createWriteStream(pack,{flags:'wx',mode:0o600}));
       } finally { await file.close(); }
       // A self-contained bundle needs no download. Resolve incremental prerequisites only from this floor.
@@ -97,9 +123,9 @@ async function transfer(env, identity, input) {
     await run('fetch','--no-tags',url,ref + ':' + ref);
     await run('symbolic-ref','HEAD',ref);
     await run('bundle','create',pack,ref,'HEAD');
+    const sha = (await run('rev-parse',ref)).stdout.trim();
     const bundle = '/workspace/office-' + randomUUID() + '.bundle';
     await copyFile(pack,bundle,constants.COPYFILE_EXCL);
-    const sha = (await run('rev-parse',ref)).stdout.trim();
     return {repository:identity.repository, branch, sha, bundle, login:identity.login,
       email:identity.login+'@office.invalid', usage:'git clone this local bundle into a new directory, or git fetch it in an existing checkout.'};
   } finally {

@@ -1,8 +1,9 @@
 import { createHash } from 'node:crypto';
 import { DropStore } from '../drops.js';
+import { gitScratch } from './git-scratch.js';
 import { execFile, spawn } from 'node:child_process';
 import { promisify } from 'node:util';
-import { existsSync, mkdirSync, realpathSync } from 'node:fs';
+import { existsSync, mkdirSync, realpathSync, statSync } from 'node:fs';
 import { mkdtemp, readdir, rename, rm } from 'node:fs/promises';
 import path from 'node:path';
 import type { WorkerInfo } from '../../shared/protocol.js';
@@ -110,7 +111,13 @@ export async function prepareContainer(info: WorkerInfo, project: string, token:
   const p = await workspace(info.id, project);
   const existing = await owned(info.id);
   let cid = existing?.cid;
-  if (existing && !['running', 'created'].includes(existing.status)) {
+  // A container created before RC16 cannot gain a bind mount through docker start.
+  const scratchPath = '/var/lib/agent-office-git/' + info.id;
+  const compatible = existing && ['running', 'created'].includes(existing.status) &&
+    existsSync(scratchPath) && statSync(scratchPath).dev !== statSync(path.dirname(scratchPath)).dev &&
+    await docker(['inspect', '--format', '{{range .Mounts}}{{if eq .Destination "/tmp/office-git"}}{{.Source}}{{end}}{{end}}', existing.cid]) === scratchPath;
+  if (existing && !compatible) {
+    if (existing.status === 'running') await docker(['stop', '--time=8', existing.cid]);
     await docker(['rm', existing.cid]); cid = undefined;
   }
   if (!cid) {
@@ -118,23 +125,33 @@ export async function prepareContainer(info: WorkerInfo, project: string, token:
     if (!opts.includes('"name=rootless"')) throw Error('Il motore degli agenti deve operare in modalità rootless');
     const seccomp = process.env.AGENT_OFFICE_CODEX_SECCOMP;
     if (!seccomp || !path.isAbsolute(seccomp)) throw Error('Profilo sandbox Codex mancante');
-    cid = await docker(['create', '--pull=never', '--name', p.name, '--label', label + '=' + info.id, '--label', instanceLabel + '=' + instance(),
-      '--init', '-it', '--cap-drop=ALL', '--cap-add=SETFCAP', '--security-opt=no-new-privileges', '--security-opt', 'seccomp=' + seccomp,
-      '--read-only', '--tmpfs', '/tmp:rw,nosuid,nodev,size=128m', '--pids-limit=256',
-      '--cpus', process.env.AGENT_OFFICE_CODEX_CPUS || '1', '--memory', process.env.AGENT_OFFICE_CODEX_MEMORY || '2g',
-      '--mount', 'type=bind,src=' + p.work + ',dst=/workspace',
-      '--mount', 'type=bind,src=' + p.home + ',dst=' + p.home,
-      '--mount', 'type=bind,src=' + p.drops + ',dst=/office-drops,readonly',
-      '--mount', 'type=bind,src=' + p.bridge + ',dst=/office-bridge,readonly',
-      '--mount', 'type=bind,src=' + path.join(p.bridge, 'codex-system') + ',dst=/etc/codex,readonly',
-      '--env', 'HOME=' + p.home, '--env', 'CODEX_HOME=' + dockerHome(info.id),
-      '--env', 'TERM=xterm-256color', '--env', 'AGENT_OFFICE_WORKER_ID=' + info.id,
-      '--env', 'AGENT_OFFICE_HOOK_TOKEN=' + token, '--env', 'AGENT_OFFICE_HOOK_SOCKET=/office-bridge/hooks.sock',
-      process.env.AGENT_OFFICE_CODEX_IMAGE || AGENT_IMAGE, ...args]);
+    // A previous process may have exited between Docker removal and scratch release.
+    await gitScratch('release', info.id);
+    await gitScratch('prepare', info.id);
+    try {
+      cid = await docker(['create', '--pull=never', '--name', p.name, '--label', label + '=' + info.id, '--label', instanceLabel + '=' + instance(),
+        '--init', '-it', '--cap-drop=ALL', '--cap-add=SETFCAP', '--security-opt=no-new-privileges', '--security-opt', 'seccomp=' + seccomp,
+        '--read-only', '--tmpfs', '/tmp:rw,nosuid,nodev,size=128m', '--pids-limit=256',
+        '--cpus', process.env.AGENT_OFFICE_CODEX_CPUS || '1', '--memory', process.env.AGENT_OFFICE_CODEX_MEMORY || '2g',
+        '--mount', 'type=bind,src=' + p.work + ',dst=/workspace',
+        '--mount', 'type=bind,src=' + scratchPath + ',dst=/tmp/office-git',
+        '--mount', 'type=bind,src=' + p.home + ',dst=' + p.home,
+        '--mount', 'type=bind,src=' + p.drops + ',dst=/office-drops,readonly',
+        '--mount', 'type=bind,src=' + p.bridge + ',dst=/office-bridge,readonly',
+        '--mount', 'type=bind,src=' + path.join(p.bridge, 'codex-system') + ',dst=/etc/codex,readonly',
+        '--env', 'HOME=' + p.home, '--env', 'CODEX_HOME=' + dockerHome(info.id),
+        '--env', 'TERM=xterm-256color', '--env', 'AGENT_OFFICE_WORKER_ID=' + info.id,
+        '--env', 'AGENT_OFFICE_HOOK_TOKEN=' + token, '--env', 'AGENT_OFFICE_HOOK_SOCKET=/office-bridge/hooks.sock',
+        process.env.AGENT_OFFICE_CODEX_IMAGE || AGENT_IMAGE, ...args]);
+    } catch (error) {
+      // After an ambiguous Docker timeout, preserve storage if creation actually completed.
+      if (!await owned(info.id)) await gitScratch('release', info.id);
+      throw error;
+    }
   }
   if (!/^[a-f0-9]{64}$/.test(cid)) throw Error('Creazione del container non confermata');
-  const attach = existing?.status === 'running' ? ['attach', '--sig-proxy=false'] : ['start', '-ai'];
-  return { file: 'docker', args: [...dockerPrefix(), ...attach, cid], env: cliEnv(), cwd: p.dir, created: !existing || !['running', 'created'].includes(existing.status) };
+  const attach = compatible && existing?.status === 'running' ? ['attach', '--sig-proxy=false'] : ['start', '-ai'];
+  return { file: 'docker', args: [...dockerPrefix(), ...attach, cid], env: cliEnv(), cwd: p.dir, created: !compatible };
 }
 
 /** Recover compute left between a floor removal and process shutdown. Only our labelled containers qualify. */
@@ -146,11 +163,19 @@ export async function reconcileContainers(registered: (id: string) => boolean) {
       await serialWorker(id, async () => { if (!registered(id)) await stopContainer(id); });
     }
   }
+  // Recover mounts left if Office exited between provisioning/removing a container and cleanup.
+  const workers = path.join(dockerRoot()!, 'workers');
+  if (existsSync(workers)) for (const id of await readdir(workers)) {
+    if (/^[0-9a-f]{12}$/.test(id) && existsSync('/var/lib/agent-office-git/' + id)) {
+      await serialWorker(id, async () => { if (!await owned(id)) await gitScratch('release', id); });
+    }
+  }
 }
 export async function stopContainer(id: string) {
   const c = await owned(id);
   if (c?.status === 'running') await docker(['stop', '--time=8', c.cid]);
   if (c) await docker(['rm', c.cid]);
+  if (existsSync('/run/agent-office-git.sock')) await gitScratch('release', id);
 }
 export async function retireContainer(id: string) {
   await stopContainer(id);

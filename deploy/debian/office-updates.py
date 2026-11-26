@@ -41,6 +41,25 @@ def install():
     drop = UNIT / (release.SERVICE + '.d')
     drop.mkdir(exist_ok=True)
     release.atomic(drop / 'update-probe.conf', '[Service]\nEnvironmentFile=' + str(secret) + '\n')
+    # Install from the candidate even when an older GUI is driving the upgrade.
+    scratch = Path(__file__).resolve().with_name('git-scratch.py')
+    release.atomic(UNIT / 'agent-office-git.socket', f"""[Socket]
+ListenStream=/run/agent-office-git.sock
+Accept=yes
+SocketMode=0660
+SocketGroup={release.USER}
+TriggerLimitIntervalSec=0
+[Install]
+WantedBy=sockets.target
+""")
+    release.atomic(UNIT / 'agent-office-git@.service', f"""[Service]
+ExecStart=/usr/bin/python3 -I {scratch}
+StandardInput=socket
+StandardOutput=socket
+StandardError=journal
+UMask=0022
+RuntimeMaxSec=60
+""")
     helper = str(release.ROOT / 'current/distribution/office-updates.py')
     release.atomic(UNIT / (PREFIX + '.socket'), f"""[Socket]
 ListenStream={SOCKET}
@@ -75,6 +94,7 @@ WantedBy=multi-user.target
     if not (ETC / 'gui-installed').exists():
         release.atomic(ETC / 'paused', '1\n')
     release.run('systemctl', 'daemon-reload')
+    release.run('systemctl', 'enable', '--now', 'agent-office-git.socket')
     release.run('systemctl', 'enable', '--now', PREFIX + '.socket')
     release.run('systemctl', 'enable', WORK)
     release.atomic(ETC / 'gui-installed', '1\n')

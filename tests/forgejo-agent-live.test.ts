@@ -11,6 +11,7 @@ import { createRequire } from 'node:module';
 import { officeWorkers } from '../src/server/hooks/office-workers.js';
 import type { Ctx } from '../src/server/office/context.js';
 import { repositoryOperation } from '../src/server/worker-repository.js';
+import { gitScratch } from '../src/server/workers/git-scratch.js';
 import { execFile, execFileSync } from 'node:child_process';
 import { assignForge, workerForge, retireForge } from '../src/server/forgejo-agents.js';
 
@@ -98,6 +99,8 @@ test('disposable Forgejo: two private offices, personal identities and protected
   await assert.rejects(gitViaOffice('-C','work','push',remote,'HEAD:refs/heads/main'));
   // On the Debian gate also run the shipped MCP command and Git inside the actual rootless image.
   if (process.env.AOP_TEST_DOCKER_SOCKET) {
+    await gitScratch('prepare', operatorId);
+    t.after(() => gitScratch('release', operatorId));
     const docker=['--host', 'unix://'+process.env.AOP_TEST_DOCKER_SOCKET];
     const image=process.env.AOP_TEST_AGENT_IMAGE || 'aop-codex:0.171.0';
     const command = `set -eu
@@ -119,7 +122,8 @@ node /office-bridge/check-transfer.cjs
 `;
     const asset=path.resolve('bin');
     await promisify(execFile)('docker',[...docker,'run','--rm','--pull=never','--read-only','--network=none','--cap-drop=ALL',
-      '--tmpfs','/tmp','--tmpfs','/workspace','-v',asset+'/office-workers.js:/office-bridge/office-workers.mjs:ro',
+      '--tmpfs','/tmp','--tmpfs','/workspace','-v','/var/lib/agent-office-git/'+operatorId+':/tmp/office-git',
+      '-v',asset+'/office-workers.js:/office-bridge/office-workers.mjs:ro',
       '-v',asset+'/office-forgejo.cjs:/office-bridge/office-forgejo.cjs:ro','-v',sock+':/office-bridge/hooks.sock:ro',
       '-v',path.resolve('tests/fixtures/check-transfer.cjs')+':/office-bridge/check-transfer.cjs:ro',
       '-e','AGENT_OFFICE_HOOK_SOCKET=/office-bridge/hooks.sock','-e','AGENT_OFFICE_WORKER_ID='+operatorId,'-e','AGENT_OFFICE_HOOK_TOKEN=test',

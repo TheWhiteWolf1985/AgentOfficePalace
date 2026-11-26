@@ -90,6 +90,7 @@ jobs:
           mkdir delivery
           mv agent-office.tgz delivery/
           bash deploy/debian/pack-release.sh delivery "${{ steps.pack.outputs.version }}" "$GITHUB_SHA"
+          sudo python3 deploy/debian/test-git-scratch.py "aop-codex:release-$GITHUB_SHA"
           python3 deploy/debian/test-release.py
           python3 deploy/proxmox/test-provision.py
           bash -n delivery/proxmox.sh

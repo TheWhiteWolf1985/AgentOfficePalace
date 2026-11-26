@@ -8,6 +8,8 @@ Apri le proprietà dell’agente per collegare un abbonamento ChatGPT tramite co
 
 ## Workspace e accessi
 
+I trasferimenti Git dell’ufficio usano `/tmp/office-git` nel container. Ogni agente ha un filesystem temporaneo ext4 sul disco della VM, con capacità massima complessiva di 4 GiB. Oggetti Git e bundle intermedi condividono questo spazio. Il servizio Debian `agent-office-git.socket` prepara il volume al primo avvio del container e l’aggiornamento gestito installa il servizio anche sulle istanze esistenti. Ogni operazione ripulisce la propria directory. Il bundle restituito da un checkout rimane in `/workspace` per l’importazione.
+
 La prima creazione importa la revisione Git dell’ufficio in un clone privato con metadati Git indipendenti. Un ufficio locale vuoto parte con un nuovo repository. Ciascun agente lavora in `/workspace`. Le modifiche e i commit restano nella sua copia anche quando il container viene ricreato. La pubblicazione sul repository dell’ufficio, le riunioni con worktree condiviso e le attività multi-repository richiedono un’integrazione successiva. Le chiavi Git dell’ufficio rimangono sul server. I file incollati nel terminale sono accessibili nel mount di sola lettura `/office-drops`.
 
 La distribuzione di prova è pensata per un ufficio fidato. Chi controlla il terminale può svolgere attività usando l’identità Codex associata. Gli amministratori gestiscono gli accessi. La vista 3D segue gli eventi del terminale come negli altri uffici.
