@@ -50,7 +50,7 @@ export function dockerPrefix(): string[] {
   if (!file || !path.isAbsolute(file)) throw Error('Socket Docker locale non configurato');
   return ['--host', 'unix://' + file];
 }
-const cliEnv = () => ({ PATH: '/usr/local/bin:/usr/bin:/bin', LANG: 'C.UTF-8' });
+export const cliEnv = () => ({ PATH: '/usr/local/bin:/usr/bin:/bin', LANG: 'C.UTF-8' });
 export async function docker(args: string[], timeout = 30_000) {
   try { return (await exec('docker', [...dockerPrefix(), ...args], { env: cliEnv(), timeout, maxBuffer: 1024 * 1024 })).stdout.trim(); }
   catch (e) {
@@ -142,7 +142,11 @@ export async function prepareContainer(info: WorkerInfo, project: string, token:
         '--env', 'HOME=' + p.home, '--env', 'CODEX_HOME=' + dockerHome(info.id),
         '--env', 'TERM=xterm-256color', '--env', 'AGENT_OFFICE_WORKER_ID=' + info.id,
         '--env', 'AGENT_OFFICE_HOOK_TOKEN=' + token, '--env', 'AGENT_OFFICE_HOOK_SOCKET=/office-bridge/hooks.sock',
-        process.env.AGENT_OFFICE_CODEX_IMAGE || AGENT_IMAGE, ...args]);
+        ...(info.sharedCodexLogin ? ['--entrypoint=/bin/sh','--env','CODEX_REFRESH_TOKEN_URL_OVERRIDE=http://127.0.0.1:19463/refresh',
+          '--env','CODEX_REVOKE_TOKEN_URL_OVERRIDE=http://127.0.0.1:19463/revoke'] : []),
+        process.env.AGENT_OFFICE_CODEX_IMAGE || AGENT_IMAGE,
+        ...(info.sharedCodexLogin ? ['-ec','node /office-bridge/shared-codex.cjs serve & node /office-bridge/shared-codex.cjs init; exec /bin/sh /usr/local/bin/aop-start "$@"','codex'] : []),
+        ...args]);
     } catch (error) {
       // After an ambiguous Docker timeout, preserve storage if creation actually completed.
       if (!await owned(info.id)) await gitScratch('release', info.id);

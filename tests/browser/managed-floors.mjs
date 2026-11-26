@@ -127,7 +127,9 @@ test('agent management assigns existing agents explicitly and retries pending ac
   const posts=[];
   await page.route('**/api/connections*',async route=>{
     if (route.request().method()==='GET') return route.fulfill({json:{floors:[floor],codexDocker:true,accounts:[],bindings:[],codexAccounts:{},forgeAccounts:{}}});
-    const input=route.request().postDataJSON(); posts.push(input);
+    const input=route.request().postDataJSON();
+    if (input.action === 'codex-login' && input.operation === 'state') return route.fulfill({json:{state:'none',account:'signed-out'}});
+    posts.push(input);
     if (input.action === 'container-create') return route.fulfill({status:201,json:{workerId:id}});
     const access=posts.length===1 ? {...input.assignment,status:'pending',error:'Forgejo offline'} :
       {...input.assignment,status:'ready',username:'aop-pixel',repository:'uffici/documenti'};

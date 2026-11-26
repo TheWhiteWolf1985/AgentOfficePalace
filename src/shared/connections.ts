@@ -14,5 +14,5 @@ export interface ConnectionFloor { id: string; name: string; dir: string; worker
 export type CodexIdentity = { method: 'chatgpt'; email?: string } | { method: 'api-key' };
 export type CodexAccount = CodexIdentity | 'signed-out' | 'unknown';
 export interface CodexAccounts { configured: CodexAccount; active: CodexAccount | 'stopped' }
-export interface ConnectionsView extends GitConnectionsState { forgeAccounts?: Record<string, import('./forgejo-agent.js').AgentForgeView>; floors: ConnectionFloor[]; admin: boolean; codexDocker?: boolean; codexAccounts?: Record<string, CodexAccounts> }
+export interface ConnectionsView extends GitConnectionsState { forgeAccounts?: Record<string, import('./forgejo-agent.js').AgentForgeView>; floors: ConnectionFloor[]; admin: boolean; codexDocker?: boolean; codexAccounts?: Record<string, CodexAccounts>; sharedCodexAccount?: CodexAccount }
 export interface WorkerConfiguration { appearance?: AgentAppearance | 'random'; name: string; color: string; deskId: string; provider?: AgentProvider; model?: string; effort?: AgentEffort; prompt?: string; restart?: boolean }

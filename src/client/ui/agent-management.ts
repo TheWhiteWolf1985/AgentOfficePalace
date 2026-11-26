@@ -44,6 +44,40 @@ export function agentManagementPanel(actions: HTMLElement, lazy = false) {
   const accountName = (id?: string) => data.accounts.find((a) => a.id === id)?.name ?? t('Not assigned');
   const bindingFor = (floor: ConnectionFloor) => data.bindings.find((b) => b.floorId === floor.id);
   async function reload() { data = await loadConnections(true); if (!disposed) list(); }
+  function loginCard(shared: boolean, current: CodexAccounts['active'] | undefined, action: (operation: string, extra?: Record<string,string>) => Promise<any>) {
+    const key = h('input', {type:'password',autocomplete:'off',spellcheck:false}) as HTMLInputElement;
+    const feedback = h('p', {role:'status'}, accountLabel(current));
+    const card = h('div.connection-card', {}, h('h4', {}, t(shared ? 'Shared Codex sign-in' : 'Codex sign-in')));
+    if (shared) card.append(h('p.setting-note', {}, t('New Codex agents in every office use this account.')));
+    card.append(feedback);
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let closed = false, waiting = false, requestNumber = 0;
+    const paint = async () => {
+      clearTimeout(timer);
+      const currentRequest = ++requestNumber;
+      const s = await action('state');
+      if (closed || currentRequest !== requestNumber) return;
+      if (s.state === 'waiting' || s.state === 'busy') {
+        waiting = true;
+        feedback.replaceChildren();
+        if (s.url && s.code) feedback.append(h('a', {href:s.url,target:'_blank',rel:'noopener noreferrer'}, t('Open ChatGPT')), ' · ', s.code);
+        else feedback.textContent = t(s.state === 'busy' ? 'Another administrator is connecting Codex.' : 'Waiting for the device code…');
+        timer = setTimeout(() => void paint().catch(() => {feedback.textContent=t('Connection failed');}),1500);
+      } else if (s.state === 'ready') {
+        feedback.textContent = s.account ? accountLabel(s.account) : t('Codex connected');
+        if (shared && waiting) await reload();
+      } else if (s.state === 'failed') feedback.textContent = t('Sign-in failed. Check device-code access or use an API key.');
+      else if (shared && waiting) await reload();
+    };
+    card.append(button(t('Connect ChatGPT'), () => run(async () => { await action('device'); waiting=true; await paint(); })),
+      field(t('OpenAI API key'),key), button(t('Connect API key'), () => run(async () => {
+        const apiKey = key.value.trim(); key.value=''; await action('key',{apiKey}); waiting=true; await paint();
+      })));
+    void paint().catch(() => {if (!closed) feedback.textContent=t('Connection failed');});
+    const disposePrevious = releaseForm;
+    releaseForm = () => {disposePrevious?.(); closed=true; clearTimeout(timer); key.value='';};
+    return card;
+  }
   function list() {
     resetForm();
     if (!data) return;
@@ -58,7 +92,7 @@ export function agentManagementPanel(actions: HTMLElement, lazy = false) {
           h('td', {}, worker.runtime ? accountLabel(accounts?.active) : accountName(worker.connectionAccountId)), h('td', {}, button(t('Edit properties'), () => edit(floor, worker))));
       })));
     body.replaceChildren(h('p', {}, t`Agents: ${rows.length}`), h('div.agent-table-wrap', {}, table));
-    if (data.codexDocker) body.prepend(button(t('Create Codex agent'), create));
+    if (data.codexDocker) body.prepend(loginCard(true,data.sharedCodexAccount,(operation,extra) => request('codex-login',{operation,...extra})), button(t('Create Codex agent'), create));
 
   }
   function create() {
@@ -190,33 +224,13 @@ export function agentManagementPanel(actions: HTMLElement, lazy = false) {
     body.replaceChildren(button(t('Back to all agents'), () => { if (canLeave()) void run(reload); }), h('h3', {}, floor.name + ' · ' + worker.name), props, identity, details);
     if (worker.runtime === 'docker') {
       const action = (operation: string, extra = {}) => request('container', { floorId: floor.id, workerId: worker.id, operation, ...extra });
-      const key = h('input', { type: 'password', autocomplete: 'off', spellcheck: false }) as HTMLInputElement;
-      const feedback = h('p', { role: 'status' }, accountLabel(data.codexAccounts?.[worker.id]?.active));
-      const auth = h('div.connection-card', {}, h('h4', {}, t('Codex sign-in')), feedback);
-      let timer: ReturnType<typeof setTimeout> | undefined;
-      let closed = false;
-      releaseForm = () => { look?.dispose(); closed = true; clearTimeout(timer); key.value = ''; };
-      const poll = async () => {
-        const s = await action('login-state');
-        if (closed) return;
-        if (s.state === 'waiting') {
-          feedback.replaceChildren();
-          if (s.url && s.code) feedback.append(h('a', { href: s.url, target: '_blank', rel: 'noopener noreferrer' }, t('Open ChatGPT')), ' · ', s.code);
-          else feedback.textContent = t('Waiting for the device code…');
-          timer = setTimeout(() => void poll().catch(() => { feedback.textContent = t('Connection failed'); }), 1500);
-        } else if (s.state === 'ready') feedback.textContent = t('Codex connected');
-        else if (s.state === 'failed') feedback.textContent = t('Sign-in failed. Check device-code access or use an API key.');
-      };
-      auth.append(button(t('Connect ChatGPT'), () => run(async () => { await action('login-device'); clearTimeout(timer); await poll(); })),
-        field(t('OpenAI API key'), key), button(t('Connect API key'), () => run(async () => {
-          const apiKey = key.value.trim(); key.value = ''; await action('login-key', { apiKey }); await poll();
-        })));
       const stopped = worker.paused || ['exited', 'offline'].includes(worker.status);
       const control = h('div.connection-card', {}, h('h4', {}, 'Docker'), h('p', {}, STATUS_LABEL[worker.status]),
         button(stopped ? t('Start container') : t('Stop container'), () => { if (canLeave()) void run(async () => { await action(stopped ? 'start' : 'stop'); await reload(); }); }),
         button(t('Remove agent'), () => confirmDialog(t('Remove agent?'), t('The private checkout is retained. Its Codex sign-in and session history will be removed.'), t('Remove'), () => void run(async () => { await action('remove'); await reload(); }))));
       body.append(control);
-      if (!stopped) { body.append(auth); void poll().catch(() => {}); }
+      if (worker.sharedCodexLogin) body.append(h('p.setting-note',{},t('Shared Codex sign-in')+' · '+accountLabel(data.sharedCodexAccount)));
+      else if (!stopped) body.append(loginCard(false,data.codexAccounts?.[worker.id]?.active,(op,extra) => action('login-'+op,extra)));
     }
     actions.replaceChildren(apply.element);
   }

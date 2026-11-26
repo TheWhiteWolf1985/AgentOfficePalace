@@ -127,6 +127,13 @@ class PackageBoundaryTest(unittest.TestCase):
             with self.assertRaises(ValueError):
                 policy['check'](root, set())
             secret.unlink()
+            private = public / 'shared-codex'
+            private.mkdir()
+            (private / 'account.json').write_text('{}')
+            with self.assertRaises(ValueError):
+                policy['check'](root, set())
+            (private / 'account.json').unlink()
+            private.rmdir()
             (public / 'model.glb.gz').write_bytes(gzip.compress(b'C:/Users/example/Documents/export'))
             with self.assertRaises(ValueError):
                 policy['check'](root, set())

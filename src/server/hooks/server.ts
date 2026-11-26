@@ -101,9 +101,13 @@ export async function startHookServer(ctx: Ctx): Promise<{ hookServer: http.Serv
     if (!forgeScript) throw Error('Missing office-forgejo command');
     copyFileSync(forgeScript, path.join(bridge, 'office-forgejo.cjs.tmp'));
     renameSync(path.join(bridge,'office-forgejo.cjs.tmp'),path.join(bridge,'office-forgejo.cjs'));
+    const loginScript = binScript('shared-codex.cjs');
+    if (!loginScript) throw Error('Missing shared Codex login bridge');
+    copyFileSync(loginScript, path.join(bridge,'shared-codex.cjs.tmp'));
+    renameSync(path.join(bridge,'shared-codex.cjs.tmp'),path.join(bridge,'shared-codex.cjs'));
     const local = http.createServer((req, res) => {
       const route = req.url?.split('?')[0];
-      if (route === '/office/workers/git' || route === '/office/workers/repository' || (req.method === 'GET' && route === '/office/workers') || (req.method === 'POST' && ['/office/workers/tell', '/office/workers/result', '/office/workers/reply', '/office/workers/tools', '/office/workers/use'].includes(route ?? ''))) {
+      if (route === '/office/workers/git' || route === '/office/workers/repository' || (req.method === 'GET' && route === '/office/workers') || (req.method === 'POST' && ['/office/workers/codex-auth', '/office/workers/tell', '/office/workers/result', '/office/workers/reply', '/office/workers/tools', '/office/workers/use'].includes(route ?? ''))) {
         const url = new URL(req.url!, 'http://localhost');
         void officeWorkers(ctx, req, res, url, true).catch(() => send(res, 500, { error: 'Delivery failed' }));
         return;

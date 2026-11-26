@@ -68,8 +68,12 @@ test('a stopped Docker worker restores its identity, sign-in boundary and chosen
   const workers = new Map<string, Worker>(); restoreWorkers(file, workers, 'codex', () => false);
   const restored = workers.get(id)!;
   assert.equal(restored.info.runtime, 'docker'); assert.equal(restored.info.paused, true);
+  assert.equal(restored.info.sharedCodexLogin, undefined);
   assert.equal(restored.info.sessionId, 'existing-session'); assert.equal(restored.owner, 'owner');
   assert.equal(restored.hookToken, w.hookToken);
+  w.info.sharedCodexLogin = true;
+  saveWorkers(file,[w],true); workers.clear(); restoreWorkers(file,workers,'codex',()=>false);
+  assert.equal(workers.get(id)?.info.sharedCodexLogin,true);
 });
 
 test('Codex account labels expose only the sign-in method and optional display email', () => {

@@ -296,7 +296,7 @@ def docker():
 
 def check_first_install():
     runtime = HOME / 'codex-runtime'
-    if any((HOME / 'projects').glob('*')) or any((runtime / 'workers').glob('*')) or any(runtime.rglob('auth.json')):
+    if any((HOME / 'projects').glob('*')) or any((runtime / 'workers').glob('*')) or any(runtime.rglob('auth.json')) or (runtime / 'shared-codex/account.json').exists():
         raise ValueError('Dati di uffici o accessi agenti inattesi al primo avvio')
     with sqlite3.connect('file:/var/lib/forgejo/data/forgejo.db?mode=ro', uri=True) as db:
         if db.execute('SELECT COUNT(*) FROM repository').fetchone()[0] != 0:

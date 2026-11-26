@@ -33,6 +33,7 @@ export interface WorkerInfo {
   kind: WorkerKind;
   provider?: AgentProvider;
   runtime?: 'docker';
+  sharedCodexLogin?: true;
   paused?: boolean;
   /** Launch settings of the current Docker container, independent of edits saved during a turn. */
   containerEngine?: { model?: string; effort?: AgentEffort };

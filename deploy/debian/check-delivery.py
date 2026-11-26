@@ -11,7 +11,7 @@ PRIVATE = re.compile(rb'-----BEGIN (?:RSA |EC |OPENSSH |DSA |ENCRYPTED )?PRIVATE
                      rb'gh[pousr]_[A-Za-z0-9]{36,}|github_pat_[A-Za-z0-9_]{40,}|'
                      rb'sk-(?:proj-|svcacct-)[A-Za-z0-9_-]{36,}|ya29\.[A-Za-z0-9_-]{40,}|'
                      rb'AIza[0-9A-Za-z_-]{35}|GOCSPX-[A-Za-z0-9_-]{22,}')
-FORBIDDEN = {'.git', '.ssh', '.codex', '.agent-office', '.config', 'auth.json', 'accounts.json',
+FORBIDDEN = {'.git', '.ssh', '.codex', '.agent-office', '.config', 'auth.json', 'accounts.json', 'shared-codex',
              'connections.json', 'forgejo-identities', 'agent-admin-token', 'workers.json', 'floors.json', 'floor.json', 'sessions', 'authorized_keys',
              'known_hosts', '.git-credentials', '.npmrc', '.netrc', '.docker', 'id_ed25519', 'id_rsa'}
 PERSONAL_PATH = re.compile(rb'(?:[A-Z]:[\\/]+Users[\\/]+(?!Public\b|Default\b)[\w.-]+[\\/]+(?:Documents|AppData)|'

@@ -4,6 +4,7 @@ import { mkdtemp, mkdir, rmdir } from 'node:fs/promises';
 import { TLSSocket } from 'node:tls';
 import { deviceState, dockerRoot, loginContainer, serialWorker } from '../../workers/docker.js';
 import { codexAccounts } from '../../workers/docker-accounts.js';
+import { sharedAccount, sharedLoginStatus, startSharedLogin } from '../../workers/shared-codex.js';
 import { agentAssignment } from '../../../shared/forgejo-agent.js';
 import { forgeView, assignForge, serializeForge } from '../../forgejo-agents.js';
 import { changeFloor, floorManagement, hasFloorForge } from '../../managed-floors.js';
@@ -40,10 +41,27 @@ export const connectionsRoute: Route = {
         const accounts = url.searchParams.has('agents') && dockerRoot()
           ? await codexAccounts(floors.flatMap(f => f.workers.filter(w => w.runtime === 'docker').map(w => w.id))) : undefined;
         const forgeAccounts = accounts && Object.fromEntries(floors.flatMap(f => f.workers.filter(w => w.runtime === 'docker').map(w => [w.id,forgeView(w.id)])));
-        return send(res, 200, { ...store.snapshot(), admin: true, codexDocker: !!dockerRoot(), floors, codexAccounts: accounts, forgeAccounts });
+        const shared = accounts ? await sharedAccount().catch(() => 'unknown' as const) : undefined;
+        if (accounts && shared) for (const floor of floors) for (const worker of floor.workers) {
+          if (worker.sharedCodexLogin && accounts[worker.id]) accounts[worker.id].configured = shared;
+        }
+        return send(res, 200, { ...store.snapshot(), admin: true, codexDocker: !!dockerRoot(), floors, codexAccounts: accounts, sharedCodexAccount: shared, forgeAccounts });
       }
       const body = JSON.parse(await readBody(req, 65536));
       switch (body.action) {
+        case 'codex-login': {
+          if (!dockerRoot()) throw Error('Runtime Codex non configurato');
+          res.setHeader('Cache-Control','no-store');
+          const local = ['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(req.socket.remoteAddress ?? '');
+          const forwarded = req.headers['x-forwarded-proto'];
+          if (!(req.socket instanceof TLSSocket && req.socket.encrypted) && !(local && (forwarded === undefined || (ctx.cfg.trustProxy && forwarded === 'https')))) throw Error('Apri il sito tramite HTTPS per collegare Codex');
+          const owner = ctx.auth.pluginBrowserBinding(req);
+          if (!owner) return send(res,403,{error:'Sessione amministrativa richiesta'});
+          if (body.operation === 'state') return send(res,200,await sharedLoginStatus(owner));
+          if (body.operation === 'device') return send(res,200,await startSharedLogin(owner));
+          if (body.operation === 'key' && typeof body.apiKey === 'string') return send(res,200,await startSharedLogin(owner,body.apiKey));
+          throw Error('Operazione non valida');
+        }
         case 'floor-create':
         case 'floor-update':
         case 'floor-delete':
@@ -117,6 +135,7 @@ export const connectionsRoute: Route = {
             case 'login-state': return send(res, 200, deviceState(id, owner));
             case 'login-device':
             case 'login-key': {
+              if (floor.workers.get(id)?.sharedCodexLogin) throw Error('Questo agente usa l’accesso Codex condiviso');
               if (!(req.socket instanceof TLSSocket && req.socket.encrypted) && !['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(req.socket.remoteAddress ?? '')) throw Error('Apri il sito tramite HTTPS per collegare Codex');
               if (body.operation === 'login-key' && typeof body.apiKey !== 'string') throw Error('Chiave API richiesta');
               return send(res, 200, await serialWorker(id, () => loginContainer(id, owner, body.operation === 'login-key' ? body.apiKey : undefined)));

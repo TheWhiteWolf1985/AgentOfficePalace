@@ -12,6 +12,7 @@ import { workerRepository } from '../worker-repository.js';
 import path from 'node:path';
 import { dockerDrops, dockerWorkspace } from '../workers/docker.js';
 import { pluginCall, pluginFile, PluginError } from '../plugin-service.js';
+import { SharedLoginExpired, workerCredential } from '../workers/shared-codex.js';
 
 /**
  * Pull request `n` on a floor, for a worker to have as its own: one that's open, or merged and still
@@ -51,6 +52,16 @@ export async function officeWorkers(ctx: Ctx, req: http.IncomingMessage, res: ht
   if (socket && me.runtime !== 'docker') return send(res, 403, { error: 'Container identity required' });
   const restricted = me.runtime === 'docker';
   const action = url.pathname.slice('/office/workers'.length);
+  if (action === '/codex-auth') {
+    if (!socket || !restricted || !me.sharedCodexLogin || req.method !== 'POST') return send(res,403,{});
+    res.setHeader('Cache-Control','no-store');
+    try {
+      const {refresh} = JSON.parse(await readBody(req,512));
+      if (refresh !== undefined && (typeof refresh !== 'string' || !/^[0-9a-f-]{36}\.[0-9a-f-]{36}$/.test(refresh))) return send(res,400,{});
+      const auth = await workerCredential(refresh);
+      return auth ? send(res,200,auth) : send(res,409,{});
+    } catch (error) { return send(res,error instanceof SharedLoginExpired ? 401 : 503,{}); }
+  }
   if (action === '/git' || action === '/repository') {
     if (!socket || !restricted) return send(res,403,{error:'Identità container richiesta'});
     return workerRepository(req,res,url,me.id,floor.def);

@@ -286,7 +286,7 @@ export class WorkerManager {
       id,
       kind,
       provider: selectedProvider,
-      ...(container ? { runtime: 'docker' as const } : {}),
+      ...(container ? { runtime: 'docker' as const, sharedCodexLogin: true as const } : {}),
       model: takesModel(selectedProvider) ? model : undefined,
       effort: takesEffort(selectedProvider) ? effort : undefined,
       deskId,
@@ -862,7 +862,8 @@ export class WorkerManager {
       }
       if (adapter?.bootHint) {
         w.bootBlocked = true;
-        info.activity = info.runtime === 'docker' ? 'Impostazioni → Gestione agenti: collega Codex, poi apri il terminale' : adapter.bootHint;
+        info.activity = info.sharedCodexLogin ? 'Impostazioni → Gestione agenti → Accesso Codex condiviso' :
+          info.runtime === 'docker' ? 'Impostazioni → Gestione agenti: collega Codex, poi apri il terminale' : adapter.bootHint;
         this.setStatus(w, 'needs_input');
       } else this.setStatus(w, 'idle');
     }, 12000);

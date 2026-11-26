@@ -1,4 +1,7 @@
 export const italianConnections: Record<string, string> = {
+  "Shared Codex sign-in": "Accesso Codex condiviso",
+  "New Codex agents in every office use this account.": "I nuovi agenti Codex di tutti gli uffici usano questo account.",
+  "Another administrator is connecting Codex.": "Un altro amministratore sta collegando Codex.",
   "Agent type": "Tipo di agente",
   "Choose agent type": "Scegli il tipo di agente",
   "Office role": "Ruolo in ufficio",
