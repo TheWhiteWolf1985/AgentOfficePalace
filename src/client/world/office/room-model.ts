@@ -8,6 +8,7 @@ import type { OfficeResources } from '../deferred-office';
 import type { DeskView, Interactable, Collider } from '../types';
 import geometry from './office-colliders.json';
 import { vacancyMarker } from './seats';
+import { chiefDesk } from './chief-desk';
 
 function required(root: THREE.Object3D, name: string) {
   const node = root.getObjectByName(name);
@@ -75,9 +76,13 @@ export function buildRoomModel({ group, desks, colliders, interactables }: Offic
     interactables.push(it);
     if (it.deskId) byDesk.set(it.deskId, it);
   }
+  const chief = chiefDesk(base);
+  desks.set(chief.def.id, chief);
+  register(chief.group, {kind:'desk',deskId:chief.def.id,x:chief.def.x,y:chief.def.y,z:chief.def.z+1.25,radius:1.6});
   for (const root of [base, extension, overflow]) {
     root.traverse(node => {
       const def = DESK_BY_ID.get(node.name);
+      if (def?.id === chief.def.id) return;
       if (!def) {
         const it = node.userData.interazione as Interactable | undefined;
         if (it) register(node, it);

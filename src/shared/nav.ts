@@ -380,6 +380,11 @@ const WALK_OFF_X = GROUNDS.minX + 4;
 const IN_FROM: Pt = [ELEVATOR.x, ELEVATOR_FRONT + 0.5];
 
 export function wayToLift(seat: DeskDef, wing = 0, from?: Pt): Pt[] {
+  if (seat.y) {
+    const z = (STAIRS.minZ + STAIRS.maxZ) / 2;
+    const foot: Pt = [STAIRS.fromX - 0.6,z];
+    return [from ?? [seat.x,seat.z+1.25], [LOFT.minX+0.6,z], ...route(foot,IN_FROM,wing)];
+  }
   return from ? route(from, IN_FROM, wing) : officeNav(wing).wayFrom(seat, IN_FROM);
 }
 

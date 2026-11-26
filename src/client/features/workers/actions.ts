@@ -6,7 +6,7 @@ import { t as uiText } from '../../../shared/i18n';
  * at a desk; and what the hint bar says at a desk or a board agent's kiosk. Also what the boards'
  * buttons do with a worker.
  */
-import { STATION_AGENT, deskSeat, type DeskDef } from '../../../shared/layout';
+import { CHIEF_DESK, STATION_AGENT, deskSeat, type DeskDef } from '../../../shared/layout';
 import { canLabel } from '../../../shared/floorplan';
 import { officeFull, pressureNote } from '../../../shared/machine';
 import type { AgentEffort, AgentProvider, WorkerInfo } from '../../../shared/protocol';
@@ -308,7 +308,7 @@ export function installWorkerActions(ctx: Ctx, core: CoreState, parts: WorkerAct
     ctx.activities.stopAll('desk');
     parts.walking.stopWalkingTo();
     let spot = deskSeat(desk, desk.station ? -1.6 : desk.beanbag ? 1.6 : 2.4);
-    player.pos.set(spot.x, 0, spot.z);
+    player.pos.set(spot.x, desk.y ?? 0, spot.z);
     player.vy = 0;
     player.facing = Math.atan2(desk.x - spot.x, desk.z - spot.z);
     player.camYaw = player.facing - Math.PI;
@@ -317,6 +317,7 @@ export function installWorkerActions(ctx: Ctx, core: CoreState, parts: WorkerAct
 
   function deskHint(deskId: string): Hint {
     const w = store.workerAtDesk(deskId);
+    if (!w && deskId === CHIEF_DESK.id) return {k:'chief', parts:[h('span.title', {}, CHIEF_DESK.label)]};
     if (!w && plan().byId.get(deskId)?.room) return { k: 'room', parts: [h('span.title', {}, uiText`🤝 ${plan().byId.get(deskId)!.label} · free`), key('E', uiText('Call a meeting'))] };
     // The sign over it, if it has one, and L to hang one (or change it).
     const sign = store.floorPlan.labels[deskId]?.text;
@@ -422,6 +423,7 @@ export function installWorkerActions(ctx: Ctx, core: CoreState, parts: WorkerAct
       if (!it.deskId) return;
       if (key === 'L') return openDeskLabel(net, it.deskId);
       const w = store.workerAtDesk(it.deskId);
+      if (!w && it.deskId === CHIEF_DESK.id) return;
       // Nobody is hired at the meeting table: a meeting seats its own workers there.
       if (!w && plan().byId.get(it.deskId)?.room) return key === 'E' ? parts.meeting.showMeeting() : undefined;
       if (key === 'B' && !w) return openShell(it.deskId);

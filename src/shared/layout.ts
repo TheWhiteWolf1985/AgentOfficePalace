@@ -17,6 +17,8 @@ export interface DeskDef {
   z: number;
   /** Rotation around Y. At 0 the worker sits on the desk's +z side, facing -z. */
   rotY: number;
+  /** Height of an elevated workstation. */
+  y?: number;
   label: string;
   /** A bean bag on the floor instead of a desk; the worker sits on it at (x, z), facing -z at rotY 0. */
   beanbag?: boolean;
@@ -170,6 +172,9 @@ export const LOFT = { minX: 9, maxX: FLOOR.maxX, minZ: 8, maxZ: FLOOR.maxZ, y: 3
 /** Its stairs climb east along the south wall and arrive at the loft's west door. */
 export const STAIRS = { fromX: 3, toX: LOFT.minX, minZ: 11.2, maxZ: FLOOR.maxZ, steps: 15 } as const;
 
+/** Reserved for the office chief, outside the pool used by ordinary hiring. */
+export const CHIEF_DESK: DeskDef = { id: 'chief-desk', x: 14, y: LOFT.y, z: 10.2, rotY: 0, label: uiText('Office chief desk') };
+
 /**
  * The meeting room: glass walls round the space under the boss office, from the loft's posts to the
  * outside walls, with a long table in the middle. Workers called to a meeting sit round it (see
@@ -202,7 +207,7 @@ export const MEETING_SEATS: DeskDef[] = (
 export const MEETING_BOARD = { x: MEETING_TABLE.x, y: 1.95, z: FLOOR.maxZ - 0.08, width: 3.6, height: 1.2 } as const;
 
 /** Any place a worker can be by id: the seats (the back office's included), the board agents' kiosks and the meeting room's chairs. */
-export const DESK_BY_ID = new Map([...SEATS, ...STATIONS, ...MEETING_SEATS].map((d) => [d.id, d]));
+export const DESK_BY_ID = new Map([...SEATS, ...STATIONS, ...MEETING_SEATS, CHIEF_DESK].map((d) => [d.id, d]));
 
 /**
  * The seat a new worker takes when nobody picks one: the first free desk (in the back office too, as
@@ -436,9 +441,8 @@ export const SEATING: SeatDef[] = [
   // Beanbags either side of the lounge, turned to the TV.
   { id: 'lounge-beanbag-1', label: uiText('🫘 Beanbag'), x: 12.5, y: 0, z: 3.5, rotY: Math.atan2(TV.x - 12.5, TV.z - 3.5), places: [0], hips: 0.42, depth: -0.1, out: 1.2 },
   { id: 'lounge-beanbag-2', label: uiText('🫘 Beanbag'), x: 14.5, y: 0, z: -3.4, rotY: Math.atan2(TV.x - 14.5, TV.z + 3.4), places: [0], hips: 0.42, depth: -0.1, out: 1.2 },
-  // Up in the boss office: the couch against the east wall, and the chair at the big desk, facing the glass.
+  // The loft couch stays available to visitors. The chief's chair is a worker workstation.
   { id: 'loft-couch', label: uiText('🛋️ Couch'), x: LOFT.maxX - 0.65, y: LOFT.y, z: (LOFT.minZ + LOFT.maxZ) / 2, rotY: -Math.PI / 2, places: [-0.5, 0.5], hips: 0.5, depth: -0.05, out: 0.9 },
-  { id: 'boss-chair', label: uiText("🪑 Boss's chair"), x: (LOFT.minX + LOFT.maxX) / 2 + 0.5, y: LOFT.y, z: (LOFT.minZ + LOFT.maxZ) / 2 + 0.7, rotY: Math.PI, places: [0], hips: 0.62, depth: -0.05, out: -0.8 },
   ...CONFERENCE_SEATING,
   ...ATRIUM_SEATING,
   ...SERVER_ROOM_SEATING,

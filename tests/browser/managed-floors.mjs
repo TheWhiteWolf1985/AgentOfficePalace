@@ -162,3 +162,34 @@ test('agent management assigns existing agents explicitly and retries pending ac
   assert.equal(posts[2].action,'container-create');
   assert.deepEqual(posts[2].assignment,{tenure:'temporary',role:'operator'});
 });
+
+test('Apply reflects chief desk promotion and demotion without leaving a false unsaved draft', async t => {
+  const page=await browser.newPage();t.after(()=>page.close());
+  const worker={id:'aabbccddeeff',kind:'agent',provider:'codex',runtime:'docker',sharedCodexLogin:true,
+    name:'Pixel',color:'#123456',deskId:'desk-1',status:'working'};
+  let role='operator', posts=0;
+  const view=()=>({floors:[{id:'docs',name:'Documenti',workers:[worker],project:{agentProviders:['codex']}}],
+    codexDocker:false,accounts:[],bindings:[],forgeAccounts:{[worker.id]:{role,tenure:'temporary',status:'none'}}});
+  await page.route('**/api/connections*',async route=>{
+    if(route.request().method()==='GET')return route.fulfill({json:view()});
+    const input=route.request().postDataJSON();
+    assert.equal(input.action,'agent-forge');posts++;role=input.assignment.role;
+    worker.deskId=role==='chief'?'chief-desk':'desk-1';
+    return route.fulfill({json:{worker,access:{role,tenure:'temporary',status:'none'}}});
+  });
+  await page.route('**/chief-panel',r=>r.fulfill({contentType:'text/html',body:`<body><footer></footer><script type="module">
+    import {agentManagementPanel} from '/src/client/ui/agent-management.ts';
+    const p=agentManagementPanel(document.querySelector('footer'));document.body.prepend(p.element);window.panel=p;
+    </script></body>`}));
+  await page.goto(vite.resolvedUrls.local[0]+'chief-panel');
+  await page.getByRole('button',{name:'Edit properties'}).click();
+  for(const next of ['chief','operator']) {
+    await page.getByLabel('Office role').selectOption(next);
+    await page.getByRole('button',{name:'Apply',exact:true}).click();
+    await page.getByText('Settings applied',{exact:true}).waitFor();
+    assert.equal(await page.getByLabel('Desk',{exact:true}).inputValue(),next==='chief'?'chief-desk':'desk-1');
+    assert.equal(await page.getByLabel('Desk',{exact:true}).isDisabled(),next==='chief');
+    assert.equal(await page.evaluate(()=>window.panel.canDismiss()),true);
+  }
+  assert.equal(posts,2);
+});

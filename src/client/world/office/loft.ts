@@ -134,7 +134,6 @@ export function buildLoft(group: THREE.Group, colliders: Collider[], interactabl
   bossChair.scale.setScalar(1.2);
   bossChair.position.set(0, 0, 1.0);
   desk.add(bossChair);
-  seatable(bossChair, 'boss-chair', 1.2, interactables);
   // Clicking the screen is using the chair: sit down, then play.
   desk.position.set(deskX, floorY, deskZ);
   group.add(desk);

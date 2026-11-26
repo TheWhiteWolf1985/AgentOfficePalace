@@ -5,6 +5,8 @@ import { isAgentProvider } from '../../shared/providers.js';
 import { DESK_BY_ID } from '../../shared/layout.js';
 import { validateWorkerEffort, validateWorkerModel } from '../agents.js';
 import { midTurn } from './lifecycle.js';
+import { CHIEF_DESK } from '../../shared/layout.js';
+import { officeRole } from './chief-desk.js';
 
 /** A user edits configuration; generated status, history and session identifiers stay immutable. */
 export async function configureWorker(ctx: WorkerContext, id: string, input: WorkerConfiguration): Promise<void> {
@@ -13,6 +15,7 @@ export async function configureWorker(ctx: WorkerContext, id: string, input: Wor
   if (typeof input.name !== 'string' || !input.name.trim() || input.name.length > 100 || /[\x00-\x1f]/.test(input.name)) throw Error('Nome dell’agente non valido');
   if (typeof input.color !== 'string' || !/^#[0-9a-f]{6}$/i.test(input.color)) throw Error('Colore non valido');
   const desk = DESK_BY_ID.get(input.deskId), previous = DESK_BY_ID.get(w.info.deskId);
+  if ((officeRole(w.info) === 'chief') !== (input.deskId === CHIEF_DESK.id)) throw Error('La scrivania deve corrispondere al ruolo del Capo ufficio');
   if (!desk || desk.station !== previous?.station || !!desk.room !== !!previous?.room) throw Error('Scrivania non compatibile con questo agente');
   if ([...ctx.workers.values()].some((other) => other !== w && other.info.deskId === desk.id)) throw Error('La scrivania e occupata');
   if (input.prompt !== undefined && (typeof input.prompt !== 'string' || input.prompt.length > 20000)) throw Error('Istruzioni troppo lunghe');

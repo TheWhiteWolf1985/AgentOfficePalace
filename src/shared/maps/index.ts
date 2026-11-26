@@ -1,4 +1,5 @@
 import { t as uiText } from '../i18n.js';
+import { CHIEF_DESK } from '../layout.js';
 import { BEANBAGS, BOARDS, DESKS, ELEVATOR, ELEVATOR_CAR, EXIT_DOOR, FLOOR, MEETING_SEATS, SEATING, STATIONS, WALL_HEIGHT, WING_DESKS, seatHere, seatPlace, type DeskDef, type SeatPlace } from '../layout.js';
 import { BOARD_KEYS, type BoardKey, type BoardDef, type MapPlan } from './types.js';
 
@@ -11,7 +12,7 @@ export const OFFICE_MAP = 'office';
 const MAP_DESKS: DeskDef[] = [...DESKS, ...WING_DESKS];
 
 function officePlan(): MapPlan {
-  const byId = new Map([...MAP_DESKS, ...BEANBAGS, ...STATIONS, ...MEETING_SEATS].map((d) => [d.id, d]));
+  const byId = new Map([...MAP_DESKS, ...BEANBAGS, ...STATIONS, ...MEETING_SEATS, CHIEF_DESK].map((d) => [d.id, d]));
   const boards = {} as Record<BoardKey, BoardDef>;
   for (const k of BOARD_KEYS) boards[k] = { ...BOARDS[k] };
   return {

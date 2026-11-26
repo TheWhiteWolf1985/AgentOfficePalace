@@ -130,6 +130,14 @@ export class Laptop {
   private paintedAt = 0;
   private openT = 0;
   private placeholder = 'booting…';
+  private monitor?: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicMaterial>;
+
+  setMonitor(monitor?: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicMaterial>) {
+    if (this.monitor?.material.map === this.texture) { this.monitor.material.map = null; this.monitor.material.color.set('#1b1d2e'); this.monitor.material.needsUpdate = true; }
+    this.monitor = monitor;
+    this.root.visible = !monitor;
+    if (monitor) { monitor.material.map = this.texture; monitor.material.color.set('#ffffff'); monitor.material.needsUpdate = true; }
+  }
 
   /** A laptop with a terminal screen and a folding lid. */
   constructor() {
@@ -199,6 +207,7 @@ export class Laptop {
   }
 
   dispose() {
+    this.setMonitor();
     this.texture.dispose();
   }
 }

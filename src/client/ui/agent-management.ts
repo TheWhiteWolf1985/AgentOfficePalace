@@ -5,7 +5,7 @@ import { t, remoteText } from '../../shared/i18n';
 import type { ConnectionsView, ConnectionFloor, CodexAccounts } from '../../shared/connections';
 import type { AgentForgeView } from '../../shared/forgejo-agent';
 import type { WorkerInfo } from '../../shared/protocol';
-import { DESKS, WING_DESKS } from '../../shared/layout';
+import { CHIEF_DESK, DESKS, WING_DESKS } from '../../shared/layout';
 import { settingsApply } from './settings-apply';
 import { h, STATUS_LABEL } from './dom';
 import { agentFields, modelBadge } from './provider';
@@ -133,6 +133,10 @@ export function agentManagementPanel(actions: HTMLElement, lazy = false) {
     const seats = [...DESKS, ...WING_DESKS].filter((d) => !d.station && !d.room).map((d) => ({ id: d.id, name: d.label }));
     if (!seats.some((d) => d.id === worker.deskId)) seats.push({ id: worker.deskId, name: worker.deskId });
     const desk = select(t('Desk'), seats, worker.deskId);
+    if (worker.deskId === CHIEF_DESK.id) {
+      desk.selectedOptions[0].textContent = CHIEF_DESK.label;
+      desk.disabled = true;
+    }
     const engine = agentFields(worker.runtime === 'docker' ? { ...floor.project, agentProviders: ['codex'] } : floor.project, 'manage-' + worker.id, { provider: worker.provider ?? 'custom', model: worker.model, effort: worker.effort });
     const prompt = h('textarea', { maxlength: 20000, rows: 8 }, worker.prompt ?? '') as HTMLTextAreaElement;
     const restart = h('input', { type: 'checkbox' }) as HTMLInputElement;
@@ -188,6 +192,14 @@ export function agentManagementPanel(actions: HTMLElement, lazy = false) {
         const result = await request('agent-forge', {floorId:floor.id, workerId:worker.id,assignment});
         current = result.access;
         (data.forgeAccounts ??= {})[worker.id] = result.access;
+        if (result.worker) {
+          worker.deskId = result.worker.deskId;
+          if (worker.deskId === CHIEF_DESK.id && ![...desk.options].some(o => o.value === CHIEF_DESK.id))
+            desk.add(new Option(CHIEF_DESK.label, CHIEF_DESK.id));
+          desk.value = worker.deskId;
+          desk.disabled = worker.deskId === CHIEF_DESK.id;
+          saved = JSON.stringify(configuration());
+        }
         paint();
       };
       let savedForge = JSON.stringify(forge.value());

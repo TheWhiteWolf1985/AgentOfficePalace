@@ -176,15 +176,16 @@ test('sits on the lounge couch until you walk off, then gets up clear of it', (t
   assert.equal(player.pos.y, 0);
 });
 
-test("gets up from the boss's chair behind it, away from the desk", (t) => {
+test("the chief chair is reserved and visitors can still get up from the loft couch", (t) => {
+  assert.equal(seatAt('boss-chair:0'),undefined);
   const floor: Collider = { minX: LOFT.minX, maxX: LOFT.maxX, minZ: LOFT.minZ, maxZ: LOFT.maxZ, bottom: 2.75, top: 3 };
   const desk: Collider = { minX: 12.7, maxX: 15.3, minZ: 9.6, maxZ: 10.8, bottom: 3, top: 3.8 };
   const { player, keys, frames } = controller(t, [floor, desk]);
-  player.sit(seatPlace(SEATING_BY_ID.get('boss-chair')!, 0));
+  player.sit(seatPlace(SEATING_BY_ID.get('loft-couch')!, 0));
   keys('Space');
   frames(1);
   assert.equal(player.seat, null);
-  assert.ok(player.pos.z > 11.9, `got up into the desk at ${player.pos.toArray()}`);
+  assert.ok(!overlaps(desk,player.pos.x,player.pos.z), `got up into the desk at ${player.pos.toArray()}`);
   keys();
   frames(60);
   assert.equal(player.pos.y, 3);

@@ -91,6 +91,7 @@ export function installWorkerViews(ctx: Ctx, core: CoreState, parts: WorkerViews
     const beside = desk.def.station ? new THREE.Vector3(0.62, 0.9, 0) : new THREE.Vector3(0.64, 0.5, -0.1);
     v.model.setPropSpot(desk.seatAnchor.worldToLocal(desk.laptopAnchor.localToWorld(beside)));
     desk.laptopAnchor.add(v.laptop.root);
+    v.laptop.setMonitor(desk.monitor);
     noOutline(desk.group);
     desk.chair.rotation.y = 0;
   }
@@ -119,7 +120,7 @@ export function installWorkerViews(ctx: Ctx, core: CoreState, parts: WorkerViews
       } else if (v.deskId !== w.deskId) {
         const previous = world.desks.get(v.deskId);
         assignDesk(v, desk);
-        if (previous && !seatedAlready) arrivals.transfer(v.model, previous, desk, world.nav);
+        if (previous && !seatedAlready) arrivals.transfer(v.model, previous, desk, world.nav, store.floorPlan.wing);
         else arrivals.sit(v.model, desk);
       }
       if (v.status !== w.status || v.acked !== w.acked) {
@@ -153,6 +154,7 @@ export function installWorkerViews(ctx: Ctx, core: CoreState, parts: WorkerViews
     for (const [id, v] of workerViews) {
       if (store.workers.has(id)) continue;
       arrivals.forget(v.model);
+      v.laptop.setMonitor();
       const desk = world.desks.get(v.deskId);
       // Sent home: pack up and walk out; the seat becomes free once the worker stands up.
       if (desk && sentHome.has(id)) {
@@ -201,7 +203,7 @@ export function installWorkerViews(ctx: Ctx, core: CoreState, parts: WorkerViews
     const world = ctx.world();
     // Someone sent home still counts until they get up, so a bean bag stays out under them.
     const free = vacantSeats(store.workers.values(), (id) => departures.seated(id));
-    for (const [id, desk] of world.desks) desk.vacancy.visible = free.has(id) && seatBuilt(id);
+    for (const [id, desk] of world.desks) desk.vacancy.visible = !desk.def.y && free.has(id) && seatBuilt(id);
     const appeared = world.setBeanbags(beanbagsOut((id) => !free.has(id), store.floorPlan.wing));
     // One came out right where you're standing (on the office floor, not down in the garage): you end up on top of it.
     const p = player.pos;

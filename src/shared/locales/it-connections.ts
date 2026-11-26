@@ -10,6 +10,7 @@ export const italianConnections: Record<string, string> = {
   "Operator": "Operatore",
   "Lead operator": "Capo operatore",
   "Office chief": "Capo ufficio",
+  "Office chief desk": "Postazione del Capo ufficio",
   "Retry Forgejo access": "Riprova accesso Forgejo",
   "Forgejo access pending": "Accesso Forgejo da completare",
   "No personal Forgejo access": "Nessun accesso Forgejo personale",

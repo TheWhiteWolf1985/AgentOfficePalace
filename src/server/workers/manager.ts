@@ -1,4 +1,7 @@
 import { assignTask, submitPrompt } from './input.js';
+import { changeOfficeRole, restoreChiefDesk } from './chief-desk.js';
+import type { AgentAssignment, ForgeRole } from '../../shared/forgejo-agent.js';
+import type { FloorDef } from '../building.js';
 import { randomAgentAppearance, sanitizeAgentAppearance, type AgentAppearance } from '../../shared/agent-appearance.js';
 import { checkBlocked } from './readiness.js';
 import { workerConnections } from '../connections/git.js';
@@ -136,6 +139,7 @@ export class WorkerManager {
     this.scrollback = new ScrollbackStore(dataDir);
     this.drops = new DropStore(dataDir);
     restoreWorkers(this.statePath, this.workers, this.defaultProvider, (deskId) => this.deskOccupied(deskId));
+    if (restoreChiefDesk(this.workers)) this.persist();
     this.scrollback.prune(new Set(this.workers.keys()));
     this.drops.prune(new Set(this.workers.keys()));
     // A session may have ended (and written its final tally) while the office was down.
@@ -227,11 +231,12 @@ export class WorkerManager {
     return false;
   }
 
-  /**
-   * Hires at a desk, or seats the worker in a meeting with its shared worktree.
-   * `repos` lists other floors' repositories available from the worker's own worktree.
-   */
-  spawn(deskId: string, by: string, prompt?: string, worktree = false, kind: WorkerKind = 'agent', provider?: AgentProvider, model?: string, effort?: AgentEffort, meeting?: { id: string; worktree?: WorkerInfo['worktree'] }, owner?: string, repos: RepoSource[] = [], appearance?: AgentAppearance): WorkerInfo | string {
+  assignRole(id: string, floor: FloorDef, desired: AgentAssignment) {
+    return changeOfficeRole(this.ctx, id, floor, desired, this.wing());
+  }
+
+  /** Hires at a desk, optionally with a worktree, meeting or other floors' repositories. */
+  spawn(deskId: string, by: string, prompt?: string, worktree = false, kind: WorkerKind = 'agent', provider?: AgentProvider, model?: string, effort?: AgentEffort, meeting?: { id: string; worktree?: WorkerInfo['worktree'] }, owner?: string, repos: RepoSource[] = [], appearance?: AgentAppearance, role?: ForgeRole): WorkerInfo | string {
     // Nobody picked (a board agent, say): the office's default worker, model and effort included.
     if (kind === 'agent' && provider === undefined) ({ provider, model, effort } = this.officeDefault);
     const selectedProvider = kind === 'agent' ? provider : undefined;
@@ -245,6 +250,7 @@ export class WorkerManager {
     if (effortError) return effortError;
     const seat = DESK_BY_ID.get(deskId);
     if (!seat) return 'Unknown desk';
+    if (seat.y && role !== 'chief') return 'La postazione è riservata al Capo ufficio';
     if (!deskBuilt(seat, this.wing())) return `${seat.label} isn't built yet: expand the back office first`;
     if (this.deskOccupied(deskId)) return seat.station ? `The ${STATION_AGENT[seat.station].name} is already there` : `That ${seat.beanbag ? 'bean bag' : 'desk'} is taken`;
     if (kind === 'shell' && seat.station) return 'A board agent is always an agent, not a shell';

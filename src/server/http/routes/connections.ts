@@ -5,10 +5,10 @@ import { TLSSocket } from 'node:tls';
 import { deviceState, dockerRoot, loginContainer, serialWorker } from '../../workers/docker.js';
 import { codexAccounts } from '../../workers/docker-accounts.js';
 import { sharedAccount, sharedLoginStatus, startSharedLogin } from '../../workers/shared-codex.js';
+import { assignmentDesk } from '../../workers/chief-desk.js';
 import { agentAssignment } from '../../../shared/forgejo-agent.js';
-import { forgeView, assignForge, serializeForge } from '../../forgejo-agents.js';
+import { forgeView, serializeForge } from '../../forgejo-agents.js';
 import { changeFloor, floorManagement, hasFloorForge } from '../../managed-floors.js';
-import { DESKS } from '../../../shared/layout.js';
 import { connections, repositoryName, checkedId } from '../../connections/store.js';
 import { RemoteApi } from '../../connections/api.js';
 import { verifyGit, cloneRepository } from '../../connections/git.js';
@@ -96,26 +96,25 @@ export const connectionsRoute: Route = {
           if (!dockerRoot()) throw Error('Docker non configurato');
           const floor = ctx.floors.get(checkedId(body.floorId));
           if (!floor) throw Error('Ufficio non trovato');
-          const desk = DESKS.find(d => !d.station && !d.room && !floor.workers.deskOccupied(d.id));
-          if (!desk) throw Error('Nessuna scrivania libera');
           if (body.prompt !== undefined && (typeof body.prompt !== 'string' || body.prompt.length > 20000)) throw Error('Istruzioni non valide');
           const assignment = agentAssignment(body.assignment ?? {tenure:'temporary',role:'operator'});
-          const r = floor.workers.spawn(desk.id, session.account?.name ?? 'admin', body.prompt, false, 'agent', 'codex', body.model, body.effort, undefined, session.account?.id, [], body.appearance);
-          if (typeof r === 'string') throw Error(r);
-          const access = await serializeForge(async () => {
-            if (ctx.floors.get(floor.id) !== floor || !floor.workers.get(r.id)) throw Error('Ufficio o agente non disponibile');
-            return assignForge(r.id,floor.def,assignment);
+          return await serializeForge(async () => {
+            if (ctx.floors.get(floor.id) !== floor) throw Error('Ufficio non disponibile');
+            const deskId = assignmentDesk(floor.workers.list(), assignment.role, undefined, floor.workers.wing());
+            const r = floor.workers.spawn(deskId, session.account?.name ?? 'admin', body.prompt, false, 'agent', 'codex', body.model, body.effort, undefined, session.account?.id, [], body.appearance, assignment.role);
+            if (typeof r === 'string') throw Error(r);
+            const access = await floor.workers.assignRole(r.id,floor.def,assignment);
+            return send(res, 201, { workerId: r.id, access });
           });
-          return send(res, 201, { workerId: r.id, access });
         }
         case 'agent-forge': {
           const id = checkedId(body.workerId), floorId = checkedId(body.floorId), assignment = agentAssignment(body.assignment);
           const access = await serializeForge(async () => {
             const floor = ctx.floors.get(floorId);
             if (!floor || floor.workers.get(id)?.runtime !== 'docker') throw Error('Agente Docker non trovato');
-            return assignForge(id,floor.def,assignment);
+            return floor.workers.assignRole(id,floor.def,assignment);
           });
-          return send(res,200,{access});
+          return send(res,200,{access, worker:ctx.floors.get(floorId)?.workers.get(id)});
         }
         case 'container': {
           const floor = ctx.floors.get(checkedId(body.floorId)), id = checkedId(body.workerId);
@@ -150,7 +149,7 @@ export const connectionsRoute: Route = {
           const desk = DESK_BY_ID.get(body.configuration?.deskId);
           if (!desk || !deskBuilt(desk, floor.workers.wing())) throw Error('La scrivania non e disponibile su questo piano');
           if (body.configuration?.provider && !managedProviders(floor.project.agentProviders).includes(body.configuration.provider)) throw Error('Provider non disponibile su questo server');
-          await floor.workers.configure(body.workerId, body.configuration);
+          await serializeForge(() => floor.workers.configure(body.workerId, body.configuration));
           return send(res, 200, { ok: true, worker: floor.workers.get(body.workerId) });
         }
         case 'bind': {

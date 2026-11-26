@@ -6,6 +6,8 @@ import type { Worker } from '../../world/character';
 import type { Laptop } from './laptop';
 import type { DeskView } from '../../world/types';
 import type { Ways } from '../../world/world';
+import { wayTo } from '../walking/walkto';
+import { deskSeat } from '../../../shared/layout';
 import { mesh, toonUnique } from '../../world/toon';
 
 /** Walking pace on the way out, in m/s: no hurry any more. */
@@ -479,7 +481,7 @@ export class Arrivals {
   }
 
   /** Walk from the actual seat (or the current aisle position on a second reassignment). */
-  transfer(model: Worker, source: DeskView, desk: DeskView, nav: NavGrid) {
+  transfer(model: Worker, source: DeskView, desk: DeskView, nav: NavGrid, wing = 0) {
     model.stopDancing();
     this.forget(model);
     const atSeat = model.root.parent === source.seatAnchor;
@@ -488,7 +490,10 @@ export class Arrivals {
     // Leave the old chair via its side and back, then enter the new chair by reversing its exit route.
     const exit = atSeat ? nav.wayFrom(source.def, [desk.def.x, desk.def.z]).slice(0, 2) : [];
     const start: Pt = exit[1] ?? [x, z];
-    const way = [...exit, ...nav.wayFrom(desk.def, start).reverse()];
+    const destination = deskSeat(desk.def, 1.25);
+    const way: Pt[] = source.def.y || desk.def.y
+      ? wayTo({x,y:model.root.position.y + FEET,z}, {...destination,y:desk.def.y ?? 0}, wing).map(p => [p.x,p.z])
+      : [...exit, ...nav.wayFrom(desk.def, start).reverse()];
     model.root.rotation.reorder('YXZ');
     model.walking = true;
     this.walkers.push({ model, desk, way, next: 0, t: 0, heading: model.root.rotation.y, stepIn: 0, hop: 0 });

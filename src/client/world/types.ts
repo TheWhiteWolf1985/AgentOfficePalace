@@ -66,6 +66,8 @@ export interface DeskView {
   vacancy: THREE.Group;
   /** How high the vacancy marker floats. */
   vacancyY: number;
+  /** A fixed monitor using the same terminal canvas as the worker's laptop. */
+  monitor?: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicMaterial>;
 }
 
 /**
