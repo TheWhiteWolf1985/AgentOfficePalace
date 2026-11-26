@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { isValidGrokModel, isValidMuseModel, isValidOpenCodeModel } from '../src/shared/providers.js';
-import { MODEL_LISTERS, createModelCatalogue, fetchCodexModels, fetchCursorModels, fetchGrokModels, fetchOpenCodeModels, type ModelCommandRunner } from '../src/server/models.js';
+import { MODEL_LISTERS, createModelCatalogue, createModelCatalogues, fetchCodexModels, fetchCursorModels, fetchGrokModels, fetchOpenCodeModels, type ModelCommandRunner } from '../src/server/models.js';
+import { CODEX_MODEL_OPTIONS } from '../src/shared/codex-models.js';
 import { AGENT_PROVIDERS, PROVIDER_META } from '../src/shared/providers.js';
 
 test('OpenCode model ids require provider/model and reject whitespace or control characters', () => {
@@ -92,6 +93,27 @@ test('Codex catalogue errors do not expose command output', async () => {
     return error instanceof Error && /unavailable/i.test(error.message) && !error.message.includes('secret-token');
   });
   await assert.rejects(fetchCodexModels('codex', '/project', async () => ({ stdout: '{"models":"none"}', stderr: '' })), /unavailable/i);
+});
+
+test('Codex always has the shipped catalogue when the CLI cannot run', async () => {
+  const catalogues=createModelCatalogues(()=>'/definitely-missing-office-cli',process.cwd());
+  const lists=await Promise.all(Array.from({length:10},()=>catalogues.codex!.get()));
+  assert.ok(CODEX_MODEL_OPTIONS.length>3);
+  for(const list of lists) assert.deepEqual(list,CODEX_MODEL_OPTIONS);
+  assert.deepEqual(await catalogues.codex!.get(),CODEX_MODEL_OPTIONS);
+});
+
+test('a temporary model refresh failure preserves a catalogue newer than the bundled fallback', async () => {
+  let now=0, fail=true;
+  const current=[{id:'gpt-future'}];
+  const catalogue=createModelCatalogue(async()=>{if(fail)throw Error('offline');return current;},()=>now,CODEX_MODEL_OPTIONS);
+  assert.deepEqual(await catalogue.get(),CODEX_MODEL_OPTIONS);
+  fail=false;now=61000;await catalogue.get();
+  await new Promise(resolve=>setImmediate(resolve));
+  assert.deepEqual(await catalogue.get(),current);
+  fail=true;now=122000;await catalogue.get();
+  await new Promise(resolve=>setImmediate(resolve));
+  assert.deepEqual(await catalogue.get(),current);
 });
 
 test('every provider that says its CLI lists its models has a lister, and only those', () => {

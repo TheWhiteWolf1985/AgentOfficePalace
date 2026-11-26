@@ -7,12 +7,16 @@ import { validateWorkerEffort, validateWorkerModel } from '../agents.js';
 import { midTurn } from './lifecycle.js';
 import { CHIEF_DESK } from '../../shared/layout.js';
 import { officeRole } from './chief-desk.js';
+import { assertWorkerName, cleanWorkerName } from './names.js';
 
 /** A user edits configuration; generated status, history and session identifiers stay immutable. */
 export async function configureWorker(ctx: WorkerContext, id: string, input: WorkerConfiguration): Promise<void> {
   const w = ctx.workers.get(id);
   if (!w) throw Error('Agente non trovato');
   if (typeof input.name !== 'string' || !input.name.trim() || input.name.length > 100 || /[\x00-\x1f]/.test(input.name)) throw Error('Nome dell’agente non valido');
+  const name = cleanWorkerName(input.name);
+  if (!name || name.length > 100) throw Error('Nome dell’agente non valido');
+  assertWorkerName(ctx,id,name);
   if (typeof input.color !== 'string' || !/^#[0-9a-f]{6}$/i.test(input.color)) throw Error('Colore non valido');
   const desk = DESK_BY_ID.get(input.deskId), previous = DESK_BY_ID.get(w.info.deskId);
   if ((officeRole(w.info) === 'chief') !== (input.deskId === CHIEF_DESK.id)) throw Error('La scrivania deve corrispondere al ruolo del Capo ufficio');
@@ -33,13 +37,14 @@ export async function configureWorker(ctx: WorkerContext, id: string, input: Wor
     for (let attempts = 0; (w.pty || w.dsh) && attempts < 50; attempts++) await new Promise((resolve) => setTimeout(resolve, 100));
     if (w.pty || w.dsh) throw Error('La sessione non si e fermata: configurazione non applicata');
   }
+  assertWorkerName(ctx,id,name);
   if (w.info.kind === 'agent' && input.appearance !== undefined) {
     const look = input.appearance === 'random' ? randomAgentAppearance() : sanitizeAgentAppearance(input.appearance);
     if (!look) throw Error('Avatar non valido');
     w.info.appearance = look;
   }
   if (docker && !w.info.containerEngine) w.info.containerEngine = { model: w.info.model, effort: w.info.effort };
-  Object.assign(w.info, { name: input.name.trim(), color: input.color, deskId: input.deskId, provider: input.provider, model: input.model || undefined, effort: input.effort, prompt: input.prompt?.trim() || undefined });
+  Object.assign(w.info, { name, color: input.color, deskId: input.deskId, provider: input.provider, model: input.model || undefined, effort: input.effort, prompt: input.prompt?.trim() || undefined });
   if ((changed || input.restart) && w.info.runtime !== 'docker') { w.info.sessionId = undefined; w.saved = undefined; }
   ctx.emit(w); ctx.persist();
   if (docker) ctx.applyContainerSettings(w);

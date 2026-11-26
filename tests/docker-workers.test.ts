@@ -1,4 +1,5 @@
 import { displayAccount } from '../src/server/workers/docker-accounts.js';
+import { CODEX_CATALOGUE_VERSION } from '../src/shared/codex-models.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
@@ -19,6 +20,7 @@ test('agent creation and model discovery select the CLI version built by default
   const version = /^ARG CODEX_VERSION=(\d+\.\d+\.\d+)$/m.exec(dockerfile)?.[1];
   assert.ok(version);
   assert.equal(AGENT_IMAGE, `aop-codex:${version}`);
+  assert.equal(CODEX_CATALOGUE_VERSION, version);
 });
 
 test('operations for one container run in order; another agent can start independently', async () => {

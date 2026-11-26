@@ -1,4 +1,5 @@
 import { t as uiText } from '../../shared/i18n';
+import { CODEX_MODEL_OPTIONS } from '../../shared/codex-models';
 import './provider.css';
 import type { AgentChoice, AgentEffort, AgentProvider, ProjectInfo, Usage, WorkerInfo } from '../../shared/protocol';
 import { AGENT_EFFORTS, isAgentEffort } from '../../shared/protocol';
@@ -181,9 +182,12 @@ export function agentFields(project: ProjectInfo | null, id: string, initial: Ag
   const value = () => (options.includes(select.value as AgentProvider) ? (select.value as AgentProvider) : fallback);
   const meta = () => PROVIDER_META[value()];
   /** Its models: the ones it always has, or the ones its CLI listed. */
-  const known = () => meta().models?.fixed ?? catalogues.get(value())?.list ?? [];
+  const known = () => {
+    const list = meta().models?.fixed ?? catalogues.get(value())?.list;
+    return list?.length ? list : value() === 'codex' ? CODEX_MODEL_OPTIONS : [];
+  };
   /** Typed in: for a provider whose model is, and for one whose list couldn't be had. */
-  const typed = () => meta().models?.pick === 'typed' || !!(meta().models?.catalog && catalogues.get(value())?.failed);
+  const typed = () => meta().models?.pick === 'typed' || !!(meta().models?.catalog && catalogues.get(value())?.failed && !known().length);
   /** The model id the fields are on, whichever control is showing. */
   let chosen = '';
   /**
@@ -226,7 +230,7 @@ export function agentFields(project: ProjectInfo | null, id: string, initial: Ag
     effortSelect.setAttribute('aria-label', m.effortLabel ? uiText`${m.label} ${m.effortLabel.toLowerCase()} level` : uiText`${m.label} reasoning effort`);
     if (!field) hint.textContent = m.unpicked ?? '';
     else if (field.catalog && catalogue?.request) hint.textContent = uiText`Loading ${m.label} models…`;
-    else if (field.catalog && catalogue?.failed) hint.textContent = uiText`${m.label}’s models couldn’t be listed: leave it empty for its default, or type a model id.`;
+    else if (field.catalog && catalogue?.failed && !known().length) hint.textContent = uiText`${m.label}’s models couldn’t be listed: leave it empty for its default, or type a model id.`;
     else hint.textContent = field.hint;
     fields.classList.toggle('hidden', !field && !m.takesEffort && !hint.textContent);
     paintEffort();

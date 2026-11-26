@@ -2,6 +2,7 @@
 // reasoning efforts it takes, where the CLI says. Each is asked without a shell, and only what
 // looks like a model gets through.
 import { AGENT_IMAGE, dockerPrefix, dockerRoot } from './workers/docker.js';
+import { CODEX_MODEL_OPTIONS } from '../shared/codex-models.js';
 import { spawn } from 'node:child_process';
 import { closeSync, mkdtempSync, openSync, readFileSync, rmSync, statSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -137,7 +138,9 @@ export async function fetchGrokModels(command: string, cwd: string, runner: Mode
 export async function fetchCodexModels(command: string, cwd: string, runner: ModelCommandRunner = runModelCommand): Promise<ModelOption[]> {
   try {
     const container = !!dockerRoot() && runner === runModelCommand;
-    const args = container ? [...dockerPrefix(), 'run', '--rm', '--pull=never', '--cap-drop=ALL', '--security-opt=no-new-privileges', '--network=none', '--pids-limit=64', '--memory=512m', '--entrypoint=codex', AGENT_IMAGE, 'debug', 'models'] : ['debug', 'models'];
+    const args = container ? [...dockerPrefix(), 'run', '--rm', '--pull=never', '--read-only', '--cap-drop=ALL', '--security-opt=no-new-privileges', '--network=none',
+      '--log-driver=none', '--pids-limit=64', '--memory=512m', '--tmpfs','/tmp:rw,nosuid,nodev,size=32m',
+      '-e','HOME=/tmp','-e','CODEX_HOME=/tmp/catalog','--entrypoint=codex', process.env.AGENT_OFFICE_CODEX_IMAGE || AGENT_IMAGE, 'debug', 'models','--bundled'] : ['debug', 'models'];
     const result = await runner(container ? 'docker' : command, args, { cwd, timeout: MODEL_COMMAND_TIMEOUT_MS, maxBuffer: MODEL_DETAILS_MAX_BUFFER });
     const listed: unknown = JSON.parse(result.stdout)?.models;
     if (!Array.isArray(listed)) throw new Error('no models');
@@ -148,6 +151,7 @@ export async function fetchCodexModels(command: string, cwd: string, runner: Mod
       const levels = Array.isArray(m.supported_reasoning_levels) ? m.supported_reasoning_levels.map((l: any) => l?.effort) : undefined;
       models.push({ id: m.slug, ...(name ? { name } : {}), ...(levels ? { efforts: knownEfforts(levels) } : {}) });
     }
+    if (!models.length) throw new Error('no models');
     return unique(models);
   } catch {
     throw new Error('Codex model catalogue unavailable');
@@ -197,13 +201,17 @@ export interface ModelCatalogue {
  * than a minute is still what the next asker gets, at once, while the CLI is asked again for the
  * one after: the models seldom change, and the CLI can take its time.
  */
-export function createModelCatalogue(list: () => Promise<ModelOption[]>, now: () => number = Date.now): ModelCatalogue {
+export function createModelCatalogue(list: () => Promise<ModelOption[]>, now: () => number = Date.now, fallback?: ModelOption[]): ModelCatalogue {
   let cached: { models: ModelOption[]; expiresAt: number } | undefined;
   let pending: Promise<ModelOption[]> | undefined;
   const refresh = () =>
     (pending ??= list().then((models) => {
       cached = { models, expiresAt: now() + MODEL_CACHE_TTL_MS };
       return [...models];
+    }, error => {
+      if (cached || !fallback) throw error;
+      cached = {models:fallback, expiresAt:now()+MODEL_CACHE_TTL_MS};
+      return [...fallback];
     }).finally(() => {
       pending = undefined;
     }));
@@ -221,7 +229,8 @@ export function createModelCatalogue(list: () => Promise<ModelOption[]>, now: ()
 export function createModelCatalogues(command: (provider: AgentProvider) => string, cwd: string): Partial<Record<AgentProvider, ModelCatalogue>> {
   const catalogues: Partial<Record<AgentProvider, ModelCatalogue>> = {};
   for (const [provider, list] of Object.entries(MODEL_LISTERS) as [AgentProvider, ModelLister][]) {
-    catalogues[provider] = createModelCatalogue(() => list(command(provider), cwd));
+    catalogues[provider] = createModelCatalogue(() => list(command(provider), cwd), Date.now,
+      provider === 'codex' ? CODEX_MODEL_OPTIONS : undefined);
   }
   return catalogues;
 }

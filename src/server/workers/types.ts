@@ -157,7 +157,11 @@ export interface WorkerHandle<S = unknown> {
  * What the workers' modules (worktree.ts, pr.ts, tasks.ts, acp.ts) share of the manager: the floor's
  * project, its workers, and what they all do to one. Narrow on purpose: they never import the manager.
  */
+export type WorkerName = Pick<WorkerInfo, 'id' | 'name' | 'createdAt'>;
+
 export interface WorkerContext {
+  /** Workers throughout this installation, including the saved records of closed floors. */
+  namePool?(): Iterable<WorkerName>;
   /** The floor's project checkout. */
   readonly dir: string;
   /** Git plumbing for it. */

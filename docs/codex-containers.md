@@ -2,6 +2,10 @@
 
 In **Impostazioni → Gestione agenti → Crea agente Codex**, scegli l’ufficio e l’aspetto, oppure lascia generare l’avatar. Se l’edificio è vuoto puoi creare qui un ufficio locale. La creazione occupa una scrivania libera. Puoi anche assumere Codex dalla scrivania di un ufficio.
 
+Il nome di un agente è univoco nell’intera installazione, su tutti i piani. Maiuscole, spazi e varianti Unicode equivalenti vengono confrontati in modo uniforme. Alla creazione viene scelto un nome libero. **Applica** rifiuta una rinomina già in uso. Al primo avvio della versione aggiornata, i nomi precedentemente duplicati ricevono un suffisso numerico. Identificativi, workspace, account e sessioni rimangono associati agli stessi agenti.
+
+Il selettore del modello dispone del catalogo incluso nella CLI distribuita, anche prima del primo agente e del collegamento dell’account. L’Office consulta l’immagine configurata per l’installazione e conserva l’elenco disponibile durante un errore di caricamento. La scelta salvata viene mantenuta anche quando il suo ID non compare nel catalogo ricevuto.
+
 In **Impostazioni → Gestione agenti → Accesso Codex condiviso**, un amministratore collega ChatGPT tramite codice dispositivo oppure inserisce una chiave API OpenAI. Può farlo anche a edificio vuoto. Tutti i nuovi agenti Codex dell’installazione usano questo account. Un agente avviato prima del collegamento attende e prosegue automaticamente. Gli agenti creati con la gestione precedente conservano l’accesso individuale nelle proprie proprietà.
 
 L’Office conserva la credenziale di rinnovo ChatGPT in una directory privata della VM e coordina i rinnovi degli agenti. Ciascuno mantiene la propria home, la cronologia, il workspace e i permessi Forgejo. Dopo la sostituzione dell’account condiviso, riavvia i container condivisi già attivi al termine dei loro incarichi per adottarlo. Al primo avvio il container riconosce automaticamente il proprio `/workspace` e i sette hook dell’Office. Gli eventuali hook aggiunti dal progetto o dall’utente seguono la normale revisione di Codex.

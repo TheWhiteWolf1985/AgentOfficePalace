@@ -36,9 +36,10 @@ import { WorkerPrs } from './pr.js';
 import { WIN, binScript, defaultShell, resolveCommand, shellRun, shq, writeOfficeCommands } from './process.js';
 import { CARRY_ON_PROMPT, WorkerTasks } from './tasks.js';
 import { startFailed, setTitle, flushScreens, fullScreens, newTerm, offlineBanner, screenText, type HeadlessTerminal } from './terminal.js';
-import type { HookEnv, OpenedPr, RepoSource, RunAs, Worker, WorkerContext, WorkerEvents, WorkerHandle } from './types.js';
+import type { HookEnv, OpenedPr, RepoSource, RunAs, Worker, WorkerContext, WorkerEvents, WorkerHandle, WorkerName } from './types.js';
 import { clamp, safeEq, truncate } from './util.js';
-import { COLORS, NAMES, newWorker, syncViewers } from './worker.js';
+import { COLORS, newWorker, syncViewers } from './worker.js';
+import { newWorkerName, reconcileWorkerNames } from './names.js';
 import { WorkerTrees, lostMessage } from './worktree.js';
 
 const SCREEN_INTERVAL_MS = 250;
@@ -100,6 +101,7 @@ export class WorkerManager {
     private runAs?: RunAs,
     /** The DSH profile a DeepSeek Harness worker boots (default "acp"). */
     dshProfile: string = DSH_PROFILE_DEFAULT,
+    private namePool?: () => Iterable<WorkerName>,
   ) {
     this.defaultProvider = configuredProvider(agentCmd);
     this.trees = new Worktrees(dir);
@@ -114,6 +116,7 @@ export class WorkerManager {
       dir,
       trees: this.trees,
       workers: this.workers,
+      namePool: () => this.namePool?.() ?? [],
       events,
       prompts,
       get closing() {
@@ -140,6 +143,7 @@ export class WorkerManager {
     this.drops = new DropStore(dataDir);
     restoreWorkers(this.statePath, this.workers, this.defaultProvider, (deskId) => this.deskOccupied(deskId));
     if (restoreChiefDesk(this.workers)) this.persist();
+    reconcileWorkerNames(this.ctx);
     this.scrollback.prune(new Set(this.workers.keys()));
     this.drops.prune(new Set(this.workers.keys()));
     // A session may have ended (and written its final tally) while the office was down.
@@ -231,9 +235,7 @@ export class WorkerManager {
     return false;
   }
 
-  assignRole(id: string, floor: FloorDef, desired: AgentAssignment) {
-    return changeOfficeRole(this.ctx, id, floor, desired, this.wing());
-  }
+  assignRole(id: string, floor: FloorDef, desired: AgentAssignment) { return changeOfficeRole(this.ctx, id, floor, desired, this.wing()); }
 
   /** Hires at a desk, optionally with a worktree, meeting or other floors' repositories. */
   spawn(deskId: string, by: string, prompt?: string, worktree = false, kind: WorkerKind = 'agent', provider?: AgentProvider, model?: string, effort?: AgentEffort, meeting?: { id: string; worktree?: WorkerInfo['worktree'] }, owner?: string, repos: RepoSource[] = [], appearance?: AgentAppearance, role?: ForgeRole): WorkerInfo | string {
@@ -269,14 +271,15 @@ export class WorkerManager {
     if (owner && signIn && this.runAs && !this.runAs.claudeReady(owner)) return this.runAs.why(signIn);
     const full = this.capacity?.full();
     if (full) return full;
-    const used = new Set([...this.workers.values()].map((w) => w.info.name.replace(/ 🐚$/, '')));
     const agent = seat.station && STATION_AGENT[seat.station];
-    const name = agent ? agent.name : (NAMES.find((n) => !used.has(n)) ?? `Worker ${this.workers.size + 1}`);
+    let name: string;
+    try { name = newWorkerName(this.ctx, agent ? agent.name : undefined, kind); }
+    catch (error) { return (error as Error).message; }
     const id = randomBytes(6).toString('hex');
     let wt: WorkerInfo['worktree'] = meeting?.worktree;
     let others: WorkerRepo[] | undefined;
     if (worktree) {
-      const slug = `${name.toLowerCase()}-${id.slice(0, 4)}`;
+      const slug = `${name.toLowerCase().replace(/[^a-z0-9_-]+/g,'-')}-${id.slice(0, 4)}`;
       const made = repos.length ? this.makeWorkspace(slug, repos) : this.trees.create(slug);
       if (typeof made === 'string') return made;
       if ('repos' in made) {
@@ -296,7 +299,7 @@ export class WorkerManager {
       model: takesModel(selectedProvider) ? model : undefined,
       effort: takesEffort(selectedProvider) ? effort : undefined,
       deskId,
-      name: kind === 'shell' ? `${name} 🐚` : name,
+      name,
       color: kind === 'shell' ? '#8d99ae' : agent ? agent.color : COLORS[Math.floor(Math.random() * COLORS.length)],
       ...(kind === 'agent' ? { appearance: sanitizeAgentAppearance(appearance) ?? randomAgentAppearance() } : {}),
       status: 'starting',

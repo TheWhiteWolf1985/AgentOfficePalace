@@ -10,6 +10,7 @@ import { Worktrees } from '../src/server/worktrees.js';
 import type { AgentProvider, WorkerInfo } from '../src/shared/protocol.js';
 import type { PromptSource } from '../src/server/prompts.js';
 import { PROMPTS } from '../src/shared/prompts.js';
+import { NAMES } from '../src/server/workers/worker.js';
 
 type Invocation = {
   kind: string;
@@ -193,9 +194,40 @@ function ledger(data: string): Ledger {
   return new Ledger(data, { pauseHiring: false }, () => {}, () => {});
 }
 
-function manager(f: Fixture, cmd: string, updates: WorkerInfo[], args = ['--from-test']) {
-  return new WorkerManager(f.root, f.data, cmd, args, { url: 'http://127.0.0.1:1', token: '' }, events(updates), ledger(f.data));
+function manager(f: Fixture, cmd: string, updates: WorkerInfo[], args = ['--from-test'], names?: () => Iterable<WorkerInfo>) {
+  return new WorkerManager(f.root, f.data, cmd, args, { url: 'http://127.0.0.1:1', token: '' }, events(updates), ledger(f.data), undefined, undefined, undefined, undefined, names);
 }
+
+test('two floor managers share generated names, reject duplicate edits and keep numbered worktrees usable', async t => {
+  const first=fixture(), second=fixture(), offices: WorkerManager[]=[];
+  isolateProviderEnvironment(first,t);
+  const old=process.env.FAKE_AGENT_LOG;
+  process.env.FAKE_AGENT_LOG=first.log;
+  t.after(()=>{
+    for(const office of offices) office.shutdown();
+    first.close();second.close();
+    if(old===undefined)delete process.env.FAKE_AGENT_LOG;else process.env.FAKE_AGENT_LOG=old;
+  });
+  const reserved:WorkerInfo[]=[];
+  const names=()=>[...offices.flatMap(m=>m.list()),...reserved];
+  for(const f of [first,second]) offices.push(manager(f,f.custom,[],[],names));
+  const a=offices[0].spawn('desk-1','test'), b=offices[1].spawn('desk-1','test');
+  assert.equal(typeof a,'object');assert.equal(typeof b,'object');
+  if(typeof a==='string'||typeof b==='string')return;
+  assert.notEqual(a.name,b.name);
+  await assert.rejects(offices[1].configure(b.id,{name:a.name,color:b.color,deskId:b.deskId,provider:b.provider}),/già/);
+  reserved.push(...[...NAMES,'Worker'].map((name,i)=>({id:'reserved-'+i,name} as WorkerInfo)));
+  execFileSync('git',['init','-q',first.root]);
+  writeFileSync(path.join(first.root,'test.txt'),'fixture');
+  execFileSync('git',['-C',first.root,'add','test.txt']);
+  execFileSync('git',['-C',first.root,'-c','user.name=QA','-c','user.email=qa@example.invalid','commit','-qm','Fixture']);
+  const numbered=offices[0].spawn('desk-2','test',undefined,true);
+  assert.equal(typeof numbered,'object',String(numbered));
+  if(typeof numbered==='string')return;
+  assert.equal(numbered.name,'Worker (2)');
+  assert.ok(numbered.worktree);
+  assert.ok(!/\s/.test(numbered.worktree!.branch));
+});
 
 async function waitFor<T>(read: () => T, predicate: (value: T) => boolean, timeout = 4000): Promise<T> {
   const end = Date.now() + timeout;
