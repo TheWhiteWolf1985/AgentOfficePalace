@@ -8,7 +8,7 @@ type Provider = { id: 'drive' | 'canva' | 'linkedin' | 'heygen'; name: string; a
 type Catalogue = { providers: Provider[]; skills: { id: string; name: string; description: string; enabled: boolean }[] };
 const descriptions = {
   drive: 'Find files and read Google Docs or text documents.',
-  canva: 'Find designs and read their details and links.',
+  canva: 'Use the official Canva MCP tools to search, create, edit and export designs.',
   heygen: 'Verify access to HeyGen with your web account.',
   linkedin: 'Read the connected LinkedIn member profile.',
 };
@@ -72,7 +72,7 @@ export function pluginsPanel() {
     return h('div', {}, setup, sharedSignIn(p, ready));
   }
   function sharedSignIn(p: Provider, ready: boolean) {
-    const loginLabel = t(p.id === 'heygen' ? 'Sign in with HeyGen' : 'Sign in with Google');
+    const loginLabel = t(p.id === 'heygen' ? 'Sign in with HeyGen' : p.id === 'canva' ? 'Sign in with Canva' : 'Sign in with Google');
     if (googleDriveSignInOrigin(location.origin) !== location.origin) {
       const controls = h('div');
       function show(session?: SignInTunnel) {
@@ -123,11 +123,26 @@ export function pluginsPanel() {
     login.disabled = !ready;
     return login;
   }
+  function canvaAccount(p: Provider) {
+    const client = h('input', { autocomplete: 'off', maxlength: 1024, placeholder: p.hasClient ? t('Leave blank to keep the saved client ID') : '' });
+    const secret = h('input', { autocomplete: 'new-password', type: 'password', maxlength: 2048 });
+    const setup = h('details', { open: !p.hasClient || !!p.clientIssue }, h('summary', {}, t('Canva MCP application setup')),
+      p.clientIssue && h('p.setting-note', { role: 'alert' }, remoteText(p.clientIssue)),
+      h('p.setting-note', {}, t('Enable Canva MCP in Outside Canva. Register this address under Redirect URLs, not Return URL.')),
+      h('code', {}, googleDriveSignInOrigin(location.origin) + '/api/plugins/callback/canva'),
+      h('p', {}, h('a', { href: 'https://www.canva.com/developers/apps', target: '_blank', rel: 'noopener noreferrer' }, 'Canva Developers')),
+      field('Client ID', client), field('Client secret', secret),
+      button(t('Apply'), () => run(async () => {
+        await change({ action: 'canva-client', clientId: client.value.trim(), secret: secret.value });
+        secret.value = '';
+      })));
+    return h('div', {}, setup, sharedSignIn(p, p.hasClient));
+  }
   function provider(p: Provider) {
     const panel = h('section.setting', {}, h('h4', {}, p.name),
       h('p.setting-note', {}, t(descriptions[p.id])),
       h('p', {}, t(labels[p.status]), p.account ? ' · ' + p.account : ''),
-      p.id === 'drive' ? googleAccount(p) : p.id === 'heygen' ? sharedSignIn(p, true) : oauthAccount(p));
+      p.id === 'drive' ? googleAccount(p) : p.id === 'canva' ? canvaAccount(p) : p.id === 'heygen' ? sharedSignIn(p, true) : oauthAccount(p));
     if (p.status !== 'disconnected') panel.append(button(t('Disconnect account'), () => {
       if (window.confirm(t('Disconnect this account for all agents?'))) return run(() => change({ action: 'disconnect', id: p.id }));
     }));

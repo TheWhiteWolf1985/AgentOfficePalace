@@ -44,7 +44,7 @@ export const pluginsRoute: Route = {
       try { b = JSON.parse(await readBody(req, 32768)); } catch { return send(res, 400, { error: 'Invalid request.' }); }
       switch (b?.action) {
         case 'prepare-tunnel': {
-          if (!['drive', 'heygen'].includes(b.id) || googleDriveSignInOrigin(origin.origin) === origin.origin) break;
+          if (!['drive', 'heygen', 'canva'].includes(b.id) || googleDriveSignInOrigin(origin.origin) === origin.origin) break;
           const result = await pluginCall('admin/tunnel', { id: b.id, origin: origin.origin, browser });
           return send(res, 200, result);
         }
@@ -53,9 +53,10 @@ export const pluginsRoute: Route = {
         case 'skill': return send(res, 200, await pluginCall('admin/skill', { id: b.id, enabled: b.enabled }));
         case 'disconnect': return send(res, 200, await pluginCall('admin/disconnect', { id: b.id }));
         case 'drive-client': return send(res, 200, await pluginCall('admin/client', { id: 'drive', clientId: b.clientId, secret: b.secret }));
+        case 'canva-client': return send(res, 200, await pluginCall('admin/client', { id: 'canva', clientId: b.clientId, secret: b.secret }));
         case 'begin': {
           if (!['drive', 'canva', 'linkedin', 'heygen'].includes(b.id)) break;
-          if (b.id === 'heygen' && googleDriveSignInOrigin(origin.origin) !== origin.origin) return send(res, 400, { error: 'Prepare the sign-in tunnel first.' });
+          if (['heygen', 'canva'].includes(b.id) && googleDriveSignInOrigin(origin.origin) !== origin.origin) return send(res, 400, { error: 'Prepare the sign-in tunnel first.' });
           if (b.id === 'drive' && googleDriveSignInOrigin(origin.origin) !== origin.origin) {
             return send(res, 400, { error: 'Open Office through localhost or the registered HTTPS domain to sign in with Google.' });
           }

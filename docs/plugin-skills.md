@@ -5,7 +5,7 @@ Apri **Impostazioni → Plugin & Skills** in Office 3D o Lite con un account amm
 | Collegamento | Operazioni disponibili nella prima versione |
 | --- | --- |
 | Google Drive | Ricerca per nome, elenco paginato, lettura di Google Docs e di file di testo o Markdown fino a 256 KiB |
-| Canva | Profilo collegato, ricerca dei progetti e lettura dei dettagli e dei collegamenti |
+| Canva MCP | Catalogo ufficiale dinamico: ricerca, creazione, modifica ed esportazione secondo i permessi e il piano Canva |
 | HeyGen | Verifica del collegamento al servizio MCP con l’account web |
 | LinkedIn | Nome e identificativo del membro che ha collegato l’account |
 | Revisione Markdown | Istruzioni condivise per controllare struttura, collegamenti e fonti, attivabili dalla pagina |
@@ -34,7 +34,17 @@ Per autorizzare gli agenti, premi **Accedi con Google**, scegli l’account sul 
 
 Il container crea un socket Unix privato e temporaneo per quel callback OAuth. Il browser che ha avviato la richiesta completa lo scambio del codice. Il profilo Drive fissa porta e percorso. Altri provider possono usare lo stesso modulo amministrativo dopo la registrazione del proprio profilo. Con un dominio HTTPS autorizzato il browser può completare l’accesso direttamente. [Regole Google per gli indirizzi di ritorno](https://developers.google.com/identity/protocols/oauth2/web-server#uri-validation) · [Inoltro locale OpenSSH](https://man.openbsd.org/ssh.1#L)
 
-**Canva.** Registra l’indirizzo di ritorno mostrato nella pagina presso il fornitore. Usa un’app con accesso utente e gli ambiti `profile:read` e `design:meta:read`. Inserisci client ID e client secret, premi **Accedi al servizio** e apri la pagina di accesso. Torna alla scheda Office dopo il consenso. [Autenticazione Canva](https://www.canva.dev/docs/connect/authentication/)
+**Canva MCP.** Nel [portale Canva Developers](https://www.canva.com/developers/apps) apri un’app con accesso utente. In **Outside Canva → Configuration → Integration methods** abilita **Canva MCP**. Office usa il server ufficiale `https://api.canva.com/connect/v1/mcp`; il client MCP e le credenziali rimangono nel container condiviso. L’attivazione delle REST API non è necessaria per questo collegamento.
+
+In **Outside Canva → Redirect URLs** registra esattamente l’indirizzo mostrato in **Plugin & Skills → Canva MCP → Configurazione applicazione Canva MCP**. Il campo **Return URL** della funzione *Return navigation* serve a tornare dall’editor Canva e non configura il ritorno del login. Su IP Office propone `http://127.0.0.1:4600/api/plugins/callback/canva`; con un dominio HTTPS propone l’origine corrente seguita da `/api/plugins/callback/canva`.
+
+Inserisci **Client ID** e **Client secret** della stessa app e premi **Applica**. Su IP usa **Prepara tunnel di accesso** e il comando PowerShell monouso, con lo stesso funzionamento e gli stessi limiti del tunnel Drive. Quando compare `Tunnel-OK`, apri **Accedi con Canva**, autorizza l’account e torna a Office. Il tunnel è una funzione amministrativa e non è disponibile agli agenti. Con un dominio registrato usa direttamente **Accedi con Canva**. Il collegamento vale per gli agenti di tutti i piani. Le operazioni avvengono nell’account Canva che ha dato il consenso e rispettano i suoi permessi.
+
+Il connettore REST precedente è stato rimosso. Se era già collegato, Office conserva la configurazione e richiede **Ricollega account**: il vecchio consenso REST non viene presentato come un accesso MCP valido. Abilita Canva MCP nel portale e completa il consenso una volta. Scollegare l’account rimuove l’accesso agli agenti e conserva Client ID e secret per un nuovo collegamento.
+
+Gli agenti usano `list_office_tools` e trovano i nomi `canva.<nome-ufficiale>`, gli schemi JSON degli argomenti e le annotazioni del catalogo remoto. Per esempio `canva.search-designs`, quando offerto dal server. Office inoltra anche contenuti, immagini e risultati strutturati MCP. Gli errori di esecuzione restano errori; nessuna creazione o modifica viene ripetuta automaticamente dopo un timeout. Un guasto Canva viene segnalato nel catalogo e lascia disponibili gli altri connettori e le skill locali. Le operazioni di generazione possono richiedere fino a 60 secondi sul server remoto. Le sessioni e il catalogo sono condivisi in memoria e si aggiornano al rinnovo del token; non vengono introdotti processi MCP nei container degli agenti.
+
+[Configurazione Canva MCP](https://www.canva.dev/docs/apps/quickstart/) · [Permessi e piani](https://www.canva.dev/docs/apps/mcp/access/) · [Verifiche MCP](https://www.canva.dev/docs/apps/mcp/verify-app/)
 
 **HeyGen.** Premi **Accedi con HeyGen**. Su una VM raggiunta tramite IP, prepara prima il tunnel mostrato nella scheda. Al primo accesso il container registra il proprio callback presso HeyGen e apre il consenso dell’account web. Dopo il collegamento gli agenti possono chiedere «Verifica il collegamento HeyGen» (`heygen.status`). La verifica legge il catalogo remoto. [Accesso MCP HeyGen](https://www.heygen.com/model-context-protocol)
 

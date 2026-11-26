@@ -96,7 +96,8 @@ export function pluginCall(op: Operation, data: object = {}, attachment?: Attach
     const headers = attachment ? { 'content-type': 'application/octet-stream', 'content-length': attachment.size,
       'x-office-tool': attachment.name, 'x-office-options': attachment.options } : { 'content-type': 'application/json' };
     const req = request({ socketPath, path: '/' + op, method: 'POST', headers,
-      signal: AbortSignal.timeout(attachment ? 45_000 : 24_000) }, res => {
+      signal: AbortSignal.timeout(attachment ? 45_000 : op === 'worker/use' && 'name' in data && String(data.name).startsWith('canva.') ? 90_000 :
+        op === 'worker/list' || op === 'admin/finish' || op === 'admin/begin' || op === 'admin/tunnel' ? 55_000 : 24_000) }, res => {
       let size = 0;
       const chunks: Buffer[] = [];
       res.on('data', (chunk: Buffer) => {

@@ -63,12 +63,12 @@ for (const sse of [false,true]) test('HeyGen checks the session and tool list wi
   await assert.rejects(invoke('heygen.create_video',{},'fixture'),/Tool unavailable/);
 });
 
-test('Canva and LinkedIn expose only the connected account and LinkedIn accepts access without refresh',async t=>{
+test('LinkedIn exposes only the connected account and accepts access without refresh',async t=>{
   t.mock.method(globalThis,'fetch', async (url:URL|string,opts:RequestInit)=>{
     if(String(url)==='https://www.linkedin.com/oauth/v2/accessToken')return Response.json({access_token:'linked',expires_in:3600});
     assert.equal(new Headers(opts.headers).get('authorization'),'Bearer fixture');
     if(String(url)==='https://api.linkedin.com/v2/userinfo')return Response.json({sub:'id',name:'Marta',email:'not-returned@example.invalid'});
-    assert.equal(String(url),'https://api.canva.com/rest/v1/users/me/profile');return Response.json({profile:{display_name:'Canva QA'}});
+    throw Error('Unexpected provider request');
   });
   const {url}=begin('linkedin','client','https://office.example.org/api/plugins/callback/linkedin');
   assert.equal(new URL(url).searchParams.get('scope'),'openid profile');
@@ -76,6 +76,6 @@ test('Canva and LinkedIn expose only the connected account and LinkedIn accepts 
   assert.equal(token.refresh,undefined);
   assert.equal(await identity('linkedin','fixture'),'Marta');
   assert.deepEqual(await invoke('linkedin.profile',{},'fixture'),{id:'id',name:'Marta'});
-  assert.deepEqual(await invoke('canva.profile',{},'fixture'),{name:'Canva QA'});
+  await assert.rejects(invoke('canva.profile',{},'fixture'),/Tool unavailable/);
   assert.equal(operations.some((tool:{name:string})=>tool.name==='linkedin.publish'),false);
 });

@@ -181,7 +181,7 @@ test('Drive connects the selected user with PKCE, requires the initiating browse
   assert.equal((await call('worker/use', { name: 'drive.search' })).status, 409);
   assert.equal((await readFile(path.join(dir, 'accounts.json'), 'utf8')).includes('offline'), false);
   const tunnelLogin = { id, browser, origin: 'https://192.0.2.1' };
-  assert.equal((await call('admin/tunnel', { ...tunnelLogin, id: 'canva' })).status, 400);
+  assert.equal((await call('admin/tunnel', { ...tunnelLogin, id: 'linkedin' })).status, 400);
   assert.equal((await call('admin/tunnel', { ...tunnelLogin, origin: 'http://office.example.org' })).status, 400);
   const prepare = async () => {
     const r = await call('admin/tunnel', { ...tunnelLogin, redirect: 'http://other.invalid/', port: 22 });

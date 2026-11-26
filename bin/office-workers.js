@@ -47,7 +47,7 @@ export const EFFORTS = ['low', 'medium', 'high', 'xhigh', 'max'];
 /** How long the office may take to come back when it's restarting (a dev reload, an upgrade). */
 const RETRY_MS = 6000;
 /** Sending several workers home waits on git for each; hiring may fetch from GitHub first. */
-const TIMEOUT_MS = { list: 15_000, tell: 15_000, result: 5000, reply: 15_000, pr: 45_000, hire: 90_000, home: 300_000, repository: 30000, tools: 5000, use: 26_000 };
+const TIMEOUT_MS = { list: 15_000, tell: 15_000, result: 5000, reply: 15_000, pr: 45_000, hire: 90_000, home: 300_000, repository: 30000, tools: 60_000, use: 26_000 };
 /** Where each call goes, under /office/workers. */
 const PATHS = { list: '', hire: '', home: '/home', tell: '/tell', result: '/result', reply: '/reply', pr: '/pr', repository: '/repository', tools: '/tools', use: '/use' };
 
@@ -176,7 +176,8 @@ export function buildRequest(what, office, body) {
   url.searchParams.set('worker', office.worker);
   const headers = { authorization: `Bearer ${office.token}` };
   if (what === 'list') return { method: 'GET', url: url.href, headers, timeout: TIMEOUT_MS.list };
-  const timeout = what === 'use' && body?.arguments?.file ? 50_000 : TIMEOUT_MS[what];
+  const timeout = what === 'use' && typeof body?.name === 'string' && body.name.startsWith('canva.') ? 95_000 :
+    what === 'use' && body?.arguments?.file ? 50_000 : TIMEOUT_MS[what];
   return { method: 'POST', url: url.href, headers: { ...headers, 'content-type': 'application/json' }, body: JSON.stringify(body ?? {}), timeout };
 }
 
@@ -420,11 +421,14 @@ async function runTool(name, args, io) {
   }
   if (name === 'use_office_tool') {
     const result = await call('use', a, io);
+    if (typeof a.name === 'string' && a.name.startsWith('canva.') && Array.isArray(result?.content))
+      return { mcp: { content: result.content, ...(result.structuredContent ? { structuredContent: result.structuredContent } : {}),
+        ...(result.isError ? { isError: true } : {}) } };
     if (result?.image?.mimeType === 'image/jpeg' && typeof result.image.data === 'string') {
       const { image, ...detail } = result;
       return { text: JSON.stringify(detail), image };
     }
-    return { text: JSON.stringify(result) };
+    return { text: JSON.stringify(result), ...(result?.isError === true ? { isError: true } : {}) };
   }
   if (name === 'list_workers') {
     if (io.env.AGENT_OFFICE_HOOK_SOCKET && a.requestId) return awaitReply(a.requestId, io);
@@ -500,7 +504,8 @@ export async function handleMcp(msg, io) {
       const name = msg.params?.name;
       if (!tools.some((t) => t.name === name)) return { jsonrpc: '2.0', id: msg.id, error: { code: -32602, message: `Unknown tool: ${name}` } };
       try {
-        const { text, image, isError } = await runTool(name, msg.params?.arguments, io);
+        const { text, image, isError, mcp } = await runTool(name, msg.params?.arguments, io);
+        if (mcp) return ok(mcp);
         const content = [{ type: 'text', text }];
         if (image) content.push({ type: 'image', ...image });
         return ok({ content, ...(isError ? { isError: true } : {}) });

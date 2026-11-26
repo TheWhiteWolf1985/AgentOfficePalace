@@ -4,6 +4,7 @@ import { chmodSync, lstatSync, readdirSync, readFileSync, renameSync, unlinkSync
 import { accessGrant, begin, exchange, googleSecretIssue, identity, invoke, operations, Problem, providers, string } from './providers.mjs';
 import { openCallback, removeStaleCallbacks, tunnelProfile } from './auth-tunnel.mjs';
 import { heygenClient } from './heygen.mjs';
+import { canvaCall, canvaClient, canvaTools, resetCanva } from './canva.mjs';
 import { pdfTools, processPdf } from './pdf.mjs';
 
 process.umask(0o077);
@@ -56,16 +57,19 @@ async function withAccount(id, action) {
 function needsLogin(account) {
   return !!account && (account.reauth || (account.kind === 'oauth' && !account.refresh && account.expires <= Date.now()));
 }
+const legacyCanva = account => account && account.transport !== 'mcp';
+const available = (id, account) => account && !needsLogin(account) && !(id === 'canva' && legacyCanva(account));
 function snapshot(browser) {
   return {
     providers: [...providers].map(([id, p]) => {
       const account = state.accounts[id];
       const client = state.clients?.[id] ?? account;
-      const clientIssue = id === 'drive' && client?.clientId ? googleSecretIssue(client.secret, client.clientId) : undefined;
+      const clientIssue = id === 'drive' && client?.clientId ? googleSecretIssue(client.secret, client.clientId) :
+        id === 'canva' && legacyCanva(account) ? 'Reconnect Canva to use the MCP server.' : undefined;
       const flow = pending.get(id);
       const tunnel = flow?.tunnel && flow.browser === browser && flow.until > Date.now() && !flow.tunnel.received ? tunnelView(flow) : undefined;
       return { id, name: p.name, account: account?.label, tunnel, hasClient: !!client?.clientId, clientIssue,
-        status: needsLogin(account) ? 'reconnect' : account ? 'connected' : 'disconnected' };
+        status: account && !available(id, account) ? 'reconnect' : account ? 'connected' : 'disconnected' };
     }),
     skills: [...skills].map(([id, s]) => ({ id, name: s.name, description: s.description, enabled: state.skills[id] === true })),
   };
@@ -86,22 +90,24 @@ async function admin(op, b) {
     const old = state.accounts[id];
     if (op === 'disconnect') {
       forget(id);
+      if (id === 'canva') resetCanva();
       save(next => {
-        if (id === 'drive' && !next.clients?.drive && old?.kind === 'oauth') {
-          (next.clients ??= {}).drive = { clientId: old.clientId, secret: old.secret };
+        if (['drive', 'canva'].includes(id) && !next.clients?.[id] && old?.kind === 'oauth') {
+          (next.clients ??= {})[id] = { clientId: old.clientId, secret: old.secret };
         }
         delete next.accounts[id];
       });
       return snapshot();
     }
-    if (op === 'client' && id === 'drive') {
-      const saved = state.clients?.drive ?? old;
+    if (op === 'client' && ['drive', 'canva'].includes(id)) {
+      const saved = state.clients?.[id] ?? old;
       const clientId = string(b.clientId === '' || b.clientId === undefined ? saved?.clientId : b.clientId, 1024, 'OAuth client ID required.');
-      if (!/^[\w-]+\.apps\.googleusercontent\.com$/.test(clientId)) throw new Problem(400, 'Enter a Google web application client ID.');
+      if (id === 'drive' && !/^[\w-]+\.apps\.googleusercontent\.com$/.test(clientId)) throw new Problem(400, 'Enter a Google web application client ID.');
       const secret = string(b.secret, 2048, 'OAuth client secret required.');
-      const issue = googleSecretIssue(secret, clientId);
+      const issue = id === 'drive' ? googleSecretIssue(secret, clientId) :
+        /^https?:\/\//i.test(secret) || secret === clientId || /[*•●]{3,}/u.test(secret) ? 'Enter the Canva application client secret.' : undefined;
       if (issue) throw new Problem(400, issue);
-      save(next => { (next.clients ??= {}).drive = { clientId, secret }; });
+      save(next => { (next.clients ??= {})[id] = { clientId, secret }; });
       forget(id);
       return snapshot();
     }
@@ -116,12 +122,13 @@ async function admin(op, b) {
         kind: 'oauth', clientId: string(b.clientId || saved?.clientId, 1024, 'OAuth client ID required.'),
         secret: string(b.secret || ((!b.clientId || b.clientId === saved?.clientId) && saved?.secret), 2048, 'OAuth client secret required.'),
       };
+      if (id === 'canva') Object.assign(account, await canvaClient(account.clientId, account.secret));
       if (id === 'drive') {
         const issue = googleSecretIssue(account.secret, account.clientId);
         if (issue) throw new Problem(400, issue);
       }
       if (id === 'heygen') save(next => { (next.clients ??= {}).heygen = account; });
-      const flow = { ...begin(id, account.clientId, redirect, id === 'heygen' ? account : undefined), account, redirect, browser, until: Date.now() + 600_000 };
+      const flow = { ...begin(id, account.clientId, redirect, id === 'heygen' || id === 'canva' ? account : undefined), account, redirect, browser, until: Date.now() + 600_000 };
       forget(id);
       if (profile) flow.tunnel = await openCallback({ profile, directory: path.dirname(socket),
         hostDirectory: process.env.AOP_PLUGIN_HOST_SOCKET_DIR || path.dirname(socket), authorization: flow.url, state: flow.state, until: flow.until });
@@ -140,6 +147,7 @@ async function admin(op, b) {
       const token = await exchange(id, flow.account, { grant_type: 'authorization_code', code: string(code, 4096, 'Invalid code.'),
         redirect_uri: flow.redirect, code_verifier: flow.verifier });
       if (!token.refresh && (id === 'drive' || id === 'canva')) throw new Problem(400, 'Offline access was not granted. Reconnect this account.');
+      if (id === 'canva') resetCanva();
       const label = await identity(id, token.access);
       save(next => { next.accounts[id] = { ...flow.account, ...token, label }; });
       return { connected: true };
@@ -151,7 +159,7 @@ async function admin(op, b) {
 async function getAccess(id) {
   return withAccount(id, async () => {
     const account = state.accounts[id];
-    if (!account || needsLogin(account)) throw new Problem(409, 'The plugin is disconnected.');
+    if (!available(id, account)) throw new Problem(409, id === 'canva' && legacyCanva(account) ? 'Reconnect Canva to use the MCP server.' : 'The plugin is disconnected.');
     if (account.expires > Date.now() + 60_000 || (account.kind === 'oauth' && !account.refresh)) return account.access;
     try {
       const token = await exchange(id, account, accessGrant(account));
@@ -164,11 +172,23 @@ async function getAccess(id) {
   });
 }
 async function worker(op, b) {
-  if (op === 'list') return {
-    tools: operations.filter(tool => { const a = state.accounts[tool.name.split('.')[0]]; return a && !needsLogin(a); })
-      .concat(skills.has('pdf-ocr') && state.skills['pdf-ocr'] ? pdfTools : []),
-    skills: [...skills].filter(([id]) => state.skills[id]).map(([id, s]) => ({ name: 'skill.' + id, description: s.description })),
-  };
+  if (op === 'list') {
+    const tools = operations.filter(tool => available(tool.name.split('.')[0], state.accounts[tool.name.split('.')[0]]))
+      .concat(skills.has('pdf-ocr') && state.skills['pdf-ocr'] ? pdfTools : []);
+    const unavailable = [];
+    if (available('canva', state.accounts.canva)) {
+      let access;
+      try { access = await getAccess('canva'); tools.push(...await canvaTools(access)); }
+      catch (error) {
+        if (error.status === 401 && access) await withAccount('canva', () => {
+          if (state.accounts.canva?.access === access) save(next => { next.accounts.canva.expires = 0; });
+        });
+        unavailable.push({ provider: 'canva', error: error instanceof Problem ? error.message : 'Canva is temporarily unavailable.' });
+      }
+    }
+    return { tools, skills: [...skills].filter(([id]) => state.skills[id]).map(([id, s]) => ({ name: 'skill.' + id, description: s.description })),
+      ...(unavailable.length ? { unavailable } : {}) };
+  }
   if (op !== 'use') throw new Problem(404, 'Unknown operation.');
   const name = string(b.name, 128, 'Tool name required.');
   if (name.startsWith('skill.')) {
@@ -176,10 +196,10 @@ async function worker(op, b) {
     if (!skills.has(id) || !state.skills[id]) throw new Problem(404, 'Skill unavailable.');
     return { instructions: skills.get(id).text };
   }
-  if (!operations.some(tool => tool.name === name)) throw new Problem(404, 'Tool unavailable.');
+  if (!name.startsWith('canva.') && !operations.some(tool => tool.name === name)) throw new Problem(404, 'Tool unavailable.');
   const id = name.split('.')[0];
   const access = await getAccess(id);
-  try { return await invoke(name, b.arguments ?? {}, access); }
+  try { return name.startsWith('canva.') ? await canvaCall(name, b.arguments ?? {}, access) : await invoke(name, b.arguments ?? {}, access); }
   catch (error) {
     if (error.status === 401) await withAccount(id, () => {
       // Let the next call renew a rejected access token. A reconnect may already have replaced it.

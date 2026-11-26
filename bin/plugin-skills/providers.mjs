@@ -2,10 +2,10 @@ import { createHash, randomBytes, sign } from 'node:crypto';
 
 import { Problem, readLimited } from './provider-http.mjs';
 import { heygenStatus } from './heygen.mjs';
+import { canvaTools } from './canva.mjs';
 export { Problem };
 
 const driveApi = 'https://www.googleapis.com/drive/v3';
-const canvaApi = 'https://api.canva.com/rest/v1';
 export const providers = new Map([
   ['drive', {
     name: 'Google Drive', authorize: 'https://accounts.google.com/o/oauth2/v2/auth',
@@ -16,10 +16,7 @@ export const providers = new Map([
     name: 'LinkedIn', authorize: 'https://www.linkedin.com/oauth/v2/authorization',
     token: 'https://www.linkedin.com/oauth/v2/accessToken', scope: 'openid profile',
   }],
-  ['canva', {
-    name: 'Canva', authorize: 'https://www.canva.com/api/oauth/authorize',
-    token: canvaApi + '/oauth/token', scope: 'profile:read design:meta:read',
-  }],
+  ['canva', { name: 'Canva MCP' }],
 ]);
 
 export function string(value, max, label) {
@@ -67,7 +64,7 @@ export function begin(id, clientId, redirect, spec = providers.get(id)) {
     scope: spec.scope, state, code_challenge: createHash('sha256').update(verifier).digest('base64url'),
     code_challenge_method: 'S256' }).toString();
   if (!spec.scope) url.searchParams.delete('scope');
-  if (id === 'heygen') url.searchParams.set('resource', spec.resource);
+  if (id === 'heygen' || id === 'canva') url.searchParams.set('resource', spec.resource);
   if (id === 'drive') {
     url.searchParams.set('access_type', 'offline');
     url.searchParams.set('prompt', 'select_account consent');
@@ -80,14 +77,19 @@ export async function exchange(id, account, params) {
   const headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
   if (account.kind !== 'service') {
     if (id === 'heygen') { body.set('client_id', account.clientId); body.set('resource', account.resource); }
-    else if (id === 'canva') headers.Authorization = 'Basic ' + Buffer.from(account.clientId + ':' + account.secret).toString('base64');
+    else if (id === 'canva') {
+      headers.Authorization = 'Basic ' + Buffer.from(account.clientId + ':' + account.secret).toString('base64');
+      body.set('resource', account.resource);
+    }
     else { body.set('client_id', account.clientId); body.set('client_secret', account.secret); }
   }
   if (id === 'drive' && account.kind !== 'service') {
     const issue = googleSecretIssue(account.secret, account.clientId);
     if (issue) throw new Problem(400, issue);
   }
-  const result = await remote(id === 'heygen' ? account.token : providers.get(id).token, { method: 'POST', headers, body });
+  if (id === 'canva' && (account.transport !== 'mcp' || account.token !== 'https://api.canva.com/auth/v1/oauth/token' ||
+      account.resource !== 'https://api.canva.com/connect/v1/mcp')) throw new Problem(409, 'Reconnect Canva to use the MCP server.');
+  const result = await remote(id === 'heygen' || id === 'canva' ? account.token : providers.get(id).token, { method: 'POST', headers, body });
   if (!result.access_token || !Number.isFinite(result.expires_in)) throw new Problem(502, 'Invalid token response.');
   return { access: result.access_token, expires: Date.now() + result.expires_in * 1000, refresh: result.refresh_token || account.refresh };
 }
@@ -111,14 +113,14 @@ async function linkedInProfile(access) {
 }
 
 export async function identity(id, access) {
+  if (id === 'canva') { await canvaTools(access); return 'Canva MCP'; }
   if (id === 'heygen') return (await heygenStatus(access)).provider;
   if (id === 'linkedin') return (await linkedInProfile(access)).name;
   if (id === 'drive') {
     const data = await get(driveApi + '/about?fields=user(emailAddress,displayName)', access);
     return string(data.user?.emailAddress || data.user?.displayName, 320, 'Account identity unavailable.');
   }
-  const data = await get(canvaApi + '/users/me/profile', access);
-  return string(data.profile?.display_name, 320, 'Account identity unavailable.');
+  throw new Problem(400, 'Unknown plugin.');
 }
 
 // Operations are a closed catalogue. Neither URLs, credentials nor request headers come from agents.
@@ -127,31 +129,22 @@ export const operations = [
   { name: 'drive.read', description: 'Read one Google Doc or text/Markdown file up to 256 KiB. Required fileId (string).' },
   { name: 'heygen.status', description: 'Verify the shared HeyGen connection. No arguments. Does not generate a video.' },
   { name: 'linkedin.profile', description: 'Read the name and ID of the connected LinkedIn member. No arguments.' },
-  { name: 'canva.search', description: 'List or search designs by title. Optional query and pageToken (strings).' },
-  { name: 'canva.profile', description: 'Read the display name of the connected Canva account. No arguments.' },
-  { name: 'canva.get', description: 'Read design metadata and links. Required designId (string).' },
 ];
 export async function invoke(name, args, access) {
-  if (name === 'canva.profile') return { name: await identity('canva', access) };
   if (name === 'heygen.status') return heygenStatus(access);
   if (name === 'linkedin.profile') return linkedInProfile(access);
-  if (name === 'drive.search' || name === 'canva.search') {
-    const drive = name === 'drive.search';
-    const url = new URL(drive ? driveApi + '/files' : canvaApi + '/designs');
+  if (name === 'drive.search') {
+    const url = new URL(driveApi + '/files');
     const query = args.query === undefined ? '' : string(args.query, 256, 'Invalid query.');
-    if (drive) {
-      url.searchParams.set('fields', 'nextPageToken,files(id,name,mimeType,webViewLink)');
-      url.searchParams.set('pageSize', '40');
-      url.searchParams.set('q', query ? "trashed = false and name contains '" + query.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'" : 'trashed = false');
-    } else if (query) url.searchParams.set('query', query);
-    if (args.pageToken !== undefined) url.searchParams.set(drive ? 'pageToken' : 'continuation', string(args.pageToken, 4096, 'Invalid page token.'));
+    url.searchParams.set('fields', 'nextPageToken,files(id,name,mimeType,webViewLink)');
+    url.searchParams.set('pageSize', '40');
+    url.searchParams.set('q', query ? "trashed = false and name contains '" + query.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'" : 'trashed = false');
+    if (args.pageToken !== undefined) url.searchParams.set('pageToken', string(args.pageToken, 4096, 'Invalid page token.'));
     return get(url, access);
   }
-  if (name !== 'drive.read' && name !== 'canva.get') throw new Problem(404, 'Tool unavailable.');
-  const drive = name === 'drive.read';
-  const id = drive ? args.fileId : args.designId;
+  if (name !== 'drive.read') throw new Problem(404, 'Tool unavailable.');
+  const id = args.fileId;
   if (typeof id !== 'string' || !/^[\w-]{1,256}$/.test(id)) throw new Problem(400, 'Invalid item ID.');
-  if (!drive) return get(canvaApi + '/designs/' + id, access);
   const url = driveApi + '/files/' + id;
   const meta = await get(url + '?fields=name,mimeType', access);
   if (meta.mimeType === 'application/vnd.google-apps.document') return { name: meta.name, text: await get(url + '/export?mimeType=text%2Fplain', access, true) };
