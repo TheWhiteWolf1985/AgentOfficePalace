@@ -81,16 +81,22 @@ async function reconcile() {
 }
 let starting: Promise<void> | undefined;
 let lastAttempt = 0;
+let ready = false;
 export function startPluginService() {
   if (starting) return starting;
-  if (Date.now() - lastAttempt < 15_000) return Promise.resolve();
+  if (Date.now() - lastAttempt < 15_000) return ready ? Promise.resolve() : Promise.reject(new PluginError(503, unavailable));
   lastAttempt = Date.now();
-  starting = reconcile().finally(() => { starting = undefined; });
+  ready = false;
+  starting = reconcile().then(() => { ready = true; }, error => { ready = false; throw error; }).finally(() => { starting = undefined; });
   return starting;
 }
 
 type Attachment = { size: number; stream: ReadStream; name: string; options: string };
-export function pluginCall(op: Operation, data: object = {}, attachment?: Attachment): Promise<unknown> {
+export async function pluginCall(op: Operation, data: object = {}, attachment?: Attachment): Promise<unknown> {
+  // A live socket can still belong to the previous image during an update. Never use it before reconciliation.
+  const guarded = op === 'worker/list' || op === 'admin/policy' || op === 'admin/reconcile' ||
+    ('id' in data && data.id === 'canva') || (op === 'worker/use' && 'name' in data && String(data.name).startsWith('canva.'));
+  if (guarded && (!ready || starting)) await startPluginService();
   const socketPath = path.join(directory(), 'socket', 'plugins.sock');
   return new Promise((resolve, reject) => {
     const fail = () => reject(new PluginError(503, unavailable));
