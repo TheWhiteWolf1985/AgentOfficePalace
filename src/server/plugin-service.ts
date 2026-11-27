@@ -8,9 +8,9 @@ import { binScript } from './workers/process.js';
 
 const unavailable = 'Plugin & Skills service unavailable.';
 export class PluginError extends Error {
-  constructor(readonly status: number, message: string) { super(message); }
+  constructor(readonly status: number, message: string, readonly code?: string) { super(message); }
 }
-type Operation = 'admin/status' | 'admin/skill' | 'admin/client' | 'admin/begin' | 'admin/tunnel' | 'admin/cancel' | 'admin/finish' | 'admin/disconnect' | 'worker/list' | 'worker/use' | 'worker/file';
+type Operation = 'admin/status' | 'admin/skill' | 'admin/client' | 'admin/begin' | 'admin/tunnel' | 'admin/cancel' | 'admin/finish' | 'admin/disconnect' | 'admin/policy' | 'admin/reconcile' | 'worker/list' | 'worker/use' | 'worker/file';
 
 function directory() {
   const root = dockerRoot();
@@ -98,6 +98,7 @@ export function pluginCall(op: Operation, data: object = {}, attachment?: Attach
       'x-office-tool': attachment.name, 'x-office-options': attachment.options } : { 'content-type': 'application/json' };
     const req = request({ socketPath, path: '/' + op, method: 'POST', headers,
       signal: AbortSignal.timeout(attachment ? 45_000 : op === 'worker/use' && 'name' in data && String(data.name).startsWith('canva.') ? 90_000 :
+        op === 'admin/policy' || op === 'admin/reconcile' ? 90_000 :
         op === 'worker/list' || op === 'admin/finish' || op === 'admin/begin' || op === 'admin/tunnel' ? 55_000 : 24_000) }, res => {
       let size = 0;
       const chunks: Buffer[] = [];
@@ -111,7 +112,8 @@ export function pluginCall(op: Operation, data: object = {}, attachment?: Attach
         try {
           const value = JSON.parse(Buffer.concat(chunks).toString('utf8'));
           if (res.statusCode === 200) resolve(value);
-          else reject(new PluginError(res.statusCode ?? 502, value.error || unavailable));
+          else reject(new PluginError(res.statusCode ?? 502, value.error || unavailable,
+            typeof value.code === 'string' && /^canva_[a-z_]+$/.test(value.code) ? value.code : undefined));
         } catch { fail(); }
       });
     });

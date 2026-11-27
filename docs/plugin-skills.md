@@ -1,5 +1,7 @@
 # Plugin & Skills
 
+**Protezione Canva.** Dopo il collegamento, configurare nome e ID della cartella in **Canva → Cartella di scrittura Canva → Applica**. Senza una cartella verificata gli agenti hanno soltanto le letture classificate. I nuovi design possono essere creati nella destinazione predefinita: Office li sposta automaticamente nella cartella e ne verifica la presenza prima del successo. I materiali preesistenti esterni rimangono in sola lettura. Gli esiti incerti sono visibili nel pannello; non generano nuove copie o cancellazioni automatiche. Dettagli, operazioni abilitate e recupero: [policy Canva](canva-folder-policy.md).
+
 Apri **Impostazioni → Plugin & Skills** in Office 3D o Lite con un account amministrativo. Un collegamento vale per gli agenti di tutti i piani, compresi quelli creati in seguito. Gli agenti consultano il catalogo durante l’incarico. Il browser dell’amministratore può essere chiuso.
 
 | Collegamento | Operazioni disponibili nella prima versione |

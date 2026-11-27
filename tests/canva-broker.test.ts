@@ -45,9 +45,18 @@ test('Canva broker migration, shared MCP access, refresh, isolation and one-time
       const msg=JSON.parse(options.body);
       if(msg.method==='notifications/initialized')return new Response(null,{status:202});
       const tools=[{name:'search-designs',description:'Search',inputSchema:{type:'object',properties:{query:{type:'string'}}}},
-        {name:'generate-design',description:'Generate',inputSchema:{type:'object',properties:{prompt:{type:'string'}}}}];
+        {name:'generate-design',description:'Generate',inputSchema:{type:'object',properties:{prompt:{type:'string'}}}},
+        ...['search-folders','list-folder-items','move-item-to-folder','copy-design','create-design','get-create-design-async-job'].map(name=>({name,inputSchema:{type:'object',properties:{}}}))];
+      globalThis.fixtureCanvaMembers ??= new Set(['Dinside']);
+      const payload = msg.params?.name === 'search-folders' ? {folders:[{id:'Ftest',name:'AI_MARKETING'}]} :
+        msg.params?.name === 'list-folder-items' ? {items:[...globalThis.fixtureCanvaMembers].map(id=>({type:'design',design:{id}}))} :
+        msg.params?.name === 'copy-design' ? {design:{id:'Dnew'}} :
+        msg.params?.name === 'create-design' ? {job_id:'JOBasync',continuation_token:'fixture-continuation',status:'pending',polling_policy:{wait_seconds:1}} :
+        msg.params?.name === 'get-create-design-async-job' ? {job_id:'JOBasync',status:'completed',design:{id:'Dasync'}} : {operation:msg.params?.name};
+      if(msg.params?.name==='move-item-to-folder')globalThis.fixtureCanvaMembers.add(msg.params.arguments.item_id);
+      if(msg.method==='tools/call')appendFileSync(new URL('./calls.tools',import.meta.url),msg.params.name+'\\n');
       const result=msg.method==='initialize'?{protocolVersion:'2025-06-18',capabilities:{tools:{}}}:msg.method==='tools/list'?{tools}:
-        {content:[{type:'text',text:JSON.stringify({operation:msg.params.name})}],structuredContent:{operation:msg.params.name},isError:false};
+        {content:[{type:'text',text:JSON.stringify(payload)}],structuredContent:payload,isError:false};
       return Response.json({jsonrpc:'2.0',id:msg.id,result});
     };
   `);
@@ -96,19 +105,43 @@ test('Canva broker migration, shared MCP access, refresh, isolation and one-time
     assert.equal((await status()).status, 'connected');
     assert.equal((await status()).account, 'Canva MCP');
   });
-  await t.test('all workers discover schemas and can call creation tools; refresh is serialized', async () => {
+  await t.test('all workers discover reads while unconfigured and refresh remains serialized', async () => {
     const lists = await Promise.all([call('worker/list'), call('worker/list'), call('worker/list')]);
     for (const list of lists) {
       assert.equal(list.status, 200);
-      assert.equal(list.data.tools.find((t: any) => t.name === 'canva.generate-design').inputSchema.type, 'object');
+      assert.equal(list.data.tools.find((t: any) => t.name === 'canva.search-designs').inputSchema.type, 'object');
+      assert.equal(list.data.tools.some((t: any) => t.name === 'canva.generate-design'), false);
       assert.equal(list.data.tools.some((t: any) => t.name === 'canva.profile'), false);
     }
     const grants = (await readFile(path.join(dir, 'calls'), 'utf8')).trim().split('\n');
     assert.equal(grants.filter(g => g === 'refresh_token').length, 1);
-    const created = await call('worker/use', { name: 'canva.generate-design', arguments: { prompt: 'Fictitious demo' } });
-    assert.equal(created.status, 200); assert.equal(created.data.structuredContent.operation, 'generate-design');
-    assert.equal((await call('worker/use', { name: 'canva.arbitrary-method' })).status, 404);
+    const created = await call('worker/use', { name: 'canva.generate-design', arguments: { prompt: 'Fictitious demo' }, caller: {worker:'iris',floor:'marketing'} });
+    assert.equal(created.status, 409); assert.equal(created.data.code, 'canva_tool_not_allowed');
+    assert.equal((await call('worker/use', { name: 'canva.arbitrary-method', caller:{worker:'iris',floor:'marketing'} })).status, 409);
     assert.doesNotMatch(JSON.stringify(lists), /fixture-secret|mcp-fixture|refresh-fixture/);
+  });
+  await t.test('the real broker applies administrative policy and automatically finalizes creations', async () => {
+    const actor = {worker:'iris',floor:'marketing'};
+    assert.equal((await call('worker/use',{name:'canva.copy-design',arguments:{design_id:'Doutside'},caller:actor})).status,409);
+    assert.equal((await call('admin/policy',{folderId:'Ftest',folderName:'AI_MARKETING'})).status,200);
+    const result=await call('worker/use',{name:'canva.copy-design',arguments:{design_id:'Doutside'},caller:actor});
+    assert.equal(result.status,200);assert.equal(result.data.office_creation.status,'completed');
+    assert.equal((await call('worker/use',{name:'canva.move-item-to-folder',arguments:{item_id:'Doutside',to_folder_id:'Ftest'},caller:actor})).status,409);
+    assert.equal((await call('worker/use',{name:'canva.search-designs'})).status,409,'Caller identity cannot be omitted');
+    const log=await readFile(path.join(dir,'calls.tools'),'utf8');assert.equal(log.split('\n').filter(x=>x==='copy-design').length,1);
+    assert.equal(log.split('\n').filter(x=>x==='move-item-to-folder').length,1);
+    assert.equal((await status()).policy.folderId,'Ftest');
+  });
+  await t.test('the shared service completes asynchronous creation without another agent prompt', async () => {
+    const created=await call('worker/use',{name:'canva.create-design',arguments:{brief:'asynchronous fixture'},caller:{worker:'iris',floor:'marketing'}});
+    assert.equal(created.status,200);assert.equal(created.data.office_creation.status,'creating');
+    const deadline=Date.now()+15000;
+    while((await status()).policy.pending.length && Date.now()<deadline)await delay(100);
+    assert.equal((await status()).policy.pending.length,0);
+    const log=await readFile(path.join(dir,'calls.tools'),'utf8');
+    assert.equal(log.split('\n').filter(x=>x==='create-design').length,1);
+    assert.equal(log.split('\n').filter(x=>x==='get-create-design-async-job').length,1);
+    assert.equal(log.split('\n').filter(x=>x==='move-item-to-folder').length,2);
   });
   await t.test('a Canva outage leaves Drive and local skills usable and is reported explicitly', async () => {
     await writeFile(path.join(dir, 'fault'), 'offline');

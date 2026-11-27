@@ -44,6 +44,8 @@ export const pluginsRoute: Route = {
       let b;
       try { b = JSON.parse(await readBody(req, 32768)); } catch { return send(res, 400, { error: 'Invalid request.' }); }
       switch (b?.action) {
+        case 'canva-policy': return send(res, 200, await pluginCall('admin/policy', { folderId: b.folderId, folderName: b.folderName, browser }));
+        case 'canva-reconcile': return send(res, 200, await pluginCall('admin/reconcile', { operationId: b.operationId, browser }));
         case 'tunnel-account': {
           try { return send(res, 200, await tunnelAccount(), callbackHeaders); }
           catch { return send(res, 503, { error: 'The tunnel account is not configured. Update or repair this installation.' }, callbackHeaders); }
@@ -90,7 +92,8 @@ export const pluginsRoute: Route = {
         return;
       }
       return send(res, error instanceof PluginError ? error.status : 503,
-        { error: error instanceof PluginError ? error.message : 'Plugin & Skills service unavailable.' }, callbackHeaders);
+        { error: error instanceof PluginError ? error.message : 'Plugin & Skills service unavailable.',
+          ...(error instanceof PluginError && error.code ? { code: error.code } : {}) }, callbackHeaders);
     }
   },
 };

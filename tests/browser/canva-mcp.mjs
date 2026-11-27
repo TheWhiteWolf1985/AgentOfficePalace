@@ -23,11 +23,12 @@ async function open(t, origin, configured = false, status = 'disconnected') {
     const response = await route.fetch({ url: vite.resolvedUrls.local[0] + url.pathname.slice(1) + url.search });
     await route.fulfill({ response });
   });
-  const provider = { id: 'canva', name: 'Canva MCP', hasClient: configured, status };
+  const provider = { id: 'canva', name: 'Canva MCP', hasClient: configured, status, policy: { configured: false, folderId: '', folderName: '', pending: [] } };
   await page.route(origin + '/api/plugins', async route => {
     if (route.request().method() === 'POST') {
       const data = route.request().postDataJSON(); posts.push(data);
       if (data.action === 'canva-client') provider.hasClient = true;
+      else if (data.action === 'canva-policy') provider.policy = { configured: true, folderId: data.folderId, folderName: data.folderName, pending: [] };
       else if (data.action === 'tunnel-account') return route.fulfill({ json: {
         user: 'office-tunnel', password: 'synthetic-tunnel-password', fingerprint: 'SHA256:synthetic-host-fingerprint',
       } });
@@ -100,4 +101,17 @@ test('Canva disconnect retains the saved application configuration', async t => 
   await page.getByText('Disconnected', { exact: true }).waitFor();
   assert.deepEqual(posts, [{ action: 'disconnect', id: 'canva' }]);
   assert.ok(await page.getByRole('button', { name: 'Sign in with Canva' }).isEnabled());
+});
+
+test('the Canva folder is applied explicitly and new resources are explained in the UI', async t => {
+  const { page, posts, provider } = await open(t, 'https://office.example.org', true, 'connected');
+  await page.getByLabel('Canva folder ID', { exact: true }).fill('Ffixture');
+  assert.equal(posts.length, 0);
+  assert.ok(await page.getByText('Choose and verify a folder to enable Canva writes.', { exact: true }).isVisible());
+  await page.getByRole('button', { name: 'Apply', exact: true }).last().click();
+  await page.getByText('Settings applied', { exact: true }).waitFor();
+  assert.deepEqual(posts, [{ action: 'canva-policy', folderId: 'Ffixture', folderName: 'AI_MARKETING' }]);
+  assert.equal(provider.policy.configured, true);
+  await page.getByText('Canva write folder', { exact: true }).click();
+  assert.ok(await page.getByText('Canva folder protection is active for all agents.', { exact: true }).isVisible());
 });

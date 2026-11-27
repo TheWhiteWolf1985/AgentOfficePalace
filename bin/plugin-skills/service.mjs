@@ -6,6 +6,8 @@ import { openCallback, removeStaleCallbacks, startCallbackGateway, tunnelProfile
 import { heygenClient } from './heygen.mjs';
 import { canvaCall, canvaClient, canvaTools, resetCanva } from './canva.mjs';
 import { pdfTools, processPdf } from './pdf.mjs';
+import { randomUUID } from 'node:crypto';
+import { CanvaPolicy } from './canva-policy.mjs';
 
 process.umask(0o077);
 const data = path.join(process.env.AOP_PLUGIN_DATA_DIR || '/data', 'accounts.json');
@@ -24,6 +26,17 @@ function save(update) {
   renameSync(data + '.tmp', data);
   state = next;
 }
+
+// A refresh keeps this identity; a new consent gets a new identity even for the same display name.
+if (state.accounts.canva && !state.accounts.canva.connectionId) save(next => { next.accounts.canva.connectionId = randomUUID(); });
+const canvaPolicy = new CanvaPolicy({ directory: path.dirname(data), account: () => state.accounts.canva,
+  invoke: async (name, args, connection) => {
+    const access = await getAccess('canva');
+    if (connection && state.accounts.canva?.connectionId !== connection) throw Object.assign(new Problem(409, 'canva_connection_changed'), { code: 'canva_connection_changed' });
+    return canvaCall(name, args, access);
+  },
+  catalogue: async () => canvaTools(await getAccess('canva')) });
+const canvaTimer = setInterval(() => { void canvaPolicy.tick().catch(() => {}); }, 2000).unref();
 
 const skills = new Map();
 for (const entry of readdirSync(new URL('./skills/', import.meta.url), { withFileTypes: true })) {
@@ -69,6 +82,7 @@ function snapshot(browser) {
       const flow = pending.get(id);
       const tunnel = flow?.tunnel && flow.browser === browser && flow.until > Date.now() && !flow.tunnel.received ? tunnelView(flow) : undefined;
       return { id, name: p.name, account: account?.label, tunnel, hasClient: !!client?.clientId, clientIssue,
+        ...(id === 'canva' ? { policy: canvaPolicy.view() } : {}),
         status: account && !available(id, account) ? 'reconnect' : account ? 'connected' : 'disconnected' };
     }),
     skills: [...skills].map(([id, s]) => ({ id, name: s.name, description: s.description, enabled: state.skills[id] === true })),
@@ -79,6 +93,14 @@ function checkProvider(id) {
 }
 async function admin(op, b) {
   if (op === 'status') return snapshot(b.browser);
+  if (op === 'policy') {
+    await canvaPolicy.setPolicy(b.folderId, b.folderName);
+    return snapshot(b.browser);
+  }
+  if (op === 'reconcile') {
+    await canvaPolicy.reconcile(b.operationId);
+    return snapshot(b.browser);
+  }
   if (op === 'skill') {
     if (!skills.has(b.id) || typeof b.enabled !== 'boolean') throw new Problem(400, 'Unknown skill.');
     save(next => { next.skills[b.id] = b.enabled; });
@@ -149,7 +171,8 @@ async function admin(op, b) {
       if (!token.refresh && (id === 'drive' || id === 'canva')) throw new Problem(400, 'Offline access was not granted. Reconnect this account.');
       if (id === 'canva') resetCanva();
       const label = await identity(id, token.access);
-      save(next => { next.accounts[id] = { ...flow.account, ...token, label }; });
+      save(next => { next.accounts[id] = { ...flow.account, ...token, label,
+        ...(id === 'canva' ? { connectionId: randomUUID() } : {}) }; });
       return { connected: true };
     }
     throw new Problem(400, 'Unknown operation.');
@@ -178,7 +201,7 @@ async function worker(op, b) {
     const unavailable = [];
     if (available('canva', state.accounts.canva)) {
       let access;
-      try { access = await getAccess('canva'); tools.push(...await canvaTools(access)); }
+      try { access = await getAccess('canva'); tools.push(...await canvaPolicy.tools()); }
       catch (error) {
         if (error.status === 401 && access) await withAccount('canva', () => {
           if (state.accounts.canva?.access === access) save(next => { next.accounts.canva.expires = 0; });
@@ -199,7 +222,7 @@ async function worker(op, b) {
   if (!name.startsWith('canva.') && !operations.some(tool => tool.name === name)) throw new Problem(404, 'Tool unavailable.');
   const id = name.split('.')[0];
   const access = await getAccess(id);
-  try { return name.startsWith('canva.') ? await canvaCall(name, b.arguments ?? {}, access) : await invoke(name, b.arguments ?? {}, access); }
+  try { return name.startsWith('canva.') ? await canvaPolicy.call(name, b.arguments ?? {}, b.caller) : await invoke(name, b.arguments ?? {}, access); }
   catch (error) {
     if (error.status === 401) await withAccount(id, () => {
       // Let the next call renew a rejected access token. A reconnect may already have replaced it.
@@ -239,7 +262,7 @@ const server = http.createServer(async (req, res) => {
   } catch (error) {
     const expected = error instanceof Problem;
     res.writeHead(expected ? error.status : 500, { 'content-type': 'application/json' })
-      .end(JSON.stringify({ error: expected ? error.message : 'Plugin service error.' }));
+      .end(JSON.stringify({ error: expected ? error.message : 'Plugin service error.', ...(expected && error.code ? { code: error.code } : {}) }));
   }
 });
 server.requestTimeout = 30_000;

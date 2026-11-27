@@ -4,7 +4,9 @@ import { connectionButton as button, connectionField as field } from './connecti
 import { h } from './dom';
 
 type SignInTunnel = { url: string; command: string; until: number };
-type Provider = { id: 'drive' | 'canva' | 'linkedin' | 'heygen'; name: string; account?: string; hasClient: boolean; clientIssue?: string; tunnel?: SignInTunnel; status: 'connected' | 'disconnected' | 'reconnect' };
+type CanvaFolderPolicy = { configured: boolean; folderId: string; folderName: string; error?: string;
+  pending: { id: string; stage: string; reason?: string; currentAccount: boolean; outputIds: string[] }[] };
+type Provider = { id: 'drive' | 'canva' | 'linkedin' | 'heygen'; name: string; account?: string; hasClient: boolean; clientIssue?: string; tunnel?: SignInTunnel; policy?: CanvaFolderPolicy; status: 'connected' | 'disconnected' | 'reconnect' };
 type Catalogue = { providers: Provider[]; skills: { id: string; name: string; description: string; enabled: boolean }[] };
 const descriptions = {
   drive: 'Find files and read Google Docs or text documents.',
@@ -18,7 +20,7 @@ async function request<T>(input?: object): Promise<T> {
   const response = await fetch('/api/plugins', input ? { method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input), credentials: 'same-origin' } : { cache: 'no-store', credentials: 'same-origin' });
   const value = await response.json();
-  if (!response.ok) throw Error(remoteText(value.error || 'Plugin & Skills service unavailable.'));
+  if (!response.ok) throw Error(remoteText(value.code || value.error || 'Plugin & Skills service unavailable.'));
   return value;
 }
 
@@ -147,7 +149,25 @@ export function pluginsPanel() {
         await change({ action: 'canva-client', clientId: client.value.trim(), secret: secret.value });
         secret.value = '';
       })));
-    return h('div', {}, setup, sharedSignIn(p, p.hasClient));
+    return h('div', {}, setup, sharedSignIn(p, p.hasClient), p.status === 'connected' && canvaFolder(p));
+  }
+  function canvaFolder(p: Provider) {
+    const policy = p.policy;
+    const folderId = h('input', { value: policy?.folderId ?? '', autocomplete: 'off', maxlength: 180 });
+    const folderName = h('input', { value: policy?.folderName || 'AI_MARKETING', autocomplete: 'off', maxlength: 180 });
+    const form = h('details', { open: !policy?.configured }, h('summary', {}, t('Canva write folder')),
+      h('p.setting-note', {}, t('Existing designs outside this folder are read-only. New designs are created, moved here automatically and verified.')),
+      h('p.setting-note', {}, t(policy?.configured ? 'Canva folder protection is active for all agents.' : 'Choose and verify a folder to enable Canva writes.')),
+      field(t('Canva folder name'), folderName), field(t('Canva folder ID'), folderId),
+      button(t('Apply'), () => run(() => change({ action: 'canva-policy', folderId: folderId.value.trim(), folderName: folderName.value.trim() }))));
+    if (policy?.error) form.append(h('p.setting-note', { role: 'alert' }, remoteText(policy.error)));
+    for (const entry of policy?.pending ?? []) {
+      form.append(h('div.setting', {}, h('strong', {}, t('Pending Canva creation')), h('code', {}, entry.id),
+        h('p', {}, remoteText(entry.reason || entry.stage)),
+        entry.outputIds.length ? h('p', {}, entry.outputIds.join(', ')) : undefined,
+        entry.currentAccount && button(t('Check pending creation'), () => run(() => change({ action: 'canva-reconcile', operationId: entry.id })))));
+    }
+    return form;
   }
   function provider(p: Provider) {
     const panel = h('section.setting', {}, h('h4', {}, p.name),
