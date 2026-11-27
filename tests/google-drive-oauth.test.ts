@@ -192,7 +192,10 @@ test('Drive connects the selected user with PKCE, requires the initiating browse
     assert.equal(files.length, 1);
     const file = path.join(socketDir, files[0]!);
     assert.equal((await stat(file)).mode & 0o777, 0o600);
-    assert.ok(plan.command.includes('127.0.0.1:4600:' + file));
+    assert.ok(plan.command.includes('127.0.0.1:4600:127.0.0.1:4610'));
+    assert.ok(plan.command.includes("'office-tunnel'"));
+    assert.ok(plan.command.includes("'-N'"));
+    assert.doesNotMatch(plan.command, /Read-Host|test -S|seq 1|StrictHostKeyChecking=no/);
     async function forward(target: string, method = 'GET', host = local.host) {
       return new Promise<{ status: number; location?: string }>((resolve, reject) => {
         const req = http.request({ socketPath: file, method, path: target, headers: { host }, agent: false }, res => {

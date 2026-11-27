@@ -2,6 +2,7 @@ import { TLSSocket } from 'node:tls';
 import { googleDriveSignInOrigin } from '../../../shared/google-drive-oauth.js';
 import { italianPlugins } from '../../../shared/locales/it-plugins.js';
 import { PluginError, pluginCall, startPluginService } from '../../plugin-service.js';
+import { tunnelAccount } from '../../tunnel-account.js';
 import type { Route } from '../router.js';
 import { isSecure, sameOrigin, readBody, send } from '../util.js';
 
@@ -43,6 +44,10 @@ export const pluginsRoute: Route = {
       let b;
       try { b = JSON.parse(await readBody(req, 32768)); } catch { return send(res, 400, { error: 'Invalid request.' }); }
       switch (b?.action) {
+        case 'tunnel-account': {
+          try { return send(res, 200, await tunnelAccount(), callbackHeaders); }
+          catch { return send(res, 503, { error: 'The tunnel account is not configured. Update or repair this installation.' }, callbackHeaders); }
+        }
         case 'prepare-tunnel': {
           if (!['drive', 'heygen', 'canva'].includes(b.id) || googleDriveSignInOrigin(origin.origin) === origin.origin) break;
           const result = await pluginCall('admin/tunnel', { id: b.id, origin: origin.origin, browser });

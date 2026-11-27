@@ -32,6 +32,7 @@ class GraphicalUpdateTest(unittest.TestCase):
             (root / 'forgejo').mkdir()
             with patch.object(gui, 'ETC', root), patch.object(gui, 'UNIT', root), patch.object(gui.release, 'run') as run:
                 gui.install()
+                run.assert_any_call(gui.sys.executable, '-I', Path(gui.__file__).with_name('office-tunnel.py'))
                 provision = (gui.sys.executable, '-I', Path(gui.__file__).with_name('office-forgejo.py'), 'agent-admin', '127.0.0.1')
                 self.assertNotIn(provision, [c.args for c in run.call_args_list])
                 (root / 'forgejo/ready').touch()

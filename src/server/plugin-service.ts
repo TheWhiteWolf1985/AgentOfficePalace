@@ -53,7 +53,7 @@ async function reconcile() {
   if (!/^sha256:[a-f0-9]{64}$/.test(image)) throw Error('Invalid Plugin & Skills runtime image.');
   const owner = createHash('sha256').update(root).digest('hex').slice(0, 24);
   const name = 'aop-plugins-' + owner;
-  const version = createHash('sha256').update(image).update('2').digest('hex');
+  const version = createHash('sha256').update(image).update('3').digest('hex');
   const ownerLabel = 'io.agentoffice.plugins';
   const revisionLabel = 'io.agentoffice.plugins-revision';
   const cid = await docker(['ps', '-a', '--no-trunc', '--filter', 'name=^/' + name + '$', '--format', '{{.ID}}']);
@@ -74,6 +74,7 @@ async function reconcile() {
     '--memory', '512m', '--memory-swap', '512m', '--cpus', '1', '--pids-limit', '64',
     '--tmpfs', '/tmp:rw,noexec,nosuid,nodev,size=32m,mode=1777',
     '--log-driver', 'local', '--env', 'AOP_PLUGIN_HOST_SOCKET_DIR=' + path.join(root, 'socket'),
+    '--env', 'AOP_PLUGIN_CALLBACK_PORT=4610', '--publish', '127.0.0.1:4610:4610',
     '--mount', 'type=bind,src=' + path.join(root, 'data') + ',dst=/data',
     '--mount', 'type=bind,src=' + path.join(root, 'socket') + ',dst=/run/office',
     image]);

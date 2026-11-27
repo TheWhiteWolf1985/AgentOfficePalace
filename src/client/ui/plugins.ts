@@ -25,8 +25,19 @@ async function request<T>(input?: object): Promise<T> {
 export function pluginsPanel() {
   const message = h('p.setting-note', { role: 'status', 'aria-live': 'polite' });
   const body = h('div.connections');
+  const credentials = h('div');
+  const accountButton = button(t('Show tunnel credentials'), () => run(async () => {
+    const account = await request<{ user: string; password: string; fingerprint: string }>({ action: 'tunnel-account' });
+    if (closed) return;
+    const password = h('input', { readOnly: true, type: 'password', autocomplete: 'off', value: account.password });
+    credentials.replaceChildren(field(t('SSH user'), h('code', {}, account.user)), field(t('SSH password'), password),
+      button(t('Show password'), () => { password.type = password.type === 'password' ? 'text' : 'password'; }),
+      field(t('SSH host fingerprint'), h('code', {}, account.fingerprint)),
+      button(t('Hide credentials'), () => credentials.replaceChildren()));
+    message.textContent = '';
+  }));
   const refresh = button(t('Refresh'), () => load());
-  const element = h('section.connections', {}, refresh, message, body);
+  const element = h('section.connections', {}, refresh, accountButton, credentials, message, body);
   let closed = false, busy = false, waiting = false, generation = 0;
   let expiry: ReturnType<typeof setTimeout> | undefined;
   async function load() {
@@ -91,7 +102,7 @@ export function pluginsPanel() {
         const signIn = h('a.btn', { href: session.url, target: '_blank', rel: 'noopener noreferrer' }, loginLabel);
         signIn.addEventListener('click', () => { waiting = true; });
         controls.replaceChildren(
-          h('p', {}, t('Run this command in PowerShell on this computer. Enter your VM SSH username when prompted.')),
+          h('p', {}, t('Run this command in PowerShell on this computer. Use the dedicated office-tunnel password.')),
           command, button(t('Copy command'), async () => {
             try { await navigator.clipboard.writeText(session!.command); message.textContent = t('Command copied.'); }
             catch { command.focus(); command.select(); message.textContent = t('Press Ctrl+C to copy the command.'); }
@@ -178,5 +189,5 @@ export function pluginsPanel() {
   }
   const onFocus = () => { if (waiting && !closed && !busy) { waiting = false; void load(); } };
   window.addEventListener('focus', onFocus);
-  return { element, load, dispose() { closed = true; clearTimeout(expiry); window.removeEventListener('focus', onFocus); } };
+  return { element, load, dispose() { closed = true; credentials.replaceChildren(); clearTimeout(expiry); window.removeEventListener('focus', onFocus); } };
 }

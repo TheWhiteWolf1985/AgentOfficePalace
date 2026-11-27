@@ -2,7 +2,7 @@ import http from 'node:http';
 import path from 'node:path';
 import { chmodSync, lstatSync, readdirSync, readFileSync, renameSync, unlinkSync, writeFileSync } from 'node:fs';
 import { accessGrant, begin, exchange, googleSecretIssue, identity, invoke, operations, Problem, providers, string } from './providers.mjs';
-import { openCallback, removeStaleCallbacks, tunnelProfile } from './auth-tunnel.mjs';
+import { openCallback, removeStaleCallbacks, startCallbackGateway, tunnelProfile } from './auth-tunnel.mjs';
 import { heygenClient } from './heygen.mjs';
 import { canvaCall, canvaClient, canvaTools, resetCanva } from './canva.mjs';
 import { pdfTools, processPdf } from './pdf.mjs';
@@ -250,4 +250,5 @@ if (existing) {
   unlinkSync(socket);
 }
 removeStaleCallbacks(path.dirname(socket));
+if (process.env.AOP_PLUGIN_CALLBACK_PORT) await startCallbackGateway(Number(process.env.AOP_PLUGIN_CALLBACK_PORT), process.env.AOP_PLUGIN_CALLBACK_HOST || '0.0.0.0');
 server.listen(socket, () => chmodSync(socket, 0o600));

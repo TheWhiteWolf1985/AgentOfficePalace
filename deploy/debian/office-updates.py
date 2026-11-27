@@ -35,6 +35,7 @@ def install():
     # Older GUI updaters run this candidate-side hook before activating the new Office.
     if (ETC / 'forgejo/ready').is_file():
         release.run(sys.executable, '-I', Path(__file__).with_name('office-forgejo.py'), 'agent-admin', '127.0.0.1')
+    release.run(sys.executable, '-I', Path(__file__).with_name('office-tunnel.py'))
     secret = ETC / 'activity.env'
     if not secret.exists():
         release.atomic(secret, 'AOP_RELEASE_PROBE=' + secrets.token_hex(32) + '\n', 0o600)

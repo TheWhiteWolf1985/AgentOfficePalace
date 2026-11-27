@@ -24,7 +24,7 @@ node -p 'process.release.sourceUrl' > "$work/package/node-source-url"
 curl --fail --silent --show-error --location --proto '=https' "https://raw.githubusercontent.com/nodejs/node/$(node --version)/LICENSE" -o "$work/package/NODE-LICENSE"
 mkdir -p "$work/package/distribution"
 cp deploy/debian/agent-office-release.py "$work/package/distribution/"
-install -m644 deploy/debian/{office-updates.py,git-scratch.py} "$work/package/distribution/"
+install -m644 deploy/debian/{office-updates.py,git-scratch.py,office-tunnel.py} "$work/package/distribution/"
 install -m755 deploy/debian/agent-office-proxy.py "$work/package/distribution/agent-office-proxy.py"
 install -m644 deploy/debian/{office-forgejo.py,register-reader.mjs} "$work/package/distribution/"
 forgejo=forgejo-17.0.2-linux-amd64
